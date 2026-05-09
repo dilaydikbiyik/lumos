@@ -2,6 +2,7 @@ import httpx
 from fastapi import Request, HTTPException
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from jose import jwt, JWTError
+from typing import Optional
 
 from backend.config import settings
 
@@ -25,7 +26,7 @@ async def get_current_user(request: Request) -> str:
     Returns the Clerk user_id (sub claim) on success.
     Raises HTTP 401 on failure.
     """
-    credentials: HTTPAuthorizationCredentials | None = await _security(request)
+    credentials: Optional[HTTPAuthorizationCredentials] = await _security(request)
 
     if not credentials:
         raise HTTPException(status_code=401, detail="Missing authentication token")

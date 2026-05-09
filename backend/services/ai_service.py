@@ -1,11 +1,12 @@
 import anthropic
 from pathlib import Path
+from typing import Optional
 from backend.config import settings
 
 _client = anthropic.Anthropic(api_key=settings.ANTHROPIC_API_KEY)
 _SYSTEM_PROMPT = (Path(__file__).parent.parent / "prompts" / "system_prompt.txt").read_text()
 
-CLAUDE_MODEL = "claude-sonnet-4-5"
+CLAUDE_MODEL = "claude-sonnet-4-6"  # Anthropic API: Claude Sonnet 4.6 (released Feb 17, 2026)
 
 
 def chat(messages: list[dict]) -> str:
@@ -27,7 +28,7 @@ def chat(messages: list[dict]) -> str:
     return response.content[0].text
 
 
-def generate_text(prompt: str, system: str | None = None) -> str:
+def generate_text(prompt: str, system: Optional[str] = None) -> str:
     """
     One-shot text generation (used for explainer / REIT prompt calls).
 

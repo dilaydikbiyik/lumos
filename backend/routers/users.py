@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from pydantic import BaseModel
+from typing import Optional
 
 from backend.db.database import get_db
 from backend.middleware.verify_clerk import get_current_user
@@ -12,9 +13,9 @@ router = APIRouter()
 
 class UserRead(BaseModel):
     clerk_user_id: str
-    email: str | None
-    risk_score: float | None
-    budget: float | None
+    email: Optional[str]
+    risk_score: Optional[float]
+    budget: Optional[float]
 
     class Config:
         from_attributes = True

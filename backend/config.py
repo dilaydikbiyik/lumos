@@ -11,7 +11,7 @@ class Settings(BaseSettings):
     DATABASE_URL: str = "sqlite+aiosqlite:///./lumos.db"
 
     # Anthropic
-    ANTHROPIC_API_KEY: str
+    ANTHROPIC_API_KEY: str = ""   # set in .env before using AI features
 
     # Clerk
     CLERK_PUBLISHABLE_KEY: str = ""

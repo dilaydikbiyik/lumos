@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from typing import Optional
 
 from backend.db.database import get_db
 from backend.middleware.verify_clerk import get_current_user
@@ -42,7 +43,7 @@ async def save_profile(
     return profile
 
 
-@router.get("", response_model=RiskProfileResponse | None)
+@router.get("", response_model=Optional[RiskProfileResponse])
 async def get_profile(
     user_id: str = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),

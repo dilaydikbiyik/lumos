@@ -10,6 +10,7 @@ Supported asset classes:
 
 import pandas as pd
 import yfinance as yf
+from typing import Optional
 
 from backend.services import cache as cache_service
 
@@ -25,7 +26,7 @@ DEFAULT_TICKERS = [
 
 
 def fetch_price_history(
-    tickers: list[str] | None = None,
+    tickers: Optional[list] = None,
     period: str = "1y",
 ) -> dict[str, pd.Series]:
     """
@@ -62,7 +63,7 @@ def fetch_price_history(
     return result
 
 
-def fetch_current_price(ticker: str) -> float | None:
+def fetch_current_price(ticker: str) -> Optional[float]:
     """Return the latest closing price for a single ticker."""
     history = fetch_price_history([ticker], period="5d")
     series = history.get(ticker)
