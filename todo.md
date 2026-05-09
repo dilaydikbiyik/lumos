@@ -139,11 +139,11 @@ lumos/                          ← proje kökü
 
 ### Frontend
 
-- [ ] Vite ile React 18 projesi oluştur
-- [ ] React Router kurulumu ve base sayfa yapısını kur
-- [ ] `frontend/src/App.jsx` — ana uygulama bileşeni
+- [x] Vite ile React 18 projesi oluştur
+- [x] React Router kurulumu ve base sayfa yapısını kur
+- [x] `frontend/src/App.jsx` — ana uygulama bileşeni + ErrorBoundary + BottomNav
 - [x] `frontend/src/components/` — bileşen klasörü oluştur
-- [ ] `frontend/.env` — frontend ortam değişkenleri
+- [x] `frontend/.env.example` — frontend ortam değişkenleri şablonu
 
 ### Auth — Clerk Entegrasyonu 🆕
 
@@ -298,48 +298,65 @@ lumos/                          ← proje kökü
 ## Phase 4 — Frontend: Chatbot UI & Visualization
 
 **Süre:** Hafta 10–14  
-**Stack:** React 18, Tailwind CSS, Recharts, Axios, React Router
+**Stack:** React 18, Recharts, Axios, React Router, Clerk
+
+> 📱 **Strateji: Mobile-First Web → Capacitor**  
+> Tüm UI dikey/telefon uyumlu tasarlandı (100dvh, 48px touch targets, bottom nav, safe-area-inset).  
+> Phase 5 sonrası Capacitor ile native iOS/Android uygulamasına sarmalanabilir.
 
 ### UI — Chatbot Arayüzü
 
-- [ ] `frontend/src/components/ChatWindow.jsx`
-  - Mesaj balonları, typing animasyonu, chat geçmişi
-  - Backend `/chat` endpoint'ine bağlan
-- [ ] `frontend/src/components/MessageBubble.jsx` — kullanıcı/asistan mesaj balonu
-- [ ] `frontend/src/hooks/useChat.js` — chat state yönetimi custom hook'u
+- [x] `frontend/src/components/ChatWindow.jsx`
+  - Mesaj balonları, typing animasyonu, iOS momentum scroll
+  - `enterKeyHint="send"` — mobil klavye gönder butonu
+- [x] `frontend/src/components/MessageBubble.jsx` — kullanıcı/asistan mesaj balonu
+- [x] `frontend/src/hooks/useChat.js` — chat state + Clerk JWT ekleme
 
 ### UI — Risk Profili Ekranı
 
-- [ ] `frontend/src/pages/ProfilePage.jsx` — konuşma sonunda risk skoru göster
-- [ ] `frontend/src/components/RiskGauge.jsx` — görsel gauge chart (1-10 risk skoru)
+- [x] `frontend/src/pages/ProfilePage.jsx` — chat → skor reveal tek sütun akış
+- [x] `frontend/src/components/RiskGauge.jsx` — SVG yarı daire gauge (renk: yeşil→amber→kırmızı)
 
 ### Charts — Portföy Dağılım Grafiği
 
-- [ ] `frontend/src/components/PortfolioChart.jsx`
-  - Recharts pie chart: hisseler / REIT'ler / fonlar / altın / nakit
-  - Tıklanabilir dilimler
-- [ ] `frontend/src/components/AssetCard.jsx` — dilime tıklandığında açılan detay paneli
+- [x] `frontend/src/components/PortfolioChart.jsx`
+  - Recharts donut chart: hisseler / REIT / fonlar / altın / nakit
+  - Tıklanabilir dilimler → AssetCard açılır
+- [x] `frontend/src/components/AssetCard.jsx` — detay paneli
 
 ### Charts — Tarihsel Performans Grafiği
 
-- [ ] `frontend/src/components/PerformanceChart.jsx`
-  - 12 aylık çizgi grafiği, karşılaştırma modu
-  - Backend cache'inden veri çek
-- [ ] `frontend/src/pages/RecommendPage.jsx` — öneri sayfası (portföy + performans)
+- [x] `frontend/src/components/PerformanceChart.jsx`
+  - 12 aylık çizgi grafiği + karşılaştırma modu
+  - ⚠️ Mock data — Phase 5'te backend cache'e bağlanacak
+- [x] `frontend/src/pages/RecommendPage.jsx` — tek sütun: badge → pie → line → REIT → açıklama
 
 ### UX — Yasal Uyarı & Onboarding
 
-- [ ] `frontend/src/components/DisclaimerModal.jsx`
-  - İlk girişte "yalnızca eğitim amaçlı" modal — kullanıcı kabul etmeden devam edemez
-- [ ] `frontend/src/pages/OnboardingPage.jsx` — karşılama ve onboarding akışı
+- [x] `frontend/src/components/DisclaimerModal.jsx`
+  - Checkbox zorunlu — kabul etmeden devam yok
+- [x] `frontend/src/pages/OnboardingPage.jsx` — hero + 3 özellik kartı + CTA
 
 ### UX — Kaydedilmiş Portföy Dashboard'u
 
-- [ ] `frontend/src/pages/DashboardPage.jsx`
-  - Giriş yapmış kullanıcılar önceki portföylerini görür, düzenler, yeniden çalıştırır
-- [ ] `frontend/src/hooks/usePortfolio.js` — portföy veri yönetimi custom hook'u
+- [x] `frontend/src/pages/DashboardPage.jsx`
+  - Profil kartı + re-run / re-profile butonları + portföy snapshot
+- [x] `frontend/src/hooks/usePortfolio.js` — portföy + profil yönetimi
+
+### Mobile-First Ekstralar 📱
+
+- [x] `frontend/src/components/BottomNav.jsx` — sabit alt navigasyon (desktop'ta gizli)
+- [x] `frontend/src/index.css` — mobile-first design system (100dvh, touch targets, safe-area)
+- [x] `frontend/index.html` — PWA meta tagları (theme-color, apple-mobile-web-app)
+- [x] `frontend/src/utils/errorBoundary.jsx` — React Error Boundary
+- [x] `frontend/src/utils/api.js` — Axios istemcisi + Clerk JWT bağlama
 
 > 💡 Bu dashboard yalnızca Phase 1'deki Clerk Auth sayesinde mümkün. Auth önce gelir.
+
+> 🚀 **Capacitor (Opsiyonel — Phase 5 sonrası)**  
+> `npm install @capacitor/core @capacitor/cli @capacitor/ios @capacitor/android`  
+> `npx cap init && npx cap add ios && npx cap sync`  
+> Tek komutla native uygulama.
 
 ---
 
@@ -422,5 +439,5 @@ lumos/                          ← proje kökü
 | 2 | NLP Engine & Risk Profile | 3–5 | `[x]` Backend tamamlandı ✅ |
 | 3 | Market Data & Portfolio Engine | 5–8 | `[x]` Backend tamamlandı ✅ |
 | 3.5 | Real Estate / REIT Layer | 8–10 | `[x]` Backend tamamlandı ✅ |
-| 4 | Frontend — Chat UI & Visualization | 10–14 | `[ ]` |
+| 4 | Frontend — Mobile-First Chat UI | 10–14 | `[x]` Tamamlandı ✅ · Build başarılı |
 | 5 | Testing, Deploy & Portfolio | 14–18 | `[ ]` |

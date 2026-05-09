@@ -1,0 +1,253 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* ── Reset & Design Tokens ────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:           #0C0D14;
+  --bg-card:      #13141F;
+  --bg-input:     #1A1B28;
+  --border:       #2A2B3D;
+  --border-light: #343550;
+  --text:         #F0F0FF;
+  --text-muted:   #8B8CA8;
+  --text-dim:     #555670;
+  --accent:       #7C6FF7;
+  --accent-2:     #5B8EF0;
+  --accent-glow:  rgba(124,111,247,0.18);
+  --green:        #3DD68C;
+  --amber:        #F5A524;
+  --red:          #F5515F;
+
+  /* Mobile-first sizing */
+  --radius:       16px;
+  --radius-sm:    10px;
+  --touch-target: 48px;   /* minimum touch target */
+  --page-pad:     16px;
+  --shadow:       0 4px 32px rgba(0,0,0,0.55);
+  --font:         'Inter', system-ui, sans-serif;
+}
+
+html { font-size: 16px; }
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  min-height: 100dvh; /* dynamic viewport for mobile browsers */
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent; /* remove tap flash on mobile */
+}
+
+/* ── Mobile-First Layout ─────────────────────────────────────────────────── */
+.page {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+}
+
+.page-content {
+  flex: 1;
+  padding: var(--page-pad);
+  padding-bottom: calc(var(--page-pad) + 72px); /* space for bottom nav */
+  max-width: 600px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* Wider on tablets/desktop */
+@media (min-width: 768px) {
+  :root { --page-pad: 24px; }
+  .page-content { padding-bottom: var(--page-pad); }
+}
+
+@media (min-width: 1024px) {
+  .page-content { max-width: 900px; }
+}
+
+/* ── Top Navbar ──────────────────────────────────────────────────────────── */
+.navbar {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(12,13,20,0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 14px var(--page-pad);
+  display: flex; align-items: center; justify-content: space-between;
+}
+
+/* ── Bottom Nav (mobile) ─────────────────────────────────────────────────── */
+.bottom-nav {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: rgba(19,20,31,0.95);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid var(--border);
+  display: flex; justify-content: space-around; align-items: center;
+  padding: 8px 0; padding-bottom: max(8px, env(safe-area-inset-bottom));
+  z-index: 100;
+}
+.bottom-nav-item {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  padding: 6px 16px; cursor: pointer; border: none; background: none;
+  color: var(--text-dim); font-family: var(--font);
+  transition: color 0.15s;
+}
+.bottom-nav-item.active { color: var(--accent); }
+.bottom-nav-item span { font-size: 11px; font-weight: 500; }
+
+/* Hide bottom nav on desktop, show top nav links instead */
+@media (min-width: 768px) {
+  .bottom-nav { display: none; }
+  .page-content { padding-bottom: var(--page-pad); }
+}
+
+/* ── Card ────────────────────────────────────────────────────────────────── */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  box-shadow: var(--shadow);
+}
+
+/* ── Typography ──────────────────────────────────────────────────────────── */
+h1 { font-size: clamp(1.6rem, 5vw, 2.4rem); font-weight: 700; letter-spacing: -0.5px; line-height: 1.2; }
+h2 { font-size: clamp(1.15rem, 3.5vw, 1.4rem); font-weight: 600; }
+h3 { font-size: 1rem; font-weight: 600; }
+p  { line-height: 1.65; color: var(--text-muted); }
+
+.gradient-text {
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Buttons ─────────────────────────────────────────────────────────────── */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: var(--touch-target);
+  padding: 0 22px;
+  border-radius: var(--radius-sm);
+  font-size: 15px; font-weight: 500; cursor: pointer;
+  border: none; transition: all 0.18s ease;
+  font-family: var(--font);
+  -webkit-tap-highlight-color: transparent;
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: #fff;
+}
+.btn-primary:hover { filter: brightness(1.1); }
+.btn-primary:active { transform: scale(0.97); }
+.btn-ghost {
+  background: transparent;
+  border: 1px solid var(--border-light);
+  color: var(--text-muted);
+}
+.btn-ghost:hover { background: var(--bg-input); color: var(--text); }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; filter: none; }
+
+.btn-full { width: 100%; }
+
+/* ── Input ───────────────────────────────────────────────────────────────── */
+.input {
+  width: 100%;
+  min-height: var(--touch-target);
+  padding: 0 16px;
+  background: var(--bg-input); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); color: var(--text);
+  font-size: 16px; /* 16px prevents iOS zoom on focus */
+  font-family: var(--font);
+  transition: border-color 0.15s;
+  outline: none;
+}
+.input:focus { border-color: var(--accent); }
+.input::placeholder { color: var(--text-dim); }
+
+/* ── Badge ───────────────────────────────────────────────────────────────── */
+.badge {
+  display: inline-block; padding: 3px 10px; border-radius: 20px;
+  font-size: 11px; font-weight: 500;
+}
+.badge-accent { background: var(--accent-glow); color: var(--accent); border: 1px solid var(--accent); }
+.badge-green  { background: rgba(61,214,140,0.12); color: var(--green); border: 1px solid var(--green); }
+.badge-amber  { background: rgba(245,165,36,0.12); color: var(--amber); border: 1px solid var(--amber); }
+
+/* ── Divider ─────────────────────────────────────────────────────────────── */
+.divider { height: 1px; background: var(--border); margin: 20px 0; }
+
+/* ── Spinner ─────────────────────────────────────────────────────────────── */
+@keyframes spin { to { transform: rotate(360deg); } }
+.spinner {
+  width: 22px; height: 22px; border-radius: 50%;
+  border: 2px solid var(--border-light);
+  border-top-color: var(--accent);
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+/* ── Chat bubbles ────────────────────────────────────────────────────────── */
+.bubble-user {
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: #fff; border-radius: 18px 18px 4px 18px;
+  padding: 12px 16px; max-width: 82%; align-self: flex-end;
+  font-size: 15px; line-height: 1.55;
+}
+.bubble-assistant {
+  background: var(--bg-card); border: 1px solid var(--border);
+  color: var(--text); border-radius: 18px 18px 18px 4px;
+  padding: 12px 16px; max-width: 88%; align-self: flex-start;
+  font-size: 15px; line-height: 1.55;
+}
+
+/* ── Typing indicator ────────────────────────────────────────────────────── */
+@keyframes blink { 0%,80%,100%{opacity:0} 40%{opacity:1} }
+.typing-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--text-muted); display: inline-block; margin: 0 2px;
+}
+.typing-dot:nth-child(1) { animation: blink 1.2s infinite 0s; }
+.typing-dot:nth-child(2) { animation: blink 1.2s infinite 0.2s; }
+.typing-dot:nth-child(3) { animation: blink 1.2s infinite 0.4s; }
+
+/* ── Disclaimer box ──────────────────────────────────────────────────────── */
+.disclaimer {
+  background: rgba(245,165,36,0.08);
+  border: 1px solid rgba(245,165,36,0.3);
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+  font-size: 13px;
+  color: var(--amber);
+  line-height: 1.65;
+}
+
+/* ── Grid helpers ────────────────────────────────────────────────────────── */
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+@media (min-width: 640px) {
+  .grid-2 { grid-template-columns: 1fr 1fr; }
+}
+
+.grid-3 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+@media (min-width: 480px) {
+  .grid-3 { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* ── Scrollbar ───────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 2px; }
+
+/* ── Safe area for notched phones ────────────────────────────────────────── */
+.safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
