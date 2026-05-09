@@ -1,0 +1,6 @@
+[
+  { "ticker": "XU100.IS", "name": "BIST 100 (Türkiye Hisseleri)", "category": "stocks" },
+  { "ticker": "SPY",      "name": "S&P 500 ETF",                   "category": "stocks" },
+  { "ticker": "QQQ",      "name": "Nasdaq 100 ETF",                 "category": "stocks" },
+  { "ticker": "GLD",      "name": "Gold ETF",                       "category": "gold"   }
+]
