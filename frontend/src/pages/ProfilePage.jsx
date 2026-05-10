@@ -28,7 +28,7 @@ export default function ProfilePage() {
           <>
             <div style={{ marginBottom: 16 }}>
               <h2>Risk Profiling</h2>
-              <p style={{ fontSize: 13, marginTop: 4 }}>Answer 5 questions to get your personalised portfolio</p>
+              <p style={{ fontSize: 13, marginTop: 4 }}>Answer 7 questions to get your personalised portfolio</p>
             </div>
             <ChatWindow onProfileComplete={handleProfileComplete} />
           </>
