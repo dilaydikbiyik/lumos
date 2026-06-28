@@ -417,6 +417,65 @@ lumos/                          ← proje kökü
 
 ---
 
+## Phase 6 — Teknik Borç & Production Sağlamlaştırma 🆕
+
+**Süre:** Phase 5 sonrası  
+**Kaynak:** Proje analizi raporu (2026-06-16)
+
+### Test Kapsamı
+
+- [ ] `backend/tests/test_chat.py` → chat router integration testi (Claude mock'lanmış)
+- [ ] `backend/tests/test_recommend.py` → portfolio_engine + recommend endpoint testi
+- [ ] `backend/tests/test_profile.py` → profile router testi
+- [ ] AI servis testleri için Claude API mock fixture'ı (`conftest.py`)
+- [ ] `tests/e2e/` içeriğini doldur (şu an boş/iskelet)
+
+### CI/CD
+
+- [ ] `.github/workflows/ci.yml` → push/PR'da pytest + ruff/black (backend)
+- [ ] Aynı workflow'a eslint + vitest (frontend) adımı ekle
+- [ ] Branch protection: CI geçmeden main'e merge engellensin
+
+### Veritabanı
+
+- [ ] `alembic init` çalıştır, mevcut şemayı baseline migration olarak commit et
+- [ ] `create_all` yerine migration akışına geçiş planı
+
+### Deployment
+
+- [ ] `Dockerfile` (backend) — Phase 5'te planlı, henüz yok
+- [ ] Local docker-compose ile backend+db'yi ayağa kaldırma testi
+
+### Veri Sağlayıcı Riski
+
+- [ ] yfinance rate-limit / kırılma senaryolarına fallback ekle
+- [ ] TEFAS resmi API'sine kademeli geçiş değerlendirmesi
+- [ ] Cache TTL stratejisini (cache.py) veri tazeliği ihtiyacına göre gözden geçir
+
+### AI Servis Gözlemlenebilirliği
+
+- [ ] Claude çağrıları için structured logging (latency, token sayımı, hata)
+- [ ] Prompt versiyonlama (system_prompt.txt, reit_explain_prompt.txt değişiklik takibi)
+- [ ] Anthropic SDK güncelle (0.39.0 → güncel) — prompt caching ile maliyet düşür
+
+### Güvenlik & Compliance
+
+- [ ] `slowapi` ile AI endpoint'lerine rate limiting ekle (chat, recommend)
+- [ ] Prompt injection koruması: kullanıcı girdisini system prompt'tan ayrıştır
+- [ ] Claude tool-use / structured output ile risk skoru + portföy çıktısını JSON-mode yerine yapılandır
+
+### AI Danışman Kalitesi 🆕
+
+- [x] `system_prompt.txt`'i derinleştir: MPT/risk-getiri çerçevesine açık referans, karşı soru sorma davranışı, yasal/etik sınırların net ifadesi
+- [x] Few-shot örnek diyaloglar ekle (1 örnek embedded) — danışman tonunu örnekten öğret
+- [x] `reit_explain_prompt.txt`'i derinleştir: 3 cümle yapısı, profil-spesifik ton, dürüst risk uyarısı, MPT bağlamı
+- [ ] RAG: `market_data.py` / `tefas_service.py`'den çekilen gerçek zamanlı veriyi chat akışına context olarak inject et (şu an sadece `explainer.py`'de kısmen var)
+- [ ] Tool-use mimarisi: `get_market_data(ticker)`, `calculate_volatility(asset)`, `get_risk_score(profile)` tool tanımları — Claude veriyi kendi üretmek yerine servislerden çeksin
+- [ ] Kullanıcı geri bildirim döngüsü: portföy önerisi kabul/red oranını ve soru pattern'lerini logla
+- [ ] Prompt versiyonlarını A/B test et, Anthropic Console Prompt Improver ile mevcut prompt'u güçlendir
+
+---
+
 ## 🔑 Kritik Hatırlatmalar
 
 | # | Kural |
@@ -441,3 +500,4 @@ lumos/                          ← proje kökü
 | 3.5 | Real Estate / REIT Layer | 8–10 | `[x]` Backend tamamlandı ✅ |
 | 4 | Frontend — Mobile-First Chat UI | 10–14 | `[x]` Tamamlandı ✅ · Build başarılı |
 | 5 | Testing, Deploy & Portfolio | 14–18 | `[ ]` |
+| 6 | Teknik Borç & Production Sağlamlaştırma | 18+ | `[ ]` |
