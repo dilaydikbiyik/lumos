@@ -1,8 +1,9 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
 from backend.db.database import get_db
+from backend.limiter import limiter
 from backend.middleware.verify_clerk import get_current_user
 from backend.models.portfolio import PortfolioRecommendRequest, PortfolioRecommendResponse
 from backend.models.user import User
@@ -13,7 +14,9 @@ router = APIRouter()
 
 
 @router.post("", response_model=PortfolioRecommendResponse)
+@limiter.limit("10/minute")
 async def recommend(
+    request: Request,
     body: PortfolioRecommendRequest,
     user_id: str = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),

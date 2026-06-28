@@ -1,18 +1,15 @@
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
-from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
-from slowapi.util import get_remote_address
 
 from backend.config import settings
 from backend.db.database import create_tables
+from backend.limiter import limiter
 from backend.middleware.error_handler import register_error_handlers
 from backend.routers import chat, health, profile, recommend, users
-
-limiter = Limiter(key_func=get_remote_address)
 
 
 @asynccontextmanager
