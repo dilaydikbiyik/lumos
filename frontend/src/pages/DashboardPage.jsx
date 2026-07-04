@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { UserButton } from '@clerk/clerk-react'
 import PortfolioChart from '../components/PortfolioChart'
+import NewsDigest from '../components/NewsDigest'
 import usePortfolio from '../hooks/usePortfolio'
 
 export default function DashboardPage() {
@@ -31,6 +32,8 @@ export default function DashboardPage() {
 
       <div className="page-content" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
         <h2>Dashboard</h2>
+
+        <NewsDigest />
 
         {!profile ? (
           <div className="card" style={{ textAlign: 'center', padding: 40 }}>

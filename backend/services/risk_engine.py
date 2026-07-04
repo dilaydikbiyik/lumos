@@ -16,7 +16,7 @@ Scoring logic:
 Budget is NOT included in the formula (it affects portfolio size, not risk tolerance).
 """
 
-from backend.models.user_profile import RiskProfileAnswers, RiskProfileResponse
+from backend.schemas.user_profile import RiskProfileAnswers, RiskProfileResponse
 
 _TIME_HORIZON_SCORES = {"short": 2, "medium": 5, "long": 9}
 _LOSS_TOLERANCE_SCORES = {"low": 2, "medium": 5, "high": 9}

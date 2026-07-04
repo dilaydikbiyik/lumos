@@ -40,7 +40,7 @@ export default function OnboardingPage() {
             <button
               className="btn btn-primary btn-full"
               style={{ maxWidth: 320, margin: '0 auto', fontSize: 16 }}
-              onClick={() => navigate('/profile')}
+              onClick={() => navigate('/path')}
             >
               Continue to Chat →
             </button>

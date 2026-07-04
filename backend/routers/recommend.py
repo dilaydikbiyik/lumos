@@ -1,12 +1,11 @@
 from fastapi import APIRouter, Depends, Request
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
 
 from backend.db.database import get_db
 from backend.limiter import limiter
 from backend.middleware.verify_clerk import get_current_user
-from backend.models.portfolio import PortfolioRecommendRequest, PortfolioRecommendResponse
-from backend.models.user import User
+from backend.repositories import user_repository
+from backend.schemas.portfolio import PortfolioRecommendRequest, PortfolioRecommendResponse
 from backend.services.portfolio_engine import build_portfolio
 from backend.services.explainer import explain_portfolio, explain_reit_inclusion
 
@@ -27,8 +26,7 @@ async def recommend(
     portfolio = build_portfolio(risk_score=body.risk_score, budget=body.budget)
 
     # Fetch user profile for personalised explanation
-    result = await db.execute(select(User).where(User.clerk_user_id == user_id))
-    user = result.scalar_one_or_none()
+    user = await user_repository.get_by_clerk_id(db, user_id)
     user_profile = {}
     if user:
         user_profile = {

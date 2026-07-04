@@ -4,7 +4,7 @@ Recommend router integration tests — portfolio engine and AI explainer mocked
 """
 from unittest.mock import patch
 
-from backend.models.portfolio import AssetAllocation, PortfolioRecommendResponse
+from backend.schemas.portfolio import AssetAllocation, PortfolioRecommendResponse
 
 FAKE_PORTFOLIO = PortfolioRecommendResponse(
     risk_score=6.0,

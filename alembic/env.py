@@ -21,6 +21,7 @@ if config.config_file_name is not None:
 from backend.config import settings  # noqa: E402
 from backend.db.database import Base  # noqa: E402
 import backend.models.user  # noqa: F401, E402
+import backend.models.holding  # noqa: F401, E402
 
 target_metadata = Base.metadata
 

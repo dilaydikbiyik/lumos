@@ -4,6 +4,7 @@ import { UserButton } from '@clerk/clerk-react'
 import PortfolioChart from '../components/PortfolioChart'
 import PerformanceChart from '../components/PerformanceChart'
 import ReitCard from '../components/ReitCard'
+import TimeMachine from '../components/TimeMachine'
 import usePortfolio from '../hooks/usePortfolio'
 
 export default function RecommendPage() {
@@ -59,6 +60,9 @@ export default function RecommendPage() {
         {/* Charts — stack on mobile, side-by-side on tablet+ */}
         <PortfolioChart allocations={portfolio.allocations} onSliceClick={setSelectedTicker} />
         <PerformanceChart tickers={portfolio.allocations?.map(a => a.ticker)} selected={selectedTicker} />
+
+        {/* Zaman Makinesi — honest historical simulation */}
+        <TimeMachine allocations={portfolio.allocations} budget={portfolio.budget} />
 
         {/* REIT card */}
         {portfolio.includes_reits && <ReitCard explanation={portfolio.metadata?.reit_explanation} />}

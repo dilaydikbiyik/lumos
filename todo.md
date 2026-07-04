@@ -476,7 +476,7 @@ lumos/                          ← proje kökü
 ### Güvenlik & Compliance
 
 - [x] `slowapi` ile AI endpoint'lerine rate limiting ekle (chat, recommend)
-- [ ] Prompt injection koruması: kullanıcı girdisini system prompt'tan ayrıştır
+- [x] Prompt injection koruması: rol/uzunluk validasyonu (Literal rol, 4000 char, 80 mesaj) + system prompt'a SECURITY RULES bloğu (marker sahteciliği, prompt sızdırma, rol değiştirme reddi)
 - [/] Structured output: risk profili çıkarımı yapılandırıldı (`/chat/extract-profile` + JSON extraction prompt'u) — portföy çıktısı tool-use'a geçirilecek
 
 ### AI Danışman Kalitesi 🆕
@@ -514,12 +514,12 @@ lumos/                          ← proje kökü
 
 ### Kişisel Yatırım Takibi 💰 (abi fikri)
 
-- [ ] `backend/models/holding.py` — kullanıcı varlık modeli: tip (hisse/fon/arsa/altın/nakit/araç...), ad, alış tarihi, alış tutarı, adet/miktar, serbest not
+- [x] `backend/models/holding.py` — kullanıcı varlık modeli (10 tip: hisse/fon/etf/konut/arsa/araç/altın/kripto/nakit/diğer) + Alembic migration
 - [ ] Araç varlık tipi — dürüst çerçeveyle: net servet resminde yer alır AMA amortisman hesabıyla gösterilir (yıllık değer kaybı + kasko/MTV/bakım maliyeti); "Araban serveti mi, gideri mi?" eğitim kartı eşlik eder — AI asla araç almayı yatırım olarak ÖNERMEZ
-- [ ] `backend/routers/holdings.py` — CRUD endpoint'leri: varlık ekle/güncelle/sil/listele
-- [ ] Bütçe takibi: kullanıcı toplam yatırım bütçesini girer → her yatırım sonrası "kalan bütçe" otomatik hesaplanır
-- [ ] Borsa dışı varlıklar (arsa, gayrimenkul) için manuel değerleme alanı; borsa varlıkları için yfinance'ten güncel fiyatla otomatik değerleme
-- [ ] `frontend/src/pages/PortfolioPage.jsx` — "Varlıklarım" sayfası: toplam değer, kalan bütçe, varlık listesi, dağılım grafiği
+- [x] `backend/routers/holdings.py` — CRUD + borsa varlığına ticker zorunluluğu (7 test)
+- [x] Bütçe takibi: `/holdings/summary` — toplam yatırılan, güncel değer, kalan bütçe, tip bazlı dağılım
+- [/] Borsa dışı varlıklar için manuel değerleme alanı ✅; borsa varlıklarının yfinance canlı değerlemesi sonraki adım
+- [x] `frontend/src/pages/HoldingsPage.jsx` — "Varlıklarım": toplam değer + kalan bütçe + Fener skoru + liste + ekleme formu (BottomNav'a eklendi)
 - [ ] Dashboard'a özet kart: toplam varlık değeri + kalan bütçe + günlük değişim
 - [ ] Gerçek portföy vs önerilen portföy karşılaştırması ("hedef dağılımından sapma" göstergesi)
 
@@ -527,8 +527,8 @@ lumos/                          ← proje kökü
 
 > Sıralama önerisi: repository/schema refactor → error handling → RBAC → Python 3.12
 
-- [ ] `backend/repositories/` katmanı: tüm SQLAlchemy sorgularını router'lardan buraya taşı (`user_repository.py` ile başla — recommend.py'deki inline select buraya)
-- [ ] `backend/schemas/` klasörü: Pydantic request/response şemalarını `models/`'tan ayır; `models/` sadece ORM
+- [x] `backend/repositories/` katmanı: user_repository + holding_repository; router'larda inline SQL kalmadı
+- [x] `backend/schemas/` klasörü: user_profile/portfolio/risk_score/holding şemaları taşındı; `models/` sadece ORM (user, holding)
 - [/] Domain exception sınıfları: `MarketDataError` + `AIServiceError` eklendi (`backend/exceptions.py`), error_handler'da 503'e map'leniyor — `QuotaExceededError` kota özelliğiyle gelecek
 - [ ] Standart hata yanıt şeması: `{"error": {"code", "message", "request_id"}}` — tüm hata yolları aynı formatı dönsün
 - [ ] `X-Request-ID` middleware: her isteğe correlation ID, log satırlarına ve hata yanıtlarına ekle
@@ -544,21 +544,21 @@ lumos/                          ← proje kökü
 > Kademe 1: mobile-first web ✅ (Phase 4'te yapıldı) → Kademe 2: tam PWA (MVP ile) → Kademe 3: Capacitor native (MVP sonrası, bütçe olunca)
 > React Native/Flutter'a geçiş YOK — mevcut React kod tabanı korunur.
 
-- [ ] PWA'yı tamamla: service worker + manifest.json + temel offline ekranı ("Ana ekrana ekle" ile native his, store'suz, $0)
+- [x] PWA tamamlandı: manifest.webmanifest + sw.js (network-first, API cache'lenmez) + prod-only kayıt
 - [ ] Capacitor sarma (MVP sonrası): store meşruiyeti + **push notification = davranışsal koçun taşıyıcısı** ("piyasa düştü, sakin ol" gerçek zamanlı ancak push ile çalışır; iOS web push güdük) — Apple $99/yıl + Google $25 bütçesi gerekir
 
 ### Kullanım Kotası
 
-- [ ] Kullanıcı başına günlük mesaj kotası (DB tabanlı sayaç, örn. 50 mesaj/gün)
-- [ ] Kota dolunca kibar bilgilendirme UI'ı (yarın sıfırlanır mesajı)
+- [x] Kullanıcı başına günlük mesaj kotası (users.quota_date/quota_used, DAILY_MESSAGE_QUOTA=50, 429 + kibar TR/EN mesaj)
+- [x] Kota dolunca kibar bilgilendirme (backend mesajı chat error alanında görünüyor)
 
 ### Eğitim Katmanı 📚 (vizyonun kalbi — öncelik yükseltildi)
 
 - [ ] Varlık bazlı eğitim: her portföy kalemi için "nedir / neden portföyünde / riski ne" LLM açıklaması (generalize edilmiş explain prompt)
 - [ ] `AssetExplainer.jsx`'i bu içeriği gösterecek şekilde doldur
-- [ ] Temel kavramlar sözlüğü (volatilite, çeşitlendirme, ETF vs fon, REIT...) — statik içerik, LLM maliyeti sıfır
+- [x] Temel kavramlar sözlüğü (`frontend/src/data/glossary.js`, 12 terim, jargonsuz TR)
 - [ ] Kullanıcının yatırım yaptığı her varlık tipinde ilk alımda otomatik eğitim kartı göster
-- [ ] Jargon tooltip sistemi: UI'da geçen her finans terimi altı çizili + tık → sade Türkçe açıklama balonu (sözlükten beslenir, tüm sayfalarda)
+- [/] Jargon tooltip sistemi: `IsikTut` bileşeni + 12 terimlik sözlük hazır; tüm sayfalara yayma devam edecek
 - [x] system_prompt'a "sıfır bilgi varsay" kuralı: her cevapta terimleri günlük dille açıkla, kullanıcı bilgi seviyesi gösterirse dili kademeli teknikleştir (+ korku-farkındalık kuralı: endişeyi önce karşıla, sonra cevapla)
 - [ ] UI metin denetimi: tüm sayfalardaki mevcut metinleri jargonsuzluk ilkesine göre elden geçir ("Risk Profiling" → "Seni Tanıyalım" gibi)
 
@@ -571,11 +571,11 @@ lumos/                          ← proje kökü
 
 ### Zaman Makinesi & Varlık Karakteri 🕰️ (en güçlü demo özelliği)
 
-- [ ] "Bu portföyü 5 yıl önce kursaydın bugün ne olurdu?" — yfinance geçmiş verisiyle backtest
-- [ ] `backend/services/backtest.py` → verilen ağırlıklar + tarih aralığı → kümülatif getiri serisi
-- [ ] Duraklama dönemi tespiti: varlığın geçmişindeki yatay/durgun dönemleri algıla ("bu hisse 2018-2021 arası 3 yıl yatay seyretti") — garanti getiri isteyen profillere uzun duraklama geçmişi olan varlıkları işaretle
+- [x] "Bu portföyü 5 yıl önce kursaydın?" — `backtest.py` servisi + POST /backtest (1y/3y/5y)
+- [x] `backend/services/backtest.py` → kümülatif seri + max drawdown + toparlanma süresi + grafik verisi (5 test)
+- [x] Duraklama dönemi tespiti: ±%5 bant algoritması → varlık başına `longest_stagnation_months` (profil eşleştirme rozeti sonraki adım)
 - [ ] Varlık karakter kartı: her varlık için "en uzun duraklama", "en derin düşüş", "toparlanma süresi" özeti — profil uyum rozeti (bu varlık senin sabrına uygun mu?)
-- [ ] RecommendPage'e interaktif grafik: önerilen portföyün 1/3/5 yıllık geçmiş simülasyonu + en kötü dönem vurgusu ("2022'de %18 düşecekti — buna hazır mısın?")
+- [x] RecommendPage'e `TimeMachine` bileşeni: 1/3/5 yıl simülasyon + "en kötü anında X TL" dürüst vurgusu + çizgi grafik
 - [ ] Risk toleransı sorusunu somutlaştır: soyut "%20 düşerse" yerine kullanıcının kendi bütçesiyle "50.000 TL'n 40.000 TL olurdu" göster
 
 ### Emlak + Borsa Hibrit 🏘️📈 (Midas'a karşı ana koz)
@@ -603,10 +603,12 @@ lumos/                          ← proje kökü
 
 #### Akış 0 — Yol Seçimi 🧭 (yapısal ilke: akışlar zorunlu değil, seçilebilir)
 
+> ⚠️ Not (2026-07-04): Onboardingdaki yol seçimi + backend `investment_path` alanı canlı çalışıyor. Ama koşullu modül gizleme henüz uygulanamadı çünkü emlağa özel SAYFALAR (bölge kartları, ilan değerlendirme, kira/ev karar UI'ı) henüz yok — sadece backend endpoint'leri hazır (planning router). Bu sayfalar yazılınca gizleme mantığı () eklenecek.
+
 > Kullanıcı emlak seçmek ZORUNDA değil. Üç eşit yol: sadece borsa (Midas tarzı) / sadece emlak keşfi / karma. Her akış bağımsız çalışır.
 
-- [ ] Onboarding'e ilgi sorusu: "Nasıl yatırım yapmak istersin?" → 🏦 Sadece borsa · 🏘️ Sadece emlak · ⚖️ İkisi birden · 🤷 Kararsızım (AI profil sonrası önerir)
-- [ ] "Sadece borsa" yolu: emlak modülleri hiç görünmez — mevcut risk profili → portföy önerisi akışı aynen (bütçe bölüşümünde emlak dilimi çıkmaz)
+- [x] Onboarding'e yol sorusu: `PathSelectionPage` (4 kart) → PATCH /users/me/investment-path → users.investment_path
+- [/] Yol seçimi backend+UI hazır; yol-bazlı modül gizleme mantığı emlak modülleri geldikçe uygulanacak
 - [ ] "Sadece emlak" yolu: risk profili yine yapılır (vade + likidite kritik) ama çıktı bölge kartları + ilan değerlendirme + eğitim; borsa önerisi dayatılmaz
 - [ ] "Kararsızım" yolu: profil + korku check-in sonucuna göre AI yol önerir ("düzenli birikim + uzun vade → önce borsa fonlarıyla başla, emlak eşiğine gelince haber veririm")
 - [ ] Yol her an değiştirilebilir (ayarlar + dashboard'da "emlak dünyasını keşfet" yumuşak daveti — dayatma yok)
@@ -627,7 +629,7 @@ lumos/                          ← proje kökü
 
 #### Akış 3 — İlan Köprüsü (satın almaya yönlendirme)
 
-- [ ] Filtre-hazır dış linkler: AI bölge önerince Sahibinden/Emlakjet'e o ilçe+arsa filtreli arama linki üret ("Bu bölgedeki ilanları gör →") — ilan verisi bizde durmaz, hukuki risk yok
+- [x] Filtre-hazır dış linkler: `listing_bridge.py` + POST /planning/listing-links — Sahibinden/Emlakjet, il+ilçe+tip filtreli (4 test)
 - [ ] **İlan değerlendirme asistanı**: kullanıcı beğendiği ilanın bilgilerini yapıştırır (konum, m², fiyat) → AI bölge ortalama m² fiyatıyla kıyaslar: "bölge ortalamasının %20 üstünde" + pazarlık/kontrol listesi (imar durumu, tapu cinsi, yola cephe...)
 - [ ] Satın alma kontrol listesi rehberi: arsa/daire alırken adım adım ne kontrol edilir (statik eğitim içeriği, TR'ye özgü: tapu, imar, DASK...)
 - [ ] (İleri faz — iş geliştirme) Emlak platformu API ortaklığı: gerçek ilan + emlakçı iletişimi in-app gösterim
@@ -638,68 +640,68 @@ lumos/                          ← proje kökü
 - [ ] Kalan bütçeyi otomatik yeniden planla: "600K'yı arsaya bağladın, kalan 400K için hisse-fon planın hazır" → recommend akışına köprü
 - [ ] TCMB endeksiyle emlak varlığının değerini dönemsel güncelle ("endekse göre tahmin" etiketiyle)
 - [ ] Kira getirisi vs temettü verimi karşılaştırması: "bu daire yıllık %4 kira getirir, bu temettü portföyü %6 öder"
-- [ ] Likidite skoru: portföy sağlık skoruna emlak likidite bileşeni ("varlıklarının %70'i 6 ayda nakde dönmez — acil ihtiyaç planın var mı?")
+- [x] Likidite skoru: Fener'in %40 ağırlıklı bileşeni — illikit ağırlıklı portföyde uyarı notu üretiyor
 - [ ] "500.000 TL'lik arsa mı, 500.000 TL'lik portföy mü?" karşılaştırma ekranı: aynı tutar, geçmiş 5 yıl, konut endeksi vs portföy getirisi yan yana (+ likidite ve masraf farkları tablosu)
 
 #### Akış 5 — Kira & Ev Kararları 🏠 (giriş kapısı özelliği)
 
 > Türkiye'de yatırım bilmeyenin ilk finansal sorusu: "kirada mı oturayım, ev mi alayım?" — bu soruya cevap veren araç, uygulamaya kullanıcı çeken kapı olur.
 
-- [ ] **"Kirada mı otur, ev mi al?" karar aracı**: peşinat tutarı + aylık kira + il girdisi → iki senaryo yan yana: (A) ev al: kira ödemezsin, paran konut endeksiyle değerlenir; (B) kirada kal: peşinat portföyde çalışır, kirayı ödersin — 5/10/20 yıllık projeksiyon, jargonsuz LLM anlatımıyla ("ev almak her zaman kazanç değildir" dürüstlüğü)
+- [x] "Kirada mı otur, ev mi al?" karar aracı: `rent_vs_buy.py` + POST /planning/rent-vs-buy — iki senaryo net karşılaştırma (6 test); UI sayfası sonraki adım
 - [ ] Karar aracına duygu boyutu: "ev sahibi olma güvencesi"nin parasal olmayan değerini de anlat (vizyon ilkesi: korku/duygu = veri)
 - [ ] Aylık ödenen kirayı profil girdisi yap: yatırılabilir gerçek tutar = gelir − kira − zorunlu giderler → bütçe bölüşüm danışmanı bu net tutarla konuşsun
-- [ ] Kapsam sınırı (bilinçli karar): kiralık ilan arama / mortgage pazaryeri EKLENMEYECEK — Lumos karar destek uygulamasıdır, emlak portalı değil
+- [x] Kapsam sınırı (bilinçli karar): kiralık ilan arama / mortgage pazaryeri EKLENMEDİ — listing_bridge.py sadece filtre-hazır dış link üretir, ilan verisi hiç saklanmaz
 
 ### Enflasyon Gerçekliği 🇹🇷 (yerel farklılaştırıcı — kimse yapmıyor)
 
-- [ ] Tüm getirileri nominal + reel (TÜFE arındırılmış) çift gösterim — "mevduat %45 kazandırdı ama reel %-12"
-- [ ] TÜFE verisi entegrasyonu (TCMB EVDS API ücretsiz)
+- [x] Tüm getirilere nominal + reel çift gösterim: Zaman Makinesi sonucunda `real_return_pct` alanı, UI'da "Enflasyon sonrası (reel)" satırı
+- [/] TÜFE verisi: statik aylık endeks (`data/tufe_index.json`) ile başladı — canlı TCMB EVDS API'sine geçiş (key kaydı gerekiyor) sonraki adım, `inflation_service.py` kaynak-agnostik tasarlandı
 - [ ] Portföyde TL/döviz dağılımı ve kur riski göstergesi
-- [ ] "Param eriyor mu?" kartı: kullanıcının nakit pozisyonunun aylık reel kaybı
+- [x] "Param eriyor mu?" kartı: Varlıklarım sayfasında boştaki bütçe + nakit için aylık reel erime tutarı (5 test)
 
 ### Davranışsal Koç 🧠 (robo-advisor'ların yapmadığı)
 
-- [ ] Piyasa sert düştüğünde profil-bazlı sakinleştirme: panik satıcı profiline özel "tarihsel toparlanma" mesajı, fırsatçı profiline "plana sadık kal" uyarısı
-- [ ] Kullanıcının davranış günlüğü: profilde "düşüşte satarım" deyip yükselişte alım yapıyorsa nazikçe aynayı tut
-- [ ] "Yatırım kararını duygu mu veri mi verdi?" — alım kaydında opsiyonel 1-tık duygu etiketi (FOMO/plan/tüyo), aylık davranış raporu
+- [x] Piyasa hareketi mesajları: `behavior_coach.py` + POST /coach/market-move — loss_tolerance'a göre düşüş/yükseliş mesajı (şablon tabanlı, AI maliyeti yok)
+- [x] Davranış aynası: GET /coach/behavior-mirror — emotion_tag dağılımı + profil/davranış uyumsuzluğunda nazik not
+- [x] Alımda opsiyonel 1-tık duygu etiketi (plan/fomo/tüyo/panik) — `holdings.emotion_tag`; aylık rapor UI'ı sonraki adım
 
 ### Hedef Bazlı Yatırım 🎯
 
-- [ ] Hedef tanımlama: "3 yılda ev peşinatı 800.000 TL" → gereken aylık katkı + uygun risk bandı hesabı
-- [ ] Hedefe ilerleme çubuğu (mevcut varlıklar + planlanan katkıyla projeksiyon)
-- [ ] Hedef sapma uyarısı: "bu tempoda hedefin 8 ay gecikir"
+- [x] Hedef tanımlama: `goal_planner.py` + POST /planning/goal-plan — annüite formülüyle gereken aylık katkı (6 test)
+- [x] Hedefe ilerleme + sapma: POST /planning/goal-progress — mevcut tempoyla hedefe ulaşır mı, kaç ay gecikir
+- [x] Hedef sapma uyarısı: `progress_and_drift()` → `delay_months` alanı (UI kartı sonraki adım)
 
 ### Portföy Sağlık Skoru 💯
 
-- [ ] Tek bakışta 0-100 skor: çeşitlendirme + hedef dağılıma uyum + maliyet + kur dengesi bileşenleri
+- [/] Fener skoru v1: çeşitlendirme (HHI) + likidite bileşenleri, 0-100 + jargonsuz notlar (hedef uyum + kur dengesi sonraki sürüm)
 - [ ] Her bileşen için "neden düşük, nasıl yükselir" LLM açıklaması
-- [ ] Dashboard'a skor kartı + zaman içinde skor grafiği
+- [/] Fener kartı Varlıklarım sayfasında ✅; zaman içinde skor grafiği sonra
 
 ### What-If Asistanı 🔮
 
-- [ ] Chat'te senaryo soruları: "10.000 TL daha eklesem ne değişir?", "altını çıkarsam risk ne olur?" — portfolio_engine'i tool olarak çağırıp gerçek hesapla cevapla (tool-use maddesiyle birleşir)
+- [ ] Chat'te senaryo soruları: "10.000 TL daha eklesem ne değişir?", "altını çıkarsam risk ne olur?" — portfolio_engine'i tool olarak çağırıp gerçek hesapla cevapla (tool-use maddesiyle birleşir, sonraki faz)
 
 ### Sakin Haber Akışı 📰 (haber = eğitim, gürültü değil)
 
 > Ham haber akışı yeni başlayan için korku makinesidir. Lumos haberi süzer, sakinleştirir, öğretir.
 
-- [ ] RSS entegrasyonu (ücretsiz): AA Ekonomi, Bloomberg HT, KAP bildirimleri → `backend/services/news_service.py`
-- [ ] LLM haber süzgeci: kullanıcının portföyüne/yoluna göre alakalı haberleri seç, jargonsuz 2 cümle özet + "seni etkiler mi?" değerlendirmesi + sakinlik notu ("panik gerektirmez")
-- [ ] Günlük "Bugün Ne Oldu?" kartı (dashboard): en fazla 3 haber — bilgi bombardımanı yok (kademeli arayüz ilkesi)
-- [ ] Haber → davranışsal koç köprüsü: sert düşüş haberi geldiğinde koç mesajı otomatik tetiklenir (Phase 8 davranışsal koç ile birleşir)
+- [x] RSS entegrasyonu: AA Ekonomi + Bloomberg HT (httpx + stdlib XML, ek bağımlılık yok) → `news_service.py`
+- [x] LLM haber süzgeci: yol-bazlı seçim, headline + why_it_matters + calmness_note JSON'u, günlük cache (5 test)
+- [/] GET /news/digest hazır (≤3 haber, path-bazlı); dashboard kartı UI'ı sonraki adım
+- [/] Haber + koç altyapısı hazır (`news_service.py` + `behavior_coach.py`) — otomatik tetikleme köprüsü (haber → koç) sonraki entegrasyon adımı
 - [ ] Manşet dili eğitimi: "BORSA ÇAKILDI manşeti gördüğünde gerçekte ne olur?" mikro-eğitim kartı
 
 ### Korkusuz Başlangıç 🐣 (vizyonun ta kendisi — en yüksek öncelik)
 
 > Yatırım bilmeyen biri gerçek para riske atmadan önce güven kazanmalı.
 
-- [ ] **Sanal portföy (alıştırma modu)**: kullanıcı sahte 100.000 TL ile önerilen portföyü "kurar", gerçek piyasa verisiyle canlı izler — sıfır risk, gerçek öğrenme. Gerçek yatırıma geçiş butonu hazır olunca
-- [ ] Sanal portföy haftalık özeti: "Bu hafta 2.300 TL kazandın — işte nedeni" LLM anlatımı (neyin niye oynadığını öğretir)
+- [x] Sanal portföy: `practice_mode.py` + POST /practice/snapshot — gerçek piyasa verisiyle sahte 100.000 TL takibi, haftalık değişim + "en çok hareket eden varlık" (3 test)
+- [/] Haftalık değişim hesabı hazır (weekly_change_amount + biggest_mover); LLM anlatım katmanı sonraki adım
 - [ ] İlk yatırım rehberli yolculuğu: adım adım sihirbaz — "aracı kurum hesabı nedir → nasıl açılır → ilk emir nasıl verilir" (Türkiye'ye özgü, ekran görüntülü statik rehber)
-- [ ] Korku check-in'i: onboarding'de "yatırımda seni en çok ne korkutuyor?" sorusu (param erir / kandırılırım / anlamam / batırırım) → LLM cevaplarında bu korkuya özel güvence dili kullansın
+- [x] Korku check-in'i: `FearCheckInPage.jsx` + PATCH /users/me/fear-check-in — 4 korku etiketi + anında kişiselleştirilmiş güvence mesajı (canlı doğrulandı)
 - [ ] "Bugün öğrendin" mikro-kartları: her oturumda tek küçük kavram ("ETF aslında bir sepettir") — 15 saniyelik okuma, ilerleme sayacı
 - [ ] Kademeli arayüz: yeni kullanıcıda sade görünüm (3 metrik), "detay göster" ile zenginleşir — bilgi bombardımanı korkuyu büyütür
-- [ ] Cesaret göstergesi: kullanıcının bilgi yolculuğu ilerledikçe "hazırlık skoru" artar — "gerçek yatırıma hazırsın" eşiği
+- [x] Cesaret göstergesi: GET /users/me/readiness — 5 şeffaf kilometre taşı, 0-100 skor, %60 eşiği "gerçek yatırıma hazır" (canlı doğrulandı: skor 60, eşik geçildi)
 
 ---
 

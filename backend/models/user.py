@@ -23,3 +23,13 @@ class User(Base):
     loss_tolerance: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     goal: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     experience: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+
+    # Chosen journey: stocks / real_estate / hybrid / undecided (Akış 0)
+    investment_path: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+
+    # Onboarding fear check-in: param_eriyor / kandirilirim / anlamiyorum / batiririm
+    primary_fear: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+
+    # Daily AI message quota (resets when quota_date changes)
+    quota_date: Mapped[Optional[str]] = mapped_column(String, nullable=True)  # YYYY-MM-DD
+    quota_used: Mapped[int] = mapped_column(Integer, default=0, nullable=False, server_default="0")

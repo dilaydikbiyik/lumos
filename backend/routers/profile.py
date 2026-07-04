@@ -1,12 +1,12 @@
+from typing import Optional
+
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
-from typing import Optional
 
 from backend.db.database import get_db
 from backend.middleware.verify_clerk import get_current_user
-from backend.models.user import User
-from backend.models.user_profile import RiskProfileAnswers, RiskProfileResponse
+from backend.repositories import user_repository
+from backend.schemas.user_profile import RiskProfileAnswers, RiskProfileResponse
 from backend.services.risk_engine import compute_risk_score
 
 router = APIRouter()
@@ -23,23 +23,15 @@ async def save_profile(
     persist to DB linked to the Clerk user ID.
     """
     profile = compute_risk_score(answers)
-
-    # Upsert user record
-    result = await db.execute(select(User).where(User.clerk_user_id == user_id))
-    user = result.scalar_one_or_none()
-
-    if user is None:
-        user = User(clerk_user_id=user_id)
-        db.add(user)
-
-    user.risk_score = profile.risk_score
-    user.budget = answers.budget
-    user.time_horizon = answers.time_horizon
-    user.loss_tolerance = answers.loss_tolerance
-    user.goal = answers.goal
-    user.experience = answers.experience
-
-    await db.flush()
+    await user_repository.save_risk_profile(
+        db, user_id,
+        risk_score=profile.risk_score,
+        budget=answers.budget,
+        time_horizon=answers.time_horizon,
+        loss_tolerance=answers.loss_tolerance,
+        goal=answers.goal,
+        experience=answers.experience,
+    )
     return profile
 
 
@@ -49,9 +41,7 @@ async def get_profile(
     db: AsyncSession = Depends(get_db),
 ):
     """GET /profile — return the saved risk profile for the current user."""
-    result = await db.execute(select(User).where(User.clerk_user_id == user_id))
-    user = result.scalar_one_or_none()
-
+    user = await user_repository.get_by_clerk_id(db, user_id)
     if user is None or user.risk_score is None:
         return None
 

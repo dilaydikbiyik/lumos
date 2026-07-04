@@ -3,7 +3,10 @@ import { SignedIn, SignedOut, RedirectToSignIn } from '@clerk/clerk-react'
 import BottomNav from './components/BottomNav'
 import ErrorBoundary from './utils/errorBoundary'
 import OnboardingPage from './pages/OnboardingPage'
+import PathSelectionPage from './pages/PathSelectionPage'
+import FearCheckInPage from './pages/FearCheckInPage'
 import ProfilePage from './pages/ProfilePage'
+import HoldingsPage from './pages/HoldingsPage'
 import RecommendPage from './pages/RecommendPage'
 import DashboardPage from './pages/DashboardPage'
 
@@ -22,7 +25,10 @@ export default function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/"          element={<OnboardingPage />} />
+          <Route path="/path"      element={<ProtectedRoute><PathSelectionPage /></ProtectedRoute>} />
+          <Route path="/fear-check-in" element={<ProtectedRoute><FearCheckInPage /></ProtectedRoute>} />
           <Route path="/profile"   element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+          <Route path="/holdings"  element={<ProtectedRoute><HoldingsPage /></ProtectedRoute>} />
           <Route path="/recommend" element={<ProtectedRoute><RecommendPage /></ProtectedRoute>} />
           <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
           <Route path="*"          element={<Navigate to="/" replace />} />

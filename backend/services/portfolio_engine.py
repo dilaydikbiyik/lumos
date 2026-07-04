@@ -11,7 +11,7 @@ Assets:
     - REIT layer (Phase 3.5): VNQ, SCHH  (included if budget < threshold)
 """
 
-from backend.models.portfolio import AssetAllocation, PortfolioRecommendResponse
+from backend.schemas.portfolio import AssetAllocation, PortfolioRecommendResponse
 from backend.services.volatility import compute_volatility
 from backend.services.hybrid_basket import should_include_reits, get_reit_assets
 import json

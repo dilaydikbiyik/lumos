@@ -1,20 +1,28 @@
+from typing import Literal
+
 from fastapi import APIRouter, Depends, HTTPException, Request
-from pydantic import BaseModel, ValidationError
+from pydantic import BaseModel, Field, ValidationError
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from backend.config import settings
+from backend.db.database import get_db
 from backend.limiter import limiter
 from backend.middleware.verify_clerk import get_current_user
-from backend.models.user_profile import RiskProfileAnswers
+from backend.repositories import user_repository
+from backend.schemas.user_profile import RiskProfileAnswers
 from backend.services.ai_service import chat as ai_chat, extract_profile
 
 router = APIRouter()
 
 
 class ChatMessage(BaseModel):
-    role: str   # "user" | "assistant"
-    content: str
+    role: Literal["user", "assistant"]
+    content: str = Field(..., min_length=1, max_length=4000)
 
 
 class ChatRequest(BaseModel):
-    messages: list[ChatMessage]
+    # Cap history length — blocks context-stuffing and runaway token cost
+    messages: list[ChatMessage] = Field(..., min_length=1, max_length=80)
 
 
 class ChatResponse(BaseModel):
@@ -27,8 +35,15 @@ async def chat_endpoint(
     request: Request,
     body: ChatRequest,
     user_id: str = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
 ):
     """Multi-turn chat with the Lumos AI assistant. Requires a valid Clerk JWT."""
+    allowed = await user_repository.consume_quota(db, user_id, settings.DAILY_MESSAGE_QUOTA)
+    if not allowed:
+        raise HTTPException(
+            status_code=429,
+            detail="Günlük mesaj hakkın doldu — yarın yenilenir. / Daily message limit reached; resets tomorrow.",
+        )
     messages = [m.model_dump() for m in body.messages]
     reply = ai_chat(messages)
     return {"reply": reply}

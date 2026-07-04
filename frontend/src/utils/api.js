@@ -13,4 +13,19 @@ export function setAuthToken(token) {
   }
 }
 
+/**
+ * FastAPI error 'detail' is a string for our own HTTPExceptions, but
+ * Pydantic validation errors (422) return an array of objects — render
+ * either safely instead of letting React print "[object Object]".
+ */
+export function extractErrorMessage(err, fallback) {
+  const detail = err?.response?.data?.detail
+  if (!detail) return fallback
+  if (typeof detail === 'string') return detail
+  if (Array.isArray(detail)) {
+    return detail.map(d => d.msg || JSON.stringify(d)).join(', ')
+  }
+  return fallback
+}
+
 export default api

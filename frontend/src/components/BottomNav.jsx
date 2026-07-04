@@ -5,6 +5,7 @@ const NAV_ITEMS = [
   { path: '/',          icon: '🏠', label: 'Home'      },
   { path: '/profile',   icon: '💬', label: 'Chat'      },
   { path: '/recommend', icon: '📊', label: 'Portfolio' },
+  { path: '/holdings',  icon: '💰', label: 'Varlıklar' },
   { path: '/dashboard', icon: '⚡', label: 'Dashboard' },
 ]
 

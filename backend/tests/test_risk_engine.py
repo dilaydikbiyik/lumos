@@ -3,7 +3,7 @@ Tests for the risk engine.
 10 scenarios covering all user types described in Phase 5.
 """
 
-from backend.models.user_profile import RiskProfileAnswers
+from backend.schemas.user_profile import RiskProfileAnswers
 from backend.services.risk_engine import compute_risk_score
 
 

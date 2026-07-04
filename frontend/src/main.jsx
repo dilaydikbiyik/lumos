@@ -10,6 +10,13 @@ if (!PUBLISHABLE_KEY) {
   console.warn('⚠️  VITE_CLERK_PUBLISHABLE_KEY is not set — auth features will not work. Add it to frontend/.env')
 }
 
+// PWA: register service worker (production builds only — dev uses HMR)
+if ('serviceWorker' in navigator && import.meta.env.PROD) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => {})
+  })
+}
+
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <ClerkProvider

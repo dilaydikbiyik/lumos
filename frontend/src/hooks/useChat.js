@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useAuth } from '@clerk/clerk-react'
-import api, { setAuthToken } from '../utils/api'
+import api, { extractErrorMessage, setAuthToken } from '../utils/api'
 
 const COMPLETE_MARKER = '[PROFILE_COMPLETE]'
 
@@ -43,7 +43,7 @@ export default function useChat(onProfileComplete) {
         await onProfileComplete(extracted.data)
       }
     } catch (err) {
-      setError(err.response?.data?.detail || 'Failed to send message')
+      setError(extractErrorMessage(err, 'Failed to send message'))
     } finally {
       setIsLoading(false)
     }

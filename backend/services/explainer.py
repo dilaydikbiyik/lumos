@@ -3,7 +3,7 @@ Portfolio explainer — uses the configured AI provider for plain-language summa
 """
 
 from pathlib import Path
-from backend.models.portfolio import PortfolioRecommendResponse
+from backend.schemas.portfolio import PortfolioRecommendResponse
 from backend.services.ai_service import generate_text
 
 _REIT_PROMPT_PATH = Path(__file__).parent.parent / "prompts" / "reit_explain_prompt.txt"

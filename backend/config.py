@@ -23,6 +23,9 @@ class Settings(BaseSettings):
     # Exchange Rate (optional)
     EXCHANGE_RATE_API_KEY: str = ""
 
+    # Usage limits
+    DAILY_MESSAGE_QUOTA: int = 50
+
     class Config:
         env_file = ".env"
         extra = "ignore"
