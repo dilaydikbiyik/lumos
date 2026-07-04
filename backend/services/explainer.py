@@ -1,5 +1,5 @@
 """
-Portfolio explainer — uses Claude to generate a plain-language summary.
+Portfolio explainer — uses the configured AI provider for plain-language summaries.
 """
 
 from pathlib import Path
@@ -11,7 +11,7 @@ _REIT_PROMPT_TEMPLATE = _REIT_PROMPT_PATH.read_text()
 
 
 def explain_portfolio(portfolio: PortfolioRecommendResponse, user_profile: dict) -> str:
-    """Generate a plain-language portfolio explanation via Claude."""
+    """Generate a plain-language portfolio explanation."""
     alloc_lines = "\n".join(
         f"  - {a.name} ({a.ticker}): {a.weight * 100:.1f}%"
         for a in portfolio.allocations
@@ -29,7 +29,7 @@ def explain_portfolio(portfolio: PortfolioRecommendResponse, user_profile: dict)
 
 
 def explain_reit_inclusion(portfolio: PortfolioRecommendResponse, user_profile: dict) -> str:
-    """Generate a personalised 2-sentence REIT explanation via Claude."""
+    """Generate a personalised REIT explanation (3 sentences per prompt template)."""
     filled_prompt = _REIT_PROMPT_TEMPLATE.format(
         risk_score=portfolio.risk_score,
         budget=portfolio.budget,

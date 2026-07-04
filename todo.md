@@ -40,7 +40,7 @@ lumos/                          ← proje kökü
 │   │
 │   ├── services/               ← [SERVICE] İş mantığı katmanı
 │   │   ├── __init__.py
-│   │   ├── ai_service.py       ← Claude API istemcisi
+│   │   ├── ai_service.py       ← Provider-agnostic AI istemcisi (Gemini/Claude)
 │   │   ├── risk_engine.py      ← Risk skoru hesaplama (1-10)
 │   │   ├── market_data.py      ← yfinance veri çekme
 │   │   ├── tefas_service.py    ← TEFAS fon verisi

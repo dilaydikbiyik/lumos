@@ -25,7 +25,7 @@ export default function OnboardingPage() {
             Your <span className="gradient-text">smart</span><br />investment guide
           </h1>
           <p style={{ fontSize: 15, marginBottom: 32 }}>
-            Lumos builds a personalised, volatility-weighted portfolio in minutes — powered by Claude AI.
+            Lumos builds a personalised, volatility-weighted portfolio in minutes — powered by AI.
           </p>
 
           <SignedOut>
@@ -50,7 +50,7 @@ export default function OnboardingPage() {
         {/* Feature cards — stack vertically on mobile */}
         <div className="grid-3" style={{ marginBottom: 24 }}>
           {[
-            { icon: '🎯', title: 'Risk Profiling', desc: '5-question AI chat' },
+            { icon: '🎯', title: 'Risk Profiling', desc: '7-question AI chat' },
             { icon: '📊', title: 'Smart Portfolio', desc: 'Volatility-weighted' },
             { icon: '🏠', title: 'Real Estate', desc: 'REIT ETFs included' },
           ].map(f => (
