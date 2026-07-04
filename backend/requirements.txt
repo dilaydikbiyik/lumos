@@ -10,8 +10,9 @@ pydantic-settings==2.9.1
 python-jose[cryptography]==3.3.0
 httpx==0.28.1
 
-# ── AI — Anthropic Claude ────────────────────────────────────────────────────
+# ── AI — provider-agnostic (AI_PROVIDER env var selects one) ─────────────────
 anthropic==0.112.0
+google-generativeai==0.8.6
 
 # ── Market Data ───────────────────────────────────────────────────────────────
 yfinance==0.2.51

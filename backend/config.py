@@ -10,8 +10,10 @@ class Settings(BaseSettings):
     # Database
     DATABASE_URL: str = "sqlite+aiosqlite:///./lumos.db"
 
-    # Anthropic
+    # AI provider: "gemini" (free tier) or "anthropic"
+    AI_PROVIDER: str = "gemini"
     ANTHROPIC_API_KEY: str = ""   # set in .env before using AI features
+    GEMINI_API_KEY: str = ""      # https://aistudio.google.com/apikey — free tier
 
     # Clerk
     CLERK_PUBLISHABLE_KEY: str = ""
