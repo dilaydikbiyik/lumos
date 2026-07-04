@@ -453,8 +453,8 @@ lumos/                          ← proje kökü
 ### Veritabanı
 
 
-- [ ] `alembic init` çalıştır, mevcut şemayı baseline migration olarak commit et
-- [ ] `create_all` yerine migration akışına geçiş planı
+- [x] `alembic init` (async template) + baseline migration (`04f9da6e7e6d`: users tablosu + indexler); dev DB `alembic stamp head` ile damgalandı
+- [/] `create_all` → migration geçiş planı: dev'de create_all kalıyor (zararsız, checkfirst); yeni şema değişikliği geldiğinde akış = model değiştir → `alembic revision --autogenerate` → `alembic upgrade head`; prod deploy'da startup öncesi `alembic upgrade head` çalıştırılacak, create_all prod'da kaldırılacak
 
 ### Deployment
 
