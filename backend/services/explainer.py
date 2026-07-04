@@ -16,12 +16,20 @@ def explain_portfolio(portfolio: PortfolioRecommendResponse, user_profile: dict)
         f"  - {a.name} ({a.ticker}): {a.weight * 100:.1f}%"
         for a in portfolio.allocations
     )
+    profile_lines = "\n".join(f"  - {k}: {v}" for k, v in user_profile.items() if v)
     prompt = (
         f"The user has a risk score of {portfolio.risk_score}/10 "
-        f"and a budget of {portfolio.budget:,.0f} TRY.\n\n"
-        f"Their portfolio allocation:\n{alloc_lines}\n\n"
-        "In 3–4 sentences, explain this portfolio in simple, jargon-free language. "
-        "Mention what each major category is and why it suits their profile.\n\n"
+        f"and a budget of {portfolio.budget:,.0f} TRY.\n"
+        f"Their profile:\n{profile_lines or '  (no extra profile data)'}\n\n"
+        f"Their recommended portfolio allocation:\n{alloc_lines}\n\n"
+        "Write a 4–5 sentence explanation for someone who has NEVER invested before:\n"
+        "1. What this mix is in plain words (explain any finance term inline, e.g. "
+        "'fund (a ready-made basket of investments)').\n"
+        "2. WHY this specific balance fits THEIR risk score and goal — reference their "
+        "profile, don't be generic.\n"
+        "3. One honest sentence about what could go wrong (e.g. temporary drops) and why "
+        "the mix is designed to soften it — calm, not alarming.\n"
+        "Respond in the same language the user has been using (Turkish or English).\n\n"
         "⚠️ Always end with: 'This is for educational purposes only and does not constitute "
         "investment advice. Please consult a licensed financial advisor.'"
     )

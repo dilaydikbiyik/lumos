@@ -499,12 +499,13 @@ lumos/                          ← proje kökü
 
 - [x] `ai_service.py`'yi provider-agnostic yap: tek `chat()` / `generate_text()` interface'i, arkasında adapter'lar
 - [x] Gemini adapter ekle (`google-generativeai`) — free tier, geliştirme/demo varsayılanı
+- [ ] `google-generativeai` → `google-genai` SDK migrasyonu (eski paket deprecated, uyarı veriyor)
 - [x] `.env`'e `AI_PROVIDER=gemini|anthropic` seçimi; Claude adapter'ı mevcut kodu sarmalasın
 - [x] Provider'a özel hata yönetimi (kredi bitti / kota doldu → kullanıcıya anlamlı mesaj)
 
 ### Risk Profili Derinleştirme
 
-- [ ] 7 soruya iki boyut yedir: yaş/emekliliğe kalan süre + gelir istikrarı (maaşlı/serbest/düzensiz)
+- [x] 7 soruya iki boyut yedir: yaş/emekliliğe kalan süre (Q2) + gelir istikrarı (Q7)
 - [ ] Dinamik follow-up: profil belirsizse LLM ek soru sorabilsin (7–10 soru arası esnek akış)
 - [ ] `risk_engine.py`'yi yeni boyutlara göre güncelle (yaş ve gelir istikrarı skora etki etsin)
 
@@ -555,7 +556,7 @@ lumos/                          ← proje kökü
 - [ ] Temel kavramlar sözlüğü (volatilite, çeşitlendirme, ETF vs fon, REIT...) — statik içerik, LLM maliyeti sıfır
 - [ ] Kullanıcının yatırım yaptığı her varlık tipinde ilk alımda otomatik eğitim kartı göster
 - [ ] Jargon tooltip sistemi: UI'da geçen her finans terimi altı çizili + tık → sade Türkçe açıklama balonu (sözlükten beslenir, tüm sayfalarda)
-- [ ] system_prompt'a "sıfır bilgi varsay" kuralı: her cevapta terimleri günlük dille açıkla, kullanıcı bilgi seviyesi gösterirse dili kademeli teknikleştir
+- [x] system_prompt'a "sıfır bilgi varsay" kuralı: her cevapta terimleri günlük dille açıkla, kullanıcı bilgi seviyesi gösterirse dili kademeli teknikleştir (+ korku-farkındalık kuralı: endişeyi önce karşıla, sonra cevapla)
 - [ ] UI metin denetimi: tüm sayfalardaki mevcut metinleri jargonsuzluk ilkesine göre elden geçir ("Risk Profiling" → "Seni Tanıyalım" gibi)
 
 ---
