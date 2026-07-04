@@ -3,7 +3,7 @@ from typing import Literal
 
 
 class RiskProfileAnswers(BaseModel):
-    """5 questions collected during the onboarding conversation."""
+    """Structured answers collected during the risk-profiling conversation."""
     budget: float = Field(..., gt=0, description="Available investment budget in TRY")
     time_horizon: Literal["short", "medium", "long"] = Field(
         ..., description="short (<2yr) / medium (2-10yr) / long (>10yr)"

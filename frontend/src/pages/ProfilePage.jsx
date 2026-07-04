@@ -7,7 +7,7 @@ import usePortfolio from '../hooks/usePortfolio'
 
 export default function ProfilePage() {
   const navigate = useNavigate()
-  const { saveProfile, isLoading } = usePortfolio()
+  const { saveProfile } = usePortfolio()
   const [riskResult, setRiskResult] = useState(null)
 
   async function handleProfileComplete(answers) {

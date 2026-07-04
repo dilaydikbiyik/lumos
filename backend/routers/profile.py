@@ -19,7 +19,7 @@ async def save_profile(
     db: AsyncSession = Depends(get_db),
 ):
     """
-    POST /profile — receive 5-question answers, compute risk score,
+    POST /profile — receive risk-profiling answers, compute risk score,
     persist to DB linked to the Clerk user ID.
     """
     profile = compute_risk_score(answers)

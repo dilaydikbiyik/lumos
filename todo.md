@@ -225,7 +225,7 @@ lumos/                          ← proje kökü
 ### Testing
 
 - [x] `backend/tests/test_risk_engine.py` → pytest ile risk motoru birim testleri (10/10 ✅)
-- [ ] `backend/tests/test_chat.py` → chat endpoint testleri
+- [x] `backend/tests/test_chat.py` → chat endpoint testleri
 - [ ] Prompt testleri: farklı girdilerle sistem prompt davranışını doğrula
 
 ---
@@ -438,19 +438,20 @@ lumos/                          ← proje kökü
 
 ### Test Kapsamı
 
-- [ ] `backend/tests/test_chat.py` → chat router integration testi (Claude mock'lanmış)
-- [ ] `backend/tests/test_recommend.py` → portfolio_engine + recommend endpoint testi
-- [ ] `backend/tests/test_profile.py` → profile router testi
-- [ ] AI servis testleri için Claude API mock fixture'ı (`conftest.py`)
+- [x] `backend/tests/test_chat.py` → chat router integration testi (AI mock'lanmış, 4 test)
+- [x] `backend/tests/test_recommend.py` → recommend endpoint testi (engine + explainer mock'lu, 4 test)
+- [x] `backend/tests/test_profile.py` → profile router testi (in-memory DB, 5 test)
+- [x] AI servis testleri için AI mock fixture'ı (`conftest.py` — `_dispatch` patch + auth bypass)
 - [ ] `tests/e2e/` içeriğini doldur (şu an boş/iskelet)
 
 ### CI/CD
 
-- [ ] `.github/workflows/ci.yml` → push/PR'da pytest + ruff/black (backend)
-- [ ] Aynı workflow'a eslint + vitest (frontend) adımı ekle
+- [x] `.github/workflows/ci.yml` → push/PR'da ruff + pytest (backend, Python 3.9)
+- [x] Aynı workflow'a eslint + build (frontend, Node 22) adımı eklendi — vitest frontend testleri yazılınca eklenecek
 - [ ] Branch protection: CI geçmeden main'e merge engellensin
 
 ### Veritabanı
+
 
 - [ ] `alembic init` çalıştır, mevcut şemayı baseline migration olarak commit et
 - [ ] `create_all` yerine migration akışına geçiş planı
@@ -479,6 +480,8 @@ lumos/                          ← proje kökü
 - [ ] Claude tool-use / structured output ile risk skoru + portföy çıktısını JSON-mode yerine yapılandır
 
 ### AI Danışman Kalitesi 🆕
+
+> ⚠️ **Tespit (2026-07-04):** ChatWindow'a `onProfileComplete` prop'u geçiliyor ama bileşen içinde hiç çağrılmıyor — chat tamamlanınca skor kaydetme akışı kopuk. Kalıcı çözüm "tool-use / structured output" maddesiyle birlikte: AI 7 cevabı yapılandırılmış döndürünce onProfileComplete tetiklenecek.
 
 - [x] `system_prompt.txt`'i derinleştir: MPT/risk-getiri çerçevesine açık referans, karşı soru sorma davranışı, yasal/etik sınırların net ifadesi
 - [x] Few-shot örnek diyaloglar ekle (1 örnek embedded) — danışman tonunu örnekten öğret
