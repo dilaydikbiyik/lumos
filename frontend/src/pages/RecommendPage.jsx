@@ -5,6 +5,7 @@ import PortfolioChart from '../components/PortfolioChart'
 import PerformanceChart from '../components/PerformanceChart'
 import ReitCard from '../components/ReitCard'
 import TimeMachine from '../components/TimeMachine'
+import PracticeMode from '../components/PracticeMode'
 import usePortfolio from '../hooks/usePortfolio'
 
 export default function RecommendPage() {
@@ -60,6 +61,9 @@ export default function RecommendPage() {
         {/* Charts — stack on mobile, side-by-side on tablet+ */}
         <PortfolioChart allocations={portfolio.allocations} onSliceClick={setSelectedTicker} />
         <PerformanceChart tickers={portfolio.allocations?.map(a => a.ticker)} selected={selectedTicker} />
+
+        {/* Sanal portföy — try before real money */}
+        <PracticeMode allocations={portfolio.allocations} />
 
         {/* Zaman Makinesi — honest historical simulation */}
         <TimeMachine allocations={portfolio.allocations} budget={portfolio.budget} />

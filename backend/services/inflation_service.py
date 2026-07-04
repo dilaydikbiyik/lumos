@@ -3,9 +3,13 @@ Inflation reality layer — nominal returns lie in Turkey; real (TÜFE-adjusted)
 returns tell the truth. This is a differentiator: almost no consumer
 investing app in Turkey shows real returns by default.
 
-Data source: backend/data/tufe_index.json (monthly TÜİK/TCMB index).
-When settings.TCMB_EVDS_API_KEY is configured, swap _load_index() for a
-live EVDS call — the rest of this module is source-agnostic.
+Data sources, in preference order:
+  1. Live TCMB EVDS TÜFE series (when TCMB_EVDS_API_KEY is set) — full
+     monthly resolution, always current
+  2. Bundled backend/data/tufe_index.json — sparse static checkpoints
+
+All math works on index RATIOS, so the two sources' different base years
+(2003=100 vs 2020-01=100) don't matter.
 """
 import json
 import logging
@@ -19,31 +23,39 @@ logger = logging.getLogger("lumos.inflation")
 _INDEX_PATH = Path(__file__).parent.parent / "data" / "tufe_index.json"
 
 
-def _load_index() -> dict[str, float]:
+def _load_static_index() -> dict[str, float]:
     data = json.loads(_INDEX_PATH.read_text())
     return data["index"]
 
 
-_INDEX = _load_index()
-_SORTED_MONTHS = sorted(_INDEX)
+_STATIC_INDEX = _load_static_index()
 
 
-def _index_at(month: str) -> float:
-    """
-    Nearest known index value at or before the given YYYY-MM month
-    (the dataset only has sparse checkpoints, not every month).
-    """
-    if month in _INDEX:
-        return _INDEX[month]
-    pos = bisect_right(_SORTED_MONTHS, month) - 1
+def _get_index() -> dict[str, float]:
+    """Live EVDS index when available (cached daily), else the static file."""
+    from backend.services import evds_service  # local import avoids cycles
+
+    live = evds_service.get_live_cpi_index()
+    if live:
+        return live
+    return _STATIC_INDEX
+
+
+def _index_at(index: dict[str, float], sorted_months: list, month: str) -> float:
+    """Nearest known index value at or before the given YYYY-MM month."""
+    if month in index:
+        return index[month]
+    pos = bisect_right(sorted_months, month) - 1
     pos = max(pos, 0)
-    return _INDEX[_SORTED_MONTHS[pos]]
+    return index[sorted_months[pos]]
 
 
 def cpi_change_pct(start_month: str, end_month: str) -> float:
     """% change in the price index between two YYYY-MM months."""
-    start_idx = _index_at(start_month)
-    end_idx = _index_at(end_month)
+    index = _get_index()
+    sorted_months = sorted(index)
+    start_idx = _index_at(index, sorted_months, start_month)
+    end_idx = _index_at(index, sorted_months, end_month)
     return (end_idx / start_idx - 1) * 100
 
 
@@ -63,13 +75,15 @@ def monthly_cash_erosion(cash_amount: float, reference_month: Optional[str] = No
     'Param eriyor mu?' — how much real purchasing power idle cash loses
     per month at the most recent known inflation rate.
     """
-    reference_month = reference_month or _SORTED_MONTHS[-1]
-    idx = _SORTED_MONTHS.index(reference_month) if reference_month in _SORTED_MONTHS else len(_SORTED_MONTHS) - 1
+    index = _get_index()
+    sorted_months = sorted(index)
+    reference_month = reference_month or sorted_months[-1]
+    idx = sorted_months.index(reference_month) if reference_month in sorted_months else len(sorted_months) - 1
     if idx == 0:
         return {"monthly_inflation_pct": 0.0, "erosion_amount": 0.0}
 
-    prev_month = _SORTED_MONTHS[idx - 1]
-    curr_month = _SORTED_MONTHS[idx]
+    prev_month = sorted_months[idx - 1]
+    curr_month = sorted_months[idx]
     monthly_pct = cpi_change_pct(prev_month, curr_month)
     erosion = cash_amount * (monthly_pct / 100)
     return {

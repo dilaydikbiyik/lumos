@@ -51,6 +51,24 @@ async def goal_progress(
     )
 
 
+@router.get("/region-intelligence")
+@limiter.limit("20/minute")
+async def region_intelligence(
+    request: Request,
+    horizon_years: int = 1,
+    user_id: str = Depends(get_current_user),
+):
+    """
+    'Değerlenme Potansiyeli' — NUTS2 regions ranked by housing-index
+    appreciation, nominal AND real (inflation-adjusted). Region-level
+    honesty: no street/parcel claims, past != future.
+    """
+    from backend.services.region_intelligence import rank_regions
+
+    horizon_years = min(max(horizon_years, 1), 3)
+    return rank_regions(horizon_years)
+
+
 @router.post("/listing-links")
 @limiter.limit("20/minute")
 async def listing_links(

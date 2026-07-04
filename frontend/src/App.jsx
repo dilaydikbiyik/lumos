@@ -7,6 +7,7 @@ import PathSelectionPage from './pages/PathSelectionPage'
 import FearCheckInPage from './pages/FearCheckInPage'
 import ProfilePage from './pages/ProfilePage'
 import HoldingsPage from './pages/HoldingsPage'
+import ExplorePage from './pages/ExplorePage'
 import RecommendPage from './pages/RecommendPage'
 import DashboardPage from './pages/DashboardPage'
 
@@ -29,6 +30,7 @@ export default function App() {
           <Route path="/fear-check-in" element={<ProtectedRoute><FearCheckInPage /></ProtectedRoute>} />
           <Route path="/profile"   element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
           <Route path="/holdings"  element={<ProtectedRoute><HoldingsPage /></ProtectedRoute>} />
+          <Route path="/explore"   element={<ProtectedRoute><ExplorePage /></ProtectedRoute>} />
           <Route path="/recommend" element={<ProtectedRoute><RecommendPage /></ProtectedRoute>} />
           <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
           <Route path="*"          element={<Navigate to="/" replace />} />

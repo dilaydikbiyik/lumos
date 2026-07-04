@@ -23,6 +23,9 @@ class Settings(BaseSettings):
     # Exchange Rate (optional)
     EXCHANGE_RATE_API_KEY: str = ""
 
+    # TCMB EVDS — live TÜFE + housing price index (free key)
+    TCMB_EVDS_API_KEY: str = ""
+
     # Usage limits
     DAILY_MESSAGE_QUOTA: int = 50
 

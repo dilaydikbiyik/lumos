@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { UserButton } from '@clerk/clerk-react'
 import PortfolioChart from '../components/PortfolioChart'
 import NewsDigest from '../components/NewsDigest'
+import GoalPlanner from '../components/GoalPlanner'
 import usePortfolio from '../hooks/usePortfolio'
 
 export default function DashboardPage() {
@@ -34,6 +35,8 @@ export default function DashboardPage() {
         <h2>Dashboard</h2>
 
         <NewsDigest />
+
+        <GoalPlanner />
 
         {!profile ? (
           <div className="card" style={{ textAlign: 'center', padding: 40 }}>

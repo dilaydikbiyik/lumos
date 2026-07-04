@@ -2,7 +2,7 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import { SignedIn } from '@clerk/clerk-react'
 
 const NAV_ITEMS = [
-  { path: '/',          icon: '🏠', label: 'Home'      },
+  { path: '/explore',   icon: '🏘️', label: 'Keşfet'    },
   { path: '/profile',   icon: '💬', label: 'Chat'      },
   { path: '/recommend', icon: '📊', label: 'Portfolio' },
   { path: '/holdings',  icon: '💰', label: 'Varlıklar' },

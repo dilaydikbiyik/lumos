@@ -622,14 +622,14 @@ lumos/                          ← proje kökü
 
 #### Akış 2 — Bölge Değerlenme İstihbaratı (AI "nereden alayım?" cevabı)
 
-- [ ] TCMB Konut Fiyat Endeksi (EVDS, il bazlı, ücretsiz): illerin 1/3/5 yıllık nominal + reel değerlenme sıralaması
+- [x] TCMB Konut Fiyat Endeksi CANLI: 19 NUTS2 bölgesi (TP.KFE.*), 1-3 yıl nominal + reel değerlenme sıralaması (`region_intelligence.py`)
 - [ ] TÜİK nüfus/göç verisi entegrasyonu: net göç alan + genç nüfuslu ilçeler = talep sinyali
-- [ ] "Değerlenme Potansiyeli" bölge kartları: veri (endeks trendi + göç + LLM bağlam yorumu) → "uzun vadede öne çıkan bölgeler" listesi — il/ilçe seviyesinde, parsel iddiası YOK (dürüstlük ilkesi: "mahalle/parsel analizi yapamayız, bölge trendi gösteririz")
+- [x] "Değerlenme Potansiyeli" bölge kartları: GET /planning/region-intelligence + ExplorePage UI (1/2/3 yıl seçimli, reel sıralı, dürüstlük notu) — canlı TCMB verisiyle tarayıcıda doğrulandı; TÜİK göç sinyali sonraki adım
 - [ ] Kullanıcı hedefiyle eşleştir: "20 yıl bekleyebilirim" → uzun vade değerlenme bölgeleri; "5 yılda satarım" → likiditesi yüksek merkezi bölgeler
 
 #### Akış 3 — İlan Köprüsü (satın almaya yönlendirme)
 
-- [x] Filtre-hazır dış linkler: `listing_bridge.py` + POST /planning/listing-links — Sahibinden/Emlakjet, il+ilçe+tip filtreli (4 test)
+- [x] Filtre-hazır dış linkler: servis + endpoint + ExplorePage "İlanlara Git" kartı (il/ilçe/tip formu → dış linkler)
 - [ ] **İlan değerlendirme asistanı**: kullanıcı beğendiği ilanın bilgilerini yapıştırır (konum, m², fiyat) → AI bölge ortalama m² fiyatıyla kıyaslar: "bölge ortalamasının %20 üstünde" + pazarlık/kontrol listesi (imar durumu, tapu cinsi, yola cephe...)
 - [ ] Satın alma kontrol listesi rehberi: arsa/daire alırken adım adım ne kontrol edilir (statik eğitim içeriği, TR'ye özgü: tapu, imar, DASK...)
 - [ ] (İleri faz — iş geliştirme) Emlak platformu API ortaklığı: gerçek ilan + emlakçı iletişimi in-app gösterim
@@ -647,7 +647,7 @@ lumos/                          ← proje kökü
 
 > Türkiye'de yatırım bilmeyenin ilk finansal sorusu: "kirada mı oturayım, ev mi alayım?" — bu soruya cevap veren araç, uygulamaya kullanıcı çeken kapı olur.
 
-- [x] "Kirada mı otur, ev mi al?" karar aracı: `rent_vs_buy.py` + POST /planning/rent-vs-buy — iki senaryo net karşılaştırma (6 test); UI sayfası sonraki adım
+- [x] "Kirada mı otur, ev mi al?" karar aracı: servis + endpoint + ExplorePage UI kartı (iki senaryo yan yana + duygusal değer notu) — canlı doğrulandı
 - [ ] Karar aracına duygu boyutu: "ev sahibi olma güvencesi"nin parasal olmayan değerini de anlat (vizyon ilkesi: korku/duygu = veri)
 - [ ] Aylık ödenen kirayı profil girdisi yap: yatırılabilir gerçek tutar = gelir − kira − zorunlu giderler → bütçe bölüşüm danışmanı bu net tutarla konuşsun
 - [x] Kapsam sınırı (bilinçli karar): kiralık ilan arama / mortgage pazaryeri EKLENMEDİ — listing_bridge.py sadece filtre-hazır dış link üretir, ilan verisi hiç saklanmaz
@@ -655,7 +655,7 @@ lumos/                          ← proje kökü
 ### Enflasyon Gerçekliği 🇹🇷 (yerel farklılaştırıcı — kimse yapmıyor)
 
 - [x] Tüm getirilere nominal + reel çift gösterim: Zaman Makinesi sonucunda `real_return_pct` alanı, UI'da "Enflasyon sonrası (reel)" satırı
-- [/] TÜFE verisi: statik aylık endeks (`data/tufe_index.json`) ile başladı — canlı TCMB EVDS API'sine geçiş (key kaydı gerekiyor) sonraki adım, `inflation_service.py` kaynak-agnostik tasarlandı
+- [x] TÜFE verisi: CANLI TCMB EVDS entegrasyonu (`evds_service.py`, TP.FG.J0, günlük cache) — statik dosya fallback olarak korunuyor
 - [ ] Portföyde TL/döviz dağılımı ve kur riski göstergesi
 - [x] "Param eriyor mu?" kartı: Varlıklarım sayfasında boştaki bütçe + nakit için aylık reel erime tutarı (5 test)
 
@@ -667,9 +667,9 @@ lumos/                          ← proje kökü
 
 ### Hedef Bazlı Yatırım 🎯
 
-- [x] Hedef tanımlama: `goal_planner.py` + POST /planning/goal-plan — annüite formülüyle gereken aylık katkı (6 test)
-- [x] Hedefe ilerleme + sapma: POST /planning/goal-progress — mevcut tempoyla hedefe ulaşır mı, kaç ay gecikir
-- [x] Hedef sapma uyarısı: `progress_and_drift()` → `delay_months` alanı (UI kartı sonraki adım)
+- [x] Hedef tanımlama: servis + endpoint + Dashboard `GoalPlanner` kartı — canlı doğrulandı (800K/3yıl → 17.993 TL/ay)
+- [x] Hedefe ilerleme + sapma: endpoint + UI ilerleme çubuğu — canlı doğrulandı (10K temponla "21 ay gecikir" uyarısı)
+- [x] Hedef sapma uyarısı: UI'da "⏳ Bu tempoda hedefin X ay gecikir" kartı canlı çalışıyor
 
 ### Portföy Sağlık Skoru 💯
 
@@ -695,7 +695,7 @@ lumos/                          ← proje kökü
 
 > Yatırım bilmeyen biri gerçek para riske atmadan önce güven kazanmalı.
 
-- [x] Sanal portföy: `practice_mode.py` + POST /practice/snapshot — gerçek piyasa verisiyle sahte 100.000 TL takibi, haftalık değişim + "en çok hareket eden varlık" (3 test)
+- [x] Sanal portföy: servis + endpoint + RecommendPage `PracticeMode` kartı ("Önce Sahte Parayla Dene")
 - [/] Haftalık değişim hesabı hazır (weekly_change_amount + biggest_mover); LLM anlatım katmanı sonraki adım
 - [ ] İlk yatırım rehberli yolculuğu: adım adım sihirbaz — "aracı kurum hesabı nedir → nasıl açılır → ilk emir nasıl verilir" (Türkiye'ye özgü, ekran görüntülü statik rehber)
 - [x] Korku check-in'i: `FearCheckInPage.jsx` + PATCH /users/me/fear-check-in — 4 korku etiketi + anında kişiselleştirilmiş güvence mesajı (canlı doğrulandı)
