@@ -104,7 +104,42 @@ def chat(messages: list[dict]) -> str:
     Returns:
         The assistant's text reply.
     """
-    return _dispatch(messages, _SYSTEM_PROMPT, max_tokens=1024)
+    # Generous budget: gemini-2.5-flash spends "thinking" tokens from the same
+    # pool, and the final profile summary must not be truncated before the
+    # [PROFILE_COMPLETE] marker.
+    return _dispatch(messages, _SYSTEM_PROMPT, max_tokens=4096)
+
+
+def extract_profile(messages: list[dict]) -> dict:
+    """
+    Extract structured risk-profile answers from a completed profiling
+    conversation. Returns a dict matching RiskProfileAnswers fields.
+
+    Raises HTTPException(422) if the AI output cannot be parsed as JSON.
+    """
+    import json
+    import re
+
+    extract_system = (
+        Path(__file__).parent.parent / "prompts" / "profile_extract_prompt.txt"
+    ).read_text()
+    transcript = "\n".join(f"{m['role'].upper()}: {m['content']}" for m in messages)
+
+    raw = _dispatch(
+        [{"role": "user", "content": f"CONVERSATION:\n{transcript}"}],
+        extract_system,
+        max_tokens=256,
+    )
+
+    # Tolerate accidental markdown fences around the JSON
+    cleaned = re.sub(r"^```(?:json)?\s*|\s*```$", "", raw.strip())
+    try:
+        return json.loads(cleaned)
+    except json.JSONDecodeError:
+        raise HTTPException(
+            status_code=422,
+            detail="Could not extract a structured profile from the conversation.",
+        )
 
 
 def generate_text(prompt: str, system: Optional[str] = None) -> str:

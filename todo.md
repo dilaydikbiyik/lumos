@@ -477,11 +477,11 @@ lumos/                          ← proje kökü
 
 - [x] `slowapi` ile AI endpoint'lerine rate limiting ekle (chat, recommend)
 - [ ] Prompt injection koruması: kullanıcı girdisini system prompt'tan ayrıştır
-- [ ] Claude tool-use / structured output ile risk skoru + portföy çıktısını JSON-mode yerine yapılandır
+- [/] Structured output: risk profili çıkarımı yapılandırıldı (`/chat/extract-profile` + JSON extraction prompt'u) — portföy çıktısı tool-use'a geçirilecek
 
 ### AI Danışman Kalitesi 🆕
 
-> ⚠️ **Tespit (2026-07-04):** ChatWindow'a `onProfileComplete` prop'u geçiliyor ama bileşen içinde hiç çağrılmıyor — chat tamamlanınca skor kaydetme akışı kopuk. Kalıcı çözüm "tool-use / structured output" maddesiyle birlikte: AI 7 cevabı yapılandırılmış döndürünce onProfileComplete tetiklenecek.
+> ✅ **Çözüldü (2026-07-04):** Kopuk profil akışı onarıldı — AI tamamlanınca `[PROFILE_COMPLETE]` işareti veriyor, frontend `/chat/extract-profile` ile yapılandırılmış cevapları çekip skor ekranına geçiyor.
 
 - [x] `system_prompt.txt`'i derinleştir: MPT/risk-getiri çerçevesine açık referans, karşı soru sorma davranışı, yasal/etik sınırların net ifadesi
 - [x] Few-shot örnek diyaloglar ekle (1 örnek embedded) — danışman tonunu örnekten öğret

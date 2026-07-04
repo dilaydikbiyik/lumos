@@ -30,6 +30,62 @@ def test_chat_rejects_invalid_body(client, mock_ai):
     mock_ai.assert_not_called()
 
 
+def test_extract_profile_returns_structured_answers(client):
+    from unittest.mock import patch
+
+    ai_json = (
+        '{"budget": 50000, "time_horizon": "long", "loss_tolerance": "medium", '
+        '"goal": "growth", "experience": "beginner"}'
+    )
+    with patch("backend.services.ai_service._dispatch", return_value=ai_json):
+        res = client.post(
+            "/chat/extract-profile",
+            json={"messages": [{"role": "user", "content": "50.000 TL, uzun vade..."}]},
+        )
+    assert res.status_code == 200
+    body = res.json()
+    assert body["budget"] == 50000
+    assert body["time_horizon"] == "long"
+
+
+def test_extract_profile_tolerates_markdown_fences(client):
+    from unittest.mock import patch
+
+    fenced = (
+        '```json\n{"budget": 20000, "time_horizon": "medium", '
+        '"loss_tolerance": "low", "goal": "preservation", "experience": "none"}\n```'
+    )
+    with patch("backend.services.ai_service._dispatch", return_value=fenced):
+        res = client.post(
+            "/chat/extract-profile",
+            json={"messages": [{"role": "user", "content": "20 bin TL"}]},
+        )
+    assert res.status_code == 200
+    assert res.json()["goal"] == "preservation"
+
+
+def test_extract_profile_rejects_unparseable_output(client):
+    from unittest.mock import patch
+
+    with patch("backend.services.ai_service._dispatch", return_value="sorry, no JSON here"):
+        res = client.post(
+            "/chat/extract-profile",
+            json={"messages": [{"role": "user", "content": "merhaba"}]},
+        )
+    assert res.status_code == 422
+
+
+def test_extract_profile_rejects_incomplete_fields(client):
+    from unittest.mock import patch
+
+    with patch("backend.services.ai_service._dispatch", return_value='{"budget": 1000}'):
+        res = client.post(
+            "/chat/extract-profile",
+            json={"messages": [{"role": "user", "content": "1000 TL"}]},
+        )
+    assert res.status_code == 422
+
+
 def test_chat_requires_auth(mock_ai):
     """Without the auth override, a tokenless request must be rejected."""
     from fastapi.testclient import TestClient

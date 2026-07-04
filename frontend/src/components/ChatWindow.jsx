@@ -4,8 +4,8 @@ import useChat from '../hooks/useChat'
 
 const INTRO = "Merhaba! Ben Lumos 👋\n\nSana 7 kısa soru soracağım ve kişisel risk profilini oluşturacağım. Hazır mısın?\n\n**1️⃣ Başlayalım: Yatırıma ayırabileceğin bütçen nedir?** (Örn: 50.000 TL)"
 
-export default function ChatWindow() {
-  const { messages, isLoading, error, sendMessage } = useChat()
+export default function ChatWindow({ onProfileComplete }) {
+  const { messages, isLoading, error, sendMessage } = useChat(onProfileComplete)
   const [input, setInput] = useState('')
   const bottomRef = useRef(null)
   const inputRef = useRef(null)

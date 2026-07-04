@@ -2,7 +2,9 @@ import { useState } from 'react'
 import { useAuth } from '@clerk/clerk-react'
 import api, { setAuthToken } from '../utils/api'
 
-export default function useChat() {
+const COMPLETE_MARKER = '[PROFILE_COMPLETE]'
+
+export default function useChat(onProfileComplete) {
   const { getToken } = useAuth()
   const [messages, setMessages] = useState([])
   const [isLoading, setIsLoading] = useState(false)
@@ -26,8 +28,20 @@ export default function useChat() {
     try {
       await ensureAuth()
       const res = await api.post('/chat', { messages: next })
-      const assistantMsg = { role: 'assistant', content: res.data.reply }
-      setMessages([...next, assistantMsg])
+      const rawReply = res.data.reply
+      const isComplete = rawReply.includes(COMPLETE_MARKER)
+      // Marker is an internal signal — never show it to the user
+      const displayReply = rawReply.replace(COMPLETE_MARKER, '').trimEnd()
+
+      const assistantMsg = { role: 'assistant', content: displayReply }
+      const full = [...next, assistantMsg]
+      setMessages(full)
+
+      if (isComplete && onProfileComplete) {
+        // Extract structured answers from the finished conversation
+        const extracted = await api.post('/chat/extract-profile', { messages: full })
+        await onProfileComplete(extracted.data)
+      }
     } catch (err) {
       setError(err.response?.data?.detail || 'Failed to send message')
     } finally {

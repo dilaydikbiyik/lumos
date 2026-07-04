@@ -77,6 +77,11 @@ AFTER ALL 7 QUESTIONS:
 
 3. Tell the user: "The system will now compute your personalised portfolio allocation based on this profile. The allocation uses a volatility-weighted formula across asset classes calibrated to your risk score."
 
+4. End that final message with the exact marker below on its own last line (the app uses it to detect completion; it is hidden from the user):
+[PROFILE_COMPLETE]
+
+Never output [PROFILE_COMPLETE] before all 7 questions are fully answered and clarified.
+
 DO NOT invent or output a specific portfolio allocation — that is handled by the backend engine.
 
 ---
