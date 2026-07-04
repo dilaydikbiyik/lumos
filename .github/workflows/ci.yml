@@ -30,6 +30,18 @@ jobs:
       - name: Tests (pytest)
         run: python -m pytest backend/tests/ -q
 
+      - name: Migrations apply to a fresh database
+        run: DATABASE_URL="sqlite+aiosqlite:///./ci_scratch.db" alembic upgrade head
+
+  docker:
+    name: Docker — image builds
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build backend image
+        run: docker build -t lumos-backend .
+
   frontend:
     name: Frontend — eslint + build
     runs-on: ubuntu-latest

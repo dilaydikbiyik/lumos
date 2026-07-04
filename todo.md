@@ -458,20 +458,20 @@ lumos/                          ← proje kökü
 
 ### Deployment
 
-- [ ] `Dockerfile` (backend) — Phase 5'te planlı, henüz yok
-- [ ] Local docker-compose ile backend+db'yi ayağa kaldırma testi
+- [x] `Dockerfile` (backend) — python:3.9-slim, migration + uvicorn startup; build doğrulaması CI'da (lokalde Docker yok)
+- [/] docker-compose.yml hazır (kalıcı volume + healthcheck) — lokal test için Docker Desktop kurulumu gerekiyor
 
 ### Veri Sağlayıcı Riski
 
-- [ ] yfinance rate-limit / kırılma senaryolarına fallback ekle
+- [x] yfinance rate-limit / kırılma senaryolarına fallback: 7 günlük stale cache kopyası — indirme çökerse bayat veriyle devam, o da yoksa MarketDataError → 503
 - [ ] TEFAS resmi API'sine kademeli geçiş değerlendirmesi
-- [ ] Cache TTL stratejisini (cache.py) veri tazeliği ihtiyacına göre gözden geçir
+- [x] Cache TTL stratejisi gözden geçirildi: taze 24s + stale 7g çift katman
 
 ### AI Servis Gözlemlenebilirliği
 
-- [ ] Claude çağrıları için structured logging (latency, token sayımı, hata)
-- [ ] Prompt versiyonlama (system_prompt.txt, reit_explain_prompt.txt değişiklik takibi)
-- [ ] Anthropic SDK güncelle (0.39.0 → güncel) — prompt caching ile maliyet düşür
+- [x] AI çağrıları için structured logging (`lumos.ai` logger: provider, prompt_version, latency_ms, mesaj sayısı, durum, hata tipi)
+- [x] Prompt versiyonlama: system prompt SHA1 hash'i (`PROMPT_VERSION`) her log satırında — hangi cevabın hangi prompt sürümünden geldiği izlenebilir
+- [x] Anthropic SDK güncellendi (0.39.0 → 0.112.0); prompt caching Anthropic'e geçilirse eklenecek
 
 ### Güvenlik & Compliance
 
@@ -529,7 +529,7 @@ lumos/                          ← proje kökü
 
 - [ ] `backend/repositories/` katmanı: tüm SQLAlchemy sorgularını router'lardan buraya taşı (`user_repository.py` ile başla — recommend.py'deki inline select buraya)
 - [ ] `backend/schemas/` klasörü: Pydantic request/response şemalarını `models/`'tan ayır; `models/` sadece ORM
-- [ ] Domain exception sınıfları: `AIServiceError`, `MarketDataError`, `QuotaExceededError` (`backend/exceptions.py`) + error_handler'da tip bazlı yakalama
+- [/] Domain exception sınıfları: `MarketDataError` + `AIServiceError` eklendi (`backend/exceptions.py`), error_handler'da 503'e map'leniyor — `QuotaExceededError` kota özelliğiyle gelecek
 - [ ] Standart hata yanıt şeması: `{"error": {"code", "message", "request_id"}}` — tüm hata yolları aynı formatı dönsün
 - [ ] `X-Request-ID` middleware: her isteğe correlation ID, log satırlarına ve hata yanıtlarına ekle
 - [ ] API versiyonlama: tüm router'ları `/api/v1` prefix'i altına al (frontend api.js baseURL güncelle)

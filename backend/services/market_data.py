@@ -8,11 +8,19 @@ Supported asset classes:
   - REIT ETFs: VNQ, SCHH  (added in Phase 3.5)
 """
 
+import logging
+
 import pandas as pd
 import yfinance as yf
 from typing import Optional
 
+from backend.exceptions import MarketDataError
 from backend.services import cache as cache_service
+
+logger = logging.getLogger("lumos.market_data")
+
+# Stale copies outlive the fresh cache — used only when yfinance fails
+STALE_TTL_SECONDS = 60 * 60 * 24 * 7  # 7 days
 
 # ── Default asset universe ────────────────────────────────────────────────────
 DEFAULT_TICKERS = [
@@ -38,28 +46,43 @@ def fetch_price_history(
     """
     tickers = tickers or DEFAULT_TICKERS
     cache_key = f"price_history:{'_'.join(sorted(tickers))}:{period}"
+    stale_key = f"stale:{cache_key}"
 
     cached = cache_service.get(cache_key)
     if cached is not None:
         return cached
 
-    raw = yf.download(
-        tickers=tickers,
-        period=period,
-        auto_adjust=True,
-        progress=False,
-        threads=True,
-    )
+    try:
+        raw = yf.download(
+            tickers=tickers,
+            period=period,
+            auto_adjust=True,
+            progress=False,
+            threads=True,
+        )
+        if raw is None or raw.empty:
+            raise MarketDataError(f"yfinance returned no data for {tickers}")
 
-    # yfinance returns MultiIndex if multiple tickers
-    if isinstance(raw.columns, pd.MultiIndex):
-        closes = raw["Close"]
-    else:
-        closes = raw[["Close"]]
-        closes.columns = tickers
+        # yfinance returns MultiIndex if multiple tickers
+        if isinstance(raw.columns, pd.MultiIndex):
+            closes = raw["Close"]
+        else:
+            closes = raw[["Close"]]
+            closes.columns = tickers
 
-    result = {ticker: closes[ticker].dropna() for ticker in closes.columns}
+        result = {ticker: closes[ticker].dropna() for ticker in closes.columns}
+    except Exception as exc:
+        # Fallback: serve the stale copy (up to 7 days old) if we have one
+        stale = cache_service.get(stale_key)
+        if stale is not None:
+            logger.warning(
+                "yfinance failed (%s) — serving stale market data for %s", exc, tickers
+            )
+            return stale
+        raise MarketDataError(f"Market data fetch failed with no fallback: {exc}") from exc
+
     cache_service.set(cache_key, result)
+    cache_service.set(stale_key, result, ttl=STALE_TTL_SECONDS)
     return result
 
 

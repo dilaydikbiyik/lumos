@@ -5,6 +5,9 @@ Exposes chat() and generate_text() backed by the provider selected via
 settings.AI_PROVIDER ("gemini" or "anthropic"). Gemini's free tier is the
 development default; Anthropic can be enabled by switching the env var.
 """
+import hashlib
+import logging
+import time
 from pathlib import Path
 from typing import Optional
 
@@ -12,7 +15,12 @@ from fastapi import HTTPException
 
 from backend.config import settings
 
+logger = logging.getLogger("lumos.ai")
+
 _SYSTEM_PROMPT = (Path(__file__).parent.parent / "prompts" / "system_prompt.txt").read_text()
+
+# Short content hash — lets logs tie a response to the exact prompt version
+PROMPT_VERSION = hashlib.sha1(_SYSTEM_PROMPT.encode()).hexdigest()[:8]
 
 ANTHROPIC_MODEL = "claude-sonnet-4-6"
 GEMINI_MODEL = "gemini-2.5-flash"
@@ -89,7 +97,26 @@ def _dispatch(messages: list[dict], system: str, max_tokens: int) -> str:
             status_code=500,
             detail=f"Unknown AI_PROVIDER '{settings.AI_PROVIDER}' — use 'gemini' or 'anthropic'.",
         )
-    return adapter(messages, system, max_tokens)
+
+    started = time.monotonic()
+    try:
+        reply = adapter(messages, system, max_tokens)
+    except Exception as exc:
+        logger.error(
+            "ai_call provider=%s prompt_version=%s messages=%d max_tokens=%d "
+            "latency_ms=%d status=error error=%s",
+            settings.AI_PROVIDER, PROMPT_VERSION, len(messages), max_tokens,
+            (time.monotonic() - started) * 1000, type(exc).__name__,
+        )
+        raise
+
+    logger.info(
+        "ai_call provider=%s prompt_version=%s messages=%d max_tokens=%d "
+        "latency_ms=%d status=ok reply_chars=%d",
+        settings.AI_PROVIDER, PROMPT_VERSION, len(messages), max_tokens,
+        (time.monotonic() - started) * 1000, len(reply),
+    )
+    return reply
 
 
 # ── Public API (unchanged signatures) ─────────────────────────────────────────
