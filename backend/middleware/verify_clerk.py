@@ -8,8 +8,8 @@ from backend.config import settings
 
 _security = HTTPBearer(auto_error=False)
 
-# Clerk JWKS endpoint
-_JWKS_URL = f"{settings.CLERK_JWT_ISSUER}/.well-known/jwks.json"
+# CLERK_JWT_ISSUER is already the full JWKS URL
+_JWKS_URL = settings.CLERK_JWT_ISSUER
 
 
 async def _get_jwks() -> dict:
