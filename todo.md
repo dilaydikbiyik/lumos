@@ -598,7 +598,7 @@ lumos/                          ← proje kökü
 > İleri faz (iş geliştirme): aracı kurum API ortaklığı ile "tek tık emir iletimi" — emlak platform ortaklığıyla aynı statüde, MVP dışı.
 
 - [ ] Onboarding'de dürüst beklenti cümlesi: "Lumos sana yol gösterir; alım-satımı kendi aracı kurumunda/emlakçında yaparsın, sonra burada takip ederiz"
-- [ ] Borsa "Aldım" akışı: öneri ekranından tek tıkla holdings'e ön-dolu kayıt (emlaktaki Akış 4 ile simetrik)
+- [x] Borsa "Aldım" akışı: `BoughtItBridge` — öneri dağılımını tek tıkla holdings'e işler, kalan bütçe otomatik güncellenir
 - [ ] "Aracı kurum hesabı nasıl açılır" rehberi (Korkusuz Başlangıç'taki rehberli yolculukla aynı madde — çift kayıt değil, referans)
 
 #### Akış 0 — Yol Seçimi 🧭 (yapısal ilke: akışlar zorunlu değil, seçilebilir)
@@ -608,7 +608,7 @@ lumos/                          ← proje kökü
 > Kullanıcı emlak seçmek ZORUNDA değil. Üç eşit yol: sadece borsa (Midas tarzı) / sadece emlak keşfi / karma. Her akış bağımsız çalışır.
 
 - [x] Onboarding'e yol sorusu: `PathSelectionPage` (4 kart) → PATCH /users/me/investment-path → users.investment_path
-- [/] Yol seçimi backend+UI hazır; yol-bazlı modül gizleme mantığı emlak modülleri geldikçe uygulanacak
+- [x] Yol-bazlı modül uyarlaması: BottomNav seçilen yola göre filtreleniyor (sadece-borsa → Keşfet gizli; sadece-emlak → Portfolio gizli)
 - [ ] "Sadece emlak" yolu: risk profili yine yapılır (vade + likidite kritik) ama çıktı bölge kartları + ilan değerlendirme + eğitim; borsa önerisi dayatılmaz
 - [ ] "Kararsızım" yolu: profil + korku check-in sonucuna göre AI yol önerir ("düzenli birikim + uzun vade → önce borsa fonlarıyla başla, emlak eşiğine gelince haber veririm")
 - [ ] Yol her an değiştirilebilir (ayarlar + dashboard'da "emlak dünyasını keşfet" yumuşak daveti — dayatma yok)

@@ -6,6 +6,7 @@ import PerformanceChart from '../components/PerformanceChart'
 import ReitCard from '../components/ReitCard'
 import TimeMachine from '../components/TimeMachine'
 import PracticeMode from '../components/PracticeMode'
+import BoughtItBridge from '../components/BoughtItBridge'
 import usePortfolio from '../hooks/usePortfolio'
 
 export default function RecommendPage() {
@@ -82,6 +83,9 @@ export default function RecommendPage() {
         <div className="disclaimer">
           ⚠️ Educational purposes only. Past performance does not guarantee future results. Consult a licensed financial advisor.
         </div>
+
+        {/* "Aldım" köprüsü — no-execution modelinin son halkası */}
+        <BoughtItBridge allocations={portfolio.allocations} budget={portfolio.budget} />
 
         <button className="btn btn-ghost btn-full" onClick={() => navigate('/dashboard')}>
           Save & View Dashboard →

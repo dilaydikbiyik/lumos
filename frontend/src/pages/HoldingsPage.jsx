@@ -11,8 +11,17 @@ const OFF_EXCHANGE = ['real_estate', 'land', 'vehicle', 'cash', 'other']
 
 const EMPTY_FORM = {
   asset_type: 'stock', name: '', ticker: '',
-  purchase_amount: '', manual_current_value: '', note: '',
+  purchase_amount: '', manual_current_value: '', note: '', emotion_tag: '',
 }
+
+// 1-tık duygu etiketi — davranış koçunun veri kaynağı, tamamen opsiyonel
+const EMOTIONS = [
+  { value: '', label: 'Bu kararı ne verdirdi? (ops.)' },
+  { value: 'plan', label: '📋 Planımın parçası' },
+  { value: 'fomo', label: '🔥 Kaçırma korkusu (FOMO)' },
+  { value: 'tuyo', label: '🗣️ Tüyo / tavsiye' },
+  { value: 'panik', label: '😰 Panik / acele' },
+]
 
 const fmt = n => new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 0 }).format(n)
 
@@ -60,6 +69,7 @@ export default function HoldingsPage() {
       if (form.ticker) body.ticker = form.ticker.toUpperCase()
       if (form.manual_current_value) body.manual_current_value = Number(form.manual_current_value)
       if (form.note) body.note = form.note
+      if (form.emotion_tag) body.emotion_tag = form.emotion_tag
       await api.post('/holdings', body)
       setForm(EMPTY_FORM)
       setShowForm(false)
@@ -173,6 +183,10 @@ export default function HoldingsPage() {
                    value={form.purchase_amount} onChange={e => setForm({ ...form, purchase_amount: e.target.value })} />
             <input className="input" type="number" placeholder="Güncel tahmini değer (opsiyonel)" min="1"
                    value={form.manual_current_value} onChange={e => setForm({ ...form, manual_current_value: e.target.value })} />
+            <select className="input" value={form.emotion_tag}
+                    onChange={e => setForm({ ...form, emotion_tag: e.target.value })}>
+              {EMOTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+            </select>
             <div style={{ display: 'flex', gap: 8 }}>
               <button className="btn btn-primary" type="submit" style={{ flex: 1 }}>Ekle</button>
               <button className="btn btn-ghost" type="button" onClick={() => setShowForm(false)}>Vazgeç</button>
