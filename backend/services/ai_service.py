@@ -26,20 +26,28 @@ ANTHROPIC_MODEL = "claude-sonnet-4-6"
 GEMINI_MODEL = "gemini-2.5-flash"
 
 
-# ── Anthropic adapter ─────────────────────────────────────────────────────────
+# ── Anthropic adapter ──────────────────────────────────────────────────────────────────────
 
 def _anthropic_chat(messages: list[dict], system: str, max_tokens: int) -> str:
     import anthropic
+    from anthropic import Anthropic
+    from anthropic.types import Message, MessageParam
+    from typing import cast as tcast
 
-    client = anthropic.Anthropic(api_key=settings.ANTHROPIC_API_KEY)
+    client = Anthropic(api_key=settings.ANTHROPIC_API_KEY)
+    typed_messages: list[MessageParam] = [
+        {"role": m["role"], "content": m["content"]} for m in messages
+    ]
     try:
-        response = client.messages.create(
+        # cast: create() returns Message|Stream union; we never pass stream=True so it's always Message
+        response = tcast(Message, client.messages.create(
             model=ANTHROPIC_MODEL,
             max_tokens=max_tokens,
             system=system,
-            messages=messages,
-        )
-        return response.content[0].text
+            messages=typed_messages,
+        ))
+        block = response.content[0]
+        return block.text if hasattr(block, "text") else ""
     except anthropic.BadRequestError as exc:
         if "credit balance" in str(exc):
             raise HTTPException(
@@ -167,18 +175,40 @@ def extract_profile(messages: list[dict]) -> dict:
     raw = _dispatch(
         [{"role": "user", "content": f"CONVERSATION:\n{transcript}"}],
         extract_system,
-        max_tokens=256,
+        max_tokens=512,
     )
 
-    # Tolerate accidental markdown fences around the JSON
-    cleaned = re.sub(r"^```(?:json)?\s*|\s*```$", "", raw.strip())
+    # Strategy 1: strip markdown fences and try direct parse
+    cleaned = re.sub(r"^```(?:json)?\s*|\s*```$", "", raw.strip(), flags=re.MULTILINE).strip()
     try:
         return json.loads(cleaned)
     except json.JSONDecodeError:
-        raise HTTPException(
-            status_code=422,
-            detail="Could not extract a structured profile from the conversation.",
-        )
+        pass
+
+    # Strategy 2: find the first {...} block in the response (handles thinking tokens / prose)
+    match = re.search(r"\{[^{}]+\}", cleaned, re.DOTALL)
+    if match:
+        try:
+            return json.loads(match.group(0))
+        except json.JSONDecodeError:
+            pass
+
+    # Strategy 3: find any {...} block including nested
+    match = re.search(r"\{.*?\}", raw, re.DOTALL)
+    if match:
+        try:
+            return json.loads(match.group(0))
+        except json.JSONDecodeError:
+            pass
+
+    logger.warning(
+        "extract_profile failed to parse JSON. raw_output=%r",
+        raw[:300],
+    )
+    raise HTTPException(
+        status_code=422,
+        detail="Sohbet tamamlanmadı — lütfen tüm soruları yanıtla ve tekrar dene.",
+    )
 
 
 def generate_text(prompt: str, system: Optional[str] = None) -> str:

@@ -1,9 +1,11 @@
 from contextlib import asynccontextmanager
+from typing import Callable, cast
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
+
 
 from backend.config import settings
 from backend.limiter import limiter
@@ -30,12 +32,26 @@ app = FastAPI(
 
 # ── Rate Limiting ─────────────────────────────────────────────────────────────
 app.state.limiter = limiter
-app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+# cast: slowapi handler'ının signature'ı Starlette'in beklediği generic
+# (Request, Exception) tipinden daha dar — cast ile tip kontrolünü atlatıyoruz
+app.add_exception_handler(
+    RateLimitExceeded,
+    cast(Callable[[Request, Exception], Response], _rate_limit_exceeded_handler),
+)
 
 # ── CORS ──────────────────────────────────────────────────────────────────────
+_dev_origins = [
+    "http://localhost:5173",
+    "http://localhost:5174",
+    "http://localhost:5175",
+    "http://127.0.0.1:5173",
+    "http://127.0.0.1:5174",
+]
+_allowed_origins = _dev_origins if settings.APP_ENV == "development" else [settings.FRONTEND_URL]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[settings.FRONTEND_URL],
+    allow_origins=_allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
