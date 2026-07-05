@@ -1,31 +1,54 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 /* ── Reset & Design Tokens ────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --bg:           #0C0D14;
-  --bg-card:      #13141F;
-  --bg-input:     #1A1B28;
-  --border:       #2A2B3D;
-  --border-light: #343550;
-  --text:         #F0F0FF;
-  --text-muted:   #8B8CA8;
-  --text-dim:     #555670;
+  --bg:           #0A0B12;
+  --bg-card:      #12141F;
+  --bg-card-2:    #181A2A;
+  --bg-input:     #1C1E2E;
+  --border:       #242638;
+  --border-light: #2E3048;
+  --text:         #F2F2FF;
+  --text-muted:   #8E90AC;
+  --text-dim:     #4E5070;
+
+  /* ── Firefly: Ana tema rengi (turuncu/amber — ateş böceği) ── */
+  --firefly:        #F5A524;
+  --firefly-bright: #FFB800;
+  --firefly-soft:   #FFE9A8;
+  --firefly-dim:    rgba(245,165,36,0.18);
+  --firefly-glow:   rgba(245,165,36,0.25);
+  --firefly-glow-lg:rgba(245,165,36,0.12);
+
+  /* ── Accent: İkincil renk (mor/indigo — uzay, gece gökyüzü) ── */
   --accent:       #7C6FF7;
   --accent-2:     #5B8EF0;
   --accent-glow:  rgba(124,111,247,0.18);
+
+  /* ── Semantic ── */
   --green:        #3DD68C;
+  --green-glow:   rgba(61,214,140,0.15);
   --amber:        #F5A524;
   --red:          #F5515F;
+  --red-glow:     rgba(245,81,95,0.15);
 
-  /* Mobile-first sizing */
-  --radius:       16px;
-  --radius-sm:    10px;
-  --touch-target: 48px;   /* minimum touch target */
+  /* ── Aydınlanan Arayüz: Gece → Şafak ── */
+  --bg-night:     #0A0B12;
+  --bg-dusk:      #0E1020;
+  --bg-predawn:   #121528;
+  --bg-dawn:      #181B32;
+
+  /* ── Mobile-first sizing ── */
+  --radius:       18px;
+  --radius-sm:    12px;
+  --radius-xs:    8px;
+  --touch-target: 48px;
   --page-pad:     16px;
-  --shadow:       0 4px 32px rgba(0,0,0,0.55);
-  --font:         'Inter', system-ui, sans-serif;
+  --shadow:       0 4px 32px rgba(0,0,0,0.6);
+  --shadow-glow:  0 0 32px rgba(245,165,36,0.18);
+  --font:         'Outfit', 'Inter', system-ui, sans-serif;
 }
 
 html { font-size: 16px; }
@@ -35,9 +58,10 @@ body {
   background: var(--bg);
   color: var(--text);
   min-height: 100vh;
-  min-height: 100dvh; /* dynamic viewport for mobile browsers */
+  min-height: 100dvh;
   -webkit-font-smoothing: antialiased;
-  -webkit-tap-highlight-color: transparent; /* remove tap flash on mobile */
+  -webkit-tap-highlight-color: transparent;
+  transition: background 1.2s ease;
 }
 
 /* ── Mobile-First Layout ─────────────────────────────────────────────────── */
@@ -51,13 +75,12 @@ body {
 .page-content {
   flex: 1;
   padding: var(--page-pad);
-  padding-bottom: calc(var(--page-pad) + 72px); /* space for bottom nav */
+  padding-bottom: calc(var(--page-pad) + 76px);
   max-width: 600px;
   width: 100%;
   margin: 0 auto;
 }
 
-/* Wider on tablets/desktop */
 @media (min-width: 768px) {
   :root { --page-pad: 24px; }
   .page-content { padding-bottom: var(--page-pad); }
@@ -70,35 +93,44 @@ body {
 /* ── Top Navbar ──────────────────────────────────────────────────────────── */
 .navbar {
   position: sticky; top: 0; z-index: 100;
-  background: rgba(12,13,20,0.85);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: rgba(10,11,18,0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--border);
-  padding: 14px var(--page-pad);
+  padding: 12px var(--page-pad);
   display: flex; align-items: center; justify-content: space-between;
 }
 
 /* ── Bottom Nav (mobile) ─────────────────────────────────────────────────── */
 .bottom-nav {
   position: fixed; bottom: 0; left: 0; right: 0;
-  background: rgba(19,20,31,0.95);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background: rgba(12,14,24,0.97);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border-top: 1px solid var(--border);
   display: flex; justify-content: space-around; align-items: center;
   padding: 8px 0; padding-bottom: max(8px, env(safe-area-inset-bottom));
   z-index: 100;
 }
 .bottom-nav-item {
-  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
   padding: 6px 16px; cursor: pointer; border: none; background: none;
   color: var(--text-dim); font-family: var(--font);
-  transition: color 0.15s;
+  transition: color 0.2s, transform 0.15s;
+  border-radius: var(--radius-xs);
 }
-.bottom-nav-item.active { color: var(--accent); }
-.bottom-nav-item span { font-size: 11px; font-weight: 500; }
+.bottom-nav-item:hover { color: var(--text-muted); }
+.bottom-nav-item.active { color: var(--firefly); }
+.bottom-nav-item.active span:first-child {
+  filter: drop-shadow(0 0 6px rgba(245,165,36,0.6));
+}
+.bottom-nav-item span:first-child {
+  font-size: 20px;
+  transition: transform 0.15s;
+}
+.bottom-nav-item.active span:first-child { transform: scale(1.1); }
+.bottom-nav-item span:last-child { font-size: 10px; font-weight: 600; letter-spacing: 0.02em; }
 
-/* Hide bottom nav on desktop, show top nav links instead */
 @media (min-width: 768px) {
   .bottom-nav { display: none; }
   .page-content { padding-bottom: var(--page-pad); }
@@ -111,15 +143,49 @@ body {
   border-radius: var(--radius);
   padding: 20px;
   box-shadow: var(--shadow);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-interactive {
+  cursor: pointer;
+}
+
+.card-interactive:hover {
+  border-color: var(--firefly-glow);
+  box-shadow: var(--shadow), 0 0 20px var(--firefly-glow-lg);
+}
+
+/* Glassmorphism card varyantı */
+.card-glass {
+  background: rgba(18,20,31,0.7);
+  border: 1px solid rgba(245,165,36,0.12);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: var(--radius);
+  padding: 20px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.card-glass:hover {
+  border-color: rgba(245,165,36,0.28);
+  box-shadow: 0 0 24px rgba(245,165,36,0.1);
 }
 
 /* ── Typography ──────────────────────────────────────────────────────────── */
-h1 { font-size: clamp(1.6rem, 5vw, 2.4rem); font-weight: 700; letter-spacing: -0.5px; line-height: 1.2; }
-h2 { font-size: clamp(1.15rem, 3.5vw, 1.4rem); font-weight: 600; }
+h1 { font-size: clamp(1.65rem, 5vw, 2.5rem); font-weight: 800; letter-spacing: -0.5px; line-height: 1.15; }
+h2 { font-size: clamp(1.2rem, 3.5vw, 1.45rem); font-weight: 700; }
 h3 { font-size: 1rem; font-weight: 600; }
 p  { line-height: 1.65; color: var(--text-muted); }
 
+/* Firefly gradient — turuncu/amber dominant */
 .gradient-text {
+  background: linear-gradient(120deg, var(--firefly-bright) 0%, var(--firefly) 50%, #FF8C00 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Mor/accent gradient (ikincil) */
+.gradient-text-accent {
   background: linear-gradient(135deg, var(--accent), var(--accent-2));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -130,27 +196,70 @@ p  { line-height: 1.65; color: var(--text-muted); }
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
   min-height: var(--touch-target);
-  padding: 0 22px;
+  padding: 0 24px;
   border-radius: var(--radius-sm);
-  font-size: 15px; font-weight: 500; cursor: pointer;
-  border: none; transition: all 0.18s ease;
+  font-size: 15px; font-weight: 600; cursor: pointer;
+  border: none; transition: all 0.2s ease;
   font-family: var(--font);
   -webkit-tap-highlight-color: transparent;
+  letter-spacing: 0.01em;
+  position: relative;
+  overflow: hidden;
 }
+
+/* Shimmer efekti — buton üzerinde parlama */
+.btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.08) 50%, transparent 60%);
+  transform: translateX(-100%);
+  transition: transform 0.45s ease;
+}
+.btn:hover::after { transform: translateX(100%); }
+
+/* Primary: Turuncu-amber ateş böceği gradyanı */
 .btn-primary {
-  background: linear-gradient(135deg, var(--accent), var(--accent-2));
-  color: #fff;
+  background: linear-gradient(135deg, var(--firefly-bright) 0%, var(--firefly) 55%, #E8940A 100%);
+  color: #0A0B12;
+  font-weight: 700;
+  box-shadow: 0 4px 20px rgba(245,165,36,0.35);
 }
-.btn-primary:hover { filter: brightness(1.1); }
-.btn-primary:active { transform: scale(0.97); }
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 28px rgba(245,165,36,0.5);
+  filter: brightness(1.06);
+}
+.btn-primary:active {
+  transform: scale(0.97) translateY(0);
+  box-shadow: 0 2px 12px rgba(245,165,36,0.3);
+}
+
+/* Ghost */
 .btn-ghost {
   background: transparent;
   border: 1px solid var(--border-light);
   color: var(--text-muted);
 }
-.btn-ghost:hover { background: var(--bg-input); color: var(--text); }
-.btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; filter: none; }
+.btn-ghost:hover {
+  background: var(--bg-input);
+  color: var(--text);
+  border-color: var(--firefly-dim);
+}
+.btn-ghost:active { transform: scale(0.97); }
 
+/* Accent (mor — ikincil eylemler) */
+.btn-accent {
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(124,111,247,0.3);
+}
+.btn-accent:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 24px rgba(124,111,247,0.45);
+}
+
+.btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none !important; filter: none !important; box-shadow: none !important; }
 .btn-full { width: 100%; }
 
 /* ── Input ───────────────────────────────────────────────────────────────── */
@@ -160,22 +269,29 @@ p  { line-height: 1.65; color: var(--text-muted); }
   padding: 0 16px;
   background: var(--bg-input); border: 1px solid var(--border);
   border-radius: var(--radius-sm); color: var(--text);
-  font-size: 16px; /* 16px prevents iOS zoom on focus */
+  font-size: 16px;
   font-family: var(--font);
-  transition: border-color 0.15s;
+  transition: border-color 0.18s, box-shadow 0.18s;
   outline: none;
+  appearance: none;
 }
-.input:focus { border-color: var(--accent); }
+.input:focus {
+  border-color: var(--firefly);
+  box-shadow: 0 0 0 3px rgba(245,165,36,0.12);
+}
 .input::placeholder { color: var(--text-dim); }
+select.input { cursor: pointer; }
 
 /* ── Badge ───────────────────────────────────────────────────────────────── */
 .badge {
-  display: inline-block; padding: 3px 10px; border-radius: 20px;
-  font-size: 11px; font-weight: 500;
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 10px; border-radius: 20px;
+  font-size: 11px; font-weight: 600; letter-spacing: 0.02em;
 }
-.badge-accent { background: var(--accent-glow); color: var(--accent); border: 1px solid var(--accent); }
-.badge-green  { background: rgba(61,214,140,0.12); color: var(--green); border: 1px solid var(--green); }
-.badge-amber  { background: rgba(245,165,36,0.12); color: var(--amber); border: 1px solid var(--amber); }
+.badge-accent { background: var(--accent-glow); color: var(--accent); border: 1px solid rgba(124,111,247,0.3); }
+.badge-green  { background: var(--green-glow); color: var(--green); border: 1px solid rgba(61,214,140,0.3); }
+.badge-amber  { background: var(--firefly-dim); color: var(--firefly); border: 1px solid rgba(245,165,36,0.3); }
+.badge-red    { background: var(--red-glow); color: var(--red); border: 1px solid rgba(245,81,95,0.3); }
 
 /* ── Divider ─────────────────────────────────────────────────────────────── */
 .divider { height: 1px; background: var(--border); margin: 20px 0; }
@@ -185,17 +301,20 @@ p  { line-height: 1.65; color: var(--text-muted); }
 .spinner {
   width: 22px; height: 22px; border-radius: 50%;
   border: 2px solid var(--border-light);
-  border-top-color: var(--accent);
+  border-top-color: var(--firefly);
   animation: spin 0.7s linear infinite;
   flex-shrink: 0;
 }
 
 /* ── Chat bubbles ────────────────────────────────────────────────────────── */
 .bubble-user {
-  background: linear-gradient(135deg, var(--accent), var(--accent-2));
-  color: #fff; border-radius: 18px 18px 4px 18px;
+  background: linear-gradient(135deg, var(--firefly-bright), var(--firefly));
+  color: #0A0B12;
+  font-weight: 500;
+  border-radius: 18px 18px 4px 18px;
   padding: 12px 16px; max-width: 82%; align-self: flex-end;
   font-size: 15px; line-height: 1.55;
+  box-shadow: 0 4px 16px rgba(245,165,36,0.25);
 }
 .bubble-assistant {
   background: var(--bg-card); border: 1px solid var(--border);
@@ -208,7 +327,8 @@ p  { line-height: 1.65; color: var(--text-muted); }
 @keyframes blink { 0%,80%,100%{opacity:0} 40%{opacity:1} }
 .typing-dot {
   width: 7px; height: 7px; border-radius: 50%;
-  background: var(--text-muted); display: inline-block; margin: 0 2px;
+  background: var(--firefly); display: inline-block; margin: 0 2px;
+  opacity: 0;
 }
 .typing-dot:nth-child(1) { animation: blink 1.2s infinite 0s; }
 .typing-dot:nth-child(2) { animation: blink 1.2s infinite 0.2s; }
@@ -216,12 +336,12 @@ p  { line-height: 1.65; color: var(--text-muted); }
 
 /* ── Disclaimer box ──────────────────────────────────────────────────────── */
 .disclaimer {
-  background: rgba(245,165,36,0.08);
-  border: 1px solid rgba(245,165,36,0.3);
+  background: rgba(245,165,36,0.06);
+  border: 1px solid rgba(245,165,36,0.2);
   border-radius: var(--radius-sm);
   padding: 12px 16px;
-  font-size: 13px;
-  color: var(--amber);
+  font-size: 12px;
+  color: var(--text-muted);
   line-height: 1.65;
 }
 
@@ -251,3 +371,246 @@ p  { line-height: 1.65; color: var(--text-muted); }
 
 /* ── Safe area for notched phones ────────────────────────────────────────── */
 .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+
+
+/* ══════════════════════════════════════════════════════════════════════════ */
+/* ── Işık Tasarım Dili — Ateş Böceği & Aydınlanan Arayüz ──────────────── */
+/* ══════════════════════════════════════════════════════════════════════════ */
+
+body.illumination-1 { background: var(--bg-dusk); }
+body.illumination-2 { background: var(--bg-predawn); }
+body.illumination-3 { background: var(--bg-dawn); }
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Lumos Wordmark — shimmer + ateş böceği uçuşu
+   Kullanım: <div class="lumos-brand [lumos-brand--hero]">
+               <span class="lumos-wordmark">Lumos</span>
+               <span class="lumos-firefly" style="--dur:7s;--delay:0s;--dx:18px;--dy:-14px;left:5%;top:-80%" />
+               …
+             </div>
+────────────────────────────────────────────────────────────────────────── */
+.lumos-brand {
+  position: relative;
+  display: inline-block;
+  padding-top: 0.6em;   /* ateş böceklerinin uçuşacağı hava sahası */
+}
+
+.lumos-wordmark {
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  background: linear-gradient(110deg, #FFFFFF 0%, var(--firefly-soft) 30%, var(--firefly) 55%, var(--firefly-soft) 75%, #FFFFFF 100%);
+  background-size: 240% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: wordmark-shimmer 5s ease-in-out infinite;
+}
+@keyframes wordmark-shimmer {
+  0%, 100% { background-position: 0% 0; }
+  50%       { background-position: 100% 0; }
+}
+
+/* Tek bir ateş böceği — parlayan turuncu nokta */
+.lumos-firefly {
+  position: absolute;
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: var(--firefly-bright);
+  box-shadow:
+    0 0 4px 1px rgba(255, 209, 102, 0.95),
+    0 0 10px 3px rgba(245, 165, 36, 0.55),
+    0 0 20px 6px rgba(245, 165, 36, 0.2);
+  pointer-events: none;
+  animation:
+    firefly-drift var(--dur, 7s) ease-in-out var(--delay, 0s) infinite alternate,
+    firefly-blink calc(var(--dur, 7s) / 2.5) ease-in-out var(--delay, 0s) infinite;
+}
+
+@keyframes firefly-drift {
+  0%   { transform: translate(0, 0) scale(1); }
+  25%  { transform: translate(calc(var(--dx) * 0.5), calc(var(--dy) * -0.9)) scale(0.9); }
+  50%  { transform: translate(var(--dx), calc(var(--dy) * -0.4)) scale(1.05); }
+  75%  { transform: translate(calc(var(--dx) * 0.3), var(--dy)) scale(0.95); }
+  100% { transform: translate(calc(var(--dx) * -0.4), calc(var(--dy) * 0.5)) scale(1); }
+}
+
+@keyframes firefly-blink {
+  0%, 100% { opacity: 1; }
+  35%       { opacity: 0.2; }
+  65%       { opacity: 0.85; }
+}
+
+/* Hero boyutunda böcekler büyür */
+.lumos-brand--hero .lumos-firefly {
+  width: 5px; height: 5px;
+  box-shadow:
+    0 0 5px 2px rgba(255, 209, 102, 0.95),
+    0 0 14px 5px rgba(245, 165, 36, 0.5),
+    0 0 28px 10px rgba(245, 165, 36, 0.18);
+}
+
+.lumos-brand--hero .lumos-wordmark {
+  font-size: inherit;
+}
+
+/* ── Onboarding hero — büyük böcek parçacıkları ── */
+/* Kullanım: <div class="firefly-swarm"> x10 <span class="firefly-particle"> */
+.firefly-swarm {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.firefly-particle {
+  position: absolute;
+  border-radius: 50%;
+  background: var(--firefly-bright);
+  pointer-events: none;
+  animation:
+    particle-float var(--dur, 8s) ease-in-out var(--delay, 0s) infinite alternate,
+    particle-glow  calc(var(--dur, 8s) / 2.8) ease-in-out var(--delay, 0s) infinite;
+  width: var(--size, 4px);
+  height: var(--size, 4px);
+  box-shadow:
+    0 0 calc(var(--size, 4px) * 1.5) rgba(255,209,102,0.9),
+    0 0 calc(var(--size, 4px) * 4) rgba(245,165,36,0.4);
+}
+
+@keyframes particle-float {
+  0%   { transform: translate(0, 0) rotate(0deg); opacity: 0.9; }
+  30%  { transform: translate(calc(var(--dx,20px) * 0.6), calc(var(--dy,-30px) * 0.8)); opacity: 0.5; }
+  60%  { transform: translate(var(--dx,20px), calc(var(--dy,-30px) * 0.3)); opacity: 0.95; }
+  100% { transform: translate(calc(var(--dx,20px) * -0.3), var(--dy,-30px)); opacity: 0.7; }
+}
+
+@keyframes particle-glow {
+  0%, 100% { filter: brightness(1) blur(0px); }
+  45%       { filter: brightness(0.3) blur(1px); }
+  70%       { filter: brightness(1.2) blur(0px); }
+}
+
+/* ── Onboarding hero particle sweep — süzülme animasyonu ── */
+@keyframes sweep-up {
+  0%   { transform: translate(var(--from-x,0), var(--from-y,60px)); opacity: 0; }
+  15%  { opacity: 0.9; }
+  85%  { opacity: 0.7; }
+  100% { transform: translate(0, 0); opacity: 0; }
+}
+
+.fireflies {
+  position: absolute;
+  inset: -20px;
+  pointer-events: none;
+  overflow: visible;
+}
+
+/* span.firefly-particle veya doğrudan span — her ikisi de çalışır */
+.fireflies span,
+.fireflies .firefly-particle {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  width: var(--size, 5px);
+  height: var(--size, 5px);
+  background: var(--firefly-bright);
+  box-shadow:
+    0 0 6px 2px rgba(255,209,102,0.9),
+    0 0 16px 5px rgba(245,165,36,0.45);
+  animation:
+    sweep-up 2.8s ease-out var(--delay, 0s) forwards,
+    firefly-blink 1.4s ease-in-out var(--delay, 0s) infinite;
+}
+
+/* ── İmza: sayı ısınma animasyonu ── */
+@keyframes number-warmup {
+  0%   { color: var(--text-dim); }
+  100% { color: var(--firefly); }
+}
+.number-warmup {
+  animation: number-warmup 0.8s ease-out forwards;
+}
+
+/* ── Loading: ışık noktası ── */
+@keyframes light-pulse {
+  0%, 100% { box-shadow: 0 0 8px 2px rgba(245,165,36,0.5); transform: scale(1); }
+  50%       { box-shadow: 0 0 20px 8px rgba(245,165,36,0.8); transform: scale(1.3); }
+}
+.light-loader {
+  width: 14px; height: 14px; border-radius: 50%;
+  background: var(--firefly);
+  animation: light-pulse 1.2s ease-in-out infinite;
+}
+
+/* ── Aydınlık animasyonu — cesaret skoru zıpladığında ── */
+@keyframes illuminate-flash {
+  0%   { opacity: 0; }
+  20%  { opacity: 0.18; }
+  100% { opacity: 0; }
+}
+.illuminate-flash {
+  position: fixed; inset: 0;
+  background: radial-gradient(ellipse at 50% 0%, rgba(245,165,36,0.22) 0%, transparent 70%);
+  pointer-events: none;
+  animation: illuminate-flash 1.5s ease-out forwards;
+  z-index: 9999;
+}
+
+/* ── Section glow separator ── */
+.glow-line {
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, var(--firefly-dim) 50%, transparent 100%);
+  margin: 24px 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lumos-firefly,
+  .firefly-particle,
+  .fireflies span,
+  .fireflies .firefly-particle { animation: none; opacity: 0.75; }
+  .lumos-wordmark { animation: none; }
+  .btn::after { display: none; }
+}
+
+/* ── Sayı ısınma animasyonu: gri → amber geçişle gelir ── */
+@keyframes number-warm {
+  0%   { color: var(--text-dim); opacity: 0; transform: translateY(8px); }
+  50%  { color: var(--firefly-soft); opacity: 0.7; }
+  100% { color: var(--firefly); opacity: 1; transform: translateY(0); }
+}
+
+.number-warm {
+  animation: number-warm 0.8s ease-out forwards;
+}
+
+/* ── Loading: spinner yerine büyüyen ışık noktası ── */
+@keyframes light-grow {
+  0%   { width: 4px; height: 4px; opacity: 0.3; box-shadow: 0 0 4px var(--firefly-dim); }
+  50%  { width: 16px; height: 16px; opacity: 1; box-shadow: 0 0 24px var(--firefly-glow); }
+  100% { width: 4px; height: 4px; opacity: 0.3; box-shadow: 0 0 4px var(--firefly-dim); }
+}
+
+.light-loader {
+  background: var(--firefly);
+  border-radius: 50%;
+  animation: light-grow 1.6s ease-in-out infinite;
+}
+
+/* ── Shimmer loading placeholder ── */
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--bg-card) 25%,
+    var(--bg-card-2) 50%,
+    var(--bg-card) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.8s ease-in-out infinite;
+  border-radius: var(--radius-xs);
+}
+
