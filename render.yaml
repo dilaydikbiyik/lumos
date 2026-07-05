@@ -1,0 +1,33 @@
+databases: []
+
+services:
+  - type: web
+    name: lumos-backend
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    plan: free
+    region: frankfurt
+    branch: main
+    healthCheckPath: /health
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: AI_PROVIDER
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: CLERK_SECRET_KEY
+        sync: false
+      - key: CLERK_JWT_ISSUER
+        sync: false
+      - key: EXCHANGE_RATE_API_KEY
+        sync: false
+      - key: TCMB_EVDS_API_KEY
+        sync: false
+      - key: FRONTEND_URL
+        sync: false
+      - key: DATABASE_URL
+        value: sqlite+aiosqlite:///./lumos.db

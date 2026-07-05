@@ -1,0 +1,10 @@
+{
+  "pythonVersion": "3.12",
+  "venvPath": "/Users/dilaydikbiyik/Projeler/AI/lumos",
+  "venv": "venv",
+  "include": ["backend"],
+  "extraPaths": [
+    "/Users/dilaydikbiyik/Projeler/AI/lumos",
+    "/Users/dilaydikbiyik/Projeler/AI/lumos/venv/lib/python3.12/site-packages"
+  ]
+}

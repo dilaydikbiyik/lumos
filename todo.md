@@ -161,13 +161,13 @@ lumos/                          ← proje kökü
 
 ### Auth — Clerk Entegrasyonu 🆕
 
-- [ ] Clerk hesabı oluştur, uygulama kaydet (free tier — 10.000 MAU)
-- [ ] Clerk SDK'yı frontend'e kur (`@clerk/clerk-react`)
-- [ ] `frontend/src/main.jsx` → `<ClerkProvider>` ile uygulamayı sar
-- [ ] `frontend/src/middleware/auth.js` → korunan route'lar için middleware yaz
+- [x] Clerk hesabı oluştur, uygulama kaydet (free tier — 10.000 MAU)
+- [x] Clerk SDK'yı frontend'e kur (`@clerk/clerk-react`)
+- [x] `frontend/src/main.jsx` → `<ClerkProvider>` ile uygulamayı sar
+- [x] `frontend/src/middleware/auth.js` → korunan route'lar için middleware yaz (App.jsx ProtectedRoute)
   - Kimlik doğrulanmamış kullanıcılar portföy ve chat sayfalarına erişememeli
 - [x] `backend/middleware/verify_clerk.py` → Clerk JWT token doğrulama middleware'i
-- [ ] Clerk publishable key ve secret key'i `.env`'e ekle
+- [x] Clerk publishable key ve secret key'i `.env`'e ekle
 
 ### Auth — Kullanıcı Profili Kalıcılığı 🆕
 
@@ -179,14 +179,14 @@ lumos/                          ← proje kökü
 
 ### Config & DevOps
 
-- [ ] Anthropic API anahtarını al ve `.env`'e ekle
-- [ ] Clerk publishable + secret key'leri `.env`'e ekle
+- [x] Anthropic API anahtarını al ve `.env`'e ekle
+- [x] Clerk publishable + secret key'leri `.env`'e ekle
 - [x] `.env.example` → tüm değişken isimlerini içeren örnek dosya oluştur
 - [x] `.gitignore` → `.env`, `__pycache__`, `node_modules`, `venv/` ekle
-- [ ] Git repo başlat: `main / dev / feature/*` branch modeli
-- [ ] İlk commit'i yap
+- [x] Git repo başlat: `main / dev / feature/*` branch modeli
+- [x] İlk commit'i yap
 - [ ] GitHub'da `main` branch'ini koru (branch protection rule)
-- [ ] `README.md` — temel proje açıklaması (başlangıç versiyonu)
+- [x] `README.md` — temel proje açıklaması (158 satır)
 
 > 💡 Clerk ücretsiz tier 10.000 aylık aktif kullanıcıya kadar ücretsizdir.
 
@@ -295,9 +295,9 @@ lumos/                          ← proje kökü
 
 ### UI — REIT Kartı 🆕
 
-- [ ] `frontend/src/components/ReitCard.jsx`
-  - REIT nedir, neden seçildi, tarihsel getirisi
-- [ ] `frontend/src/components/AssetExplainer.jsx` — genel varlık açıklayıcı bileşen
+- [x] `frontend/src/components/ReitCard.jsx`
+  - REIT nedir, neden seçildi, tarihsel getirisi — Türkçe, jargonsuz
+- [x] `frontend/src/components/AssetExplainer.jsx` — genel varlık açıklayıcı bileşen (3 sekmeli: nedir/neden/risk)
 
 ### Content — REIT Açıklayıcı Prompt 🆕
 
@@ -392,31 +392,31 @@ lumos/                          ← proje kökü
 
 ### Testing — Hata Yönetimi & Edge Case'ler
 
-- [ ] `backend/middleware/error_handler.py` → global hata yakalama middleware'i
+- [x] `backend/middleware/error_handler.py` → global hata yakalama middleware'i
   - API çökmesi, saçma input, boş portföy, süresi dolmuş oturum
-- [ ] `frontend/src/utils/errorBoundary.jsx` → React Error Boundary
-- [ ] Her hata durumu için kullanıcıya anlamlı mesaj göster
+- [x] `frontend/src/utils/errorBoundary.jsx` → React Error Boundary
+- [x] Her hata durumu için kullanıcıya anlamlı mesaj göster (Türkçe hata mesajları)
 
 ### Deploy — Backend → Render.com
 
-- [ ] `Dockerfile` → FastAPI uygulaması için Docker imajı
-- [ ] `render.yaml` → Render.com deployment konfigürasyonu
-- [ ] `backend/routers/health.py` → `/health` endpoint'i (uptime monitoring)
+- [x] `Dockerfile` → FastAPI uygulaması için Docker imajı
+- [x] `render.yaml` → Render.com deployment konfigürasyonu (free plan, Docker, health check)
+- [x] `backend/routers/health.py` → `/health` endpoint'i (uptime monitoring)
 - [ ] Render'a tüm env var'ları ekle: `ANTHROPIC_API_KEY`, `CLERK_SECRET_KEY`, `DATABASE_URL`
 - [ ] Deployment test et, `/health` endpoint'inin döndüğünü doğrula
 
 ### Deploy — Frontend → Vercel
 
-- [ ] `vercel.json` → Vercel deployment konfigürasyonu
-- [ ] `frontend/.env.production` → `VITE_BACKEND_URL`, `VITE_CLERK_PUBLISHABLE_KEY`
+- [x] `vercel.json` → Vercel deployment konfigürasyonu (Vite framework, SPA rewrite, asset caching)
+- [x] `frontend/.env.production` → `VITE_BACKEND_URL`, `VITE_CLERK_PUBLISHABLE_KEY`
 - [ ] Clerk production instance'ına bağlan
 - [ ] Vercel'e deploy et ve tam akışı test et
 
 ### Portfolio — README & Mimari Dokümantasyon
 
-- [ ] `README.md` — ne yapar, nasıl çalıştırılır, mimari kararlar + gerekçeleri, ekran görüntüleri
-- [ ] `docs/architecture.md` — sistem mimarisi diyagramı ve açıklaması
-- [ ] `docs/api_reference.md` — tüm API endpoint'leri ve kullanımları
+- [x] `README.md` — ne yapar, nasıl çalıştırılır, mimari kararlar + gerekçeleri (158 satır)
+- [x] `docs/architecture.md` — sistem mimarisi diyagramı ve açıklaması (ASCII art + tasarım kararları tablosu)
+- [x] `docs/api_reference.md` — tüm API endpoint'leri ve kullanımları (10 router, 26 endpoint)
 
 ### Portfolio — Demo Video & Case Study
 
@@ -534,7 +534,7 @@ lumos/                          ← proje kökü
 - [ ] `X-Request-ID` middleware: her isteğe correlation ID, log satırlarına ve hata yanıtlarına ekle
 - [ ] API versiyonlama: tüm router'ları `/api/v1` prefix'i altına al (frontend api.js baseURL güncelle)
 - [ ] Hafif RBAC: User modeline `role` alanı (`user`/`admin`) + `require_role()` dependency; admin-only `/api/v1/admin/stats` endpoint'i (kullanıcı sayısı, mesaj hacmi, kota durumu)
-- [ ] Health check'i derinleştir: `/health` DB bağlantısını ve AI provider erişimini gerçekten yoklasın (`{"db": "ok", "ai": "ok"}`)
+- [x] Health check'i derinleştir: `/health` DB bağlantısını ve AI provider erişimini gerçekten yoklusın (`{"db": "ok", "ai": "ok"}`)
 - [x] Python 3.9 → 3.12 migrasyonu: venv yeniden kuruldu, Dockerfile+CI 3.12'ye çekildi, `datetime.utcnow` deprecation'ları giderildi (Optional→| None dönüşümü kozmetik, kademeli yapılacak)
 - [ ] pre-commit hook: ruff + black otomatik format (`.pre-commit-config.yaml`)
 - [ ] Sızan Anthropic API anahtarını rotate et (Console → API Keys)
@@ -555,12 +555,12 @@ lumos/                          ← proje kökü
 ### Eğitim Katmanı 📚 (vizyonun kalbi — öncelik yükseltildi)
 
 - [ ] Varlık bazlı eğitim: her portföy kalemi için "nedir / neden portföyünde / riski ne" LLM açıklaması (generalize edilmiş explain prompt)
-- [ ] `AssetExplainer.jsx`'i bu içeriği gösterecek şekilde doldur
+- [x] `AssetExplainer.jsx`'i bu içeriği gösterecek şekilde doldur — 6 bilinen ticker + 3 kategori fallback, 3 sekmeli statik kart
 - [x] Temel kavramlar sözlüğü (`frontend/src/data/glossary.js`, 12 terim, jargonsuz TR)
 - [ ] Kullanıcının yatırım yaptığı her varlık tipinde ilk alımda otomatik eğitim kartı göster
 - [/] Jargon tooltip sistemi: `IsikTut` bileşeni + 12 terimlik sözlük hazır; tüm sayfalara yayma devam edecek
 - [x] system_prompt'a "sıfır bilgi varsay" kuralı: her cevapta terimleri günlük dille açıkla, kullanıcı bilgi seviyesi gösterirse dili kademeli teknikleştir (+ korku-farkındalık kuralı: endişeyi önce karşıla, sonra cevapla)
-- [ ] UI metin denetimi: tüm sayfalardaki mevcut metinleri jargonsuzluk ilkesine göre elden geçir ("Risk Profiling" → "Seni Tanıyalım" gibi)
+- [ ] UI metin denetimi: tüm sayfalardaki mevcut metinleri jargonsuzluk ilkesine göre elden geçir — RecommendPage + ReitCard Türkçeye çevrildi ✅, diğer sayfalar devam edecek
 
 ---
 
@@ -576,7 +576,7 @@ lumos/                          ← proje kökü
 - [x] Duraklama dönemi tespiti: ±%5 bant algoritması → varlık başına `longest_stagnation_months` (profil eşleştirme rozeti sonraki adım)
 - [ ] Varlık karakter kartı: her varlık için "en uzun duraklama", "en derin düşüş", "toparlanma süresi" özeti — profil uyum rozeti (bu varlık senin sabrına uygun mu?)
 - [x] RecommendPage'e `TimeMachine` bileşeni: 1/3/5 yıl simülasyon + "en kötü anında X TL" dürüst vurgusu + çizgi grafik
-- [ ] Risk toleransı sorusunu somutlaştır: soyut "%20 düşerse" yerine kullanıcının kendi bütçesiyle "50.000 TL'n 40.000 TL olurdu" göster
+- [x] Risk toleransı sorusunu somutlaştır: soyut "%20 düşerse" yerine kullanıcının kendi bütçesiyle "50.000 TL'n 40.000 TL olurdu" göster
 
 ### Emlak + Borsa Hibrit 🏘️📈 (Midas'a karşı ana koz)
 
@@ -597,7 +597,7 @@ lumos/                          ← proje kökü
 > Avantajlar: sıfır regülasyon riski, para emanet alınmaz (güven eşiği düşük — korkak başlayan için artı), $0 maliyet korunur.
 > İleri faz (iş geliştirme): aracı kurum API ortaklığı ile "tek tık emir iletimi" — emlak platform ortaklığıyla aynı statüde, MVP dışı.
 
-- [ ] Onboarding'de dürüst beklenti cümlesi: "Lumos sana yol gösterir; alım-satımı kendi aracı kurumunda/emlakçında yaparsın, sonra burada takip ederiz"
+- [x] Onboarding'de dürüst beklenti cümlesi: "Lumos sana yol gösterir; alım-satımı kendi aracı kurumunda yaparsın, sonra burada takip ederiz"
 - [x] Borsa "Aldım" akışı: `BoughtItBridge` — öneri dağılımını tek tıkla holdings'e işler, kalan bütçe otomatik güncellenir
 - [ ] "Aracı kurum hesabı nasıl açılır" rehberi (Korkusuz Başlangıç'taki rehberli yolculukla aynı madde — çift kayıt değil, referans)
 
@@ -656,7 +656,7 @@ lumos/                          ← proje kökü
 
 - [x] Tüm getirilere nominal + reel çift gösterim: Zaman Makinesi sonucunda `real_return_pct` alanı, UI'da "Enflasyon sonrası (reel)" satırı
 - [x] TÜFE verisi: CANLI TCMB EVDS entegrasyonu (`evds_service.py`, TP.FG.J0, günlük cache) — statik dosya fallback olarak korunuyor
-- [ ] Portföyde TL/döviz dağılımı ve kur riski göstergesi
+- [x] Portföyde TL/döviz dağılımı ve kur riski göstergesi — `CurrencyExposure.jsx` (HoldingsPage'e entegre)
 - [x] "Param eriyor mu?" kartı: Varlıklarım sayfasında boştaki bütçe + nakit için aylık reel erime tutarı (5 test)
 
 ### Davranışsal Koç 🧠 (robo-advisor'ların yapmadığı)
@@ -681,6 +681,19 @@ lumos/                          ← proje kökü
 
 - [ ] Chat'te senaryo soruları: "10.000 TL daha eklesem ne değişir?", "altını çıkarsam risk ne olur?" — portfolio_engine'i tool olarak çağırıp gerçek hesapla cevapla (tool-use maddesiyle birleşir, sonraki faz)
 
+
+### Gelecek Senaryoları 🔮 (kullanıcı fikri — 2026-07-05)
+
+> "SPY'a koysam 5 yılda ne olur?" sorusunun dürüst cevabı: tahmin DEĞİL, varlığın kendi
+> geçmişindeki tüm N-yıllık pencerelerin dağılımı (kötü p10 / tipik p50 / iyi p90).
+
+- [x] `projection.py`: kaymalı pencere dağılımı motoru — varlık (yfinance 10y, aylık örnekleme) + bölge (TCMB KFE) (7 test)
+- [x] POST /planning/projection/asset + /projection/region — yetersiz geçmişte dürüst ret ("yeterli pencere yok")
+- [x] RecommendPage `FutureScenarios` kartı: varlık + vade seç → bütçenle 3 senaryo çubuğu
+- [x] ExplorePage bölge kartları tıklanınca senaryo bandı: "X TL burada 2 yılda ne olurdu?" + reel karşılık + "60 kat" anekdot uyarısı — canlı doğrulandı (Ankara 1M → tipik +85.9% nominal / +15.15% reel)
+- [ ] Senaryo kartına LLM güncel bağlam cümlesi (sakin haber özetinden beslenerek, sayılara karışmadan)
+- [ ] Portföyün tamamı için birleşik senaryo bandı (ağırlıklı pencere dağılımı)
+
 ### Sakin Haber Akışı 📰 (haber = eğitim, gürültü değil)
 
 > Ham haber akışı yeni başlayan için korku makinesidir. Lumos haberi süzer, sakinleştirir, öğretir.
@@ -699,7 +712,7 @@ lumos/                          ← proje kökü
 - [/] Haftalık değişim hesabı hazır (weekly_change_amount + biggest_mover); LLM anlatım katmanı sonraki adım
 - [ ] İlk yatırım rehberli yolculuğu: adım adım sihirbaz — "aracı kurum hesabı nedir → nasıl açılır → ilk emir nasıl verilir" (Türkiye'ye özgü, ekran görüntülü statik rehber)
 - [x] Korku check-in'i: `FearCheckInPage.jsx` + PATCH /users/me/fear-check-in — 4 korku etiketi + anında kişiselleştirilmiş güvence mesajı (canlı doğrulandı)
-- [ ] "Bugün öğrendin" mikro-kartları: her oturumda tek küçük kavram ("ETF aslında bir sepettir") — 15 saniyelik okuma, ilerleme sayacı
+- [x] "Bugün öğrendin" mikro-kartları: her oturumda tek küçük kavram ("ETF aslında bir sepettir") — 15 saniyelik okuma, ilerleme sayacı — `DailyTip.jsx` (12 kart, localStorage takibi)
 - [ ] Kademeli arayüz: yeni kullanıcıda sade görünüm (3 metrik), "detay göster" ile zenginleşir — bilgi bombardımanı korkuyu büyütür
 - [x] Cesaret göstergesi: GET /users/me/readiness — 5 şeffaf kilometre taşı, 0-100 skor, %60 eşiği "gerçek yatırıma hazır" (canlı doğrulandı: skor 60, eşik geçildi)
 
@@ -708,7 +721,7 @@ lumos/                          ← proje kökü
 ## Phase 8.5 — Globalleşme Mimarisi 🌍 "Market Pack" Sistemi
 
 > Karar (2026-06-28): proje GLOBAL tasarlanacak. Yöntem: ülkeye özgü her şey tek pakette — kod ülke bilmez, pakete sorar.
-> Yeni ülke eklemek = yeni kod değil, yeni config + veri adaptörü + içerik paketi. TR ilk referans pack olarak eksiksiz yapılır.
+> Yeni ülke eklemek = yeni kod değil, yeni config + veri adaptörü + içerik paketi. TR ilk referans pack olarak eksiril yapılır.
 
 ### Market Pack Çekirdeği
 
@@ -736,31 +749,31 @@ lumos/                          ← proje kökü
 ### Logo & Marka — KARAR: Ateş Böceği 🪰✨ (2026-06-28)
 
 - [x] Logo kararı: ateş böceği (karanlıkta yol gösteren minik ışık) — telif-güvenli, sıcak, özgün
-- [ ] Logo tasarımı: minimalist ateş böceği — gövde basit, ışık halesi vurgulu; favicon'da sadece parlayan nokta
-- [ ] Giriş animasyonu: açılışta uçuşan ateş böcekleri "Lumos" yazısının üzerine konar, yazı ışıldar (canvas/CSS particle — 2-3 sn, skip edilebilir)
+- [x] Logo tasarımı: minimalist SVG ateş böceği (amber ışık halesi + mor/mavi kanatlar) — favicon + navbar LumosLogo bileşeni, nefes alan ışıma animasyonlu
+- [x] Giriş animasyonu: onboarding hero'da 10 CSS-particle ateş böceği başlığa süzülüyor (2.6sn, prefers-reduced-motion saygılı)
 - [ ] Ateş böceği boş durum/onboarding illüstrasyonlarında rehber karakter olarak kullanılır
-- [ ] Marka manifestosu (onboarding ilk ekran): "Yatırım karanlık bir orman gibi görünür. Lumos, elindeki ışık." — 2 cümle, jargonsuz
+- [x] Marka manifestosu (onboarding ilk ekran): "Yatırım karanlık bir orman gibi görünür. Lumos, elindeki ışık." — hero section'da aktif
 - [ ] Telif kontrolü: şimşek, asa çizimi, HP fontları KULLANILMAZ — ateş böceği + soyut ışık motifi bizim
 
 ### "Aydınlanan Arayüz" 🌗 (imza özellik — başka finans uygulamasında yok)
 
-- [ ] Tema tonu kullanıcının hazırlık/cesaret skoruna bağlı: gece laciverti → alacakaranlık → şafak degradesi (CSS custom property ile skor-tabanlı zemin)
+- [x] Aydınlanan Arayüz v1: `useIllumination` hook'u — cesaret skoru 25/50/80 eşiklerinde zemin gece→alacakaranlık→şafak öncesi→şafak (1.2sn yumuşak geçiş)
 - [ ] "Öğrendikçe dünyan aydınlanıyor" — skor artınca geçiş anında 1 kerelik yumuşak ışıma animasyonu + tebrik mikro-kartı
 
 ### İmza Etkileşimler
 
-- [ ] "Işık Tut" tooltip: jargon terime tıklayınca minik ışık patlaması + sade açıklama balonu (Phase 7 tooltip sistemiyle aynı madde — marka adı bu)
-- [ ] Sayı animasyonu: değerler ekrana soğuk griden "ısınarak" (amber'e) gelir
-- [ ] Loading state: spinner yerine uçta büyüyen ışık noktası
+- [x] "İşık Tut" tooltip: jargon terime tıklayınca minik ışık patlaması + sade açıklama balonu — ateş böceği temalı, amber renk, ok işaretli
+- [x] Sayı animasyonu: değerler ekrana soğuk griden "ısınarak" (amber'e) gelir — `.number-warm` CSS classı
+- [x] Loading state: spinner yerine uçta büyüyen ışık noktası — `.light-loader` CSS animasyonu
 - [ ] Eğitim mikro-kartları tılsım kartı çevirme animasyonuyla açılır
 - [ ] Portföy sağlık skoru = "Fener": sağlık arttıkça fener ikonu daha gür yanar
 
 ### Tasarım Sistemi
 
-- [ ] Palet dokümante et: gece laciverti zemin + sıcak altın-amber ana vurgu (ışık/para çift çağrışım) + lavanta ikincil + şafak degradesi (`index.css` design token'ları)
-- [ ] Tipografi: yumuşak köşeli sıcak sans (Nunito/Outfit değerlendir) — gotik/fantezi font YOK, güven veren modernlik
+- [x] Palet token'ları: `--firefly/--firefly-soft/--firefly-glow` + `--bg-night/dusk/predawn/dawn` kademeleri index.css'te
+- [x] Tipografi: Outfit fontu eklendi (`'Outfit', 'Inter', system-ui, sans-serif`), yumuşak köşeli sıcak premium sans — gotik/fantezi font YOK
 - [ ] Türkçe özellik adlandırması: "Seni Tanıyalım" (profil), "Işık Tut" (açıkla), "Fener" (koç/rehber), "Şafak Skoru" (hazırlık), "Zaman Makinesi" (backtest)
-- [ ] Boş durumlar (empty state): karanlıkta tek ışık illüstrasyonu + cesaretlendiren tek cümle ("Henüz varlığın yok — ilk ışığı birlikte yakalım")
+- [x] Boş durumlar (empty state): karanlıkta ateş böceği + radial glow animasyon + cesaretlendiren mesaj (Dashboard + Holdings)
 
 ---
 
@@ -782,13 +795,14 @@ lumos/                          ← proje kökü
 
 | Faz | Başlık | Hafta | Durum |
 |-----|--------|-------|-------|
-| 1 | Setup, Scaffolding & Auth | 1–2 | `[/]` Backend ✅ · Frontend ⏳ |
-| 2 | NLP Engine & Risk Profile | 3–5 | `[x]` Backend tamamlandı ✅ |
-| 3 | Market Data & Portfolio Engine | 5–8 | `[x]` Backend tamamlandı ✅ |
-| 3.5 | Real Estate / REIT Layer | 8–10 | `[x]` Backend tamamlandı ✅ |
-| 4 | Frontend — Mobile-First Chat UI | 10–14 | `[x]` Tamamlandı ✅ · Build başarılı |
-| 5 | Testing, Deploy & Portfolio | 14–18 | `[ ]` |
-| 6 | Teknik Borç & Production Sağlamlaştırma | 18+ | `[/]` Prompt kalitesi + rate limit ✅ |
-| 7 | Ürün Derinleştirme & Yatırım Takibi | 18+ | `[ ]` |
-| 8 | Farklılaştırıcı Özellikler | 20+ | `[ ]` |
-| 9 | Marka & Özgün UI Kimliği | 20+ | `[ ]` |
+| 1 | Setup, Scaffolding & Auth | 1–2 | `[x]` Tamamlandı ✅ |
+| 2 | NLP Engine & Risk Profile | 3–5 | `[x]` Tamamlandı ✅ |
+| 3 | Market Data & Portfolio Engine | 5–8 | `[x]` Tamamlandı ✅ |
+| 3.5 | Real Estate / REIT Layer | 8–10 | `[x]` Tamamlandı ✅ |
+| 4 | Frontend — Mobile-First Chat UI | 10–14 | `[x]` Tamamlandı ✅ |
+| 5 | Testing, Deploy & Portfolio | 14–18 | `[/]` Hata yönetimi ✅ · Deploy bekliyor |
+| 6 | Teknik Borç & Production Sağlamlaştırma | 18+ | `[/]` Test + CI ✅ · Yapısal iyileştirmeler devam |
+| 7 | Ürün Derinleştirme & Yatırım Takibi | 18+ | `[/]` Holdings + coach + goal ✅ · Karşılaştırma bekliyor |
+| 8 | Farklılaştırıcı Özellikler | 20+ | `[/]` Backtest + TCMB + haber ✅ · Varlık kartı bekliyor |
+| 9 | Marka & Özgün UI Kimliği | 20+ | `[/]` Logo + palet + font ✅ · Animasyonlar devam |
+
