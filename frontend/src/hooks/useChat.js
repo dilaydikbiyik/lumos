@@ -43,7 +43,7 @@ export default function useChat(onProfileComplete) {
         await onProfileComplete(extracted.data)
       }
     } catch (err) {
-      setError(extractErrorMessage(err, 'Failed to send message'))
+      setError(extractErrorMessage(err, 'Mesaj gönderilemedi — tekrar dene'))
     } finally {
       setIsLoading(false)
     }

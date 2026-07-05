@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { useAuth } from '@clerk/clerk-react'
 import api, { setAuthToken } from '../utils/api'
 
@@ -14,7 +14,8 @@ export default function usePortfolio() {
     setAuthToken(token)
   }
 
-  async function loadProfile() {
+  // useCallback — DashboardPage'deki useEffect dependency'i için
+  const loadProfile = useCallback(async () => {
     try {
       await ensureAuth()
       const res = await api.get('/profile')
@@ -22,7 +23,8 @@ export default function usePortfolio() {
     } catch {
       setProfile(null)
     }
-  }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [getToken])
 
   async function recommend(riskScore, budget) {
     setIsLoading(true)
@@ -36,7 +38,7 @@ export default function usePortfolio() {
       setPortfolio(res.data)
       return res.data
     } catch (err) {
-      setError(err.response?.data?.detail || 'Failed to get recommendation')
+      setError(err.response?.data?.detail || 'Öneri alınamadı')
     } finally {
       setIsLoading(false)
     }
@@ -51,7 +53,7 @@ export default function usePortfolio() {
       setProfile(res.data)
       return res.data
     } catch (err) {
-      setError(err.response?.data?.detail || 'Failed to save profile')
+      setError(err.response?.data?.detail || 'Profil kaydedilemedi')
     } finally {
       setIsLoading(false)
     }
