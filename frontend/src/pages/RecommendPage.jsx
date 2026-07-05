@@ -9,7 +9,6 @@ import AssetExplainer from '../components/AssetExplainer'
 import TimeMachine from '../components/TimeMachine'
 import PracticeMode from '../components/PracticeMode'
 import BoughtItBridge from '../components/BoughtItBridge'
-import FutureScenarios from '../components/FutureScenarios'
 import usePortfolio from '../hooks/usePortfolio'
 
 export default function RecommendPage() {
@@ -18,13 +17,13 @@ export default function RecommendPage() {
   const { portfolio, isLoading, error, recommend } = usePortfolio()
   const [selectedTicker, setSelectedTicker] = useState(null)
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (profileState?.risk_score && profileState?.answers?.budget) {
       recommend(profileState.risk_score, profileState.answers.budget)
     } else {
       navigate('/profile')
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profileState?.risk_score, profileState?.answers?.budget])
 
   if (isLoading) return (

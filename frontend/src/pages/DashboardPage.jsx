@@ -32,10 +32,12 @@ export default function DashboardPage() {
   }, [getToken])
 
   // ESLint fix: loadProfile ve loadSummary dependency'de
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     loadProfile()
     loadSummary()
   }, [loadProfile, loadSummary])
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   async function handleRerun() {
     if (profile) {

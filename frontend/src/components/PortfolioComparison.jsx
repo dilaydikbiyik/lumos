@@ -19,7 +19,6 @@ const CATEGORY_COLORS = {
   crypto: '#9B59B6', cash: 'var(--text-dim)', vehicle: 'var(--red)', other: '#666',
 }
 
-const fmt = n => new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 0 }).format(n)
 
 export default function PortfolioComparison() {
   const { getToken } = useAuth()
@@ -77,6 +76,7 @@ export default function PortfolioComparison() {
     }
   }, [getToken])
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { load() }, [load])
 
   if (!data || data.comparison.length === 0) return null

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 
 /**
  * "Bugün Öğrendin" — her oturumda tek kavram, 15 saniyelik okuma.
@@ -39,17 +39,10 @@ function markSeen(tipId) {
 }
 
 export default function DailyTip() {
-  const [tip, setTip] = useState(null)
+  const seen = getSeenTips()
+  const unseen = TIPS.filter(t => !seen.includes(t.id))
+  const [tip] = useState(() => unseen[0] || null)
   const [dismissed, setDismissed] = useState(false)
-
-  useEffect(() => {
-    const seen = getSeenTips()
-    const unseen = TIPS.filter(t => !seen.includes(t.id))
-    if (unseen.length > 0) {
-      // Sırayla göster, rastgele değil — öğrenme düzenli olsun
-      setTip(unseen[0])
-    }
-  }, [])
 
   if (!tip || dismissed) return null
 
