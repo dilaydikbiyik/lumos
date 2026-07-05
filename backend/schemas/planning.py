@@ -1,3 +1,5 @@
+from typing import Literal
+
 from pydantic import BaseModel, Field
 
 
@@ -24,3 +26,15 @@ class ListingBridgeRequest(BaseModel):
     il: str = Field(..., min_length=2, max_length=40)
     ilce: str = Field("", max_length=40)
     asset_type: str = Field("arsa", pattern="^(arsa|daire|konut)$")
+
+
+class AssetProjectionRequest(BaseModel):
+    ticker: str = Field(..., min_length=1, max_length=20)
+    amount: float = Field(..., gt=0)
+    years: Literal[1, 3, 5] = 5
+
+
+class RegionProjectionRequest(BaseModel):
+    region_code: str = Field(..., min_length=5, max_length=20)  # e.g. TP.KFE.TR51
+    amount: float = Field(..., gt=0)
+    years: Literal[1, 2, 3] = 2

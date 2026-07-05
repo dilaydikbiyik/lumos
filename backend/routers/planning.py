@@ -3,6 +3,8 @@ from fastapi import APIRouter, Depends, Request
 from backend.limiter import limiter
 from backend.middleware.verify_clerk import get_current_user
 from backend.schemas.planning import (
+    AssetProjectionRequest,
+    RegionProjectionRequest,
     GoalPlanRequest,
     GoalProgressRequest,
     ListingBridgeRequest,
@@ -78,3 +80,33 @@ async def listing_links(
 ):
     """Filter-ready deep links to real estate portals — no scraping, no listing data stored."""
     return {"links": build_listing_links(body.il, body.ilce, body.asset_type)}
+
+
+@router.post("/projection/asset")
+@limiter.limit("15/minute")
+async def asset_projection(
+    request: Request,
+    body: AssetProjectionRequest,
+    user_id: str = Depends(get_current_user),
+):
+    """
+    Gelecek senaryoları — tahmin değil: varlığın kendi geçmişindeki tüm
+    N-yıllık pencerelerin dağılımı (kötü/tipik/iyi), kullanıcının kendi
+    tutarına uygulanmış.
+    """
+    from backend.services.projection import project_asset
+
+    return project_asset(body.ticker.upper(), body.amount, body.years)
+
+
+@router.post("/projection/region")
+@limiter.limit("15/minute")
+async def region_projection(
+    request: Request,
+    body: RegionProjectionRequest,
+    user_id: str = Depends(get_current_user),
+):
+    """Bölge senaryo bandı — TCMB konut endeksi pencere dağılımı + reel karşılık."""
+    from backend.services.projection import project_region
+
+    return project_region(body.region_code, body.amount, body.years)
