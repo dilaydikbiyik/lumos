@@ -1,5 +1,5 @@
-# Lumos backend — FastAPI + Alembic
-FROM python:3.9-slim
+# Lumos backend — FastAPI + Alembic (Python 3.12)
+FROM python:3.12-slim
 
 WORKDIR /app
 

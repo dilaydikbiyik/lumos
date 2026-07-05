@@ -54,34 +54,46 @@ def _anthropic_chat(messages: list[dict], system: str, max_tokens: int) -> str:
         )
 
 
-# ── Gemini adapter ────────────────────────────────────────────────────────────
+# ── Gemini adapter (google-genai SDK) ─────────────────────────────────────────
 
 def _gemini_chat(messages: list[dict], system: str, max_tokens: int) -> str:
-    import google.generativeai as genai
-    from google.api_core import exceptions as gexc
+    from google import genai
+    from google.genai import errors as genai_errors
+    from google.genai import types as genai_types
 
-    genai.configure(api_key=settings.GEMINI_API_KEY)
-    model = genai.GenerativeModel(GEMINI_MODEL, system_instruction=system)
+    client = genai.Client(api_key=settings.GEMINI_API_KEY)
 
-    # Convert OpenAI/Anthropic-style messages to Gemini history format
-    history = [
-        {"role": "user" if m["role"] == "user" else "model", "parts": [m["content"]]}
-        for m in messages[:-1]
+    # Convert OpenAI/Anthropic-style messages to Gemini content format
+    contents = [
+        genai_types.Content(
+            role="user" if m["role"] == "user" else "model",
+            parts=[genai_types.Part(text=m["content"])],
+        )
+        for m in messages
     ]
-    last = messages[-1]["content"]
 
     try:
-        session = model.start_chat(history=history)
-        response = session.send_message(
-            last,
-            generation_config={"max_output_tokens": max_tokens},
+        response = client.models.generate_content(
+            model=GEMINI_MODEL,
+            contents=contents,
+            config=genai_types.GenerateContentConfig(
+                system_instruction=system,
+                max_output_tokens=max_tokens,
+            ),
         )
+        if response.text is None:
+            raise HTTPException(
+                status_code=503,
+                detail="AI returned an empty response. Please try again.",
+            )
         return response.text
-    except gexc.ResourceExhausted:
-        raise HTTPException(
-            status_code=503,
-            detail="Daily free AI quota reached. Please try again tomorrow.",
-        )
+    except genai_errors.APIError as exc:
+        if exc.code == 429:
+            raise HTTPException(
+                status_code=503,
+                detail="Daily free AI quota reached. Please try again tomorrow.",
+            )
+        raise
 
 
 _ADAPTERS = {

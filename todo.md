@@ -502,7 +502,7 @@ lumos/                          ← proje kökü
 
 - [x] `ai_service.py`'yi provider-agnostic yap: tek `chat()` / `generate_text()` interface'i, arkasında adapter'lar
 - [x] Gemini adapter ekle (`google-generativeai`) — free tier, geliştirme/demo varsayılanı
-- [ ] `google-generativeai` → `google-genai` SDK migrasyonu (eski paket deprecated, uyarı veriyor)
+- [x] `google-generativeai` → `google-genai` (2.10.0) SDK migrasyonu — deprecated uyarısı gitti, canlı doğrulandı
 - [x] `.env`'e `AI_PROVIDER=gemini|anthropic` seçimi; Claude adapter'ı mevcut kodu sarmalasın
 - [x] Provider'a özel hata yönetimi (kredi bitti / kota doldu → kullanıcıya anlamlı mesaj)
 
@@ -535,7 +535,7 @@ lumos/                          ← proje kökü
 - [ ] API versiyonlama: tüm router'ları `/api/v1` prefix'i altına al (frontend api.js baseURL güncelle)
 - [ ] Hafif RBAC: User modeline `role` alanı (`user`/`admin`) + `require_role()` dependency; admin-only `/api/v1/admin/stats` endpoint'i (kullanıcı sayısı, mesaj hacmi, kota durumu)
 - [ ] Health check'i derinleştir: `/health` DB bağlantısını ve AI provider erişimini gerçekten yoklasın (`{"db": "ok", "ai": "ok"}`)
-- [ ] Python 3.9 → 3.12 migrasyonu: venv'i yeniden kur, `Optional[X]`'leri `X | None`'a geri çevir, greenlet pin'ini kaldır
+- [x] Python 3.9 → 3.12 migrasyonu: venv yeniden kuruldu, Dockerfile+CI 3.12'ye çekildi, `datetime.utcnow` deprecation'ları giderildi (Optional→| None dönüşümü kozmetik, kademeli yapılacak)
 - [ ] pre-commit hook: ruff + black otomatik format (`.pre-commit-config.yaml`)
 - [ ] Sızan Anthropic API anahtarını rotate et (Console → API Keys)
 

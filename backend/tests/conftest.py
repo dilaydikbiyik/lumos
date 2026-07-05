@@ -48,7 +48,7 @@ def client():
         async with _test_engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
 
-    asyncio.get_event_loop().run_until_complete(_create())
+    asyncio.run(_create())
 
     with TestClient(app) as c:
         yield c
