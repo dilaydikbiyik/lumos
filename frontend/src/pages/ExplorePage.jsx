@@ -1,14 +1,60 @@
 import { useEffect, useState, useCallback } from 'react'
 import { UserButton, useAuth } from '@clerk/clerk-react'
 import api, { extractErrorMessage, setAuthToken } from '../utils/api'
+import LumosLogo from '../components/LumosLogo'
 import IsikTut from '../components/IsikTut'
 
 const fmt = n => new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 0 }).format(n)
 
-function RegionCard({ region }) {
-  const realPositive = region.real_change_pct > 0
+function RegionScenario({ region, amount }) {
+  const [band, setBand] = useState(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(null)
+
+  async function run() {
+    setLoading(true)
+    setError(null)
+    try {
+      const res = await api.post('/planning/projection/region', {
+        region_code: region.code, amount: Number(amount) || 1000000, years: 2,
+      })
+      setBand(res.data)
+    } catch (err) {
+      setError(extractErrorMessage(err, 'Senaryo hesaplanamadı'))
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
-    <div className="card" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+    <div style={{ paddingTop: 10, marginTop: 10, borderTop: '1px solid var(--border)' }}>
+      {!band && (
+        <button className="btn btn-ghost" style={{ width: '100%' }} onClick={run} disabled={loading}>
+          {loading
+            ? <span className="spinner" style={{ width: 16, height: 16 }} />
+            : `${fmt(Number(amount) || 1000000)} TL burada 2 yılda ne olurdu?`}
+        </button>
+      )}
+      {error && <p style={{ color: 'var(--red)', fontSize: 12 }}>{error}</p>}
+      {band && !band.available && <p style={{ fontSize: 12, opacity: 0.75 }}>{band.reason}</p>}
+      {band?.available && (
+        <div style={{ fontSize: 13, lineHeight: 1.7 }}>
+          <div>Kötü dönem: <strong style={{ color: 'var(--red)' }}>{fmt(band.pessimistic.value)} TL</strong> ({band.pessimistic.return_pct > 0 ? '+' : ''}{band.pessimistic.return_pct}%)</div>
+          <div>Tipik dönem: <strong style={{ color: 'var(--firefly, #F5A524)' }}>{fmt(band.typical.value)} TL</strong> (+{band.typical.return_pct}% · reel {band.typical_real_return_pct > 0 ? '+' : ''}{band.typical_real_return_pct}%)</div>
+          <div>İyi dönem: <strong style={{ color: 'var(--green, #3DD68C)' }}>{fmt(band.optimistic.value)} TL</strong> (+{band.optimistic.return_pct}%)</div>
+          <p style={{ fontSize: 11, opacity: 0.6, marginTop: 6 }}>⚠️ {band.honesty_note}</p>
+        </div>
+      )}
+    </div>
+  )
+}
+
+function RegionCard({ region, amount }) {
+  const realPositive = region.real_change_pct > 0
+  const [open, setOpen] = useState(false)
+  return (
+    <div className="card" onClick={() => setOpen(true)}
+         style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', cursor: 'pointer' }}>
       <span style={{
         fontSize: 15, fontWeight: 700, width: 34, height: 34, borderRadius: '50%',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -29,6 +75,7 @@ function RegionCard({ region }) {
           reel {region.real_change_pct > 0 ? '+' : ''}{region.real_change_pct}%
         </div>
       </div>
+      {open && <div style={{ flexBasis: '100%' }}><RegionScenario region={region} amount={amount} /></div>}
     </div>
   )
 }
@@ -153,6 +200,7 @@ export default function ExplorePage() {
   const { getToken } = useAuth()
   const [regions, setRegions] = useState(null)
   const [horizon, setHorizon] = useState(1)
+  const [scenarioAmount, setScenarioAmount] = useState('1000000')
   // Loading is derived: no data yet, or data belongs to a different horizon
   const loading = !regions || regions._horizon !== horizon
 
@@ -179,7 +227,7 @@ export default function ExplorePage() {
   return (
     <div className="page">
       <header className="navbar">
-        <span style={{ fontWeight: 700 }}><span className="gradient-text">Lumos</span></span>
+        <LumosLogo />
         <UserButton afterSignOutUrl="/" />
       </header>
 
@@ -204,6 +252,17 @@ export default function ExplorePage() {
             ))}
           </div>
 
+          <input
+            className="input"
+            type="number"
+            min="1"
+            placeholder="Senaryo tutarı (TL)"
+            value={scenarioAmount}
+            onChange={e => setScenarioAmount(e.target.value)}
+            style={{ marginBottom: 12 }}
+            aria-label="Senaryo tutarı"
+          />
+
           {loading && (
             <div style={{ textAlign: 'center', padding: 24 }}>
               <span className="spinner" style={{ width: 28, height: 28 }} />
@@ -213,7 +272,7 @@ export default function ExplorePage() {
           {!loading && regions?.available && (
             <>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                {regions.regions.map(r => <RegionCard key={r.code} region={r} />)}
+                {regions.regions.map(r => <RegionCard key={r.code} region={r} amount={scenarioAmount} />)}
               </div>
               <p style={{ fontSize: 12, opacity: 0.6, marginTop: 10, lineHeight: 1.5 }}>
                 ⚠️ {regions.honesty_note} (Veri: {regions.data_through})

@@ -1,4 +1,6 @@
 import { useEffect, useState, useCallback } from 'react'
+import LumosLogo from '../components/LumosLogo'
+import CurrencyExposure from '../components/CurrencyExposure'
 import { UserButton, useAuth } from '@clerk/clerk-react'
 import api, { extractErrorMessage, setAuthToken } from '../utils/api'
 
@@ -89,7 +91,7 @@ export default function HoldingsPage() {
   return (
     <div className="page">
       <header className="navbar">
-        <span style={{ fontWeight: 700 }}><span className="gradient-text">Lumos</span></span>
+        <LumosLogo />
         <UserButton afterSignOutUrl="/" />
       </header>
 
@@ -143,6 +145,9 @@ export default function HoldingsPage() {
           </div>
         )}
 
+        {/* Kur dağılımı — TL vs döviz */}
+        <CurrencyExposure holdings={holdings} />
+
         {/* Holdings list */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {holdings.map(h => (
@@ -159,9 +164,30 @@ export default function HoldingsPage() {
             </div>
           ))}
           {holdings.length === 0 && (
-            <div className="card" style={{ textAlign: 'center', padding: 28 }}>
-              <div style={{ fontSize: 26, marginBottom: 8 }}>✨</div>
-              <p style={{ fontSize: 14 }}>Henüz varlığın yok — ilk ışığı birlikte yakalım.</p>
+            <div className="card" style={{
+              textAlign: 'center', padding: '36px 24px',
+              position: 'relative', overflow: 'hidden',
+            }}>
+              {/* Arka plan ışıltı */}
+              <div style={{
+                position: 'absolute', top: '40%', left: '50%',
+                width: 140, height: 140, borderRadius: '50%',
+                background: 'radial-gradient(circle, rgba(245,165,36,0.10) 0%, transparent 70%)',
+                transform: 'translate(-50%, -50%)',
+                animation: 'pulse 3s ease-in-out infinite',
+              }} />
+              <div style={{ position: 'relative', zIndex: 1 }}>
+                <div style={{
+                  fontSize: 36, marginBottom: 10,
+                  filter: 'drop-shadow(0 0 12px rgba(245,165,36,0.35))',
+                }}>🪲</div>
+                <p style={{ fontSize: 14, fontWeight: 600, marginBottom: 4 }}>
+                  Henüz varlığın yok
+                </p>
+                <p style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.6 }}>
+                  İlk ışığı birlikte yakalayalım — bir varlık ekleyerek başla.
+                </p>
+              </div>
             </div>
           )}
         </div>
