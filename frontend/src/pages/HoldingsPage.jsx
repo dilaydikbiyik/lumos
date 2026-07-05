@@ -87,6 +87,7 @@ export default function HoldingsPage() {
   }
 
   const needsTicker = !OFF_EXCHANGE.includes(form.asset_type)
+  const isVehicle = form.asset_type === 'vehicle'
 
   return (
     <div className="page">
@@ -201,6 +202,26 @@ export default function HoldingsPage() {
             </select>
             <input className="input" placeholder="Ad (örn: Gölbaşı arsa, SPY ETF)" required
                    value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
+            {/* 🚗 Araç uyarısı — "Araban serveti mi, gideri mi?" */}
+            {isVehicle && (
+              <div style={{
+                padding: '12px 14px', borderRadius: 'var(--radius-xs)',
+                background: 'rgba(248,113,113,0.06)',
+                border: '1px solid rgba(248,113,113,0.2)',
+                fontSize: 12, lineHeight: 1.65,
+              }}>
+                <p style={{ fontWeight: 700, marginBottom: 6, color: 'var(--text)' }}>
+                  🚗 Araban serveti mi, gideri mi?
+                </p>
+                <p style={{ color: 'var(--text-muted)', marginBottom: 6 }}>
+                  Araç servet resmine dahil edilebilir — ama dikkatli ol: her yıl %10–20 değer kaybeder (amortisman),
+                  üstüne kasko + MTV + bakım gelir. Lumos asla araç almayı yatırım olarak önermez.
+                </p>
+                <p style={{ color: 'var(--firefly)', fontWeight: 600 }}>
+                  💡 Bunu eklemek istiyorsan güncel piyasa değerini "Güncel tahmini değer"e yaz.
+                </p>
+              </div>
+            )}
             {needsTicker && (
               <input className="input" placeholder="Sembol (örn: SPY, THYAO.IS)" required
                      value={form.ticker} onChange={e => setForm({ ...form, ticker: e.target.value })} />

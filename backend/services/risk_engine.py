@@ -1,17 +1,22 @@
 """
 Risk score engine.
 
-Maps the 5-question risk profile answers to a score between 1 and 10.
+Maps the risk profile answers to a score between 1 and 10.
 
 Scoring logic:
   Each dimension contributes a sub-score; the weighted average gives the final score.
 
-  Dimension         Weight
-  ──────────────    ──────
-  time_horizon       25 %
-  loss_tolerance     30 %
-  goal               25 %
-  experience         20 %
+  Dimension           Weight   Notes
+  ──────────────────  ──────   ────────────────────────────────────────────────────
+  time_horizon         25 %
+  loss_tolerance       30 %
+  goal                 25 %
+  experience           20 %
+
+  Optional modifiers (additive, capped at ±1.5):
+  age                         ≥55 → −0.5 (preservation priority increases with age)
+                              ≤30 → +0.5 (longer runway, more risk capacity)
+  income_stability            irregular → −1.0   variable → −0.4   stable → 0
 
 Budget is NOT included in the formula (it affects portfolio size, not risk tolerance).
 """
@@ -35,6 +40,12 @@ _WEIGHTS = {
     "experience": 0.20,
 }
 
+_INCOME_MODIFIER = {
+    "stable": 0.0,
+    "variable": -0.4,
+    "irregular": -1.0,
+}
+
 
 def _label(score: float) -> str:
     if score <= 3:
@@ -47,30 +58,59 @@ def _label(score: float) -> str:
         return "Aggressive"
 
 
+def _age_modifier(age: int | None) -> float:
+    """Older users need more capital preservation; younger users have longer runway."""
+    if age is None:
+        return 0.0
+    if age >= 55:
+        return -0.5
+    if age <= 30:
+        return 0.5
+    return 0.0
+
+
 def compute_risk_score(answers: RiskProfileAnswers) -> RiskProfileResponse:
     """
-    Compute a 1-10 risk score from the 5-question answers.
+    Compute a 1-10 risk score from the profile answers.
 
     Args:
         answers: Validated RiskProfileAnswers instance.
 
     Returns:
-        RiskProfileResponse with score, label, and summary.
+        RiskProfileResponse with score, label, and Turkish summary.
     """
-    raw = (
+    base = (
         _TIME_HORIZON_SCORES[answers.time_horizon] * _WEIGHTS["time_horizon"]
         + _LOSS_TOLERANCE_SCORES[answers.loss_tolerance] * _WEIGHTS["loss_tolerance"]
         + _GOAL_SCORES[answers.goal] * _WEIGHTS["goal"]
         + _EXPERIENCE_SCORES[answers.experience] * _WEIGHTS["experience"]
     )
-    score = round(min(max(raw, 1.0), 10.0), 1)
+
+    # Optional modifiers — each capped so they can't dominate
+    modifier = _age_modifier(answers.age)
+    if answers.income_stability:
+        modifier += _INCOME_MODIFIER[answers.income_stability]
+    modifier = max(-1.5, min(1.5, modifier))
+
+    score = round(min(max(base + modifier, 1.0), 10.0), 1)
     label = _label(score)
 
+    # Modifier context for summary
+    modifier_note = ""
+    if answers.age and answers.age >= 55:
+        modifier_note += " Yaşın göz önünde bulunduruldu — koruma ağırlığı artırıldı."
+    elif answers.age and answers.age <= 30:
+        modifier_note += " Genç yaşın uzun bir yatırım ufku sağlıyor — hafifçe yukarı güncellendi."
+    if answers.income_stability == "irregular":
+        modifier_note += " Düzensiz geliriniz risk kapasiteni sınırlıyor."
+    elif answers.income_stability == "variable":
+        modifier_note += " Değişken geliriniz hafifçe dikkate alındı."
+
     summary = (
-        f"Your risk score is {score}/10 ({label}). "
-        f"Based on your {answers.time_horizon} time horizon, "
-        f"{answers.loss_tolerance} loss tolerance, "
-        f"and {answers.goal} goal, Lumos will build a portfolio tailored to your profile."
+        f"Risk skoru {score}/10 ({label}). "
+        f"{answers.time_horizon.capitalize()} yatırım ufku, "
+        f"{answers.loss_tolerance} kayıp toleransı ve "
+        f"{answers.goal} hedefi temel alındı.{modifier_note}"
     )
 
     return RiskProfileResponse(

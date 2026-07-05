@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import Literal
+from typing import Literal, Optional
 
 
 class RiskProfileAnswers(BaseModel):
@@ -16,6 +16,14 @@ class RiskProfileAnswers(BaseModel):
     )
     experience: Literal["none", "beginner", "intermediate", "advanced"] = Field(
         ..., description="User's investment experience level"
+    )
+    age: Optional[int] = Field(
+        None, ge=18, le=100,
+        description="User age — older users get a mild risk reduction (capital preservation priority)"
+    )
+    income_stability: Optional[Literal["stable", "variable", "irregular"]] = Field(
+        None,
+        description="Income stability — irregular income lowers risk capacity"
     )
 
 

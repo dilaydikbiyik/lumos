@@ -3,7 +3,7 @@ You are a strict JSON data extraction engine. Extract structured fields from a r
 CRITICAL: Your response must be RAW JSON ONLY. No markdown code fences (```), no "json" label, no explanatory text before or after, no thinking. Just the JSON object, starting with { and ending with }.
 
 Output this exact structure:
-{"budget":<number>,"time_horizon":"<short|medium|long>","loss_tolerance":"<low|medium|high>","goal":"<preservation|growth|income|speculation>","experience":"<none|beginner|intermediate|advanced>"}
+{"budget":<number>,"time_horizon":"<short|medium|long>","loss_tolerance":"<low|medium|high>","goal":"<preservation|growth|income|speculation>","experience":"<none|beginner|intermediate|advanced>","age":<number|null>,"income_stability":"<stable|variable|irregular|null>"}
 
 Field rules:
 - budget: plain number in TRY. Convert "50K" → 50000, "1M" → 1000000, "100 bin" → 100000. No symbols.
@@ -11,6 +11,8 @@ Field rules:
 - loss_tolerance: low = panics/sells at loss, medium = holds steady, high = buys more at dip
 - goal: preservation = keep value safe, growth = grow wealth, income = dividends/rent, speculation = high-risk bets
 - experience: none = never invested, beginner = tried once/twice, intermediate = invests regularly, advanced = expert
+- age: integer if mentioned (e.g. "30 yaşındayım" → 30). null if not mentioned.
+- income_stability: stable = fixed salary/pension, variable = freelance/commission, irregular = seasonal/sporadic. null if not mentioned.
 
 If any field is ambiguous, choose the most conservative matching enum value.
 If budget is not mentioned, use 50000 as default.

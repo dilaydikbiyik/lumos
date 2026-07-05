@@ -7,11 +7,45 @@ import PortfolioComparison from '../components/PortfolioComparison'
 import NewsDigest from '../components/NewsDigest'
 import GoalPlanner from '../components/GoalPlanner'
 import DailyTip from '../components/DailyTip'
+import HeadlineEducation from '../components/HeadlineEducation'
 import usePortfolio from '../hooks/usePortfolio'
 import api, { setAuthToken } from '../utils/api'
 import { useState } from 'react'
 
 const fmt = n => new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 0 }).format(n)
+
+/** Kademeli arayüz: Yeni kullanıcıda sade görünüm, "Daha Fazla" ile derinleşir */
+function ProgressiveDetails({ holdingsSummary, portfolio }) {
+  const [expanded, setExpanded] = useState(false)
+  // Hiç holding yoksa detay bölümü gösterme
+  const hasData = holdingsSummary?.total_current_value > 0 || portfolio
+  if (!hasData) return null
+  return (
+    <>
+      {!expanded ? (
+        <button
+          onClick={() => setExpanded(true)}
+          className="btn btn-ghost"
+          style={{ width: '100%', fontSize: 13, border: '1px dashed var(--border)' }}
+        >
+          📊 Detayları Göster (karşılaştırma & hedef)
+        </button>
+      ) : (
+        <>
+          <PortfolioComparison />
+          <GoalPlanner />
+          <button
+            onClick={() => setExpanded(false)}
+            className="btn btn-ghost"
+            style={{ width: '100%', fontSize: 12, color: 'var(--text-dim)' }}
+          >
+            ↑ Küçült
+          </button>
+        </>
+      )}
+    </>
+  )
+}
 
 export default function DashboardPage() {
   const navigate = useNavigate()
@@ -161,11 +195,11 @@ export default function DashboardPage() {
         {/* ── Haber Özeti ── */}
         <NewsDigest />
 
-        {/* ── Portföy Karşılaştırması: gerçek vs önerilen ── */}
-        <PortfolioComparison />
+        {/* ── Manset Dili Eğitimi ── */}
+        <HeadlineEducation />
 
-        {/* ── Hedef Planlayıcı ── */}
-        <GoalPlanner />
+        {/* ── Kademe: Detay Göster toggle ── */}
+        <ProgressiveDetails holdingsSummary={holdingsSummary} portfolio={portfolio} />
 
         {/* ── Risk Profili / Portföy ── */}
         {!profile ? (

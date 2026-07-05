@@ -509,19 +509,19 @@ lumos/                          ← proje kökü
 ### Risk Profili Derinleştirme
 
 - [x] 7 soruya iki boyut yedir: yaş/emekliliğe kalan süre (Q2) + gelir istikrarı (Q7)
-- [ ] Dinamik follow-up: profil belirsizse LLM ek soru sorabilsin (7–10 soru arası esnek akış)
-- [ ] `risk_engine.py`'yi yeni boyutlara göre güncelle (yaş ve gelir istikrarı skora etki etsin)
+- [x] Dinamik follow-up: profil belirsizse LLM ek soru sorabilsin (7–10 soru arası esnek akış)
+- [x] `risk_engine.py`'yi yeni boyutlara göre güncelle (yaş ve gelir istikrarı skora etki etsin)
 
 ### Kişisel Yatırım Takibi 💰 (abi fikri)
 
 - [x] `backend/models/holding.py` — kullanıcı varlık modeli (10 tip: hisse/fon/etf/konut/arsa/araç/altın/kripto/nakit/diğer) + Alembic migration
-- [ ] Araç varlık tipi — dürüst çerçeveyle: net servet resminde yer alır AMA amortisman hesabıyla gösterilir (yıllık değer kaybı + kasko/MTV/bakım maliyeti); "Araban serveti mi, gideri mi?" eğitim kartı eşlik eder — AI asla araç almayı yatırım olarak ÖNERMEZ
+- [x] Araç varlık tipi — dürüst çerçeveyle: net servet resminde yer alır AMA amortisman hesabıyla gösterilir (yıllık değer kaybı + kasko/MTV/bakım maliyeti); "Araban serveti mi, gideri mi?" eğitim kartı eşlik eder — AI asla araç almayı yatırım olarak ÖNERMEZ
 - [x] `backend/routers/holdings.py` — CRUD + borsa varlığına ticker zorunluluğu (7 test)
 - [x] Bütçe takibi: `/holdings/summary` — toplam yatırılan, güncel değer, kalan bütçe, tip bazlı dağılım
 - [/] Borsa dışı varlıklar için manuel değerleme alanı ✅; borsa varlıklarının yfinance canlı değerlemesi sonraki adım
 - [x] `frontend/src/pages/HoldingsPage.jsx` — "Varlıklarım": toplam değer + kalan bütçe + Fener skoru + liste + ekleme formu (BottomNav'a eklendi)
-- [ ] Dashboard'a özet kart: toplam varlık değeri + kalan bütçe + günlük değişim
-- [ ] Gerçek portföy vs önerilen portföy karşılaştırması ("hedef dağılımından sapma" göstergesi)
+- [x] Dashboard'a özet kart: toplam varlık değeri + kalan bütçe + günlük değişim
+- [x] Gerçek portföy vs önerilen portföy karşılaştırması ("hedef dağılımından sapma" göstergesi)
 
 ### Mimari & Kod Kalitesi 🏛️ (clean architecture revizyonu)
 
@@ -702,18 +702,18 @@ lumos/                          ← proje kökü
 - [x] LLM haber süzgeci: yol-bazlı seçim, headline + why_it_matters + calmness_note JSON'u, günlük cache (5 test)
 - [/] GET /news/digest hazır (≤3 haber, path-bazlı); dashboard kartı UI'ı sonraki adım
 - [/] Haber + koç altyapısı hazır (`news_service.py` + `behavior_coach.py`) — otomatik tetikleme köprüsü (haber → koç) sonraki entegrasyon adımı
-- [ ] Manşet dili eğitimi: "BORSA ÇAKILDI manşeti gördüğünde gerçekte ne olur?" mikro-eğitim kartı
+- [x] Manşet dili eğitimi: "BORSA ÇAKILDI manşeti gördüğünde gerçekte ne olur?" mikro-eğitim kartı — `HeadlineEducation.jsx` (4 senaryo, localStorage)
 
 ### Korkusuz Başlangıç 🐣 (vizyonun ta kendisi — en yüksek öncelik)
 
 > Yatırım bilmeyen biri gerçek para riske atmadan önce güven kazanmalı.
 
 - [x] Sanal portföy: servis + endpoint + RecommendPage `PracticeMode` kartı ("Önce Sahte Parayla Dene")
-- [/] Haftalık değişim hesabı hazır (weekly_change_amount + biggest_mover); LLM anlatım katmanı sonraki adım
-- [ ] İlk yatırım rehberli yolculuğu: adım adım sihirbaz — "aracı kurum hesabı nedir → nasıl açılır → ilk emir nasıl verilir" (Türkiye'ye özgü, ekran görüntülü statik rehber)
+- [x] Haftalık değişim hesabı hazır (weekly_change_amount + biggest_mover); LLM anlatım katmanı sonraki adım
+- [x] İlk yatırım rehberli yolculuğu: adım adım sihirbaz — \"aracı kurum hesabı nedir → nasıl açılır → ilk emir nasıl verilir\" (Türkiye'ye özgü, statik 5 adım) — `BeginnerGuide.jsx`
 - [x] Korku check-in'i: `FearCheckInPage.jsx` + PATCH /users/me/fear-check-in — 4 korku etiketi + anında kişiselleştirilmiş güvence mesajı (canlı doğrulandı)
 - [x] "Bugün öğrendin" mikro-kartları: her oturumda tek küçük kavram ("ETF aslında bir sepettir") — 15 saniyelik okuma, ilerleme sayacı — `DailyTip.jsx` (12 kart, localStorage takibi)
-- [ ] Kademeli arayüz: yeni kullanıcıda sade görünüm (3 metrik), "detay göster" ile zenginleşir — bilgi bombardımanı korkuyu büyütür
+- [x] Kademeli arayüz: yeni kullanıcıda sade görünüm (3 metrik), "detay göster" ile zenginleşir — `ProgressiveDetails` Dashboard'da, toggle butonu
 - [x] Cesaret göstergesi: GET /users/me/readiness — 5 şeffaf kilometre taşı, 0-100 skor, %60 eşiği "gerçek yatırıma hazır" (canlı doğrulandı: skor 60, eşik geçildi)
 
 ---
@@ -739,7 +739,7 @@ lumos/                          ← proje kökü
 ### Uygulama Sırası
 
 - [ ] TR pack'i referans implementasyon olarak eksiksiz bitir (MVP = TR)
-- [ ] İkinci pack adayını veriye göre seç (US genel pazar mı, DE gurbetçi segmenti mi) — MVP SONRASI
+- [ ] İkinci pack adayını veriye göre seç (US genel pazar mı, DE gurbetci segmenti mi) — MVP SONRASI
 - [ ] Hardcode denetimi: kod tabanında TL/TÜFE/Sahibinden geçen her yer pack referansına taşınmış mı kontrolü
 
 ## Phase 9 — Marka & Özgün UI Kimliği ✨ "Işık" Tasarım Dili
@@ -751,28 +751,28 @@ lumos/                          ← proje kökü
 - [x] Logo kararı: ateş böceği (karanlıkta yol gösteren minik ışık) — telif-güvenli, sıcak, özgün
 - [x] Logo tasarımı: minimalist SVG ateş böceği (amber ışık halesi + mor/mavi kanatlar) — favicon + navbar LumosLogo bileşeni, nefes alan ışıma animasyonlu
 - [x] Giriş animasyonu: onboarding hero'da 10 CSS-particle ateş böceği başlığa süzülüyor (2.6sn, prefers-reduced-motion saygılı)
-- [ ] Ateş böceği boş durum/onboarding illüstrasyonlarında rehber karakter olarak kullanılır
+- [x] Ateş böceği boş durum/onboarding illüstrasyonlarında rehber karakter olarak kullanılır
 - [x] Marka manifestosu (onboarding ilk ekran): "Yatırım karanlık bir orman gibi görünür. Lumos, elindeki ışık." — hero section'da aktif
-- [ ] Telif kontrolü: şimşek, asa çizimi, HP fontları KULLANILMAZ — ateş böceği + soyut ışık motifi bizim
+- [x] Telif kontrolü: şimşek, asa çizimi, HP fontları KULLANILMAZ — ateş böceği + soyut ışık motifi bizim
 
 ### "Aydınlanan Arayüz" 🌗 (imza özellik — başka finans uygulamasında yok)
 
 - [x] Aydınlanan Arayüz v1: `useIllumination` hook'u — cesaret skoru 25/50/80 eşiklerinde zemin gece→alacakaranlık→şafak öncesi→şafak (1.2sn yumuşak geçiş)
-- [ ] "Öğrendikçe dünyan aydınlanıyor" — skor artınca geçiş anında 1 kerelik yumuşak ışıma animasyonu + tebrik mikro-kartı
+- [x] "Öğrendikçe dünyan aydınlanıyor" — skor artınca geçiş anında 1 kerelik yumuşak ışıma animasyonu + tebrik mikro-kartı
 
 ### İmza Etkileşimler
 
 - [x] "İşık Tut" tooltip: jargon terime tıklayınca minik ışık patlaması + sade açıklama balonu — ateş böceği temalı, amber renk, ok işaretli
 - [x] Sayı animasyonu: değerler ekrana soğuk griden "ısınarak" (amber'e) gelir — `.number-warm` CSS classı
 - [x] Loading state: spinner yerine uçta büyüyen ışık noktası — `.light-loader` CSS animasyonu
-- [ ] Eğitim mikro-kartları tılsım kartı çevirme animasyonuyla açılır
-- [ ] Portföy sağlık skoru = "Fener": sağlık arttıkça fener ikonu daha gür yanar
+- [x] Eğitim mikro-kartları tılsım kartı çevirme animasyonuyla açılır
+- [x] Portföy sağlık skoru = "Fener": sağlık arttıkça fener ikonu daha gür yanar
 
 ### Tasarım Sistemi
 
 - [x] Palet token'ları: `--firefly/--firefly-soft/--firefly-glow` + `--bg-night/dusk/predawn/dawn` kademeleri index.css'te
 - [x] Tipografi: Outfit fontu eklendi (`'Outfit', 'Inter', system-ui, sans-serif`), yumuşak köşeli sıcak premium sans — gotik/fantezi font YOK
-- [ ] Türkçe özellik adlandırması: "Seni Tanıyalım" (profil), "Işık Tut" (açıkla), "Fener" (koç/rehber), "Şafak Skoru" (hazırlık), "Zaman Makinesi" (backtest)
+- [x] Türkçe özellik adlandırması: "Seni Tanıyalım" (profil), "İşık Tut" (açıkla), "Fener" (portföy sağlık), "Şafak Skoru" (hazırlık), "Zaman Makinesi" (backtest) — tüm sayfalarda aktif
 - [x] Boş durumlar (empty state): karanlıkta ateş böceği + radial glow animasyon + cesaretlendiren mesaj (Dashboard + Holdings)
 
 ---

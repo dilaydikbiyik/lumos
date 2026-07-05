@@ -9,6 +9,7 @@ import AssetExplainer from '../components/AssetExplainer'
 import TimeMachine from '../components/TimeMachine'
 import PracticeMode from '../components/PracticeMode'
 import BoughtItBridge from '../components/BoughtItBridge'
+import BeginnerGuide from '../components/BeginnerGuide'
 import usePortfolio from '../hooks/usePortfolio'
 
 export default function RecommendPage() {
@@ -104,6 +105,9 @@ export default function RecommendPage() {
         <div className="disclaimer">
           ⚠️ Bu bilgiler yalnızca eğitim amaçlıdır. Geçmiş performans, gelecek sonuçların garantisi değildir. Yatırım kararlarınız için lisanslı bir finansal danışmana başvurun.
         </div>
+
+        {/* "İlk Adımı At" rehberi — aracı kurum gösterimi */}
+        <BeginnerGuide />
 
         {/* "Aldım" köprüsü — no-execution modelinin son halkası */}
         <BoughtItBridge allocations={portfolio.allocations} budget={portfolio.budget} />
