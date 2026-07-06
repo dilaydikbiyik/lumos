@@ -55,6 +55,13 @@ def client():
     app.dependency_overrides.clear()
 
 
+@pytest.fixture(autouse=True)
+def _no_network_chat_context():
+    """Chat RAG context never hits real market data in tests."""
+    with patch("backend.services.chat_context.build_market_context", return_value=""):
+        yield
+
+
 @pytest.fixture
 def mock_ai():
     """Patch the provider dispatch — tests never hit Gemini/Anthropic."""

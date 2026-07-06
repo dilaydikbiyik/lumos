@@ -24,6 +24,9 @@ class User(Base):
     goal: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     experience: Mapped[Optional[str]] = mapped_column(String, nullable=True)
 
+    # Access role: user (default) / admin — admin unlocks /admin/stats
+    role: Mapped[str] = mapped_column(String, default="user", nullable=False, server_default="user")
+
     # Chosen journey: stocks / real_estate / hybrid / undecided (Akış 0)
     investment_path: Mapped[Optional[str]] = mapped_column(String, nullable=True)
 

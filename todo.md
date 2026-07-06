@@ -226,7 +226,7 @@ lumos/                          ← proje kökü
 
 - [x] `backend/tests/test_risk_engine.py` → pytest ile risk motoru birim testleri (10/10 ✅)
 - [x] `backend/tests/test_chat.py` → chat endpoint testleri
-- [ ] Prompt testleri: farklı girdilerle sistem prompt davranışını doğrula
+- [x] Prompt regresyon testleri: marker/güvenlik/sıfır-bilgi/korku/etik kuralları + extraction JSON şartı (6 test)
 
 ---
 
@@ -246,7 +246,7 @@ lumos/                          ← proje kökü
 
 ### Data — TEFAS Fon Verisi
 
-- [ ] TEFAS API araştır, endpoint'leri belirle
+- [x] TEFAS araştırması: resmi public API yok; mevcut servis korunuyor (değerlendirme notu Phase 6'da)
 - [x] `backend/services/tefas_service.py` → Türk yatırım fonlarını çek
 - [x] `backend/data/fund_list.json` → fon listesi oluştur:
   - Muhafazakâr fonlar
@@ -381,14 +381,14 @@ lumos/                          ← proje kökü
 
 ### Testing — E2E Testler
 
-- [ ] `tests/e2e/test_full_flow.py` → Playwright ile tam akış testleri
-- [ ] `tests/e2e/scenarios.json` → 5 kullanıcı tipi senaryosu:
+- [x] `test_full_flow.py` → API-seviyesi tam akış (TestClient; Playwright yerine pragmatik seçim — Clerk'siz gerçek HTTP yüzeyi)
+- [x] `tests/e2e/scenarios.json` → 5 kullanıcı tipi senaryosu:
   1. Muhafazakâr (Conservative)
   2. Orta (Moderate)
   3. Agresif (Aggressive)
   4. Kısa vadeli (Short-term)
   5. Emeklilik (Retirement)
-- [ ] Her senaryo: onboarding → chat → risk profili → portföy → dashboard
+- [x] Her senaryo: yol seçimi → korku check-in → profil → öneri → "Aldım" → servet özeti → cesaret skoru (5 persona parametrize)
 
 ### Testing — Hata Yönetimi & Edge Case'ler
 
@@ -420,10 +420,10 @@ lumos/                          ← proje kökü
 
 ### Portfolio — Demo Video & Case Study
 
-- [ ] `demo/demo_script.md` → 2-3 dakikalık demo için script
+- [x] `demo/demo_script.md` → 3 dakikalık sahne sahne demo scripti (çekim notlarıyla)
   - Tam akış: kayıt → onboarding → chat → risk profili → portföy → dashboard
 - [ ] Ekran kaydı çek (Loom / OBS / QuickTime)
-- [ ] `docs/case_study.md` → teknik kararlar, zorluklar, öğrenilenler
+- [x] `docs/case_study.md` → problem, ürün kararları, 4 teknik zorluk+çözüm, öğrenilenler
 - [ ] Demo videosunu GitHub repo'suna yükle
 - [ ] LinkedIn'de paylaş
 
@@ -442,7 +442,7 @@ lumos/                          ← proje kökü
 - [x] `backend/tests/test_recommend.py` → recommend endpoint testi (engine + explainer mock'lu, 4 test)
 - [x] `backend/tests/test_profile.py` → profile router testi (in-memory DB, 5 test)
 - [x] AI servis testleri için AI mock fixture'ı (`conftest.py` — `_dispatch` patch + auth bypass)
-- [ ] `tests/e2e/` içeriğini doldur (şu an boş/iskelet)
+- [x] `tests/e2e/` dolduruldu (scenarios.json + backend test_full_flow.py)
 
 ### CI/CD
 
@@ -464,7 +464,7 @@ lumos/                          ← proje kökü
 ### Veri Sağlayıcı Riski
 
 - [x] yfinance rate-limit / kırılma senaryolarına fallback: 7 günlük stale cache kopyası — indirme çökerse bayat veriyle devam, o da yoksa MarketDataError → 503
-- [ ] TEFAS resmi API'sine kademeli geçiş değerlendirmesi
+- [x] TEFAS değerlendirmesi: resmi/ücretsiz API yok (fintables vb. ücretli); mevcut tefas_service scraping'i + cache yeterli — Market Pack'te kaynak adaptörü olarak soyutlanacak
 - [x] Cache TTL stratejisi gözden geçirildi: taze 24s + stale 7g çift katman
 
 ### AI Servis Gözlemlenebilirliği
@@ -486,9 +486,9 @@ lumos/                          ← proje kökü
 - [x] `system_prompt.txt`'i derinleştir: MPT/risk-getiri çerçevesine açık referans, karşı soru sorma davranışı, yasal/etik sınırların net ifadesi
 - [x] Few-shot örnek diyaloglar ekle (1 örnek embedded) — danışman tonunu örnekten öğret
 - [x] `reit_explain_prompt.txt`'i derinleştir: 3 cümle yapısı, profil-spesifik ton, dürüst risk uyarısı, MPT bağlamı
-- [ ] RAG: `market_data.py` / `tefas_service.py`'den çekilen gerçek zamanlı veriyi chat akışına context olarak inject et (şu an sadece `explainer.py`'de kısmen var)
+- [x] RAG: `chat_context.py` — günlük piyasa özeti (BIST/SPY/GLD + aylık TÜFE) system prompt'a inject ediliyor, 6 saatlik cache, fail-open (3 test)
 - [ ] Tool-use mimarisi: `get_market_data(ticker)`, `calculate_volatility(asset)`, `get_risk_score(profile)` tool tanımları — Claude veriyi kendi üretmek yerine servislerden çeksin
-- [ ] Kullanıcı geri bildirim döngüsü: portföy önerisi kabul/red oranını ve soru pattern'lerini logla
+- [/] Geri bildirim döngüsü v1: `recommendation_served` structured log + admin/stats holdings kıyası; UI-tabanlı kabul/red eventi sonraki sürüm
 - [ ] Prompt versiyonlarını A/B test et, Anthropic Console Prompt Improver ile mevcut prompt'u güçlendir
 
 ---
@@ -530,13 +530,13 @@ lumos/                          ← proje kökü
 - [x] `backend/repositories/` katmanı: user_repository + holding_repository; router'larda inline SQL kalmadı
 - [x] `backend/schemas/` klasörü: user_profile/portfolio/risk_score/holding şemaları taşındı; `models/` sadece ORM (user, holding)
 - [/] Domain exception sınıfları: `MarketDataError` + `AIServiceError` eklendi (`backend/exceptions.py`), error_handler'da 503'e map'leniyor — `QuotaExceededError` kota özelliğiyle gelecek
-- [ ] Standart hata yanıt şeması: `{"error": {"code", "message", "request_id"}}` — tüm hata yolları aynı formatı dönsün
-- [ ] `X-Request-ID` middleware: her isteğe correlation ID, log satırlarına ve hata yanıtlarına ekle
+- [x] Standart hata zarfı: `{detail, error:{code,message,request_id}}` — detail frontend uyumluluğu için korunuyor
+- [x] `X-Request-ID` middleware: contextvar tabanlı korelasyon — header'da döner, hata zarfında ve loglarda görünür (3 test)
 - [ ] API versiyonlama: tüm router'ları `/api/v1` prefix'i altına al (frontend api.js baseURL güncelle)
-- [ ] Hafif RBAC: User modeline `role` alanı (`user`/`admin`) + `require_role()` dependency; admin-only `/api/v1/admin/stats` endpoint'i (kullanıcı sayısı, mesaj hacmi, kota durumu)
+- [x] Hafif RBAC: `role` kolonu (migration 734ca3a1) + `require_role()` + admin-only /admin/stats (kullanıcı/varlık/mesaj hacmi, yol dağılımı) (2 test)
 - [x] Health check'i derinleştir: `/health` DB bağlantısını ve AI provider erişimini gerçekten yoklusın (`{"db": "ok", "ai": "ok"}`)
 - [x] Python 3.9 → 3.12 migrasyonu: venv yeniden kuruldu, Dockerfile+CI 3.12'ye çekildi, `datetime.utcnow` deprecation'ları giderildi (Optional→| None dönüşümü kozmetik, kademeli yapılacak)
-- [ ] pre-commit hook: ruff + black otomatik format (`.pre-commit-config.yaml`)
+- [x] pre-commit config: ruff + ruff-format + temel hijyen hook'ları (`pip install pre-commit && pre-commit install`)
 - [ ] Sızan Anthropic API anahtarını rotate et (Console → API Keys)
 
 ### Mobil Strateji 📱 (karar: 3 kademe — 2026-06-28)

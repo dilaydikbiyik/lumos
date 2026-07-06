@@ -1,0 +1,55 @@
+{
+  "_note": "5 kullanıcı tipi — API seviyesi uçtan uca akış senaryoları (test_full_flow.py bunları parametrize eder)",
+  "scenarios": [
+    {
+      "name": "conservative",
+      "description": "Muhafazakâr: emekliliğe yakın, kayıptan kaçınır",
+      "answers": {
+        "budget": 500000, "time_horizon": "short",
+        "loss_tolerance": "low", "goal": "preservation", "experience": "none"
+      },
+      "expected_label_in": ["Conservative", "Moderate"],
+      "max_risk_score": 4.5
+    },
+    {
+      "name": "moderate",
+      "description": "Orta: dengeli büyüme ister",
+      "answers": {
+        "budget": 200000, "time_horizon": "medium",
+        "loss_tolerance": "medium", "goal": "growth", "experience": "beginner"
+      },
+      "expected_label_in": ["Moderate", "Growth"],
+      "max_risk_score": 8
+    },
+    {
+      "name": "aggressive",
+      "description": "Agresif: genç, uzun vade, dip alıcısı",
+      "answers": {
+        "budget": 100000, "time_horizon": "long",
+        "loss_tolerance": "high", "goal": "speculation", "experience": "advanced"
+      },
+      "expected_label_in": ["Growth", "Aggressive"],
+      "min_risk_score": 6
+    },
+    {
+      "name": "short_term",
+      "description": "Kısa vadeli: 1-2 yıl içinde paraya ihtiyacı var",
+      "answers": {
+        "budget": 150000, "time_horizon": "short",
+        "loss_tolerance": "medium", "goal": "income", "experience": "beginner"
+      },
+      "expected_label_in": ["Conservative", "Moderate"],
+      "max_risk_score": 6
+    },
+    {
+      "name": "retirement",
+      "description": "Emeklilik: uzun vade ama düşük kayıp toleransı",
+      "answers": {
+        "budget": 1000000, "time_horizon": "long",
+        "loss_tolerance": "low", "goal": "income", "experience": "intermediate"
+      },
+      "expected_label_in": ["Conservative", "Moderate", "Growth"],
+      "max_risk_score": 7
+    }
+  ]
+}

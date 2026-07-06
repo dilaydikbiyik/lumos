@@ -151,10 +151,15 @@ def chat(messages: list[dict]) -> str:
     Returns:
         The assistant's text reply.
     """
+    # RAG: bugünün piyasa özeti system prompt'a eklenir (fail-open — boşsa eklenmez)
+    from backend.services.chat_context import build_market_context
+
+    system = _SYSTEM_PROMPT + build_market_context()
+
     # Generous budget: gemini-2.5-flash spends "thinking" tokens from the same
     # pool, and the final profile summary must not be truncated before the
     # [PROFILE_COMPLETE] marker.
-    return _dispatch(messages, _SYSTEM_PROMPT, max_tokens=4096)
+    return _dispatch(messages, system, max_tokens=4096)
 
 
 def extract_profile(messages: list[dict]) -> dict:

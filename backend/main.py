@@ -10,7 +10,8 @@ from slowapi.errors import RateLimitExceeded
 from backend.config import settings
 from backend.limiter import limiter
 from backend.middleware.error_handler import register_error_handlers
-from backend.routers import backtest, chat, coach, health, holdings, news, planning, practice, profile, recommend, users
+from backend.middleware.request_id import RequestIDMiddleware
+from backend.routers import admin, backtest, chat, coach, health, holdings, news, planning, practice, profile, recommend, users
 
 
 @asynccontextmanager
@@ -38,6 +39,9 @@ app.add_exception_handler(
     RateLimitExceeded,
     cast(Callable[[Request, Exception], Response], _rate_limit_exceeded_handler),
 )
+
+# ── Request ID (correlation) ──────────────────────────────────────────────────
+app.add_middleware(RequestIDMiddleware)
 
 # ── CORS ──────────────────────────────────────────────────────────────────────
 _dev_origins = [
@@ -72,3 +76,4 @@ app.include_router(news.router,     prefix="/news",      tags=["News"])
 app.include_router(coach.router,    prefix="/coach",     tags=["Coach"])
 app.include_router(planning.router, prefix="/planning",  tags=["Planning"])
 app.include_router(practice.router,  prefix="/practice",  tags=["Practice"])
+app.include_router(admin.router,    prefix="/admin",     tags=["Admin"])

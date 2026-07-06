@@ -1,3 +1,5 @@
+import logging
+
 from fastapi import APIRouter, Depends, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -10,6 +12,7 @@ from backend.services.portfolio_engine import build_portfolio
 from backend.services.explainer import explain_portfolio, explain_reit_inclusion
 
 router = APIRouter()
+logger = logging.getLogger("lumos.recommend")
 
 
 @router.post("", response_model=PortfolioRecommendResponse)
@@ -44,4 +47,8 @@ async def recommend(
         reit_text = explain_reit_inclusion(portfolio, user_profile)
         portfolio.metadata["reit_explanation"] = reit_text
 
+    logger.info(
+        "recommendation_served user=%s risk=%s budget=%s reits=%s",
+        user_id, body.risk_score, body.budget, portfolio.includes_reits,
+    )
     return portfolio
