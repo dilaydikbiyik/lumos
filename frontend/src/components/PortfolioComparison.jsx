@@ -43,7 +43,7 @@ export default function PortfolioComparison() {
 
       const actual = {}
       Object.entries(summary.by_type).forEach(([type, val]) => {
-        actual[type] = (val.current_value / totalValue) * 100
+        actual[type] = (val / totalValue) * 100
       })
 
       // Basit hedef dağılım (risk skoruna göre)
