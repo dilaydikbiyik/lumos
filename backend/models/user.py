@@ -24,6 +24,13 @@ class User(Base):
     goal: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     experience: Mapped[Optional[str]] = mapped_column(String, nullable=True)
 
+    # Billing-ready plan tier: free / plus / pro (ai_tiers.py) — a payment
+    # webhook or admin flips this; models & quotas follow automatically
+    plan: Mapped[str] = mapped_column(String, default="free", nullable=False, server_default="free")
+
+    # Market pack: TR (reference) / US / DE ... (backend/markets/)
+    market: Mapped[str] = mapped_column(String, default="TR", nullable=False, server_default="TR")
+
     # Access role: user (default) / admin — admin unlocks /admin/stats
     role: Mapped[str] = mapped_column(String, default="user", nullable=False, server_default="user")
 

@@ -10,7 +10,7 @@ def test_quota_exhaustion_returns_429(client, mock_ai):
     from backend.middleware.verify_clerk import get_current_user
 
     app.dependency_overrides[get_current_user] = lambda: "user_quota_test"
-    with patch("backend.routers.chat.settings.DAILY_MESSAGE_QUOTA", 3):
+    with patch.dict("backend.services.ai_tiers.AI_TIERS", {"free": {**__import__("backend.services.ai_tiers", fromlist=["AI_TIERS"]).AI_TIERS["free"], "daily_quota": 3}}):
         for _ in range(3):
             ok = client.post(
                 "/chat", json={"messages": [{"role": "user", "content": "merhaba"}]}

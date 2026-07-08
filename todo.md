@@ -736,17 +736,29 @@ lumos/                          ← proje kökü
 > Karar (2026-06-28): proje GLOBAL tasarlanacak. Yöntem: ülkeye özgü her şey tek pakette — kod ülke bilmez, pakete sorar.
 > Yeni ülke eklemek = yeni kod değil, yeni config + veri adaptörü + içerik paketi. TR ilk referans pack olarak eksiril yapılır.
 
+
+### Ücretli AI Tier Altyapısı 💳 (billing-ready — 2026-07-08)
+
+> Ödeme entegrasyonu bilinçli olarak DAHİL DEĞİL; entegrasyon noktası tek satır: `user.plan = "plus"`.
+> Stripe/Iyzico webhook'u geldiğinde başka hiçbir kod değişmez — modeller, kotalar, fallback'ler tier tablosundan akar.
+
+- [x] `ai_tiers.py`: free (Ateş Böceği, Gemini flash zinciri, 50/gün) · plus (Fener, Gemini Pro, 500/gün, ~$4.99) · pro (Şafak, Claude zinciri, 2000/gün, ~$14.99)
+- [x] Adapter'lar model zincirini parametre alıyor — Anthropic zinciri kredi/rate-limit'te Gemini'yle simetrik düşüş yapıyor (kota çözümü premium'a taşındı)
+- [x] `users.plan` kolonu (migration 38f539c3) + chat kotası plan-bazlı + 429 mesajında upgrade ipucu
+- [x] GET /users/me/plans (fiyatlandırma payload'ı, iç model zinciri sızmaz) + PATCH /admin/users/{id}/plan (webhook entegrasyon noktası)
+- [ ] Stripe/Iyzico webhook + ödeme sayfası (gerçek billing — hesap gerektirir)
+
 ### Market Pack Çekirdeği
 
-- [ ] `backend/markets/` yapısı: her ülke bir pack — `tr.py` / `us.py`... + `base.py` (MarketPack interface)
-- [ ] Pack içeriği tanımı: para birimi & format, enflasyon veri kaynağı adaptörü (TR: TCMB EVDS → US: FRED), konut endeksi kaynağı, ilan sitesi köprü şablonları (Sahibinden → Zillow → ImmoScout24), aracı kurum rehber içeriği, varlık evreni (BIST+TEFAS → NYSE+ETF'ler)
-- [ ] Kullanıcı profiline `market` alanı; tüm servisler pack üzerinden veri kaynağı seçer (doğrudan TCMB/TEFAS import'u kalmaz)
+- [x] `backend/markets/` yapısı: `base.py` (frozen dataclass) + `tr.py` (referans, tam bağlı) + `us.py`/`de.py` (araştırılmış iskelet) + registry (bilinmeyen kod → TR'ye güvenli düşüş)
+- [x] Pack içeriği: para birimi/locale, veri kaynağı bildirimleri (TR canlı, US: FRED / DE: Destatis roadmap), ilan köprüleri (Zillow/Realtor, ImmoScout24/Immowelt), regülatör + yerel vergi/aracı kurum eğitim notları (ABD: 401k/IRA + sermaye kazancı vadeleri; DE: Abgeltungsteuer + Sparer-Pauschbetrag) — hepsi 'yerel uzmana danış' disclaimer'lı
+- [/] `users.market` kolonu + PATCH /users/me/market + GET /users/markets ✅; listing_bridge pack-farkında ✅ — enflasyon/endeks servislerinin tam pack-yönlendirmesi US/DE adaptörleri yazılınca
 - [ ] i18n altyapısı: UI metinleri + LLM prompt'ları locale dosyalarında (react-i18next + prompt şablonlarına dil parametresi)
 
 ### İçerik Yerelleştirme (LLM avantajı)
 
 - [ ] Hukuk/vergi eğitim içeriği pack başına LLM ile üretilir + "genel bilgidir, yerel uzmana danış" disclaimer'ı (hukuki iddia yok, eğitim var)
-- [ ] Kültürel korku haritası pack'e dahil: TR "param enflasyona erir" / US "kandırılırım" / DE "risk sevmem" — korku check-in seçenekleri ülkeye uyarlanır
+- [x] Kültürel korku haritası: her pack yerelleştirilmiş fear_options taşıyor (TR/EN/DE)
 - [ ] Kavram sözlüğü çeviri değil yerelleştirme: örnekler yerel para ve yerel ürünlerle ("ETF bir sepettir — içinde THY, Aselsan..." vs "...Apple, Microsoft...")
 
 ### Uygulama Sırası

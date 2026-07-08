@@ -44,14 +44,21 @@ async def chat_endpoint(
     db: AsyncSession = Depends(get_db),
 ):
     """Multi-turn chat with the Lumos AI assistant. Requires a valid Clerk JWT."""
-    allowed = await user_repository.consume_quota(db, user_id, settings.DAILY_MESSAGE_QUOTA)
+    from backend.services.ai_tiers import get_tier
+
+    user = await user_repository.get_or_create(db, user_id)
+    tier = get_tier(user.plan)
+    allowed = await user_repository.consume_quota(db, user_id, tier["daily_quota"])
     if not allowed:
         raise HTTPException(
             status_code=429,
-            detail="Günlük mesaj hakkın doldu — yarın yenilenir. / Daily message limit reached; resets tomorrow.",
+            detail=(
+                f"Günlük mesaj hakkın doldu ({tier['daily_quota']}/gün) — yarın yenilenir. "
+                "Daha fazla mesaj için planını yükseltebilirsin. / Daily limit reached; resets tomorrow."
+            ),
         )
     messages = [m.model_dump() for m in body.messages]
-    reply = ai_chat(messages)
+    reply = ai_chat(messages, tier=user.plan)
     return {"reply": reply}
 
 

@@ -17,11 +17,14 @@ export default function PanicButton() {
   const [closing, setClosing] = useState(null)
   const [breathCount, setBreathCount] = useState(0)
 
-  // Nefes aşaması: 3 nefes (~4.5sn/nefes), sonra koç aşamasına geç
+  // Nefes aşaması: 3 nefes (~4.5sn/nefes), sonra koç aşamasına geç.
+  // Tüm setState'ler timeout callback'inde — effect gövdesinde senkron değil.
   useEffect(() => {
     if (!open || stage !== 'breathe') return
-    if (breathCount >= 3) { setStage('coach'); return }
-    const t = setTimeout(() => setBreathCount(c => c + 1), 4500)
+    const t = setTimeout(() => {
+      if (breathCount + 1 >= 3) setStage('coach')
+      else setBreathCount(breathCount + 1)
+    }, 4500)
     return () => clearTimeout(t)
   }, [open, stage, breathCount])
 

@@ -38,38 +38,51 @@ GEMINI_MODEL = GEMINI_MODEL_CHAIN[0]  # geriye dönük uyumluluk (testler/loglar
 
 # ── Anthropic adapter ──────────────────────────────────────────────────────────────────────
 
-def _anthropic_chat(messages: list[dict], system: str, max_tokens: int) -> str:
+def _anthropic_chat(
+    messages: list[dict], system: str, max_tokens: int,
+    model_chain: Optional[list[str]] = None,
+) -> str:
     import anthropic
     from anthropic import Anthropic
     from anthropic.types import Message, MessageParam
     from typing import cast as tcast
 
+    chain = model_chain or [ANTHROPIC_MODEL]
     client = Anthropic(api_key=settings.ANTHROPIC_API_KEY)
     typed_messages: list[MessageParam] = [
         {"role": m["role"], "content": m["content"]} for m in messages
     ]
-    try:
-        # cast: create() returns Message|Stream union; we never pass stream=True so it's always Message
-        response = tcast(Message, client.messages.create(
-            model=ANTHROPIC_MODEL,
-            max_tokens=max_tokens,
-            system=system,
-            messages=typed_messages,
-        ))
-        block = response.content[0]
-        return block.text if hasattr(block, "text") else ""
-    except anthropic.BadRequestError as exc:
-        if "credit balance" in str(exc):
-            raise HTTPException(
-                status_code=503,
-                detail="AI service is temporarily unavailable (provider quota). Please try again later.",
-            )
-        raise
-    except anthropic.RateLimitError:
-        raise HTTPException(
-            status_code=503,
-            detail="AI service is busy right now. Please try again in a moment.",
-        )
+
+    last_exc: Optional[Exception] = None
+    for i, model in enumerate(chain):
+        try:
+            # cast: create() returns Message|Stream union; we never pass stream=True so it's always Message
+            response = tcast(Message, client.messages.create(
+                model=model,
+                max_tokens=max_tokens,
+                system=system,
+                messages=typed_messages,
+            ))
+            if i > 0:
+                logger.info("anthropic_fallback served_by=%s", model)
+            block = response.content[0]
+            return block.text if hasattr(block, "text") else ""
+        except anthropic.RateLimitError as exc:
+            logger.warning("anthropic model=%s rate-limited — trying next", model)
+            last_exc = exc
+            continue
+        except anthropic.BadRequestError as exc:
+            if "credit balance" in str(exc):
+                logger.warning("anthropic model=%s credit exhausted — trying next", model)
+                last_exc = exc
+                continue
+            raise
+
+    logger.error("anthropic_chain_exhausted models=%s last=%s", chain, last_exc)
+    raise HTTPException(
+        status_code=503,
+        detail="AI service is temporarily unavailable (provider quota). Please try again later.",
+    )
 
 
 # ── Gemini adapter (google-genai SDK) ─────────────────────────────────────────
@@ -94,12 +107,16 @@ def _gemini_call_model(client, model: str, contents, system: str, max_tokens: in
     return response.text
 
 
-def _gemini_chat(messages: list[dict], system: str, max_tokens: int) -> str:
+def _gemini_chat(
+    messages: list[dict], system: str, max_tokens: int,
+    model_chain: Optional[list[str]] = None,
+) -> str:
     from google import genai
     from google.genai import errors as genai_errors
 
     from google.genai import types as genai_types
 
+    chain = model_chain or GEMINI_MODEL_CHAIN
     client = genai.Client(api_key=settings.GEMINI_API_KEY)
 
     # Convert OpenAI/Anthropic-style messages to Gemini content format
@@ -115,7 +132,7 @@ def _gemini_chat(messages: list[dict], system: str, max_tokens: int) -> str:
     # Her model ayrı free-tier kotaya sahip olduğu için bu, ücretsiz
     # kapasiteyi fiilen ~3 katına çıkarır ve kullanıcıya hata göstermez.
     last_exc: Optional[Exception] = None
-    for i, model in enumerate(GEMINI_MODEL_CHAIN):
+    for i, model in enumerate(chain):
         try:
             reply = _gemini_call_model(client, model, contents, system, max_tokens)
             if i > 0:
@@ -130,7 +147,7 @@ def _gemini_chat(messages: list[dict], system: str, max_tokens: int) -> str:
             raise  # 400 vb. gerçek hatalar zincir boyunca maskelenmez
 
     # Zincirin tamamı tükendi
-    logger.error("gemini_chain_exhausted models=%s last=%s", GEMINI_MODEL_CHAIN, last_exc)
+    logger.error("gemini_chain_exhausted models=%s last=%s", chain, last_exc)
     raise HTTPException(
         status_code=503,
         detail=(
@@ -146,30 +163,46 @@ _ADAPTERS = {
 }
 
 
-def _dispatch(messages: list[dict], system: str, max_tokens: int) -> str:
-    adapter = _ADAPTERS.get(settings.AI_PROVIDER)
+def _resolve_tier(tier_name: Optional[str]) -> tuple[str, dict]:
+    """
+    Tier adı → (ad, config). tier verilmezse geriye dönük davranış korunur:
+    settings.AI_PROVIDER'a göre free (gemini) ya da pro (anthropic).
+    """
+    from backend.services.ai_tiers import get_tier
+
+    if tier_name is None:
+        tier_name = "pro" if settings.AI_PROVIDER == "anthropic" else "free"
+    return tier_name, get_tier(tier_name)
+
+
+def _dispatch(
+    messages: list[dict], system: str, max_tokens: int,
+    tier: Optional[str] = None,
+) -> str:
+    tier_name, tier_cfg = _resolve_tier(tier)
+    adapter = _ADAPTERS.get(tier_cfg["provider"])
     if adapter is None:
         raise HTTPException(
             status_code=500,
-            detail=f"Unknown AI_PROVIDER '{settings.AI_PROVIDER}' — use 'gemini' or 'anthropic'.",
+            detail=f"Unknown AI provider '{tier_cfg['provider']}' for tier '{tier_name}'.",
         )
 
     started = time.monotonic()
     try:
-        reply = adapter(messages, system, max_tokens)
+        reply = adapter(messages, system, max_tokens, model_chain=tier_cfg["model_chain"])
     except Exception as exc:
         logger.error(
-            "ai_call provider=%s prompt_version=%s messages=%d max_tokens=%d "
+            "ai_call tier=%s provider=%s prompt_version=%s messages=%d max_tokens=%d "
             "latency_ms=%d status=error error=%s",
-            settings.AI_PROVIDER, PROMPT_VERSION, len(messages), max_tokens,
+            tier_name, tier_cfg["provider"], PROMPT_VERSION, len(messages), max_tokens,
             (time.monotonic() - started) * 1000, type(exc).__name__,
         )
         raise
 
     logger.info(
-        "ai_call provider=%s prompt_version=%s messages=%d max_tokens=%d "
+        "ai_call tier=%s provider=%s prompt_version=%s messages=%d max_tokens=%d "
         "latency_ms=%d status=ok reply_chars=%d",
-        settings.AI_PROVIDER, PROMPT_VERSION, len(messages), max_tokens,
+        tier_name, tier_cfg["provider"], PROMPT_VERSION, len(messages), max_tokens,
         (time.monotonic() - started) * 1000, len(reply),
     )
     return reply
@@ -177,17 +210,20 @@ def _dispatch(messages: list[dict], system: str, max_tokens: int) -> str:
 
 # ── Public API (unchanged signatures) ─────────────────────────────────────────
 
-def chat(messages: list[dict]) -> str:
+def chat(messages: list[dict], tier: Optional[str] = None) -> str:
     """
-    Send a conversation history to the configured AI provider.
+    Send a conversation history to the AI provider resolved from the
+    user's plan tier (None = legacy default from settings.AI_PROVIDER).
 
     Args:
         messages: List of {"role": "user"|"assistant", "content": str}
+        tier: plan name from ai_tiers (free/plus/pro)
 
     Returns:
         The assistant's text reply.
     """
     # RAG: bugünün piyasa özeti system prompt'a eklenir (fail-open — boşsa eklenmez)
+    from backend.services.ai_tiers import get_tier
     from backend.services.chat_context import build_market_context
 
     system = _SYSTEM_PROMPT + build_market_context()
@@ -195,7 +231,8 @@ def chat(messages: list[dict]) -> str:
     # Generous budget: gemini-2.5-flash spends "thinking" tokens from the same
     # pool, and the final profile summary must not be truncated before the
     # [PROFILE_COMPLETE] marker.
-    return _dispatch(messages, system, max_tokens=4096)
+    max_tokens = get_tier(tier)["max_tokens"] if tier else 4096
+    return _dispatch(messages, system, max_tokens=max_tokens, tier=tier)
 
 
 def extract_profile(messages: list[dict]) -> dict:

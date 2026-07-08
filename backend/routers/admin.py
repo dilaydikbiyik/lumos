@@ -42,3 +42,35 @@ async def admin_stats(
         "ai_messages_today": messages_today,
         "users_by_path": by_path,
     }
+
+
+from pydantic import BaseModel  # noqa: E402
+
+
+class PlanUpdate(BaseModel):
+    plan: str
+
+
+@router.patch("/users/{clerk_user_id}/plan")
+async def set_user_plan(
+    clerk_user_id: str,
+    body: PlanUpdate,
+    admin_id: str = Depends(require_role("admin")),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Billing entegrasyon noktası: bir ödeme webhook'u (Stripe/Iyzico) veya
+    admin planı değiştirir — model zinciri ve kota otomatik uyum sağlar.
+    """
+    from fastapi import HTTPException
+
+    from backend.repositories import user_repository
+    from backend.services.ai_tiers import AI_TIERS
+
+    if body.plan not in AI_TIERS:
+        raise HTTPException(status_code=422, detail=f"Unknown plan '{body.plan}'. Available: {list(AI_TIERS)}")
+
+    user = await user_repository.get_or_create(db, clerk_user_id)
+    user.plan = body.plan
+    await db.flush()
+    return {"clerk_user_id": clerk_user_id, "plan": user.plan}

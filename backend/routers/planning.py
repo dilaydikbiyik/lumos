@@ -1,5 +1,7 @@
 from fastapi import APIRouter, Depends, Request
+from sqlalchemy.ext.asyncio import AsyncSession
 
+from backend.db.database import get_db
 from backend.limiter import limiter
 from backend.middleware.verify_clerk import get_current_user
 from backend.schemas.planning import (
@@ -78,9 +80,13 @@ async def listing_links(
     request: Request,
     body: ListingBridgeRequest,
     user_id: str = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
 ):
     """Filter-ready deep links to real estate portals — no scraping, no listing data stored."""
-    return {"links": build_listing_links(body.il, body.ilce, body.asset_type)}
+    from backend.repositories import user_repository
+
+    user = await user_repository.get_or_create(db, user_id)
+    return {"links": build_listing_links(body.il, body.ilce, body.asset_type, market=user.market)}
 
 
 @router.post("/projection/asset")

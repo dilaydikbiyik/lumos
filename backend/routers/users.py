@@ -29,6 +29,8 @@ class UserRead(BaseModel):
     risk_score: Optional[float]
     budget: Optional[float]
     investment_path: Optional[str]
+    plan: str = "free"
+    market: str = "TR"
     primary_fear: Optional[str]
 
 
@@ -104,3 +106,45 @@ async def readiness_score(
         "milestones": milestones,
         "ready_for_real_investing": score >= 60,
     }
+
+
+class MarketUpdate(BaseModel):
+    market: str
+
+
+@router.get("/markets")
+async def list_markets():
+    """Kullanılabilir Market Pack'ler — market seçici için."""
+    from backend.markets import public_markets
+
+    return {"markets": public_markets()}
+
+
+@router.patch("/me/market", response_model=UserRead)
+async def update_market(
+    body: MarketUpdate,
+    user_id: str = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Kullanıcının market pack'ini değiştir (TR/US/DE)."""
+    from fastapi import HTTPException
+
+    from backend.markets import MARKET_PACKS
+    from backend.repositories import user_repository
+
+    code = body.market.upper()
+    if code not in MARKET_PACKS:
+        raise HTTPException(status_code=422, detail=f"Unknown market '{code}'. Available: {list(MARKET_PACKS)}")
+
+    user = await user_repository.get_or_create(db, user_id)
+    user.market = code
+    await db.flush()
+    return user
+
+
+@router.get("/me/plans")
+async def list_plans(user_id: str = Depends(get_current_user)):
+    """AI plan tier'ları — fiyatlandırma sayfası payload'ı (billing-ready)."""
+    from backend.services.ai_tiers import public_tiers
+
+    return {"plans": public_tiers()}
