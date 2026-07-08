@@ -23,7 +23,17 @@ _SYSTEM_PROMPT = (Path(__file__).parent.parent / "prompts" / "system_prompt.txt"
 PROMPT_VERSION = hashlib.sha1(_SYSTEM_PROMPT.encode()).hexdigest()[:8]
 
 ANTHROPIC_MODEL = "claude-sonnet-4-6"
-GEMINI_MODEL = "gemini-2.5-flash"
+
+# Ücretsiz kota stratejisi: her Gemini modelinin AYRI free-tier kotası var.
+# 429 (kota) veya 503 (aşırı yük) yediğimizde sıradaki modele düşeriz —
+# kullanıcı hata yerine bir tık daha hafif bir modelden cevap alır.
+# Sıralama: kalite ↓, ücretsiz limit ↑ (flash-lite ve 2.0-flash daha cömert).
+GEMINI_MODEL_CHAIN = [
+    "gemini-2.5-flash",
+    "gemini-2.5-flash-lite",
+    "gemini-2.0-flash",
+]
+GEMINI_MODEL = GEMINI_MODEL_CHAIN[0]  # geriye dönük uyumluluk (testler/loglar)
 
 
 # ── Anthropic adapter ──────────────────────────────────────────────────────────────────────
@@ -64,9 +74,30 @@ def _anthropic_chat(messages: list[dict], system: str, max_tokens: int) -> str:
 
 # ── Gemini adapter (google-genai SDK) ─────────────────────────────────────────
 
+def _gemini_call_model(client, model: str, contents, system: str, max_tokens: int) -> str:
+    """Single model call — raises APIError upward for the fallback chain."""
+    from google.genai import types as genai_types
+
+    response = client.models.generate_content(
+        model=model,
+        contents=contents,
+        config=genai_types.GenerateContentConfig(
+            system_instruction=system,
+            max_output_tokens=max_tokens,
+        ),
+    )
+    if response.text is None:
+        raise HTTPException(
+            status_code=503,
+            detail="AI returned an empty response. Please try again.",
+        )
+    return response.text
+
+
 def _gemini_chat(messages: list[dict], system: str, max_tokens: int) -> str:
     from google import genai
     from google.genai import errors as genai_errors
+
     from google.genai import types as genai_types
 
     client = genai.Client(api_key=settings.GEMINI_API_KEY)
@@ -80,28 +111,33 @@ def _gemini_chat(messages: list[dict], system: str, max_tokens: int) -> str:
         for m in messages
     ]
 
-    try:
-        response = client.models.generate_content(
-            model=GEMINI_MODEL,
-            contents=contents,
-            config=genai_types.GenerateContentConfig(
-                system_instruction=system,
-                max_output_tokens=max_tokens,
-            ),
-        )
-        if response.text is None:
-            raise HTTPException(
-                status_code=503,
-                detail="AI returned an empty response. Please try again.",
-            )
-        return response.text
-    except genai_errors.APIError as exc:
-        if exc.code == 429:
-            raise HTTPException(
-                status_code=503,
-                detail="Daily free AI quota reached. Please try again tomorrow.",
-            )
-        raise
+    # Fallback zinciri: kota (429) veya geçici yük (5xx) → sıradaki model.
+    # Her model ayrı free-tier kotaya sahip olduğu için bu, ücretsiz
+    # kapasiteyi fiilen ~3 katına çıkarır ve kullanıcıya hata göstermez.
+    last_exc: Optional[Exception] = None
+    for i, model in enumerate(GEMINI_MODEL_CHAIN):
+        try:
+            reply = _gemini_call_model(client, model, contents, system, max_tokens)
+            if i > 0:
+                logger.info("gemini_fallback served_by=%s (primary quota/load)", model)
+            return reply
+        except genai_errors.APIError as exc:
+            code = getattr(exc, "code", None)
+            if code == 429 or (isinstance(code, int) and code >= 500):
+                logger.warning("gemini model=%s unavailable (code=%s) — trying next", model, code)
+                last_exc = exc
+                continue
+            raise  # 400 vb. gerçek hatalar zincir boyunca maskelenmez
+
+    # Zincirin tamamı tükendi
+    logger.error("gemini_chain_exhausted models=%s last=%s", GEMINI_MODEL_CHAIN, last_exc)
+    raise HTTPException(
+        status_code=503,
+        detail=(
+            "Günlük ücretsiz AI kotası doldu — yarın otomatik yenilenir. / "
+            "Daily free AI quota reached across all models; resets tomorrow."
+        ),
+    )
 
 
 _ADAPTERS = {

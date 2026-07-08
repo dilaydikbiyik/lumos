@@ -505,6 +505,7 @@ lumos/                          ← proje kökü
 - [x] `google-generativeai` → `google-genai` (2.10.0) SDK migrasyonu — deprecated uyarısı gitti, canlı doğrulandı
 - [x] `.env`'e `AI_PROVIDER=gemini|anthropic` seçimi; Claude adapter'ı mevcut kodu sarmalasın
 - [x] Provider'a özel hata yönetimi (kredi bitti / kota doldu → kullanıcıya anlamlı mesaj)
+- [x] Gemini free-tier fallback zinciri: 2.5-flash → 2.5-flash-lite → 2.0-flash — her modelin AYRI ücretsiz kotası olduğundan 429/5xx'te otomatik geçiş; ücretsiz kapasite ~3x, kullanıcı hata görmez (5 test)
 
 ### Risk Profili Derinleştirme
 
