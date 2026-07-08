@@ -614,3 +614,21 @@ body.illumination-3 { background: var(--bg-dawn); }
   border-radius: var(--radius-xs);
 }
 
+
+/* Panik Düğmesi: nefes halkası — 4.5sn döngü (al 2s, tut 0.5s, ver 2s) */
+.panic-breath {
+  width: 110px; height: 110px; border-radius: 50%;
+  background: radial-gradient(circle, var(--firefly-dim) 0%, transparent 70%);
+  border: 2px solid var(--firefly);
+  box-shadow: 0 0 30px var(--firefly-glow);
+  animation: panic-breathe 4.5s ease-in-out infinite;
+}
+@keyframes panic-breathe {
+  0%   { transform: scale(0.72); }
+  44%  { transform: scale(1.18); }
+  55%  { transform: scale(1.18); }
+  100% { transform: scale(0.72); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .panic-breath { animation: none; transform: scale(1); }
+}

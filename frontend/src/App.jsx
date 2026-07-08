@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { SignedIn, SignedOut, RedirectToSignIn } from '@clerk/clerk-react'
 import BottomNav from './components/BottomNav'
+import PanicButton from './components/PanicButton'
 import ErrorBoundary from './utils/errorBoundary'
 import useIllumination from './hooks/useIllumination'
 import OnboardingPage from './pages/OnboardingPage'
@@ -47,6 +48,9 @@ export default function App() {
 
         {/* Mobile bottom nav — hidden on desktop via CSS */}
         <BottomNav />
+
+        {/* Panik Düğmesi — kriz anı desteği (sadece giriş yapmışken) */}
+        <SignedIn><PanicButton /></SignedIn>
       </BrowserRouter>
     </ErrorBoundary>
   )
