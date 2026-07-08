@@ -696,6 +696,17 @@ lumos/                          ← proje kökü
 - [ ] Senaryo kartına LLM güncel bağlam cümlesi (sakin haber özetinden beslenerek, sayılara karışmadan)
 - [ ] Portföyün tamamı için birleşik senaryo bandı (ağırlıklı pencere dağılımı)
 
+
+### Panik Düğmesi 🫨 (özgün fikir — 2026-07-08, hiçbir finans uygulamasında yok)
+
+> "Korku = veri" ilkesinin kriz anı hali: piyasa korkuttuğunda basılacak gerçek bir buton.
+> Karanlık desen yok — satış engellenmez, sadece kullanıcı kendi profiline göre sakinleştirilir.
+
+- [x] POST /coach/panic: profil-bazlı sakinleştirme + 4 dürüst statik gerçek (LLM maliyeti sıfır) + basış/çözüm loglama (davranış aynası verisi) (4 test)
+- [x] `PanicButton.jsx`: yüzen buton → 3 aşamalı tam ekran akış: nefes halkası (3 nefes, atlanabilir) → koç mesajı + gerçekler → "Sakinleştim / Hâlâ endişeliyim"
+- [x] "Hâlâ endişeliyim" → 24 saat bekleme + lisanslı danışman önerisi (dürüst yönlendirme)
+- [x] Canlı doğrulandı: basış → koç → çözüm mesajı uçtan uca
+
 ### Sakin Haber Akışı 📰 (haber = eğitim, gürültü değil)
 
 > Ham haber akışı yeni başlayan için korku makinesidir. Lumos haberi süzer, sakinleştirir, öğretir.
