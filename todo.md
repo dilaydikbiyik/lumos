@@ -185,7 +185,7 @@ lumos/                          ← proje kökü
 - [x] `.gitignore` → `.env`, `__pycache__`, `node_modules`, `venv/` ekle
 - [x] Git repo başlat: `main / dev / feature/*` branch modeli
 - [x] İlk commit'i yap
-- [ ] GitHub'da `main` branch'ini koru (branch protection rule)
+- [!] GitHub'da `main` branch'ini koru — private repo + free plan'da GitHub branch protection kilitli ("Upgrade to GitHub Pro or make public"); repo public yapılırsa veya Pro'ya geçilirse `gh api repos/.../branches/main/protection` ile tek komutla açılır
 - [x] `README.md` — temel proje açıklaması (158 satır)
 
 > 💡 Clerk ücretsiz tier 10.000 aylık aktif kullanıcıya kadar ücretsizdir.
@@ -448,7 +448,7 @@ lumos/                          ← proje kökü
 
 - [x] `.github/workflows/ci.yml` → push/PR'da ruff + pytest (backend, Python 3.9)
 - [x] Aynı workflow'a eslint + build (frontend, Node 22) adımı eklendi — vitest frontend testleri yazılınca eklenecek
-- [ ] Branch protection: CI geçmeden main'e merge engellensin
+- [!] Branch protection: aynı GitHub Pro/public kısıtı (yukarıdaki maddeyle aynı)
 
 ### Veritabanı
 
@@ -676,10 +676,11 @@ lumos/                          ← proje kökü
 - [/] Fener skoru v1: çeşitlendirme (HHI) + likidite bileşenleri, 0-100 + jargonsuz notlar (hedef uyum + kur dengesi sonraki sürüm)
 - [ ] Her bileşen için "neden düşük, nasıl yükselir" LLM açıklaması
 - [/] Fener kartı Varlıklarım sayfasında ✅; zaman içinde skor grafiği sonra
+- [x] Cesaret Skoru UI: `ReadinessScore.jsx` — Dashboard'da 5 kilometre taşı + dairesel skor göstergesi, %60 eşiğinde "gerçek yatırıma hazırsın" mesajı
 
 ### What-If Asistanı 🔮
 
-- [ ] Chat'te senaryo soruları: "10.000 TL daha eklesem ne değişir?", "altını çıkarsam risk ne olur?" — portfolio_engine'i tool olarak çağırıp gerçek hesapla cevapla (tool-use maddesiyle birleşir, sonraki faz)
+- [x] Chat'te senaryo soruları: "10.000 TL daha eklesem?", "daha agresif olsam?" — `what_if.py` tool-use: LLM sadece niyeti JSON'a çıkarır, `portfolio_engine` gerçek before/after hesaplar, LLM sadece sonucu yorumlar (asla matematik uydurmaz); `/chat/what-if` + `WhatIfAssistant` UI kartı, 6 test, canlı Gemini ile doğrulandı
 
 
 ### Gelecek Senaryoları 🔮 (kullanıcı fikri — 2026-07-05)

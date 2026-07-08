@@ -15,6 +15,12 @@ from backend.services.ai_service import chat as ai_chat, extract_profile
 router = APIRouter()
 
 
+class WhatIfRequest(BaseModel):
+    question: str = Field(..., min_length=3, max_length=500)
+    risk_score: float = Field(..., ge=1, le=10)
+    budget: float = Field(..., gt=0)
+
+
 class ChatMessage(BaseModel):
     role: Literal["user", "assistant"]
     content: str = Field(..., min_length=1, max_length=4000)
@@ -70,3 +76,24 @@ async def extract_profile_endpoint(
             status_code=422,
             detail="Extracted profile is incomplete — please continue the conversation.",
         )
+
+
+@router.post("/what-if")
+@limiter.limit("15/minute")
+async def what_if_endpoint(
+    request: Request,
+    body: WhatIfRequest,
+    user_id: str = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    'Ne olurdu?' asistanı — tool-use: AI matematiği uydurmaz, portfolio_engine'i
+    gerçek before/after olarak çağırır, sadece sonucu yorumlar.
+    """
+    from backend.services.what_if import answer_what_if
+
+    allowed = await user_repository.consume_quota(db, user_id, settings.DAILY_MESSAGE_QUOTA)
+    if not allowed:
+        raise HTTPException(status_code=429, detail="Günlük mesaj hakkın doldu — yarın yenilenir.")
+
+    return answer_what_if(body.question, body.risk_score, body.budget)

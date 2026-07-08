@@ -30,8 +30,10 @@ function BandRow({ label, tone, data, amount }) {
  * Gelecek Senaryoları — "SPY'a param 5 yılda ne olur?" sorusunun dürüst hali.
  * Tahmin yok: varlığın kendi geçmişindeki tüm N-yıllık pencerelerin dağılımı.
  */
+const PORTFOLIO_OPTION = '__portfolio__'
+
 export default function FutureScenarios({ allocations, budget }) {
-  const [ticker, setTicker] = useState(allocations?.[0]?.ticker || '')
+  const [ticker, setTicker] = useState(PORTFOLIO_OPTION)
   const [years, setYears] = useState(5)
   const [result, setResult] = useState(null)
   const [loading, setLoading] = useState(false)
@@ -41,10 +43,14 @@ export default function FutureScenarios({ allocations, budget }) {
     setLoading(true)
     setError(null)
     try {
-      const res = await api.post('/planning/projection/asset', {
-        ticker, amount: budget, years,
-      })
-      setResult(res.data)
+      const isPortfolio = ticker === PORTFOLIO_OPTION
+      const res = isPortfolio
+        ? await api.post('/planning/projection/portfolio', {
+            weights: Object.fromEntries(allocations.map(a => [a.ticker, a.weight])),
+            amount: budget, years,
+          })
+        : await api.post('/planning/projection/asset', { ticker, amount: budget, years })
+      setResult({ ...res.data, isPortfolio })
     } catch (err) {
       setError(extractErrorMessage(err, 'Senaryolar şu an hesaplanamadı'))
     } finally {
@@ -63,6 +69,7 @@ export default function FutureScenarios({ allocations, budget }) {
       <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
         <select className="input" style={{ flex: 2 }} value={ticker}
                 onChange={e => { setTicker(e.target.value); setResult(null) }}>
+          <option value={PORTFOLIO_OPTION}>🧺 Tüm Portföy</option>
           {allocations?.map(a => (
             <option key={a.ticker} value={a.ticker}>{a.name} ({a.ticker})</option>
           ))}
@@ -85,7 +92,7 @@ export default function FutureScenarios({ allocations, budget }) {
       {result?.available && (
         <>
           <p style={{ fontSize: 13, marginBottom: 4 }}>
-            <strong>{fmt(budget)} TL</strong>, {result.ticker} içinde {years} yıl kalsaydı
+            <strong>{fmt(budget)} TL</strong>, {result.isPortfolio ? 'tüm portföyünde' : result.ticker} {years} yıl kalsaydı
             (geçmiş {result.history_years} yılın {result.windows_analysed} dönemine göre):
           </p>
           <BandRow label="Kötü dönem"  tone="bad"  data={result.pessimistic} amount={budget} />

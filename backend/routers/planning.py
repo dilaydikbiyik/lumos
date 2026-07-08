@@ -4,6 +4,7 @@ from backend.limiter import limiter
 from backend.middleware.verify_clerk import get_current_user
 from backend.schemas.planning import (
     AssetProjectionRequest,
+    PortfolioProjectionRequest,
     RegionProjectionRequest,
     GoalPlanRequest,
     GoalProgressRequest,
@@ -110,3 +111,23 @@ async def region_projection(
     from backend.services.projection import project_region
 
     return project_region(body.region_code, body.amount, body.years)
+
+
+@router.post("/projection/portfolio")
+@limiter.limit("15/minute")
+async def portfolio_projection(
+    request: Request,
+    body: PortfolioProjectionRequest,
+    user_id: str = Depends(get_current_user),
+):
+    """
+    Birleşik portföy senaryo bandı — tekil varlık değil, ağırlıklı tüm
+    portföyün kendi geçmişindeki dağılımı (çeşitlendirmenin etkisini gösterir).
+    """
+    from backend.services.projection import project_portfolio
+
+    total = sum(body.weights.values())
+    if not 0.95 <= total <= 1.05:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=422, detail=f"Weights must sum to ~1 (got {total:.2f}).")
+    return project_portfolio(body.weights, body.amount, body.years)

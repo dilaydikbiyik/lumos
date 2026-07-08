@@ -6,7 +6,7 @@ import pandas as pd
 import pytest
 from unittest.mock import patch
 
-from backend.services.projection import project_asset, project_region
+from backend.services.projection import project_asset, project_portfolio, project_region
 
 # 10 years of daily data, steady ~12%/yr growth with noise
 _N = 2520
@@ -67,6 +67,48 @@ def test_region_projection_honest_about_short_history():
         r = project_region("TP.KFE.TR51", amount=1000000, years=3)
     assert r["available"] is False
     assert "yeterli pencere yok" in r["reason"]
+
+
+def test_portfolio_projection_combines_weighted_series():
+    # İki farklı büyüme profili — çeşitlendirme bandı tekil varlıktan dar olmalı
+    n = 2520
+    rng2 = np.random.default_rng(11)
+    calm = pd.Series(
+        100 * np.cumprod(1 + rng2.normal(0.0003, 0.004, n)),
+        index=pd.date_range("2016-01-01", periods=n, freq="B"),
+    )
+
+    def fake_multi(tickers, period="10y"):
+        return {"SPY": _GROWTH, "GLD": calm}
+
+    with patch("backend.services.projection.fetch_price_history", side_effect=fake_multi):
+        r = project_portfolio({"SPY": 0.6, "GLD": 0.4}, amount=100000, years=5)
+
+    assert r["available"] is True
+    assert r["pessimistic"]["value"] <= r["typical"]["value"] <= r["optimistic"]["value"]
+    assert set(r["tickers"]) == {"SPY", "GLD"}
+    assert "tahmin DEĞİL" in r["honesty_note"]
+
+
+def test_portfolio_projection_endpoint(client):
+    def fake_multi(tickers, period="10y"):
+        return {t: _GROWTH for t in tickers}
+
+    with patch("backend.services.projection.fetch_price_history", side_effect=fake_multi):
+        res = client.post(
+            "/planning/projection/portfolio",
+            json={"weights": {"SPY": 0.5, "GLD": 0.5}, "amount": 100000, "years": 5},
+        )
+    assert res.status_code == 200
+    assert res.json()["available"] is True
+
+
+def test_portfolio_projection_endpoint_rejects_bad_weights(client):
+    res = client.post(
+        "/planning/projection/portfolio",
+        json={"weights": {"SPY": 0.5}, "amount": 100000, "years": 5},
+    )
+    assert res.status_code == 422
 
 
 def test_asset_projection_endpoint(client):

@@ -10,6 +10,7 @@ shown first (vision: honest downside before upside).
 import logging
 
 import numpy as np
+import pandas as pd
 
 from backend.exceptions import MarketDataError
 from backend.services import evds_service, inflation_service
@@ -77,6 +78,51 @@ def project_asset(ticker: str, amount: float, years: int) -> dict:
         "honesty_note": (
             f"Bu bir tahmin DEĞİL: {ticker}'nin kendi geçmişindeki tüm {years} yıllık "
             "dönemlerin dağılımı. Gelecek bu aralığın dışına da çıkabilir."
+        ),
+    }
+
+
+def project_portfolio(weights: dict[str, float], amount: float, years: int) -> dict:
+    """
+    Scenario band for a whole weighted portfolio, not a single asset.
+
+    We build the combined daily value series (same normalisation as
+    backtest.py) and run the rolling-window distribution on THAT series —
+    so diversification's smoothing effect shows up in the band width.
+    """
+    history = fetch_price_history(list(weights), period="10y")
+    frame = pd.DataFrame(history).dropna()
+    if frame.empty:
+        raise MarketDataError(f"No overlapping history for {list(weights)}")
+
+    normalised = frame / frame.iloc[0]
+    portfolio_series = sum(normalised[t] * w for t, w in weights.items() if t in normalised)
+    values = portfolio_series.to_numpy()
+
+    window = years * TRADING_DAYS_PER_YEAR
+    returns = _rolling_window_returns(values, window, step=21)
+
+    if len(returns) < MIN_WINDOWS:
+        return {
+            "available": False,
+            "reason": (
+                f"Portföyün için {years} yıllık pencere dağılımı çıkaracak kadar "
+                "ortak geçmiş veri yok — daha kısa bir vade dene."
+            ),
+        }
+
+    years_covered = round(len(values) / TRADING_DAYS_PER_YEAR, 1)
+    return {
+        "available": True,
+        "amount": amount,
+        "years": years,
+        "history_years": years_covered,
+        "tickers": list(weights),
+        **_band(returns, amount),
+        "honesty_note": (
+            f"Bu bir tahmin DEĞİL: tüm portföyünün (ağırlıklı) kendi geçmişindeki "
+            f"tüm {years} yıllık dönemlerin dağılımı. Çeşitlendirme bandı daraltabilir "
+            "ama garanti etmez."
         ),
     }
 

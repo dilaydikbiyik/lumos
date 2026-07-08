@@ -38,3 +38,9 @@ class RegionProjectionRequest(BaseModel):
     region_code: str = Field(..., min_length=5, max_length=20)  # e.g. TP.KFE.TR51
     amount: float = Field(..., gt=0)
     years: Literal[1, 2, 3] = 2
+
+
+class PortfolioProjectionRequest(BaseModel):
+    weights: dict[str, float] = Field(..., min_length=1, max_length=15)
+    amount: float = Field(..., gt=0)
+    years: Literal[1, 3, 5] = 5

@@ -7,6 +7,8 @@ import PerformanceChart from '../components/PerformanceChart'
 import ReitCard from '../components/ReitCard'
 import AssetExplainer from '../components/AssetExplainer'
 import TimeMachine from '../components/TimeMachine'
+import FutureScenarios from '../components/FutureScenarios'
+import WhatIfAssistant from '../components/WhatIfAssistant'
 import PracticeMode from '../components/PracticeMode'
 import BoughtItBridge from '../components/BoughtItBridge'
 import BeginnerGuide from '../components/BeginnerGuide'
@@ -86,6 +88,12 @@ export default function RecommendPage() {
 
         {/* Zaman Makinesi — dürüst tarihsel simülasyon */}
         <TimeMachine allocations={portfolio.allocations} budget={portfolio.budget} />
+
+        {/* Gelecek Senaryoları — tahmin değil, geçmiş pencere dağılımı */}
+        <FutureScenarios allocations={portfolio.allocations} budget={portfolio.budget} />
+
+        {/* Ne olurdu? — tool-use: AI matematiği uydurmaz, gerçek motoru çağırır */}
+        <WhatIfAssistant riskScore={portfolio.risk_score} budget={portfolio.budget} />
 
         {/* REIT kartı */}
         {portfolio.includes_reits && <ReitCard explanation={portfolio.metadata?.reit_explanation} />}

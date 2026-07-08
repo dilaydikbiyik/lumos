@@ -8,6 +8,7 @@ import NewsDigest from '../components/NewsDigest'
 import GoalPlanner from '../components/GoalPlanner'
 import DailyTip from '../components/DailyTip'
 import HeadlineEducation from '../components/HeadlineEducation'
+import ReadinessScore from '../components/ReadinessScore'
 import usePortfolio from '../hooks/usePortfolio'
 import api, { setAuthToken } from '../utils/api'
 import { useState } from 'react'
@@ -102,6 +103,9 @@ export default function DashboardPage() {
           </h2>
           <p style={{ fontSize: 13 }}>Tüm servetin, tek bakışta.</p>
         </div>
+
+        {/* ── Cesaret Skoru — vizyonun görünür yüzü ── */}
+        <ReadinessScore />
 
         {/* ── Bugün Öğrendin ── */}
         <DailyTip />

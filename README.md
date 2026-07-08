@@ -1,5 +1,11 @@
 # 🪰✨ Lumos — Smart Investment Assistant
 
+[![CI](https://github.com/dilaydikbiyik/lumos/actions/workflows/ci.yml/badge.svg)](https://github.com/dilaydikbiyik/lumos/actions/workflows/ci.yml)
+![Python](https://img.shields.io/badge/python-3.12-blue)
+![React](https://img.shields.io/badge/react-19-61DAFB)
+![Tests](https://img.shields.io/badge/tests-133%20passed-3DD68C)
+![License: Educational](https://img.shields.io/badge/license-educational%20use-lightgrey)
+
 > **Yatırım hakkında hiçbir fikri olmayan insanların korkmadan, öğrenerek yatırım yapabilmesi için.**
 > An AI-powered investment guide built for people who have never invested — and are scared to start.
 
@@ -26,7 +32,9 @@ track it all in one portfolio.
   adapts its modules to your choice (no real-estate content forced on a stocks-only user)
 - **Fear check-in** — "What scares you most?" (losing money / being scammed / not understanding /
   messing up) with instant, specific reassurance; the AI advisor adapts its language to your fear
-- **Readiness score** — five transparent milestones toward "ready for real money"
+- **Readiness score** — five transparent milestones toward "ready for real money", shown as a
+  live dashboard card *and* used to shift the whole UI's background from night toward dawn
+  ("Aydınlanan Arayüz" — the interface literally brightens as you learn)
 
 ### 💬 Conversational risk profiling
 - 7-question chat (budget, horizon + life stage, loss tolerance, goal, experience, current
@@ -74,6 +82,15 @@ track it all in one portfolio.
 - Virtual 100.000 TL on the recommended portfolio with **real market data** — feel the swings
   before risking anything
 
+### 🔮 Future Scenarios & "What if?" (tool-use, not guesswork)
+- **Scenario bands**: "What could SPY become in 5 years?" answered honestly — not a prediction,
+  but the pessimistic/typical/optimistic distribution of *every* rolling 5-year window the asset
+  has actually lived through, applied to your own amount
+- Same treatment for real estate regions, paired with the *real* (inflation-adjusted) return
+- **"Ne olurdu?" assistant**: ask "what if I add 10,000 TL?" or "what if I were more aggressive?"
+  in plain language — the LLM never does the math itself. It extracts your intent, the real
+  portfolio engine computes before/after twice, and the model only narrates the actual numbers
+
 ---
 
 ## Architecture
@@ -98,7 +115,7 @@ AI         provider-agnostic adapter: Gemini (google-genai) or Claude (anthropic
 - Prompt-injection hardening: user messages are data, never instructions; completion marker
   can't be forged; role/length validation on every request
 - Per-user daily AI quota (DB-backed) + per-IP rate limiting (slowapi)
-- 93 backend tests (AI and market data fully mocked), ruff + eslint in CI, Docker build gate,
+- 133 backend tests (AI and market data fully mocked), ruff + eslint in CI, Docker build gate,
   fresh-database migration check on every push
 
 ---
@@ -132,7 +149,7 @@ docker compose up --build    # runs migrations, then serves on :8000
 ```
 
 ```bash
-python -m pytest backend/tests/ -q     # 93 tests, no network needed
+python -m pytest backend/tests/ -q     # 133 tests, no network needed
 ```
 
 ---
@@ -149,9 +166,10 @@ python -m pytest backend/tests/ -q     # 93 tests, no network needed
 
 ## Roadmap
 
-See [todo.md](todo.md) — active phases: firefly brand identity & "brightening UI" (the interface
-literally gets lighter as your readiness grows), Market Pack architecture for going global
-(TR is the reference market), E2E tests, and deployment (Render + Vercel).
+See [todo.md](todo.md) — active phases: Market Pack architecture for going global (TR is the
+reference market) and deployment (Render + Vercel). Everything else in the original 9-phase plan
+— including the firefly brand identity, the brightening UI, and the API-level 5-persona E2E
+suite — is done.
 
 ---
 
