@@ -119,8 +119,8 @@ def test_tr_village_detail_uses_search_fallback():
     emlakjet = next(l for l in links if l["site"] == "Emlakjet")
     assert "arama?query_text=" in sahibinden["url"]
     assert "%C3%87eriba%C5%9F%C4%B1" in sahibinden["url"] or "eriba" in sahibinden["url"]
-    # Emlakjet mahalle-derinliği canlı doğrulanmış kalıp: il-ilce-detay
-    assert "emlakjet.com/satilik-arsa/edirne-kesan-ceribasi-koyu" in emlakjet["url"]
+    # Emlakjet: köy slugu uydurulmaz (404 riski) — garantili ilçe sayfası
+    assert emlakjet["url"] == "https://www.emlakjet.com/satilik-arsa/edirne-kesan"
 
 
 def test_us_listing_links_use_pack_templates():

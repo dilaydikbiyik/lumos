@@ -6,8 +6,10 @@ Instead it hands the user a pre-filtered search URL on sites they already
 trust. Zero API keys, zero maintenance burden.
 
 GERÇEKÇİLİK NOTU (2026-07-10 doğrulaması):
-- Emlakjet kalıpları curl ile doğrulandı: /satilik-arsa/edirne-kesan → 200,
-  /satilik-konut/edirne-kesan-cumhuriyet-mahallesi (MAHALLE seviyesi!) → 200.
+- Emlakjet il-ilçe kalıpları curl ile doğrulandı: /satilik-arsa/edirne-kesan → 200.
+  Mahalle/köy yolları YALNIZCA sitenin veritabanındaki sluglarda çözülüyor
+  (cumhuriyet-mahallesi → 200 ama ceribasi-koyu → 404) — bu yüzden serbest
+  metin detayda yol uydurmuyoruz, ilçe sayfasına iniyoruz.
 - Sahibinden bot koruması dış doğrulamayı engelliyor (her yola 403);
   kanonik public kalıpları (satilik-arsa/satilik-daire) kullanıyoruz ve
   köy/mahalle gibi mikro konumlar için sitenin kendi arama rotasına
@@ -53,9 +55,12 @@ def _tr_links(il: str, ilce: str, asset_type: str, detail: Optional[str] = None)
                 "url": f"https://www.sahibinden.com/arama?query_text={quote(text)}",
             },
             {
-                # Emlakjet mahalle-seviyesi yolu destekliyor (canlı doğrulandı)
+                # Köy slugu UYDURMUYORUZ: Emlakjet yolları yalnızca kendi
+                # veritabanındaki konumlar için çözülüyor (ceribasi-koyu → 404
+                # canlı görüldü). Garantili çözülen il-ilçe sayfasına indirip
+                # mikro filtreyi siteye bırakmak dürüst davranış.
                 "site": "Emlakjet",
-                "url": f"https://www.emlakjet.com/{emlakjet_slug}/{location}-{_slug(detail)}",
+                "url": f"https://www.emlakjet.com/{emlakjet_slug}/{location}",
             },
         ]
 
