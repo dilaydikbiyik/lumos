@@ -742,6 +742,8 @@ lumos/                          ← proje kökü
 
 ### Kullanıcı Geri Bildirimi Turu 🛠️ (2026-07-09)
 
+- [x] **"Signature has expired" kalıcı çözümü**: Clerk token'ları ~1dk'da ölüyor, sayfa-yükleme anında alınan token bayatlıyordu → axios request interceptor'ı her istekte Clerk getToken()'dan taze token çekiyor (AuthBridge kaydeder; Clerk içeride cache'leyip otomatik yenilediği için maliyetsiz)
+
 - [x] **Canlı varlık değerlemesi**: borsa varlıkları yfinance güncel fiyatla (adet ya da alış tarihinden türetilen adetle), emlak/arsa TCMB ulusal konut endeksi oranıyla otomatik revalüe — kaynak etiketiyle (📡 canlı / 📊 endeks tahmini / ✍️ manuel) ve ▲▼ değişim rozetiyle listede (7 test; emlak canlı doğrulandı: Oca 2024 3M ev → 5.42M +%80.6)
 - [x] Öncelik zinciri: manuel > canlı/endeks > alış tutarı; kaynaklar çökerse fail-open alış bazına düşer
 - [x] "Aldım" köprüsü artık alış tarihini otomatik yazar → canlı takip anında başlar

@@ -1,9 +1,11 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import { ClerkLoading, SignedIn, SignedOut, RedirectToSignIn } from '@clerk/clerk-react'
+import { useEffect } from 'react'
+import { ClerkLoading, SignedIn, SignedOut, RedirectToSignIn, useAuth } from '@clerk/clerk-react'
 import BottomNav from './components/BottomNav'
 import PanicButton from './components/PanicButton'
 import ErrorBoundary from './utils/errorBoundary'
 import useIllumination from './hooks/useIllumination'
+import { registerTokenGetter } from './utils/api'
 import OnboardingPage from './pages/OnboardingPage'
 import PathSelectionPage from './pages/PathSelectionPage'
 import FearCheckInPage from './pages/FearCheckInPage'
@@ -15,6 +17,17 @@ import DashboardPage from './pages/DashboardPage'
 
 function Illumination() {
   useIllumination()
+  return null
+}
+
+/** Clerk token'ı her API isteğinde taze çekilsin diye interceptor'a kaydeder —
+    "Signature has expired" hatasının kalıcı çözümü. */
+function AuthBridge() {
+  const { getToken } = useAuth()
+  useEffect(() => {
+    registerTokenGetter(getToken)
+    return () => registerTokenGetter(null)
+  }, [getToken])
   return null
 }
 
@@ -59,6 +72,9 @@ export default function App() {
           <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
           <Route path="*"          element={<Navigate to="/" replace />} />
         </Routes>
+
+        {/* Her istekte taze Clerk token'ı (interceptor) */}
+        <AuthBridge />
 
         {/* Aydınlanan Arayüz: cesaret skoru zemini geceden şafağa taşır */}
         <Illumination />

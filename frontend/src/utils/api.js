@@ -4,7 +4,33 @@ const api = axios.create({
   baseURL: import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000',
 })
 
-// Attach Clerk JWT to every request
+/**
+ * Clerk oturum token'ları ~1 dakikada süresi dolar. Token'ı bir kez alıp
+ * saklamak "Signature has expired" hatası üretir. Çözüm: AuthBridge
+ * (App.jsx) Clerk'in getToken'ını buraya kaydeder; interceptor HER istekte
+ * taze token çeker — Clerk kendi içinde cache'leyip otomatik yenilediği
+ * için maliyeti yoktur.
+ */
+let tokenGetter = null
+
+export function registerTokenGetter(fn) {
+  tokenGetter = fn
+}
+
+api.interceptors.request.use(async (config) => {
+  if (tokenGetter) {
+    try {
+      const token = await tokenGetter()
+      if (token) config.headers.Authorization = `Bearer ${token}`
+    } catch {
+      // token alınamazsa istek yine gitsin — backend 401 ile cevaplar
+    }
+  }
+  return config
+})
+
+// Geriye dönük uyumluluk: eski sayfa-yükleme çağrıları zararsız hale geldi
+// (interceptor her istekte bunun üzerine taze token yazar).
 export function setAuthToken(token) {
   if (token) {
     api.defaults.headers.common['Authorization'] = `Bearer ${token}`
