@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from 'react'
+import { useNavigate } from 'react-router-dom'
 import LumosLogo from '../components/LumosLogo'
 import CurrencyExposure from '../components/CurrencyExposure'
 import { UserButton, useAuth } from '@clerk/clerk-react'
@@ -28,22 +29,26 @@ const EMOTIONS = [
 const fmt = n => new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 0 }).format(n)
 
 export default function HoldingsPage() {
+  const navigate = useNavigate()
   const { getToken } = useAuth()
   const [holdings, setHoldings] = useState([])
   const [summary, setSummary] = useState(null)
   const [health, setHealth] = useState(null)
+  const [profile, setProfile] = useState(null)
   const [form, setForm] = useState(EMPTY_FORM)
   const [showForm, setShowForm] = useState(false)
   const [error, setError] = useState(null)
 
   const refresh = useCallback(async () => {
     setAuthToken(await getToken())
-    const [h, s, hs] = await Promise.all([
+    const [h, s, hs, p] = await Promise.all([
       api.get('/holdings'), api.get('/holdings/summary'), api.get('/holdings/health'),
+      api.get('/profile').catch(() => ({ data: null })),
     ])
     setHoldings(h.data)
     setSummary(s.data)
     setHealth(hs.data)
+    setProfile(p.data)
   }, [getToken])
 
   useEffect(() => {
@@ -149,6 +154,21 @@ export default function HoldingsPage() {
         {/* Kur dağılımı — TL vs döviz */}
         <CurrencyExposure holdings={holdings} />
 
+        {/* Portföyü mevcut varlıklarla güncelle */}
+        {profile?.risk_score != null && summary?.remaining_budget > 0 && (
+          <button
+            className="btn btn-primary btn-full"
+            onClick={() => navigate('/recommend', {
+              state: {
+                risk_score: profile.risk_score,
+                answers: { budget: summary.remaining_budget },
+              },
+            })}
+          >
+            🔄 Kalan {fmt(summary.remaining_budget)} TL ile portföyümü güncelle
+          </button>
+        )}
+
         {/* Holdings list */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {holdings.map(h => (
@@ -158,7 +178,26 @@ export default function HoldingsPage() {
                 <div style={{ fontWeight: 600, fontSize: 14 }}>{h.name}</div>
                 <div style={{ fontSize: 12, opacity: 0.7 }}>
                   Alış: {fmt(h.purchase_amount)} TL
-                  {h.manual_current_value != null && ` · Güncel: ${fmt(h.manual_current_value)} TL`}
+                  {h.current_value != null && h.value_source !== 'purchase' && (
+                    <> · Güncel: <strong style={{ color: 'var(--text)' }}>{fmt(h.current_value)} TL</strong>
+                      {h.value_change_pct != null && (
+                        <span style={{
+                          marginLeft: 6, fontWeight: 700,
+                          color: h.value_change_pct >= 0 ? 'var(--green, #3DD68C)' : 'var(--red)',
+                        }}>
+                          {h.value_change_pct >= 0 ? '▲' : '▼'} {Math.abs(h.value_change_pct)}%
+                        </span>
+                      )}
+                      <span style={{ marginLeft: 6, fontSize: 10, opacity: 0.6 }}>
+                        {h.value_source === 'live' ? '📡 canlı' : h.value_source === 'index' ? '📊 endeks tahmini' : '✍️ manuel'}
+                      </span>
+                    </>
+                  )}
+                  {(h.current_value == null || h.value_source === 'purchase') && h.ticker && (
+                    <span style={{ marginLeft: 6, fontSize: 10, opacity: 0.55 }}>
+                      (canlı takip için adet veya alış tarihi ekle)
+                    </span>
+                  )}
                 </div>
               </div>
               <button className="btn btn-ghost" onClick={() => remove(h.id)} aria-label="Sil" style={{ padding: '4px 10px' }}>✕</button>

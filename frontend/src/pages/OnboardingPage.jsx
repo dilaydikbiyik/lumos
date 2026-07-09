@@ -23,7 +23,7 @@ const FEATURES = [
   {
     icon: '🎯',
     title: 'Seni Tanıyalım',
-    desc: '7 soru, yapay zeka destekli risk profili — jargon yok, baskı yok.',
+    desc: '9 soru, yapay zeka destekli risk profili — jargon yok, baskı yok.',
   },
   {
     icon: '📊',

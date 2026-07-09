@@ -739,6 +739,16 @@ lumos/                          ← proje kökü
 
 
 
+
+### Kullanıcı Geri Bildirimi Turu 🛠️ (2026-07-09)
+
+- [x] **Canlı varlık değerlemesi**: borsa varlıkları yfinance güncel fiyatla (adet ya da alış tarihinden türetilen adetle), emlak/arsa TCMB ulusal konut endeksi oranıyla otomatik revalüe — kaynak etiketiyle (📡 canlı / 📊 endeks tahmini / ✍️ manuel) ve ▲▼ değişim rozetiyle listede (7 test; emlak canlı doğrulandı: Oca 2024 3M ev → 5.42M +%80.6)
+- [x] Öncelik zinciri: manuel > canlı/endeks > alış tutarı; kaynaklar çökerse fail-open alış bazına düşer
+- [x] "Aldım" köprüsü artık alış tarihini otomatik yazar → canlı takip anında başlar
+- [x] **Portföyümü Güncelle**: Varlıklarım'da "Kalan X TL ile portföyümü güncelle" butonu → mevcut risk skoru + kalan bütçeyle yeni öneri akışı
+- [x] **Sorular tekliye ayrıldı**: Q2 (vade+yaş) ve Q7 (yükümlülük+gelir) ikişerliydi → 9 tekli soru; "her mesaj tek şey sorar" kuralı prompt'a eklendi; tüm "7 soru" metinleri güncellendi
+- [x] Yol seçimi kartlarındaki görünmez (siyah) metinler düzeltildi (button'a color: var(--text)) + "Önerilen" rozeti kaldırıldı
+
 ### Uçtan Uca Test Turu Bulguları 🔍 (2026-07-09)
 
 - [x] Sekme ikonu hizası: logo-icon.svg viewBox'ı kare değildi (84×90) ve içerik kuyruğu kırpılıyordu → kare (100×100), içeriğe ortalı viewBox; fikstürle doğrulandı (L harfi ortası = böcek ortası)

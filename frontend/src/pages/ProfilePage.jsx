@@ -49,7 +49,7 @@ export default function ProfilePage() {
               </p>
               <h2>Seni Tanıyalım 👋</h2>
               <p style={{ fontSize: 13, marginTop: 6 }}>
-                7 kısa soru — yapay zeka profilini çıkaracak, portföyünü buna göre kişiselleştirecek.
+                9 kısa soru — yapay zeka profilini çıkaracak, portföyünü buna göre kişiselleştirecek.
               </p>
             </div>
             <ChatWindow onProfileComplete={handleProfileComplete} />

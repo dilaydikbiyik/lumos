@@ -28,7 +28,6 @@ const PATHS = [
     desc: 'Bütçeni iki dünya arasında dengeli böl — tam Lumos deneyimi.',
     color: 'rgba(245,165,36,0.12)',
     border: 'rgba(245,165,36,0.4)',
-    featured: true,
   },
   {
     id: 'undecided',
@@ -96,6 +95,7 @@ export default function PathSelectionPage() {
                 onMouseEnter={() => setHovered(p.id)}
                 onMouseLeave={() => setHovered(null)}
                 style={{
+                  color: 'var(--text)',
                   textAlign: 'left',
                   cursor: saving !== null ? 'default' : 'pointer',
                   display: 'flex',
@@ -129,9 +129,6 @@ export default function PathSelectionPage() {
                 <div style={{ flex: 1 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 3 }}>
                     <strong style={{ fontSize: 15 }}>{p.title}</strong>
-                    {p.featured && (
-                      <span className="badge badge-amber" style={{ fontSize: 10 }}>Önerilen</span>
-                    )}
                   </div>
                   <span style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.5 }}>
                     {p.desc}

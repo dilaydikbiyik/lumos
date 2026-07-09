@@ -13,15 +13,18 @@ from backend.schemas.holding import (
     PortfolioSummary,
 )
 from backend.services import inflation_service
+from backend.services.holdings_valuation import current_value, enrich_holdings
 
 router = APIRouter()
 
 
-def _current_value(holding) -> float:
-    """Best-known value: manual valuation wins, else purchase price."""
-    if holding.manual_current_value is not None:
-        return holding.manual_current_value
-    return holding.purchase_amount
+def _serialize(holding, enrichment: dict) -> HoldingRead:
+    read = HoldingRead.model_validate(holding)
+    info = enrichment.get(holding.id)
+    read.current_value = info["value"] if info else holding.purchase_amount
+    read.value_source = info["source"] if info else "purchase"
+    read.value_change_pct = info.get("change_pct") if info else None
+    return read
 
 
 @router.get("", response_model=list[HoldingRead])
@@ -30,7 +33,9 @@ async def list_holdings(
     db: AsyncSession = Depends(get_db),
 ):
     user = await user_repository.get_or_create(db, user_id)
-    return await holding_repository.list_for_user(db, user.id)
+    holdings = await holding_repository.list_for_user(db, user.id)
+    enrichment = enrich_holdings(holdings)
+    return [_serialize(h, enrichment) for h in holdings]
 
 
 @router.post("", response_model=HoldingRead, status_code=201)
@@ -86,9 +91,10 @@ async def health_score(
 
     user = await user_repository.get_or_create(db, user_id)
     holdings = await holding_repository.list_for_user(db, user.id)
+    enrichment = enrich_holdings(holdings)
     by_type: dict[str, float] = {}
     for h in holdings:
-        by_type[h.asset_type] = by_type.get(h.asset_type, 0.0) + _current_value(h)
+        by_type[h.asset_type] = by_type.get(h.asset_type, 0.0) + current_value(h, enrichment)
     return compute_health(by_type)
 
 
@@ -104,11 +110,12 @@ async def portfolio_summary(
     user = await user_repository.get_or_create(db, user_id)
     holdings = await holding_repository.list_for_user(db, user.id)
 
+    enrichment = enrich_holdings(holdings)
     total_invested = sum(h.purchase_amount for h in holdings)
-    total_value = sum(_current_value(h) for h in holdings)
+    total_value = sum(current_value(h, enrichment) for h in holdings)
     by_type: dict[str, float] = {}
     for h in holdings:
-        by_type[h.asset_type] = by_type.get(h.asset_type, 0.0) + _current_value(h)
+        by_type[h.asset_type] = by_type.get(h.asset_type, 0.0) + current_value(h, enrichment)
 
     remaining = None
     if user.budget is not None:

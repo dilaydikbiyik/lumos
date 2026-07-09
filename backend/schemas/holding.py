@@ -52,6 +52,11 @@ class HoldingRead(BaseModel):
     emotion_tag: Optional[EmotionTag]
     created_at: datetime
 
+    # Canlı değerleme (holdings_valuation.py doldurur — DB'de saklanmaz)
+    current_value: Optional[float] = None
+    value_source: Optional[str] = None   # manual | live | index | purchase
+    value_change_pct: Optional[float] = None
+
 
 class CashErosion(BaseModel):
     """'Param eriyor mu?' — real monthly purchasing-power loss on idle cash."""

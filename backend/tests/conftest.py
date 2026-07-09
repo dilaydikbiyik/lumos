@@ -62,6 +62,17 @@ def _no_network_chat_context():
         yield
 
 
+@pytest.fixture(autouse=True)
+def _no_network_valuation():
+    """Holding valuation never hits yfinance/EVDS in tests — purchase basis.
+    Valuation-specific tests patch these narrowly themselves."""
+    with patch("backend.services.holdings_valuation.fetch_price_history",
+               side_effect=ConnectionError("no network in tests")), \
+         patch("backend.services.holdings_valuation.evds_service.fetch_series",
+               side_effect=ConnectionError("no network in tests")):
+        yield
+
+
 @pytest.fixture
 def mock_ai():
     """Patch the provider dispatch — tests never hit Gemini/Anthropic."""

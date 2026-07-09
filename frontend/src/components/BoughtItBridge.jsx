@@ -31,6 +31,8 @@ export default function BoughtItBridge({ allocations, budget }) {
           asset_type: type,
           name: a.name,
           purchase_amount: amount,
+          // alış tarihi = bugün → canlı fiyat takibi otomatik devreye girer
+          purchase_date: new Date().toISOString().slice(0, 10),
         }
         if (!NO_TICKER_TYPES.has(type)) body.ticker = a.ticker
         await api.post('/holdings', body)
