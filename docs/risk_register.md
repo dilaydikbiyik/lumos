@@ -16,7 +16,7 @@
 
 | # | Risk | Severity | Mitigation in place | Residual gap |
 |---|------|----------|--------------------|--------------|
-| 5 | **Free-tier quota exhaustion (429)** | 🟡 | Model fallback chain per tier (each Gemini model has its own free quota → ~3× capacity); per-user daily quotas by plan; polite bilingual 429 | Heavy multi-user load still shares one API key; paid tiers (infrastructure ready) are the real fix |
+| 5 | **Free-tier quota exhaustion (429)** | 🟡 | Model-major matrix: 4 models × up to 4 keys = 16 independent quota pools; thinking disabled on 2.5 family (token diet); deterministic generations cached 24h; per-user daily quotas by plan; polite bilingual 429 | Multi-project free keys are a ToS gray area (treated as failover); paid tiers remain the production answer |
 | 6 | **Provider outage (503, observed live)** | 🟡 | Chain treats 5xx like 429 and falls through; Anthropic chain handles credit-exhaustion the same way | Cross-provider fallback (gemini→anthropic) not automatic — deliberate, to keep costs predictable |
 | 7 | **LLM returns malformed JSON in extraction** (profile / what-if) | 🟡 | 3-strategy parser (fence strip → first-object regex → nested regex); 422 with "continue the conversation" guidance; thinking-token truncation fixed via 4096+ budgets | — |
 | 8 | **`[PROFILE_COMPLETE]` marker forgery via prompt injection** | 🔴 | SECURITY RULES block in system prompt; marker never honored from user text (only assistant output is scanned); role/length validation (Literal roles, 4k chars, 80 msgs) | Prompt-level defenses are probabilistic by nature; server-side re-validation (Pydantic) is the hard gate |

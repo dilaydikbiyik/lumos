@@ -737,6 +737,16 @@ lumos/                          ← proje kökü
 > Yeni ülke eklemek = yeni kod değil, yeni config + veri adaptörü + içerik paketi. TR ilk referans pack olarak eksiril yapılır.
 
 
+
+### Kota Sorunu — Kalıcı Çözüm Paketi ⚡ (2026-07-09)
+
+- [x] Model-öncelikli anahtar matrisi: 4 model × 4 anahtar = 16 bağımsız kota havuzu — anahtar kotası dolunca kalite değil anahtar değişir
+- [x] Thinking kapatıldı (2.5 ailesi, thinking_budget=0): görünmez token yakımı bitti, sıcak yol gecikmesi ~2sn'ye indi
+- [x] Deterministik üretimlere 24s cache (portföy/REIT açıklamaları) — aynı girdi kotayı iki kez yakmaz
+- [x] Boş RAG context kısa-TTL cache: yfinance çökükken 10.1sn → 1.9sn (canlı ölçüm)
+- [x] 3 yeni anahtar canlı doğrulandı; .env.example'da dürüst ToS notu (failover çerçevesi, üretim cevabı ücretli tier)
+- [x] 3 yeni test (çoklu-anahtar sırası, thinking-kapalı config, generate_text cache)
+
 ### Ücretli AI Tier Altyapısı 💳 (billing-ready — 2026-07-08)
 
 > Ödeme entegrasyonu bilinçli olarak DAHİL DEĞİL; entegrasyon noktası tek satır: `user.plan = "plus"`.
