@@ -8,6 +8,7 @@ actually produced, applied to their own amount — with the worst window
 shown first (vision: honest downside before upside).
 """
 import logging
+from typing import Optional
 
 import numpy as np
 import pandas as pd
@@ -30,6 +31,48 @@ def _rolling_window_returns(values: np.ndarray, window: int, step: int) -> list[
         if begin > 0:
             returns.append(end / begin - 1)
     return returns
+
+
+def _windowed_real_band(
+    values, months: list[str], window: int, amount: float,
+) -> tuple[dict, Optional[dict]]:
+    """
+    Aylık/çeyreklik seride kaymalı pencerelerin NOMINAL bandı + her pencerenin
+    KENDİ dönem enflasyonuyla düşürülmüş REEL bandı. (Tüm pencerelerin nominal
+    medyanını tek bir dönemin enflasyonuyla kıyaslamak elma-armut hatasıdır.)
+    """
+    from backend.services import inflation_service
+
+    nominals: list[float] = []
+    reals: list[float] = []
+    for start in range(0, len(values) - window):
+        begin, end = values[start], values[start + window]
+        if begin <= 0:
+            continue
+        nominal = end / begin - 1
+        nominals.append(nominal)
+        try:
+            real_pct = inflation_service.real_return_pct(
+                nominal * 100, months[start], months[start + window]
+            )
+            reals.append(real_pct / 100)
+        except Exception:
+            pass
+
+    if len(nominals) < MIN_WINDOWS:
+        return {}, None
+
+    band = _band(nominals, amount)
+    real_band = None
+    if len(reals) >= MIN_WINDOWS:
+        import numpy as _np
+        p10, p50, p90 = _np.percentile(_np.array(reals), [10, 50, 90])
+        real_band = {
+            "pessimistic_pct": round(p10 * 100, 1),
+            "typical_pct": round(p50 * 100, 1),
+            "optimistic_pct": round(p90 * 100, 1),
+        }
+    return band, real_band
 
 
 def _band(returns: list[float], amount: float) -> dict:

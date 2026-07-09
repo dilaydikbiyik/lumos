@@ -742,6 +742,11 @@ lumos/                          ← proje kökü
 
 ### Kullanıcı Geri Bildirimi Turu 🛠️ (2026-07-09)
 
+- [x] **Emlak Keşfet il bazına indi**: TCMB birim fiyat serileri keşfedildi (bie_birimfiyat — 81 il, TL/m², çeyreklik, 2010→bugün) → NUTS2 bölge bulanıklığı yerine il il somut fiyatlar ("Muğla 79.110 TL/m²"); il arama + ilk-12 listesi; toplu çekim (15 seri/istek, günlük cache) (7 test, canlı doğrulandı)
+- [x] Ufuk butonları 1/2/3 → **1/3/5 yıl** (16 yıllık çeyreklik geçmiş bunu dürüstçe destekliyor)
+- [x] İl kartına tıkla → 5 yıllık senaryo bandı + o ilin Sahibinden/Emlakjet ilan linkleri
+- [x] **Hesap hatası düzeltildi**: senaryo bandının "reel" değeri tüm pencerelerin medyanını tek dönemin enflasyonuyla kıyaslıyordu (Muğla saçma -%62 gösteriyordu) → her pencere KENDİ dönem enflasyonuyla arındırılıp reel dağılım çıkarılıyor (Muğla tipik reel +%137.6)
+
 - [x] **"Signature has expired" kalıcı çözümü**: Clerk token'ları ~1dk'da ölüyor, sayfa-yükleme anında alınan token bayatlıyordu → axios request interceptor'ı her istekte Clerk getToken()'dan taze token çekiyor (AuthBridge kaydeder; Clerk içeride cache'leyip otomatik yenilediği için maliyetsiz)
 
 - [x] **Canlı varlık değerlemesi**: borsa varlıkları yfinance güncel fiyatla (adet ya da alış tarihinden türetilen adetle), emlak/arsa TCMB ulusal konut endeksi oranıyla otomatik revalüe — kaynak etiketiyle (📡 canlı / 📊 endeks tahmini / ✍️ manuel) ve ▲▼ değişim rozetiyle listede (7 test; emlak canlı doğrulandı: Oca 2024 3M ev → 5.42M +%80.6)

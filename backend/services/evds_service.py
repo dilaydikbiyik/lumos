@@ -118,3 +118,108 @@ def get_regional_housing_indices(start: str = "01-01-2023") -> dict[str, dict]:
         except Exception as exc:
             logger.warning("EVDS KFE fetch failed for %s: %s", code, exc)
     return out
+
+
+# ── İl bazında konut birim fiyatları (TL/m², çeyreklik, 2010→bugün) ──────────
+# TCMB bie_birimfiyat veri grubu: ulusal + 81 il. NUTS2 bölge endeksinden çok
+# daha somut: "Muğla'da m² 79.110 TL" — kullanıcının istediği spesifiklik.
+
+UNIT_PRICE_PREFIX = "TP.BIRIMFIYAT."
+
+PROVINCES: dict[str, str] = {
+    "IST": "İstanbul", "ANK": "Ankara", "IZM": "İzmir",
+    "ADANA": "Adana", "ADIYAMAN": "Adıyaman", "AFYON": "Afyonkarahisar",
+    "AGRI": "Ağrı", "AMASYA": "Amasya", "ANTALYA": "Antalya",
+    "ARTVIN": "Artvin", "AYDIN": "Aydın", "BALIKESIR": "Balıkesir",
+    "BILECIK": "Bilecik", "BINGOL": "Bingöl", "BITLIS": "Bitlis",
+    "BOLU": "Bolu", "BURDUR": "Burdur", "BURSA": "Bursa",
+    "CANAKKALE": "Çanakkale", "CANKIRI": "Çankırı", "CORUM": "Çorum",
+    "DENIZLI": "Denizli", "DIYARBAKIR": "Diyarbakır", "EDIRNE": "Edirne",
+    "ELAZIG": "Elazığ", "ERZINCAN": "Erzincan", "ERZURUM": "Erzurum",
+    "ESKISEHIR": "Eskişehir", "ANTEP": "Gaziantep", "GIRESUN": "Giresun",
+    "GUMUSHANE": "Gümüşhane", "HAKKARI": "Hakkari", "HATAY": "Hatay",
+    "ISPARTA": "Isparta", "MERSIN": "Mersin", "KARS": "Kars",
+    "KASTAMONU": "Kastamonu", "KAYSERI": "Kayseri", "KIRKLARELI": "Kırklareli",
+    "KIRSEHIR": "Kırşehir", "KOCAELI": "Kocaeli", "KONYA": "Konya",
+    "KUTAHYA": "Kütahya", "MALATYA": "Malatya", "MANISA": "Manisa",
+    "MARAS": "Kahramanmaraş", "MARDIN": "Mardin", "MUGLA": "Muğla",
+    "MUS": "Muş", "NEVSEHIR": "Nevşehir", "NIGDE": "Niğde",
+    "ORDU": "Ordu", "RIZE": "Rize", "SAKARYA": "Sakarya",
+    "SAMSUN": "Samsun", "SIIRT": "Siirt", "SINOP": "Sinop",
+    "SIVAS": "Sivas", "TEKIRDAG": "Tekirdağ", "TOKAT": "Tokat",
+    "TRABZON": "Trabzon", "TUNCELI": "Tunceli", "URFA": "Şanlıurfa",
+    "USAK": "Uşak", "VAN": "Van", "YOZGAT": "Yozgat",
+    "ZONGULDAK": "Zonguldak", "AKSARAY": "Aksaray", "BAYBURT": "Bayburt",
+    "KARAMAN": "Karaman", "KIRIKKALE": "Kırıkkale", "BATMAN": "Batman",
+    "SIRNAK": "Şırnak", "BARTIN": "Bartın", "ARDAHAN": "Ardahan",
+    "IGDIR": "Iğdır", "YALOVA": "Yalova", "KARABUK": "Karabük",
+    "KILIS": "Kilis", "OSMANIYE": "Osmaniye", "DUZCE": "Düzce",
+}
+
+
+def _quarter_to_month(quarter_label: str) -> str:
+    """'2026-Q1' → '2026-03' (çeyrek sonu ayı — enflasyon kıyası için)."""
+    year, q = quarter_label.split("-Q")
+    return f"{year}-{int(q) * 3:02d}"
+
+
+def fetch_quarterly_series_batch(codes: list[str], start: str, end: str) -> dict[str, dict[str, float]]:
+    """
+    Çeyreklik serileri TOPLU çeker (tek istekte ~15 seri) — 82 il için
+    6 istek, günlük cache. Dönüş: {code: {"YYYY-MM": değer}} (çeyrek→ay).
+    """
+    cache_key = f"evds_batch_q:{hashlib_key(codes)}:{start}:{end}"
+    cached = cache_service.get(cache_key)
+    if cached is not None:
+        return cached
+
+    out: dict[str, dict[str, float]] = {c: {} for c in codes}
+    CHUNK = 15
+    for i in range(0, len(codes), CHUNK):
+        chunk = codes[i:i + CHUNK]
+        url = f"{BASE_URL}/series={'-'.join(chunk)}&startDate={start}&endDate={end}&type=json"
+        resp = httpx.get(url, headers={"key": settings.TCMB_EVDS_API_KEY}, timeout=20)
+        resp.raise_for_status()
+        for item in resp.json().get("items", []):
+            tarih = item.get("Tarih", "")
+            if "-Q" not in tarih:
+                continue
+            month = _quarter_to_month(tarih)
+            for code in chunk:
+                raw = item.get(code.replace(".", "_"))
+                if raw is not None:
+                    out[code][month] = float(raw)
+
+    if any(out.values()):
+        cache_service.set(cache_key, out, ttl=_CACHE_TTL)
+    return out
+
+
+def hashlib_key(codes: list[str]) -> str:
+    import hashlib
+    return hashlib.sha1(",".join(sorted(codes)).encode()).hexdigest()[:12]
+
+
+def get_province_unit_prices() -> dict[str, dict]:
+    """
+    81 il + 3 büyükşehir için TL/m² birim fiyat geçmişi (2010→bugün, çeyreklik).
+    Dönüş: {suffix: {"name": il_adı, "prices": {"YYYY-MM": tl_m2}}}
+    """
+    from datetime import date as _date
+
+    if not is_configured():
+        return {}
+    codes = [UNIT_PRICE_PREFIX + suffix for suffix in PROVINCES]
+    try:
+        batch = fetch_quarterly_series_batch(
+            codes, start="01-01-2010", end=_date.today().strftime("%d-%m-%Y")
+        )
+    except Exception as exc:
+        logger.warning("province unit prices unavailable: %s", exc)
+        return {}
+
+    return {
+        suffix: {"name": name, "prices": batch.get(UNIT_PRICE_PREFIX + suffix, {})}
+        for suffix, name in PROVINCES.items()
+        if batch.get(UNIT_PRICE_PREFIX + suffix)
+    }

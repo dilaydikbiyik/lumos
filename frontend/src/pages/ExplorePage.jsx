@@ -6,8 +6,9 @@ import IsikTut from '../components/IsikTut'
 
 const fmt = n => new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 0 }).format(n)
 
-function RegionScenario({ region, amount }) {
+function ProvinceScenario({ province, amount }) {
   const [band, setBand] = useState(null)
+  const [links, setLinks] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
 
@@ -15,10 +16,14 @@ function RegionScenario({ region, amount }) {
     setLoading(true)
     setError(null)
     try {
-      const res = await api.post('/planning/projection/region', {
-        region_code: region.code, amount: Number(amount) || 1000000, years: 2,
-      })
-      setBand(res.data)
+      const [b, l] = await Promise.all([
+        api.post('/planning/projection/province', {
+          region_code: province.code, amount: Number(amount) || 1000000, years: 5,
+        }),
+        api.post('/planning/listing-links', { il: province.province, ilce: '', asset_type: 'daire' }),
+      ])
+      setBand(b.data)
+      setLinks(l.data.links)
     } catch (err) {
       setError(extractErrorMessage(err, 'Senaryo hesaplanamadı'))
     } finally {
@@ -32,16 +37,32 @@ function RegionScenario({ region, amount }) {
         <button className="btn btn-ghost" style={{ width: '100%' }} onClick={run} disabled={loading}>
           {loading
             ? <span className="spinner" style={{ width: 16, height: 16 }} />
-            : `${fmt(Number(amount) || 1000000)} TL burada 2 yılda ne olurdu?`}
+            : `${fmt(Number(amount) || 1000000)} TL ${province.province}'de 5 yılda ne olurdu?`}
         </button>
       )}
       {error && <p style={{ color: 'var(--red)', fontSize: 12 }}>{error}</p>}
       {band && !band.available && <p style={{ fontSize: 12, opacity: 0.75 }}>{band.reason}</p>}
       {band?.available && (
         <div style={{ fontSize: 13, lineHeight: 1.7 }}>
-          <div>Kötü dönem: <strong style={{ color: 'var(--red)' }}>{fmt(band.pessimistic.value)} TL</strong> ({band.pessimistic.return_pct > 0 ? '+' : ''}{band.pessimistic.return_pct}%)</div>
-          <div>Tipik dönem: <strong style={{ color: 'var(--firefly, #F5A524)' }}>{fmt(band.typical.value)} TL</strong> (+{band.typical.return_pct}% · reel {band.typical_real_return_pct > 0 ? '+' : ''}{band.typical_real_return_pct}%)</div>
-          <div>İyi dönem: <strong style={{ color: 'var(--green, #3DD68C)' }}>{fmt(band.optimistic.value)} TL</strong> (+{band.optimistic.return_pct}%)</div>
+          <div>Kötü dönem: <strong style={{ color: 'var(--red)' }}>{fmt(band.pessimistic.value)} TL</strong>
+            {band.real_band && <span style={{ fontSize: 11, opacity: 0.7 }}> · reel {band.real_band.pessimistic_pct > 0 ? '+' : ''}{band.real_band.pessimistic_pct}%</span>}
+          </div>
+          <div>Tipik dönem: <strong style={{ color: 'var(--firefly, #F5A524)' }}>{fmt(band.typical.value)} TL</strong>
+            {band.real_band && <span style={{ fontSize: 11, opacity: 0.7 }}> · reel {band.real_band.typical_pct > 0 ? '+' : ''}{band.real_band.typical_pct}%</span>}
+          </div>
+          <div>İyi dönem: <strong style={{ color: 'var(--green, #3DD68C)' }}>{fmt(band.optimistic.value)} TL</strong>
+            {band.real_band && <span style={{ fontSize: 11, opacity: 0.7 }}> · reel {band.real_band.optimistic_pct > 0 ? '+' : ''}{band.real_band.optimistic_pct}%</span>}
+          </div>
+          {links && (
+            <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+              {links.map(l => (
+                <a key={l.site} href={l.url} target="_blank" rel="noopener noreferrer"
+                   className="btn btn-ghost" style={{ flex: 1, textAlign: 'center', fontSize: 12, textDecoration: 'none' }}>
+                  {l.site}'de ilanlar →
+                </a>
+              ))}
+            </div>
+          )}
           <p style={{ fontSize: 11, opacity: 0.6, marginTop: 6 }}>⚠️ {band.honesty_note}</p>
         </div>
       )}
@@ -49,33 +70,33 @@ function RegionScenario({ region, amount }) {
   )
 }
 
-function RegionCard({ region, amount }) {
-  const realPositive = region.real_change_pct > 0
+function ProvinceCard({ province, amount }) {
+  const realPositive = (province.real_change_pct ?? 0) > 0
   const [open, setOpen] = useState(false)
   return (
     <div className="card" onClick={() => setOpen(true)}
          style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', cursor: 'pointer' }}>
       <span style={{
-        fontSize: 15, fontWeight: 700, width: 34, height: 34, borderRadius: '50%',
+        fontSize: 13, fontWeight: 700, width: 34, height: 34, borderRadius: '50%',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         background: realPositive ? 'rgba(74,222,128,0.15)' : 'rgba(248,113,113,0.12)',
         color: realPositive ? 'var(--green, #4ade80)' : 'var(--red)',
         flexShrink: 0,
-      }}>{region.rank}</span>
+      }}>{province.rank}</span>
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontWeight: 600, fontSize: 14 }}>{region.region}</div>
-        <div style={{ fontSize: 12, opacity: 0.7 }}>{region.note}</div>
+        <div style={{ fontWeight: 600, fontSize: 14 }}>{province.province}</div>
+        <div style={{ fontSize: 12, opacity: 0.7 }}>{fmt(province.price_per_m2)} TL/m²</div>
       </div>
       <div style={{ textAlign: 'right', flexShrink: 0 }}>
-        <div style={{ fontSize: 13 }}>+{region.nominal_change_pct}%</div>
+        <div style={{ fontSize: 13 }}>+{province.nominal_change_pct}%</div>
         <div style={{
           fontSize: 13, fontWeight: 700,
           color: realPositive ? 'var(--green, #4ade80)' : 'var(--red)',
         }}>
-          reel {region.real_change_pct > 0 ? '+' : ''}{region.real_change_pct}%
+          reel {province.real_change_pct > 0 ? '+' : ''}{province.real_change_pct}%
         </div>
       </div>
-      {open && <div style={{ flexBasis: '100%' }}><RegionScenario region={region} amount={amount} /></div>}
+      {open && <div style={{ flexBasis: '100%' }}><ProvinceScenario province={province} amount={amount} /></div>}
     </div>
   )
 }
@@ -198,19 +219,20 @@ function ListingLinks() {
 
 export default function ExplorePage() {
   const { getToken } = useAuth()
-  const [regions, setRegions] = useState(null)
-  const [horizon, setHorizon] = useState(1)
+  const [provinces, setProvinces] = useState(null)
+  const [horizon, setHorizon] = useState(3)
   const [scenarioAmount, setScenarioAmount] = useState('1000000')
+  const [search, setSearch] = useState('')
   // Loading is derived: no data yet, or data belongs to a different horizon
-  const loading = !regions || regions._horizon !== horizon
+  const loading = !provinces || provinces._horizon !== horizon
 
   const load = useCallback(async (years) => {
     try {
       setAuthToken(await getToken())
-      const res = await api.get(`/planning/region-intelligence?horizon_years=${years}`)
+      const res = await api.get(`/planning/province-intelligence?horizon_years=${years}`)
       return res.data
     } catch {
-      return { available: false, regions: [] }
+      return { available: false, provinces: [] }
     }
   }, [getToken])
 
@@ -218,11 +240,18 @@ export default function ExplorePage() {
     let cancelled = false
     async function run() {
       const data = await load(horizon)
-      if (!cancelled) setRegions({ ...data, _horizon: horizon })
+      if (!cancelled) setProvinces({ ...data, _horizon: horizon })
     }
     run()
     return () => { cancelled = true }
   }, [load, horizon])
+
+  const q = search.trim().toLocaleLowerCase('tr')
+  const visible = provinces?.available
+    ? (q
+        ? provinces.provinces.filter(p => p.province.toLocaleLowerCase('tr').includes(q))
+        : provinces.provinces.slice(0, 12))
+    : []
 
   return (
     <div className="page">
@@ -235,14 +264,14 @@ export default function ExplorePage() {
         <div>
           <h2>Emlak Keşfet</h2>
           <p style={{ fontSize: 13, marginTop: 4 }}>
-            Bölgelerin gerçek (<IsikTut term="reel getiri">enflasyon sonrası</IsikTut>) değerlenmesi — TCMB verisiyle
+            İl il konut m² fiyatları ve gerçek (<IsikTut term="reel getiri">enflasyon sonrası</IsikTut>) değerlenme — TCMB verisiyle
           </p>
         </div>
 
         {/* Region intelligence */}
         <div className="card" style={{ padding: 0, background: 'none', border: 'none', boxShadow: 'none' }}>
           <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
-            {[1, 2, 3].map(y => (
+            {[1, 3, 5].map(y => (
               <button key={y}
                       className={`btn ${horizon === y ? 'btn-primary' : 'btn-ghost'}`}
                       style={{ flex: 1 }}
@@ -251,6 +280,15 @@ export default function ExplorePage() {
               </button>
             ))}
           </div>
+
+          <input
+            className="input"
+            placeholder="İl ara (örn: Muğla, Eskişehir...)"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            style={{ marginBottom: 12 }}
+            aria-label="İl ara"
+          />
 
           <input
             className="input"
@@ -269,20 +307,30 @@ export default function ExplorePage() {
             </div>
           )}
 
-          {!loading && regions?.available && (
+          {!loading && provinces?.available && (
             <>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                {regions.regions.map(r => <RegionCard key={r.code} region={r} amount={scenarioAmount} />)}
+                {visible.map(p => <ProvinceCard key={p.code} province={p} amount={scenarioAmount} />)}
+                {visible.length === 0 && (
+                  <p style={{ fontSize: 13, opacity: 0.7, textAlign: 'center', padding: 12 }}>
+                    "{search}" bulunamadı — 81 ilin tamamında arayabilirsin.
+                  </p>
+                )}
               </div>
+              {!q && (
+                <p style={{ fontSize: 12, opacity: 0.55, marginTop: 8, textAlign: 'center' }}>
+                  İlk 12 il gösteriliyor — diğer iller için yukarıdan ara.
+                </p>
+              )}
               <p style={{ fontSize: 12, opacity: 0.6, marginTop: 10, lineHeight: 1.5 }}>
-                ⚠️ {regions.honesty_note} (Veri: {regions.data_through})
+                ⚠️ {provinces.honesty_note} (Veri: {provinces.data_through})
               </p>
             </>
           )}
 
-          {!loading && !regions?.available && (
+          {!loading && !provinces?.available && (
             <div className="card" style={{ textAlign: 'center', padding: 24 }}>
-              <p style={{ fontSize: 14 }}>Bölge verisi şu an alınamıyor — birazdan tekrar dene.</p>
+              <p style={{ fontSize: 14 }}>İl verisi şu an alınamıyor — birazdan tekrar dene.</p>
             </div>
           )}
         </div>

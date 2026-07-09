@@ -137,3 +137,32 @@ async def portfolio_projection(
         from fastapi import HTTPException
         raise HTTPException(status_code=422, detail=f"Weights must sum to ~1 (got {total:.2f}).")
     return project_portfolio(body.weights, body.amount, body.years)
+
+
+@router.get("/province-intelligence")
+@limiter.limit("20/minute")
+async def province_intelligence(
+    request: Request,
+    horizon_years: int = 3,
+    user_id: str = Depends(get_current_user),
+):
+    """
+    İl bazında konut fiyatları (TCMB birim fiyat, TL/m²) — 81 il,
+    1/3/5 yıllık nominal + reel değerlenme sıralaması.
+    """
+    from backend.services.province_intelligence import rank_provinces
+
+    return rank_provinces(horizon_years)
+
+
+@router.post("/projection/province")
+@limiter.limit("15/minute")
+async def province_projection(
+    request: Request,
+    body: RegionProjectionRequest,  # region_code alanı il kodu (örn. MUGLA) taşır
+    user_id: str = Depends(get_current_user),
+):
+    """İl senaryo bandı — 16 yıllık birim fiyat geçmişinin pencere dağılımı."""
+    from backend.services.province_intelligence import project_province
+
+    return project_province(body.region_code.upper(), body.amount, body.years)

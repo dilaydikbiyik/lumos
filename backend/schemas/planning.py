@@ -35,9 +35,10 @@ class AssetProjectionRequest(BaseModel):
 
 
 class RegionProjectionRequest(BaseModel):
-    region_code: str = Field(..., min_length=5, max_length=20)  # e.g. TP.KFE.TR51
+    # NUTS2 kodu (TP.KFE.TR51) veya il kodu (MUGLA) taşır
+    region_code: str = Field(..., min_length=2, max_length=20)
     amount: float = Field(..., gt=0)
-    years: Literal[1, 2, 3] = 2
+    years: Literal[1, 2, 3, 5] = 3
 
 
 class PortfolioProjectionRequest(BaseModel):
