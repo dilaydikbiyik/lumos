@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="8 10 84 90" fill="none">
+  <defs>
+    <linearGradient id="body" x1="50" y1="18" x2="50" y2="105" gradientUnits="userSpaceOnUse">
+      <stop offset="0%"   stop-color="#FFB300"/>
+      <stop offset="40%"  stop-color="#FF8C00"/>
+      <stop offset="100%" stop-color="#E64000"/>
+    </linearGradient>
+    <filter id="glow" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="4.5" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="wglow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="2" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Left wing outer -->
+  <path d="M50 48 C38 30, 6 26, 8 50 C9 64, 28 75, 46 70"
+    stroke="#C9A84C" stroke-width="2" stroke-linecap="round" fill="none"
+    filter="url(#wglow)" opacity="0.9"/>
+  <!-- Left wing inner -->
+  <path d="M50 55 C42 40, 20 36, 20 54 C20 64, 34 72, 46 70"
+    stroke="#C9A84C" stroke-width="1.3" stroke-linecap="round" fill="none" opacity="0.5"/>
+
+  <!-- Right wing outer -->
+  <path d="M50 48 C62 30, 94 26, 92 50 C91 64, 72 75, 54 70"
+    stroke="#C9A84C" stroke-width="2" stroke-linecap="round" fill="none"
+    filter="url(#wglow)" opacity="0.9"/>
+  <!-- Right wing inner -->
+  <path d="M50 55 C58 40, 80 36, 80 54 C80 64, 66 72, 54 70"
+    stroke="#C9A84C" stroke-width="1.3" stroke-linecap="round" fill="none" opacity="0.5"/>
+
+  <!-- Body -->
+  <path d="M50 18 C50 18, 55 32, 55 52 C55 70, 52 90, 50 105
+           C48 90, 45 70, 45 52 C45 32, 50 18, 50 18 Z"
+    fill="url(#body)" filter="url(#glow)"/>
+
+  <!-- Head dot -->
+  <circle cx="50" cy="17" r="6" fill="#FFD740" filter="url(#glow)"/>
+
+  <!-- Belly light dot -->
+  <circle cx="50" cy="60" r="4" fill="white" opacity="0.95" filter="url(#glow)"/>
+</svg>

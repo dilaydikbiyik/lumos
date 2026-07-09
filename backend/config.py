@@ -14,6 +14,9 @@ class Settings(BaseSettings):
     AI_PROVIDER: str = "gemini"
     ANTHROPIC_API_KEY: str = ""   # set in .env before using AI features
     GEMINI_API_KEY: str = ""      # https://aistudio.google.com/apikey — free tier
+    GEMINI_API_KEY_2: str = ""    # Opsiyonel: 2. Google hesabından ek kota
+    GEMINI_API_KEY_3: str = ""    # Opsiyonel: 3. Google hesabından ek kota
+    GEMINI_API_KEY_4: str = ""    # Opsiyonel: 4. Google hesabından ek kota
 
     # Clerk
     CLERK_PUBLISHABLE_KEY: str = ""
@@ -36,4 +39,8 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+
+# Geliştirme ortamında kotayı pratikte sınırsız yap
+if settings.APP_ENV == "development":
+    settings.DAILY_MESSAGE_QUOTA = 9999
 

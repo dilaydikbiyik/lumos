@@ -65,6 +65,9 @@ def build_market_context() -> str:
         logger.warning("inflation line for chat context failed: %s", exc)
 
     if not lines:
+        # Boş sonucu da KISA süreliğine cache'le — kaynaklar çökükken her
+        # chat mesajının yfinance timeout'unu beklemesini engeller.
+        cache_service.set(cache_key, "", ttl=600)
         return ""
 
     context = (

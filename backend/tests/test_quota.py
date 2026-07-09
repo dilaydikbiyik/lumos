@@ -11,15 +11,19 @@ def test_quota_exhaustion_returns_429(client, mock_ai):
 
     app.dependency_overrides[get_current_user] = lambda: "user_quota_test"
     with patch.dict("backend.services.ai_tiers.AI_TIERS", {"free": {**__import__("backend.services.ai_tiers", fromlist=["AI_TIERS"]).AI_TIERS["free"], "daily_quota": 3}}):
-        for _ in range(3):
-            ok = client.post(
-                "/chat", json={"messages": [{"role": "user", "content": "merhaba"}]}
-            )
-            assert ok.status_code == 200
+        # Dev bypass'ını devre dışı bırak — bu test üretim kota davranışını doğrular
+        with patch("backend.routers.chat.settings") as mock_settings:
+            mock_settings.APP_ENV = "production"
+            mock_settings.DAILY_MESSAGE_QUOTA = 3
+            for _ in range(3):
+                ok = client.post(
+                    "/chat", json={"messages": [{"role": "user", "content": "merhaba"}]}
+                )
+                assert ok.status_code == 200
 
-        blocked = client.post(
-            "/chat", json={"messages": [{"role": "user", "content": "bir daha"}]}
-        )
+            blocked = client.post(
+                "/chat", json={"messages": [{"role": "user", "content": "bir daha"}]}
+            )
     assert blocked.status_code == 429
     assert "yarın" in blocked.json()["detail"] or "tomorrow" in blocked.json()["detail"]
     assert mock_ai.call_count == 3  # blocked message never reached the AI

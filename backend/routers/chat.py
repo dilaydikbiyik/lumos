@@ -48,7 +48,9 @@ async def chat_endpoint(
 
     user = await user_repository.get_or_create(db, user_id)
     tier = get_tier(user.plan)
-    allowed = await user_repository.consume_quota(db, user_id, tier["daily_quota"])
+    # Dev ortamında tier limiti yerine settings'i kullan (9999)
+    effective_quota = settings.DAILY_MESSAGE_QUOTA if settings.APP_ENV == "development" else tier["daily_quota"]
+    allowed = await user_repository.consume_quota(db, user_id, effective_quota)
     if not allowed:
         raise HTTPException(
             status_code=429,

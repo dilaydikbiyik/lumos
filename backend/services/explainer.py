@@ -33,7 +33,7 @@ def explain_portfolio(portfolio: PortfolioRecommendResponse, user_profile: dict)
         "⚠️ Always end with: 'This is for educational purposes only and does not constitute "
         "investment advice. Please consult a licensed financial advisor.'"
     )
-    return generate_text(prompt)
+    return generate_text(prompt, cache=True)
 
 
 def explain_reit_inclusion(portfolio: PortfolioRecommendResponse, user_profile: dict) -> str:
@@ -46,4 +46,4 @@ def explain_reit_inclusion(portfolio: PortfolioRecommendResponse, user_profile: 
         goal=user_profile.get("goal", "growth"),
         experience=user_profile.get("experience", "beginner"),
     )
-    return generate_text(filled_prompt)
+    return generate_text(filled_prompt, cache=True)

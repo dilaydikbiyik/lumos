@@ -16,7 +16,7 @@ AI_TIERS: dict[str, dict] = {
         "label": "Ateş Böceği",
         "provider": "gemini",
         # Her modelin AYRI free kotası var — zincir, ücretsiz kapasiteyi katlar
-        "model_chain": ["gemini-2.5-flash", "gemini-2.5-flash-lite", "gemini-2.0-flash"],
+        "model_chain": ["gemini-2.5-flash", "gemini-2.5-flash-lite", "gemini-2.0-flash", "gemini-2.0-flash-lite"],
         "daily_quota": 50,
         "max_tokens": 4096,
         "price_monthly_usd": 0,

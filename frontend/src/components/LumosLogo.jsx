@@ -26,14 +26,14 @@ export default function LumosLogo({ size = 22, hero = false }) {
         background: 'none', border: 'none', cursor: 'pointer', padding: '4px 0',
       }}
     >
-      {/* Ateş böceği ikonu */}
+      {/* Ateşböceği ikonu — şeffaf SVG, arka plan yok */}
       <img
-        src="/favicon.svg"
+        src="/logo-icon.svg"
         alt=""
-        width={size}
-        height={size}
+        width={size * 1.4}
+        height={size * 1.4}
         style={{
-          filter: 'drop-shadow(0 0 4px rgba(245,165,36,0.6))',
+          filter: 'drop-shadow(0 0 5px rgba(245,165,36,0.55))',
           flexShrink: 0,
         }}
       />

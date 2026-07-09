@@ -12,6 +12,7 @@ import pytest
 from fastapi import HTTPException
 from google.genai import errors as genai_errors
 
+from backend.config import settings
 from backend.services.ai_service import GEMINI_MODEL_CHAIN, _gemini_chat
 
 MSGS = [{"role": "user", "content": "merhaba"}]
@@ -39,7 +40,11 @@ def _ok_response(text="cevap"):
 
 @pytest.fixture
 def genai_client():
-    with patch("google.genai.Client") as cls:
+    # Testler tek anahtar varsayımıyla yazıldı — ekstra slotları kapat
+    with patch("google.genai.Client") as cls, \
+         patch.object(settings, "GEMINI_API_KEY_2", ""), \
+         patch.object(settings, "GEMINI_API_KEY_3", ""), \
+         patch.object(settings, "GEMINI_API_KEY_4", ""):
         yield cls
 
 
@@ -87,3 +92,43 @@ def test_real_errors_are_not_masked_by_chain(genai_client):
     with pytest.raises(genai_errors.APIError):
         _gemini_chat(MSGS, "sys", 100)
     assert client.models.generate_content.call_count == 1
+
+
+def test_multi_key_model_major_order():
+    """4 anahtar varken: en iyi model TÜM anahtarlarda denenir, sonra alt model."""
+    with patch("google.genai.Client") as cls, \
+         patch.object(settings, "GEMINI_API_KEY", "k1"), \
+         patch.object(settings, "GEMINI_API_KEY_2", "k2"), \
+         patch.object(settings, "GEMINI_API_KEY_3", ""), \
+         patch.object(settings, "GEMINI_API_KEY_4", ""):
+        c1, c2 = MagicMock(), MagicMock()
+        # k1'in en iyi modeli kotada; k2'nin en iyi modeli cevap veriyor
+        c1.models.generate_content.side_effect = [_api_error(429)]
+        c2.models.generate_content.side_effect = [_ok_response("k2-flash")]
+        cls.side_effect = [c1, c2]
+
+        assert _gemini_chat(MSGS, "sys", 100) == "k2-flash"
+        # İki çağrı da AYNI (en iyi) modele gitti — kalite korunarak anahtar değişti
+        assert c1.models.generate_content.call_args.kwargs["model"] == GEMINI_MODEL_CHAIN[0]
+        assert c2.models.generate_content.call_args.kwargs["model"] == GEMINI_MODEL_CHAIN[0]
+
+
+def test_thinking_disabled_for_25_family(genai_client):
+    client = _client_with([_ok_response("ok")])
+    genai_client.return_value = client
+    _gemini_chat(MSGS, "sys", 100)
+    config = client.models.generate_content.call_args.kwargs["config"]
+    assert config.thinking_config is not None
+    assert config.thinking_config.thinking_budget == 0
+
+
+def test_generate_text_cache_skips_second_ai_call():
+    from backend.services.ai_service import generate_text
+
+    with patch("backend.services.ai_service._dispatch", return_value="üretildi") as m, \
+         patch("backend.services.cache.get", side_effect=[None, "üretildi"]), \
+         patch("backend.services.cache.set"):
+        first = generate_text("aynı prompt", system="s", cache=True)
+        second = generate_text("aynı prompt", system="s", cache=True)
+    assert first == second == "üretildi"
+    assert m.call_count == 1  # ikinci çağrı cache'ten döndü

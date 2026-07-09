@@ -32,6 +32,7 @@ GEMINI_MODEL_CHAIN = [
     "gemini-2.5-flash",
     "gemini-2.5-flash-lite",
     "gemini-2.0-flash",
+    "gemini-2.0-flash-lite",
 ]
 GEMINI_MODEL = GEMINI_MODEL_CHAIN[0]  # geriye dönük uyumluluk (testler/loglar)
 
@@ -97,6 +98,13 @@ def _gemini_call_model(client, model: str, contents, system: str, max_tokens: in
         config=genai_types.GenerateContentConfig(
             system_instruction=system,
             max_output_tokens=max_tokens,
+            # 2.5 ailesi görünmez "düşünme" tokenları yakar — kapatmak hem
+            # token tüketimini ciddi düşürür hem cevabı hızlandırır.
+            # (2.0 ailesi thinking desteklemez; ona göndermek 400 verir.)
+            thinking_config=(
+                genai_types.ThinkingConfig(thinking_budget=0)
+                if model.startswith("gemini-2.5") else None
+            ),
         ),
     )
     if response.text is None:
@@ -113,13 +121,19 @@ def _gemini_chat(
 ) -> str:
     from google import genai
     from google.genai import errors as genai_errors
-
     from google.genai import types as genai_types
 
     chain = model_chain or GEMINI_MODEL_CHAIN
-    client = genai.Client(api_key=settings.GEMINI_API_KEY)
 
-    # Convert OpenAI/Anthropic-style messages to Gemini content format
+    # Çoklu API anahtarı — her biri ayrı free-tier kotaya sahip
+    keys = [k for k in [
+        settings.GEMINI_API_KEY,
+        settings.GEMINI_API_KEY_2,
+        settings.GEMINI_API_KEY_3,
+        settings.GEMINI_API_KEY_4,
+    ] if k]
+
+    # Convert messages once
     contents = [
         genai_types.Content(
             role="user" if m["role"] == "user" else "model",
@@ -128,26 +142,33 @@ def _gemini_chat(
         for m in messages
     ]
 
-    # Fallback zinciri: kota (429) veya geçici yük (5xx) → sıradaki model.
-    # Her model ayrı free-tier kotaya sahip olduğu için bu, ücretsiz
-    # kapasiteyi fiilen ~3 katına çıkarır ve kullanıcıya hata göstermez.
+    # MODEL-öncelikli sıra: en iyi model TÜM anahtarlarda denenir, sonra
+    # bir alt modele inilir. Böylece tek anahtarın kotası dolduğunda
+    # kullanıcı kaliteden değil, sadece anahtardan feragat eder.
+    clients = [genai.Client(api_key=k) for k in keys]
     last_exc: Optional[Exception] = None
-    for i, model in enumerate(chain):
-        try:
-            reply = _gemini_call_model(client, model, contents, system, max_tokens)
-            if i > 0:
-                logger.info("gemini_fallback served_by=%s (primary quota/load)", model)
-            return reply
-        except genai_errors.APIError as exc:
-            code = getattr(exc, "code", None)
-            if code == 429 or (isinstance(code, int) and code >= 500):
-                logger.warning("gemini model=%s unavailable (code=%s) — trying next", model, code)
-                last_exc = exc
-                continue
-            raise  # 400 vb. gerçek hatalar zincir boyunca maskelenmez
+    for model_idx, model in enumerate(chain):
+        for key_idx, client in enumerate(clients):
+            try:
+                reply = _gemini_call_model(client, model, contents, system, max_tokens)
+                if key_idx > 0 or model_idx > 0:
+                    logger.info(
+                        "gemini_fallback served_by=%s key_slot=%d", model, key_idx + 1
+                    )
+                return reply
+            except genai_errors.APIError as exc:
+                code = getattr(exc, "code", None)
+                if code == 429 or (isinstance(code, int) and code >= 500):
+                    logger.warning(
+                        "gemini key=%d model=%s unavailable (code=%s) — trying next",
+                        key_idx + 1, model, code,
+                    )
+                    last_exc = exc
+                    continue
+                raise  # 400 vb. gerçek hatalar maskelenmez
 
-    # Zincirin tamamı tükendi
-    logger.error("gemini_chain_exhausted models=%s last=%s", chain, last_exc)
+    # Tüm anahtarlar ve modeller tükendi
+    logger.error("gemini_all_keys_exhausted keys=%d models=%s last=%s", len(keys), chain, last_exc)
     raise HTTPException(
         status_code=503,
         detail=(
@@ -289,19 +310,38 @@ def extract_profile(messages: list[dict]) -> dict:
     )
 
 
-def generate_text(prompt: str, system: Optional[str] = None) -> str:
+def generate_text(prompt: str, system: Optional[str] = None, cache: bool = False) -> str:
     """
     One-shot text generation (used for explainer / REIT prompt calls).
 
     Args:
         prompt:  The user-turn prompt.
         system:  Optional override system prompt.
+        cache:   Deterministik çağrılar için günlük cache — aynı portföy
+                 açıklaması için kota tekrar tekrar yakılmaz.
 
     Returns:
         Generated text.
     """
-    return _dispatch(
+    cache_key = None
+    if cache:
+        from backend.services import cache as cache_service
+
+        cache_key = "ai_text:" + hashlib.sha1(
+            (prompt + "||" + (system or "")).encode()
+        ).hexdigest()
+        hit = cache_service.get(cache_key)
+        if hit is not None:
+            logger.info("ai_text_cache_hit key=%s", cache_key[:20])
+            return hit
+
+    reply = _dispatch(
         [{"role": "user", "content": prompt}],
         system or _SYSTEM_PROMPT,
         max_tokens=512,
     )
+    if cache_key:
+        from backend.services import cache as cache_service
+
+        cache_service.set(cache_key, reply, ttl=60 * 60 * 24)
+    return reply

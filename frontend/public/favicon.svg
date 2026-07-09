@@ -1,21 +1,82 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <!-- Lumos firefly: a small light guiding through the dark -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
   <defs>
-    <radialGradient id="glow" cx="50%" cy="62%" r="52%">
-      <stop offset="0%" stop-color="#FFE9A8" stop-opacity="0.95"/>
-      <stop offset="42%" stop-color="#F5A524" stop-opacity="0.55"/>
-      <stop offset="100%" stop-color="#F5A524" stop-opacity="0"/>
-    </radialGradient>
-    <radialGradient id="belly" cx="50%" cy="40%" r="70%">
-      <stop offset="0%" stop-color="#FFF3C4"/>
-      <stop offset="100%" stop-color="#F5A524"/>
-    </radialGradient>
+    <!-- Amber-orange gradient for the body -->
+    <linearGradient id="bodyGrad" x1="60" y1="28" x2="60" y2="88" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FFB300"/>
+      <stop offset="45%" stop-color="#FF8C00"/>
+      <stop offset="100%" stop-color="#E64A00"/>
+    </linearGradient>
+    <!-- Glow filter -->
+    <filter id="glow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <!-- Soft wing glow -->
+    <filter id="wingGlow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="2.5" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
   </defs>
-  <circle cx="32" cy="40" r="26" fill="url(#glow)"/>
-  <ellipse cx="24.5" cy="22" rx="7" ry="12" fill="#7C6FF7" opacity="0.55" transform="rotate(-28 24.5 22)"/>
-  <ellipse cx="39.5" cy="22" rx="7" ry="12" fill="#5B8EF0" opacity="0.55" transform="rotate(28 39.5 22)"/>
-  <ellipse cx="32" cy="24" rx="7.5" ry="9" fill="#2A2B3D"/>
-  <ellipse cx="32" cy="40" rx="9" ry="11" fill="url(#belly)"/>
-  <path d="M28.5 16 Q26 10 22 8.5" stroke="#2A2B3D" stroke-width="1.8" stroke-linecap="round" fill="none"/>
-  <path d="M35.5 16 Q38 10 42 8.5" stroke="#2A2B3D" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+
+  <!-- Left wing — golden arc -->
+  <path
+    d="M60 52 C50 38, 24 32, 26 52 C27 62, 42 70, 56 66"
+    stroke="#C8A84B"
+    stroke-width="1.8"
+    stroke-linecap="round"
+    fill="none"
+    filter="url(#wingGlow)"
+    opacity="0.85"
+  />
+  <!-- Left wing inner -->
+  <path
+    d="M60 58 C54 46, 34 40, 34 56 C34 64, 44 69, 56 67"
+    stroke="#C8A84B"
+    stroke-width="1.2"
+    stroke-linecap="round"
+    fill="none"
+    opacity="0.55"
+  />
+
+  <!-- Right wing — golden arc -->
+  <path
+    d="M60 52 C70 38, 96 32, 94 52 C93 62, 78 70, 64 66"
+    stroke="#C8A84B"
+    stroke-width="1.8"
+    stroke-linecap="round"
+    fill="none"
+    filter="url(#wingGlow)"
+    opacity="0.85"
+  />
+  <!-- Right wing inner -->
+  <path
+    d="M60 58 C66 46, 86 40, 86 56 C86 64, 76 69, 64 67"
+    stroke="#C8A84B"
+    stroke-width="1.2"
+    stroke-linecap="round"
+    fill="none"
+    opacity="0.55"
+  />
+
+  <!-- Body — teardrop/firefly shape -->
+  <path
+    d="M60 28 C60 28, 64 38, 64 54 C64 68, 62 80, 60 88 C58 80, 56 68, 56 54 C56 38, 60 28, 60 28 Z"
+    fill="url(#bodyGrad)"
+    filter="url(#glow)"
+  />
+
+  <!-- Head dot -->
+  <circle cx="60" cy="27" r="5" fill="#FFD740" filter="url(#glow)"/>
+
+  <!-- Bioluminescent belly dot (white) -->
+  <circle cx="60" cy="60" r="3.2" fill="white" opacity="0.92" filter="url(#glow)"/>
+
+  <!-- Subtle ambient glow behind body -->
+  <ellipse cx="60" cy="60" rx="10" ry="28" fill="#FF8C00" opacity="0.07"/>
 </svg>
