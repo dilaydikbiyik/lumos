@@ -738,6 +738,14 @@ lumos/                          ← proje kökü
 
 
 
+
+### Uçtan Uca Test Turu Bulguları 🔍 (2026-07-09)
+
+- [x] Sekme ikonu hizası: logo-icon.svg viewBox'ı kare değildi (84×90) ve içerik kuyruğu kırpılıyordu → kare (100×100), içeriğe ortalı viewBox; fikstürle doğrulandı (L harfi ortası = böcek ortası)
+- [x] Navbar/hero ile sekme ikonu artık aynı marka işareti (logo-icon.svg)
+- [x] Kritik UX açığı: oturumsuz kullanıcı korumalı linke (deep-link) gelince SİYAH EKRAN kalıyordu → `AuthPending` fallback'i (ateş böceği + "yönlendiriliyorsun" mesajı), ClerkLoading dahil — canlı doğrulandı
+- [x] Deep health check canlı doğrulandı: /health artık db+ai probluyor
+
 ### Kota Sorunu — Kalıcı Çözüm Paketi ⚡ (2026-07-09)
 
 - [x] Model-öncelikli anahtar matrisi: 4 model × 4 anahtar = 16 bağımsız kota havuzu — anahtar kotası dolunca kalite değil anahtar değişir

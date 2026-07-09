@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import { SignedIn, SignedOut, RedirectToSignIn } from '@clerk/clerk-react'
+import { ClerkLoading, SignedIn, SignedOut, RedirectToSignIn } from '@clerk/clerk-react'
 import BottomNav from './components/BottomNav'
 import PanicButton from './components/PanicButton'
 import ErrorBoundary from './utils/errorBoundary'
@@ -18,11 +18,28 @@ function Illumination() {
   return null
 }
 
+/** Clerk yüklenirken ve yönlendirme sırasında görünür durum —
+    korumalı linke oturumsuz gelen kullanıcı asla siyah ekran görmez. */
+function AuthPending() {
+  return (
+    <div className="page" style={{ alignItems: 'center', justifyContent: 'center', minHeight: '100dvh' }}>
+      <img src="/logo-icon.svg" alt="" width={40} height={40} className="firefly-mark" />
+      <p style={{ marginTop: 14, fontSize: 13, color: 'var(--text-muted)' }}>
+        Giriş sayfasına yönlendiriliyorsun…
+      </p>
+    </div>
+  )
+}
+
 function ProtectedRoute({ children }) {
   return (
     <>
+      <ClerkLoading><AuthPending /></ClerkLoading>
       <SignedIn>{children}</SignedIn>
-      <SignedOut><RedirectToSignIn /></SignedOut>
+      <SignedOut>
+        <RedirectToSignIn />
+        <AuthPending />
+      </SignedOut>
     </>
   )
 }

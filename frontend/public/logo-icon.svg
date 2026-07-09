@@ -1,4 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="8 10 84 90" fill="none">
+<!-- viewBox: kare (100x100) ve içerik sınırlarına (x 6-94, y 11-105) ortalanmış —
+     böylece tarayıcı sekmesi gibi kare yuvalarda ateş böceği dikeyde tam ortada durur -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 8 100 100" fill="none">
   <defs>
     <linearGradient id="body" x1="50" y1="18" x2="50" y2="105" gradientUnits="userSpaceOnUse">
       <stop offset="0%"   stop-color="#FFB300"/>
