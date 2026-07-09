@@ -11,19 +11,28 @@ function ProvinceScenario({ province, amount }) {
   const [links, setLinks] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
+  const [ilce, setIlce] = useState('')
+  const [detail, setDetail] = useState('')
+  const [assetType, setAssetType] = useState('daire')
+
+  async function fetchLinks() {
+    const res = await api.post('/planning/listing-links', {
+      il: province.province, ilce, asset_type: assetType, detail,
+    })
+    setLinks(res.data.links)
+  }
 
   async function run() {
     setLoading(true)
     setError(null)
     try {
-      const [b, l] = await Promise.all([
+      const [b] = await Promise.all([
         api.post('/planning/projection/province', {
           region_code: province.code, amount: Number(amount) || 1000000, years: 5,
         }),
-        api.post('/planning/listing-links', { il: province.province, ilce: '', asset_type: 'daire' }),
+        fetchLinks(),
       ])
       setBand(b.data)
-      setLinks(l.data.links)
     } catch (err) {
       setError(extractErrorMessage(err, 'Senaryo hesaplanamadı'))
     } finally {
@@ -54,13 +63,38 @@ function ProvinceScenario({ province, amount }) {
             {band.real_band && <span style={{ fontSize: 11, opacity: 0.7 }}> · reel {band.real_band.optimistic_pct > 0 ? '+' : ''}{band.real_band.optimistic_pct}%</span>}
           </div>
           {links && (
-            <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
-              {links.map(l => (
-                <a key={l.site} href={l.url} target="_blank" rel="noopener noreferrer"
-                   className="btn btn-ghost" style={{ flex: 1, textAlign: 'center', fontSize: 12, textDecoration: 'none' }}>
-                  {l.site}'de ilanlar →
-                </a>
-              ))}
+            <div style={{ marginTop: 10, padding: 10, borderRadius: 10, border: '1px dashed var(--border)' }}>
+              <p style={{ fontSize: 12, opacity: 0.75, marginBottom: 8 }}>
+                📍 İlçe/köy düzeyinde resmi fiyat verisi yayınlanmıyor — mikro konum
+                için seni doğrudan ilanlara götürüyoruz:
+              </p>
+              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}
+                   onClick={e => e.stopPropagation()}>
+                <input className="input" placeholder="İlçe (örn: Keşan)" value={ilce}
+                       onChange={e => setIlce(e.target.value)}
+                       style={{ flex: 1, minWidth: 100, fontSize: 13 }} />
+                <input className="input" placeholder="Köy/mahalle (örn: Çeribaşı)" value={detail}
+                       onChange={e => setDetail(e.target.value)}
+                       style={{ flex: 1, minWidth: 120, fontSize: 13 }} />
+                <select className="input" value={assetType}
+                        onChange={e => setAssetType(e.target.value)}
+                        style={{ flex: 0.7, minWidth: 80, fontSize: 13 }}>
+                  <option value="arsa">Arsa</option>
+                  <option value="daire">Daire</option>
+                </select>
+                <button className="btn btn-ghost" style={{ fontSize: 12 }}
+                        onClick={() => fetchLinks().catch(() => {})}>
+                  Yenile
+                </button>
+              </div>
+              <div style={{ display: 'flex', gap: 8 }}>
+                {links.map(l => (
+                  <a key={l.site} href={l.url} target="_blank" rel="noopener noreferrer"
+                     className="btn btn-ghost" style={{ flex: 1, textAlign: 'center', fontSize: 12, textDecoration: 'none' }}>
+                    {l.site}'de ilanlar →
+                  </a>
+                ))}
+              </div>
             </div>
           )}
           <p style={{ fontSize: 11, opacity: 0.6, marginTop: 6 }}>⚠️ {band.honesty_note}</p>

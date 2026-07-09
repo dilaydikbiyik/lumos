@@ -26,6 +26,8 @@ class ListingBridgeRequest(BaseModel):
     il: str = Field(..., min_length=2, max_length=40)
     ilce: str = Field("", max_length=40)
     asset_type: str = Field("arsa", pattern="^(arsa|daire|konut)$")
+    # Köy/mahalle gibi mikro konum — "Keşan Çeribaşı köyü" gerçekçiliği
+    detail: str = Field("", max_length=60)
 
 
 class AssetProjectionRequest(BaseModel):

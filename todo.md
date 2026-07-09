@@ -742,6 +742,10 @@ lumos/                          ← proje kökü
 
 ### Kullanıcı Geri Bildirimi Turu 🛠️ (2026-07-09)
 
+- [x] **İlan linkleri gerçekçilik denetimi**: eski Emlakjet kalıbı 301 atıyordu → gerçek kalıplar curl ile doğrulandı (/satilik-arsa/edirne-kesan → 200, mahalle derinliği dahil); Sahibinden kanonik sluglara (satilik-arsa/satilik-daire) geçildi + Türkçe karakter slugify (Keşan→kesan)
+- [x] **Köy/mahalle derinliği**: il kartında ilçe + köy/mahalle alanları — "Keşan Çeribaşı köyü" Emlakjet'te gerçek yola (edirne-kesan-ceribasi-koyu ✓ 200), Sahibinden'de güvenli arama rotasına gidiyor; "ilçe/köy düzeyinde resmi fiyat verisi yayınlanmıyor" dürüstlük notuyla
+- [x] Not: preview panelindeki "link blocked" uygulama hatası değil — panel yalnızca localhost açar; gerçek tarayıcıda linkler çalışır
+
 - [x] **Emlak Keşfet il bazına indi**: TCMB birim fiyat serileri keşfedildi (bie_birimfiyat — 81 il, TL/m², çeyreklik, 2010→bugün) → NUTS2 bölge bulanıklığı yerine il il somut fiyatlar ("Muğla 79.110 TL/m²"); il arama + ilk-12 listesi; toplu çekim (15 seri/istek, günlük cache) (7 test, canlı doğrulandı)
 - [x] Ufuk butonları 1/2/3 → **1/3/5 yıl** (16 yıllık çeyreklik geçmiş bunu dürüstçe destekliyor)
 - [x] İl kartına tıkla → 5 yıllık senaryo bandı + o ilin Sahibinden/Emlakjet ilan linkleri

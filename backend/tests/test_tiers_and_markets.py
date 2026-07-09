@@ -105,9 +105,22 @@ def test_unknown_market_falls_back_to_tr():
     assert get_market_pack("").code == "TR"
 
 
-def test_tr_listing_links_unchanged():
+def test_tr_listing_links_use_canonical_slugs():
     links = build_listing_links("Ankara", "Çankaya", "arsa", market="TR")
-    assert any("sahibinden.com/arsa" in link["url"] for link in links)
+    # kanonik kalıp + Türkçe karakter sadeleştirme (Çankaya → cankaya)
+    assert any("sahibinden.com/satilik-arsa/ankara-cankaya" in link["url"] for link in links)
+    assert any("emlakjet.com/satilik-arsa/ankara-cankaya" in link["url"] for link in links)
+
+
+def test_tr_village_detail_uses_search_fallback():
+    # "Keşan'da Çeribaşı köyü" gerçekçiliği: mikro konum → arama rotası
+    links = build_listing_links("Edirne", "Keşan", "arsa", market="TR", detail="Çeribaşı köyü")
+    sahibinden = next(l for l in links if l["site"] == "Sahibinden")
+    emlakjet = next(l for l in links if l["site"] == "Emlakjet")
+    assert "arama?query_text=" in sahibinden["url"]
+    assert "%C3%87eriba%C5%9F%C4%B1" in sahibinden["url"] or "eriba" in sahibinden["url"]
+    # Emlakjet mahalle-derinliği canlı doğrulanmış kalıp: il-ilce-detay
+    assert "emlakjet.com/satilik-arsa/edirne-kesan-ceribasi-koyu" in emlakjet["url"]
 
 
 def test_us_listing_links_use_pack_templates():

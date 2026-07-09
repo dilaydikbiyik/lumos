@@ -86,7 +86,7 @@ async def listing_links(
     from backend.repositories import user_repository
 
     user = await user_repository.get_or_create(db, user_id)
-    return {"links": build_listing_links(body.il, body.ilce, body.asset_type, market=user.market)}
+    return {"links": build_listing_links(body.il, body.ilce, body.asset_type, market=user.market, detail=body.detail)}
 
 
 @router.post("/projection/asset")
