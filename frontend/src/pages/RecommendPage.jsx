@@ -8,6 +8,7 @@ import ReitCard from '../components/ReitCard'
 import AssetExplainer from '../components/AssetExplainer'
 import TimeMachine from '../components/TimeMachine'
 import FutureScenarios from '../components/FutureScenarios'
+import AllocationRationale from '../components/AllocationRationale'
 import WhatIfAssistant from '../components/WhatIfAssistant'
 import PracticeMode from '../components/PracticeMode'
 import BoughtItBridge from '../components/BoughtItBridge'
@@ -71,6 +72,9 @@ export default function RecommendPage() {
 
         {/* Portföy dağılım grafiği — tıklama AssetExplainer açar */}
         <PortfolioChart allocations={portfolio.allocations} onSliceClick={setSelectedTicker} />
+
+        {/* Neden bu dağılım? — deterministik formül + elenen varlıklar */}
+        <AllocationRationale portfolio={portfolio} />
 
         {/* Varlık açıklayıcı — seçili varlık için nedir/neden/risk */}
         {selectedAlloc && (
