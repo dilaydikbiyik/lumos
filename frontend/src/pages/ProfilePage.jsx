@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { UserButton } from '@clerk/clerk-react'
 import LumosLogo from '../components/LumosLogo'
@@ -21,12 +21,26 @@ function getRiskMeta(score) {
 
 export default function ProfilePage() {
   const navigate = useNavigate()
-  const { saveProfile } = usePortfolio()
-  const [riskResult, setRiskResult] = useState(null)
+  const { saveProfile, loadProfile, profile } = usePortfolio()
+  const [quizResult, setQuizResult] = useState(null)
+  const [checkedStore, setCheckedStore] = useState(false)
+  const [retaking, setRetaking] = useState(false)
+
+  // Kayıtlı profil varsa quiz'i atlayıp skoru göster — sayfa yenilenince
+  // 9 sorunun kaybolması güven kırar; skor kalıcı olmalı.
+  useEffect(() => {
+    loadProfile().finally(() => setCheckedStore(true))
+  }, [loadProfile])
+
+  // Türetilmiş görünüm: quiz sonucu > kayıtlı profil (yeniden test istenmedikçe)
+  const riskResult = quizResult ?? (!retaking && profile?.risk_score ? profile : null)
 
   async function handleProfileComplete(answers) {
     const result = await saveProfile(answers)
-    if (result) setRiskResult(result)
+    if (result) {
+      setRetaking(false)
+      setQuizResult(result)
+    }
   }
 
   return (
@@ -37,7 +51,11 @@ export default function ProfilePage() {
       </header>
 
       <div className="page-content">
-        {!riskResult ? (
+        {!checkedStore && !riskResult ? (
+          <p style={{ textAlign: 'center', padding: '48px 0', fontSize: 13, opacity: 0.6 }}>
+            Profilin yükleniyor…
+          </p>
+        ) : !riskResult ? (
           <>
             {/* Başlık — jargonsuz Türkçe */}
             <div style={{ marginBottom: 16 }}>
@@ -145,9 +163,9 @@ export default function ProfilePage() {
             </button>
             <button
               className="btn btn-ghost btn-full"
-              onClick={() => setRiskResult(null)}
+              onClick={() => { setRetaking(true); setQuizResult(null) }}
             >
-              ← Sohbeti Yenile
+              ← Testi Yeniden Yap
             </button>
           </div>
         )}

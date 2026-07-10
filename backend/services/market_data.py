@@ -22,6 +22,13 @@ logger = logging.getLogger("lumos.market_data")
 # Stale copies outlive the fresh cache — used only when yfinance fails
 STALE_TTL_SECONDS = 60 * 60 * 24 * 7  # 7 days
 
+# GERÇEKÇİLİK NOTU (2026-07-10): Yahoo, eski yfinance sürümlerinin isteklerini
+# canlıda bloklamaya başladı ve iki cache katmanı da boş olduğu için kullanıcı
+# sert hata gördü ("Market data temporarily unavailable"). Üçüncü katman eklendi:
+# hiç süresi dolmayan "son bilinen iyi" (LKG) kopya. Bir kez başarılı fetch
+# yapan her kurulum, Yahoo tamamen kapansa bile en son gerçek veriyle çalışmaya
+# devam eder — hata sayfası yerine tarihli gerçek veri, uydurma değer asla.
+
 # ── Default asset universe ────────────────────────────────────────────────────
 DEFAULT_TICKERS = [
     "XU100.IS",   # BIST 100 index (proxy)
@@ -47,6 +54,7 @@ def fetch_price_history(
     tickers = tickers or DEFAULT_TICKERS
     cache_key = f"price_history:{'_'.join(sorted(tickers))}:{period}"
     stale_key = f"stale:{cache_key}"
+    lkg_key = f"lkg:{cache_key}"  # last-known-good: süresiz son çare
 
     cached = cache_service.get(cache_key)
     if cached is not None:
@@ -72,17 +80,20 @@ def fetch_price_history(
 
         result = {ticker: closes[ticker].dropna() for ticker in closes.columns}
     except Exception as exc:
-        # Fallback: serve the stale copy (up to 7 days old) if we have one
-        stale = cache_service.get(stale_key)
-        if stale is not None:
-            logger.warning(
-                "yfinance failed (%s) — serving stale market data for %s", exc, tickers
-            )
-            return stale
+        # Fallback 1: stale copy (≤7 gün) — Fallback 2: last-known-good (süresiz)
+        for label, key in (("stale", stale_key), ("last-known-good", lkg_key)):
+            fallback = cache_service.get(key)
+            if fallback is not None:
+                logger.warning(
+                    "yfinance failed (%s) — serving %s market data for %s",
+                    exc, label, tickers,
+                )
+                return fallback
         raise MarketDataError(f"Market data fetch failed with no fallback: {exc}") from exc
 
     cache_service.set(cache_key, result)
     cache_service.set(stale_key, result, ttl=STALE_TTL_SECONDS)
+    cache_service.set(lkg_key, result, ttl=None)  # asla süresi dolmaz
     return result
 
 

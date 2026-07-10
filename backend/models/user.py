@@ -23,6 +23,10 @@ class User(Base):
     loss_tolerance: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     goal: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     experience: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    # Skoru etkileyen HER cevap kalıcı olmalı — yoksa GET /profile quiz'dekinden
+    # farklı skor hesaplar (yaş/gelir düzeltmeleri kaybolur). Tutarlılık = güven.
+    age: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    income_stability: Mapped[Optional[str]] = mapped_column(String, nullable=True)
 
     # Billing-ready plan tier: free / plus / pro (ai_tiers.py) — a payment
     # webhook or admin flips this; models & quotas follow automatically

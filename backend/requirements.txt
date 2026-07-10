@@ -15,7 +15,7 @@ anthropic==0.112.0
 google-genai==2.10.0
 
 # ── Market Data ───────────────────────────────────────────────────────────────
-yfinance==0.2.51
+yfinance==1.5.1      # 0.2.x istekleri Yahoo tarafından bloklanıyor (canlıda görüldü, 2026-07-10)
 pandas==2.2.3
 numpy==2.0.2
 

@@ -31,6 +31,8 @@ async def save_profile(
         loss_tolerance=answers.loss_tolerance,
         goal=answers.goal,
         experience=answers.experience,
+        age=answers.age,
+        income_stability=answers.income_stability,
     )
     return profile
 
@@ -45,11 +47,15 @@ async def get_profile(
     if user is None or user.risk_score is None:
         return None
 
+    # Kayıtlı TÜM cevaplarla yeniden hesapla — yaş/gelir düzeltmeleri dahil,
+    # skor quiz anındakiyle birebir aynı çıkar (tutarlılık = güven).
     answers = RiskProfileAnswers(
         budget=user.budget,
         time_horizon=user.time_horizon,
         loss_tolerance=user.loss_tolerance,
         goal=user.goal,
         experience=user.experience,
+        age=user.age,
+        income_stability=user.income_stability,
     )
     return compute_risk_score(answers)
