@@ -21,7 +21,7 @@ Scoring logic:
 Budget is NOT included in the formula (it affects portfolio size, not risk tolerance).
 """
 
-from backend.schemas.user_profile import RiskProfileAnswers, RiskProfileResponse
+from backend.schemas.user_profile import RiskFactor, RiskProfileAnswers, RiskProfileResponse
 
 _TIME_HORIZON_SCORES = {"short": 2, "medium": 5, "long": 9}
 _LOSS_TOLERANCE_SCORES = {"low": 2, "medium": 5, "high": 9}
@@ -69,6 +69,21 @@ def _age_modifier(age: int | None) -> float:
     return 0.0
 
 
+_ANSWER_LABELS = {
+    "time_horizon": {"short": "Kısa (<2 yıl)", "medium": "Orta (2-10 yıl)", "long": "Uzun (10+ yıl)"},
+    "loss_tolerance": {"low": "Düşüşte satarım", "medium": "Bekler, tutarım", "high": "Düşüşte alırım"},
+    "goal": {"preservation": "Koruma", "income": "Düzenli gelir", "growth": "Büyüme", "speculation": "Spekülasyon"},
+    "experience": {"none": "Hiç yok", "beginner": "Yeni başlayan", "intermediate": "Orta", "advanced": "İleri"},
+}
+
+_FACTOR_EXPLANATIONS = {
+    "time_horizon": "Vade uzadıkça kısa vadeli dalgalanmaların önemi azalır — en belirleyici faktör budur",
+    "loss_tolerance": "Düşüş anındaki gerçek davranışın, teoriden daha önemlidir — en yüksek ağırlık bunda",
+    "goal": "Hedefin, kabul etmen gereken risk seviyesini belirler",
+    "experience": "Deneyim, dalgalanmayı tanımayı ve panik yapmamayı kolaylaştırır",
+}
+
+
 def compute_risk_score(answers: RiskProfileAnswers) -> RiskProfileResponse:
     """
     Compute a 1-10 risk score from the profile answers.
@@ -79,18 +94,51 @@ def compute_risk_score(answers: RiskProfileAnswers) -> RiskProfileResponse:
     Returns:
         RiskProfileResponse with score, label, and Turkish summary.
     """
-    base = (
-        _TIME_HORIZON_SCORES[answers.time_horizon] * _WEIGHTS["time_horizon"]
-        + _LOSS_TOLERANCE_SCORES[answers.loss_tolerance] * _WEIGHTS["loss_tolerance"]
-        + _GOAL_SCORES[answers.goal] * _WEIGHTS["goal"]
-        + _EXPERIENCE_SCORES[answers.experience] * _WEIGHTS["experience"]
-    )
+    dimension_scores = {
+        "time_horizon": _TIME_HORIZON_SCORES[answers.time_horizon],
+        "loss_tolerance": _LOSS_TOLERANCE_SCORES[answers.loss_tolerance],
+        "goal": _GOAL_SCORES[answers.goal],
+        "experience": _EXPERIENCE_SCORES[answers.experience],
+    }
+    base = sum(dimension_scores[d] * _WEIGHTS[d] for d in dimension_scores)
+
+    # ── şeffaf döküm: her puanın nereden geldiği ──
+    factor_names = {
+        "time_horizon": "Yatırım vaden",
+        "loss_tolerance": "Kayıp toleransın",
+        "goal": "Hedefin",
+        "experience": "Deneyimin",
+    }
+    factors = [
+        RiskFactor(
+            factor=f"{factor_names[d]} (ağırlık %{round(_WEIGHTS[d] * 100)})",
+            answer=_ANSWER_LABELS[d][getattr(answers, d)],
+            contribution=round(dimension_scores[d] * _WEIGHTS[d], 2),
+            explanation=_FACTOR_EXPLANATIONS[d],
+        )
+        for d in dimension_scores
+    ]
 
     # Optional modifiers — each capped so they can't dominate
-    modifier = _age_modifier(answers.age)
-    if answers.income_stability:
-        modifier += _INCOME_MODIFIER[answers.income_stability]
-    modifier = max(-1.5, min(1.5, modifier))
+    age_mod = _age_modifier(answers.age)
+    income_mod = _INCOME_MODIFIER[answers.income_stability] if answers.income_stability else 0.0
+    modifier = max(-1.5, min(1.5, age_mod + income_mod))
+
+    if age_mod != 0 and answers.age is not None:
+        factors.append(RiskFactor(
+            factor="Yaş düzeltmesi",
+            answer=f"{answers.age} yaş",
+            contribution=age_mod,
+            explanation=("55+ yaşta koruma önceliği artar" if age_mod < 0
+                         else "30 yaş altı: uzun toparlanma süresi risk kapasitesini artırır"),
+        ))
+    if income_mod != 0:
+        factors.append(RiskFactor(
+            factor="Gelir istikrarı düzeltmesi",
+            answer={"variable": "Değişken gelir", "irregular": "Düzensiz gelir"}.get(answers.income_stability, str(answers.income_stability)),
+            contribution=income_mod,
+            explanation="Öngörülemeyen gelir daha büyük güvenlik payı gerektirir — skor aşağı çekilir",
+        ))
 
     score = round(min(max(base + modifier, 1.0), 10.0), 1)
     label = _label(score)
@@ -117,5 +165,6 @@ def compute_risk_score(answers: RiskProfileAnswers) -> RiskProfileResponse:
         risk_score=score,
         label=label,
         summary=summary,
+        factors=factors,
         answers=answers,
     )

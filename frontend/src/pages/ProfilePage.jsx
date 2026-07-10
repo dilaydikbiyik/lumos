@@ -106,6 +106,37 @@ export default function ProfilePage() {
               )}
             </div>
 
+            {/* Skor dökümü — kara kutu yok: her puanın kaynağı */}
+            {riskResult.factors?.length > 0 && (
+              <div className="card">
+                <h3 style={{ marginBottom: 4, fontSize: 15 }}>🧮 Bu skor nereden geldi?</h3>
+                <p style={{ fontSize: 12, opacity: 0.7, marginBottom: 12 }}>
+                  Kara kutu yok — her puanın kaynağı ve gerekçesi:
+                </p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  {riskResult.factors.map((f, i) => (
+                    <div key={i} style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+                      <span style={{
+                        minWidth: 52, textAlign: 'center', padding: '3px 6px',
+                        borderRadius: 8, fontSize: 12, fontWeight: 700,
+                        background: f.contribution >= 0 ? 'rgba(61,214,140,0.14)' : 'rgba(248,113,113,0.12)',
+                        color: f.contribution >= 0 ? 'var(--green, #3DD68C)' : 'var(--red)',
+                      }}>
+                        {f.contribution >= 0 ? '+' : ''}{f.contribution}
+                      </span>
+                      <div style={{ fontSize: 13, lineHeight: 1.5 }}>
+                        <strong>{f.factor}:</strong> {f.answer}
+                        <div style={{ fontSize: 12, opacity: 0.65 }}>{f.explanation}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <p style={{ fontSize: 12, opacity: 0.6, marginTop: 12, borderTop: '1px solid var(--border)', paddingTop: 8 }}>
+                  Toplam ≈ <strong>{riskResult.risk_score}/10</strong> (katkıların toplamı, 1-10 aralığına sabitlenir)
+                </p>
+              </div>
+            )}
+
             <button
               className="btn btn-primary btn-full"
               onClick={() => navigate('/recommend', { state: riskResult })}

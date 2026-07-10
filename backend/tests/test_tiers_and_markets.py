@@ -115,8 +115,8 @@ def test_tr_listing_links_use_canonical_slugs():
 def test_tr_village_detail_uses_search_fallback():
     # "Keşan'da Çeribaşı köyü" gerçekçiliği: mikro konum → arama rotası
     links = build_listing_links("Edirne", "Keşan", "arsa", market="TR", detail="Çeribaşı köyü")
-    sahibinden = next(l for l in links if l["site"] == "Sahibinden")
-    emlakjet = next(l for l in links if l["site"] == "Emlakjet")
+    sahibinden = next(link for link in links if link["site"] == "Sahibinden")
+    emlakjet = next(link for link in links if link["site"] == "Emlakjet")
     assert "arama?query_text=" in sahibinden["url"]
     assert "%C3%87eriba%C5%9F%C4%B1" in sahibinden["url"] or "eriba" in sahibinden["url"]
     # Emlakjet: köy slugu uydurulmaz (404 riski) — garantili ilçe sayfası

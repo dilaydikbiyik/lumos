@@ -27,9 +27,18 @@ class RiskProfileAnswers(BaseModel):
     )
 
 
+class RiskFactor(BaseModel):
+    """Skorun tek bir bileşeni — kara kutu yok, her puan izlenebilir."""
+    factor: str          # insan-okur ad, örn. "Kayıp toleransı"
+    answer: str          # kullanıcının cevabı (okunur halde)
+    contribution: float  # skora net katkı (ağırlıklı puan ya da modifier)
+    explanation: str     # neden bu katkı
+
+
 class RiskProfileResponse(BaseModel):
     """Computed risk profile returned to the client."""
     risk_score: float = Field(..., ge=1, le=10, description="Risk score from 1 (safe) to 10 (aggressive)")
     label: str = Field(..., description="Human-readable label: Conservative / Moderate / Aggressive")
     summary: str = Field(..., description="Brief explanation of the score")
+    factors: list[RiskFactor] = Field(default_factory=list, description="Skorun şeffaf dökümü")
     answers: RiskProfileAnswers
