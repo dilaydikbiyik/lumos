@@ -37,7 +37,7 @@ def register_error_handlers(app: FastAPI) -> None:
                      request_id_var.get(), request.method, request.url, exc)
         return _error_response(
             503, "market_data_unavailable",
-            "Market data is temporarily unavailable. Please try again shortly.",
+            "Piyasa verisi şu an alınamıyor — birazdan tekrar dene.",
         )
 
     @app.exception_handler(AIServiceError)
@@ -46,7 +46,7 @@ def register_error_handlers(app: FastAPI) -> None:
                      request_id_var.get(), request.method, request.url, exc)
         return _error_response(
             503, "ai_unavailable",
-            "The AI assistant is temporarily unavailable. Please try again shortly.",
+            "Yapay zeka asistanı şu an yanıt veremiyor — birazdan tekrar dene.",
         )
 
     @app.exception_handler(ValueError)
@@ -59,5 +59,5 @@ def register_error_handlers(app: FastAPI) -> None:
                          request_id_var.get(), request.method, request.url)
         return _error_response(
             500, "internal_error",
-            "An unexpected error occurred. Please try again later.",
+            "Beklenmedik bir hata oluştu — lütfen daha sonra tekrar dene.",
         )

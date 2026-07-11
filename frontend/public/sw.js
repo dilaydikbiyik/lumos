@@ -1,6 +1,6 @@
 /* Lumos service worker — app-shell cache with network-first strategy.
    API calls are never cached (financial data must be fresh). */
-const CACHE = 'lumos-shell-v1'
+const CACHE = 'lumos-shell-v2'  // v2: cross-origin skip — clears any v1-cached API data
 const SHELL = ['/', '/manifest.webmanifest', '/favicon.svg']
 
 self.addEventListener('install', event => {
@@ -20,8 +20,15 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
   const url = new URL(event.request.url)
 
-  // Never intercept API traffic or non-GET requests
-  if (event.request.method !== 'GET' || url.port === '8000' || url.pathname.startsWith('/api')) {
+  // Never intercept API traffic or non-GET requests. The production backend
+  // lives on ANOTHER origin (e.g. onrender.com) — matching only dev port 8000
+  // would have cached live financial data in production, so any cross-origin
+  // request is skipped entirely.
+  if (
+    event.request.method !== 'GET' ||
+    url.origin !== self.location.origin ||
+    url.pathname.startsWith('/api')
+  ) {
     return
   }
 

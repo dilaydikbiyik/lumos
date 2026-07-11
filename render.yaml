@@ -19,6 +19,14 @@ services:
         sync: false
       - key: GEMINI_API_KEY
         sync: false
+      # Optional extra quota pools — without these the 16-pool key matrix
+      # collapses to 4 pools in production
+      - key: GEMINI_API_KEY_2
+        sync: false
+      - key: GEMINI_API_KEY_3
+        sync: false
+      - key: GEMINI_API_KEY_4
+        sync: false
       - key: CLERK_SECRET_KEY
         sync: false
       - key: CLERK_JWT_ISSUER
@@ -29,5 +37,9 @@ services:
         sync: false
       - key: FRONTEND_URL
         sync: false
+      # ⚠️ Render free-plan disks are EPHEMERAL: a SQLite file is wiped on every
+      # deploy/restart — user profiles and holdings would vanish. Before real
+      # users arrive, point this at a managed Postgres
+      # (postgresql+asyncpg://...) and add asyncpg to requirements.txt.
       - key: DATABASE_URL
         value: sqlite+aiosqlite:///./lumos.db
