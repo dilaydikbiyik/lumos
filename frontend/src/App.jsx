@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { useEffect } from 'react'
 import { ClerkLoading, SignedIn, SignedOut, RedirectToSignIn, useAuth } from '@clerk/clerk-react'
-import BottomNav from './components/BottomNav'
+import AppNav from './components/AppNav'
 import PanicButton from './components/PanicButton'
 import ErrorBoundary from './utils/errorBoundary'
 import useIllumination from './hooks/useIllumination'
@@ -79,8 +79,8 @@ export default function App() {
         {/* Aydınlanan Arayüz: cesaret skoru zemini geceden şafağa taşır */}
         <Illumination />
 
-        {/* Mobile bottom nav — hidden on desktop via CSS */}
-        <BottomNav />
+        {/* Responsive nav: mobilde alt bar, desktop'ta sol sidebar (CSS seçer) */}
+        <AppNav />
 
         {/* Panik Düğmesi — kriz anı desteği (sadece giriş yapmışken) */}
         <SignedIn><PanicButton /></SignedIn>
