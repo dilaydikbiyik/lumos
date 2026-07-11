@@ -4,7 +4,7 @@
 ![Python](https://img.shields.io/badge/python-3.12-blue)
 ![FastAPI](https://img.shields.io/badge/FastAPI-async-009688)
 ![React](https://img.shields.io/badge/react-19-61DAFB)
-![Tests](https://img.shields.io/badge/backend%20tests-158%20passed-3DD68C)
+![Tests](https://img.shields.io/badge/backend%20tests-185%20passed-3DD68C)
 ![Cost](https://img.shields.io/badge/running%20cost-%240%2Fmonth-F5A524)
 
 > An AI-powered investment guide built for people who have never invested — and are scared to start.
@@ -54,13 +54,18 @@ surface, zero custody risk — and a lower trust barrier for scared beginners.
   literally brightens from night toward dawn as the score grows
 
 ### 💬 Conversational risk profiling
-- 7-question chat grounded in Modern Portfolio Theory (budget, horizon + life stage, loss
-  tolerance, goal, experience, current holdings, obligations + income stability)
+- 9 single-topic questions grounded in Modern Portfolio Theory (budget, horizon, age, loss
+  tolerance, goal, experience, current holdings, obligations, income stability) — each message
+  asks exactly one thing, so a nervous beginner never has to answer two questions at once
 - **Zero-knowledge language rules**: every finance term explained inline on first use; technicality
   escalates only when the user demonstrates knowledge
 - **Fear-aware**: worry is acknowledged and normalized before any answer
-- Structured extraction turns the conversation into a validated 1–10 risk score that drives a
-  volatility-weighted portfolio recommendation
+- Structured extraction turns the conversation into a validated 1–10 risk score with a fully
+  transparent breakdown — every factor's weight, your answer, its exact contribution, and why
+  (contributions sum to the score; no black box)
+- The score drives a **risk-blended allocation engine**: cautious profiles overweight calm assets,
+  bold ones overweight growth engines — and the UI shows the formula, each asset's role, and every
+  asset that was *dropped*, with its reason (no silent pruning, no pie-slice decoration)
 
 ### 🕰️ Time Machine (honest backtesting)
 - "What if you'd built this portfolio 5 years ago?" — with **your own budget** as the start value
@@ -78,8 +83,9 @@ surface, zero custody risk — and a lower trust barrier for scared beginners.
 - Thin histories are refused outright rather than dressed up as statistics
 
 ### 🏘️ Real-estate intelligence (live central-bank data)
-- **Region ranking**: 19 NUTS2 regions ranked by *real* housing-index appreciation — live-verified
-  results like *Ankara +27.3% nominal / +6.8% real* vs *Adana-Mersin +18.8% nominal / −0.4% real*
+- **Province intelligence**: concrete TL/m² prices for all **81 provinces** (central-bank unit-price
+  series, quarterly since 2010) ranked by *real* appreciation over 1/3/5 years — plus the coarser
+  19-region NUTS2 index; every scenario band deflates each window by its own period inflation
 - **Rent vs. buy** decision tool — two scenarios side by side, including the honest note that
   homeownership has non-financial value too
 - **Listing bridge**: filter-ready links out to listing portals (market-aware: Sahibinden/Emlakjet
@@ -137,8 +143,9 @@ surface, zero custody risk — and a lower trust barrier for scared beginners.
 
 - **Layered by rule, not by habit**: routers never touch SQL; services never parse HTTP;
   one repository layer owns every query
-- **Two-tier market-data cache** (fresh 24h + stale 7-day fallback) — a Yahoo Finance outage
-  degrades gracefully instead of breaking the app (observed and survived live)
+- **Three-tier market-data cache** (fresh 24h → stale 7-day → never-expiring last-known-good,
+  plus historical volatility baselines as the final resort) — a Yahoo Finance outage degrades
+  gracefully instead of breaking the app (observed and survived live, twice)
 - **Structured observability**: every AI call logs tier, provider, prompt-version hash, latency,
   and outcome; every request carries an `X-Request-ID` echoed in the standard error envelope
   `{detail, error: {code, message, request_id}}`
@@ -160,6 +167,9 @@ an answer from a slightly lighter model instead of an error. Free capacity is ef
 ```
 free  →  gemini-2.5-flash  →  gemini-2.5-flash-lite  →  gemini-2.0-flash
 ```
+
+The chain is crossed with a **multi-key matrix** (up to 4 keys × 4 models = 16 independent quota
+pools, model-major order): when one key's quota fills, the user sacrifices a key — not quality.
 
 **2. Plan tiers (payments-ready, payments-excluded).** Providers, model chains, and daily quotas
 all hang off a single tier table. A future Stripe/Iyzico webhook flips one field
@@ -196,7 +206,10 @@ hardcodes a country; it asks the user's pack:
 | Fear check-in | localized 🇹🇷 | localized 🇺🇸 | localized 🇩🇪 |
 
 Adding a country = adding one pack module + data adapters. The TR pack is the complete reference
-implementation; unknown market codes degrade safely to it. All tax/regulatory content is
+implementation; unknown market codes degrade safely to it. An in-app market switcher drives
+currency and number formatting end to end — and TL-denominated data stays **pinned to TRY**
+(never dressed up as dollars), while markets without live data show an honest
+"integration on the way" state instead of masquerading foreign numbers. All tax/regulatory content is
 **educational only** and every pack carries an explicit "confirm with a licensed local professional"
 disclaimer — Lumos gives no tax or legal advice in any market.
 
@@ -207,7 +220,7 @@ disclaimer — Lumos gives no tax or legal advice in any market.
 | Source | Used for | Resilience |
 |---|---|---|
 | **TCMB EVDS** (Turkish central bank) | Live CPI, 19-region housing price indices | Daily cache; in-repo static CPI fallback; honest `available: false` when down |
-| **yfinance** | Prices, volatility, backtests, projections | Fresh 24h + stale 7-day cache tiers; typed 503 on total failure |
+| **yfinance** | Prices, volatility, backtests, projections | Fresh 24h + stale 7d + last-known-good cache tiers; baseline volatilities as final resort |
 | **RSS** (AA, Bloomberg HT) | Calm news digest | Per-feed fail-open; digest hides when empty |
 | **Google Gemini** (free tier) | Advisor chat, extraction, phrasing | 3-model fallback chain + per-plan quotas |
 
@@ -228,7 +241,7 @@ disclaimer — Lumos gives no tax or legal advice in any market.
 ## Testing
 
 ```bash
-python -m pytest backend/tests/ -q     # 158 tests, ~1s, zero network
+python -m pytest backend/tests/ -q     # 185 tests, ~1s, zero network
 ```
 
 - External boundaries (AI providers, yfinance, EVDS, RSS) are fully mocked; business logic runs real
@@ -272,12 +285,12 @@ Or with Docker: `docker compose up --build` (runs migrations, serves on :8000).
 
 ## Roadmap
 
-**Near-term:** deployment (Render + Vercel configs ready) · screenshots & demo video ·
-Stripe/Iyzico webhook onto the existing plan-tier switch · JWKS caching · Sentry
+**Near-term:** deployment (Render + Vercel configs ready, cloud Postgres) · screenshots &
+demo video · Stripe/Iyzico webhook onto the existing plan-tier switch · Sentry · uptime ping
 
 **Growth:** wire US/DE data adapters (FRED, Destatis) onto the Market Pack skeletons ·
-react-i18next localization · Capacitor wrap for stores (push notifications power the
-behavioral coach in real time) · Postgres migration for multi-user scale
+react-i18next localization · OpenAI/Mistral adapters once billing lands · Capacitor wrap for
+stores (push notifications power the behavioral coach in real time)
 
 See [todo.md](todo.md) for the full 9-phase build log — kept honest since day one.
 

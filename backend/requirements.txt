@@ -22,6 +22,7 @@ numpy==2.0.2
 # ── Database ──────────────────────────────────────────────────────────────────
 sqlalchemy==2.0.40
 aiosqlite==0.20.0
+asyncpg==0.30.0       # cloud Postgres driver (postgresql+asyncpg://...) — deploy target
 greenlet==3.2.5       # required by SQLAlchemy async
 alembic==1.15.2
 
