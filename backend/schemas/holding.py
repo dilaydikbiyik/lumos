@@ -52,7 +52,7 @@ class HoldingRead(BaseModel):
     emotion_tag: Optional[EmotionTag]
     created_at: datetime
 
-    # Canlı değerleme (holdings_valuation.py doldurur — DB'de saklanmaz)
+    # Live valuation (filled by holdings_valuation.py — not stored in the DB)
     current_value: Optional[float] = None
     value_source: Optional[str] = None   # manual | live | index | purchase
     value_change_pct: Optional[float] = None

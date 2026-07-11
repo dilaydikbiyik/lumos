@@ -1,36 +1,36 @@
-# Lumos - Smart Investment Assistant — TODO 
+# Lumos - Smart Investment Assistant — TODO
 
-> **~18 hafta · 8 faz · $0 başlangıç maliyeti**
-> Başlangıç: 2026-05-09
+> **~18 weeks · 8 phases · $0 starting cost**
+> Started: 2026-05-09
 
-## 🌟 Ürün Vizyonu
+## 🌟 Product Vision
 
-**Yatırım hakkında hiçbir fikri olmayan insanların KORKMADAN, ÖĞRENEREK yatırım yapabilmesi.**
+**People who know nothing about investing should be able to invest WITHOUT FEAR, learning as they go.**
 
-Her özellik şu filtreden geçmeli: *"Bu, çekingen bir yeni başlayanın anlamasına ve harekete geçmesine yardım ediyor mu?"*
+Every feature must pass this filter: *"Does this help a timid beginner understand and take action?"*
 
-| İlke | Anlamı |
+| Principle | Meaning |
 |------|--------|
-| Önce anlat, sonra göster | Hiçbir grafik/terim açıklamasız ekrana gelmez |
-| Jargonsuz varsayılan | "Volatilite" değil "fiyatın inişli çıkışlılığı" — terim isteyen detaya tıklar |
-| Küçük ilk adım | Kullanıcıyı büyük tutarla değil, alıştırma ve küçük adımlarla başlat |
-| Korku = veri | Kullanıcının çekincesi bastırılacak değil, adreslenecek bir sinyal |
-| İki dünya tek çatı | Emlak + borsa aynı portföyde, aynı dilde |
+| Explain first, show second | No chart/term reaches the screen without an explanation |
+| Jargon-free by default | Not "volatility" but "how bumpy the price ride is" — those who want the term click for detail |
+| Small first step | Start the user with practice and small steps, not a big lump sum |
+| Fear = data | A user's hesitation is a signal to address, not to suppress |
+| Two worlds, one roof | Real estate + stocks in the same portfolio, same language |
 
 ---
 
-## 📁 Proje Klasör Yapısı
+## 📁 Project Folder Structure
 
 ```
-lumos/                          ← proje kökü
+lumos/                          ← project root
 │
-├── backend/                    ← FastAPI uygulaması (Python)
+├── backend/                    ← FastAPI application (Python)
 │   ├── __init__.py
-│   ├── main.py                 ← FastAPI app, middleware kayıtları, lifespan
-│   ├── requirements.txt        ← Python bağımlılıkları ✅
-│   ├── .env.example            ← ortam değişkenleri şablonu ✅
+│   ├── main.py                 ← FastAPI app, middleware registration, lifespan
+│   ├── requirements.txt        ← Python dependencies ✅
+│   ├── .env.example            ← environment variable template ✅
 │   │
-│   ├── routers/                ← [CONTROLLER] HTTP endpoint tanımları
+│   ├── routers/                ← [CONTROLLER] HTTP endpoint definitions
 │   │   ├── __init__.py
 │   │   ├── chat.py             ← POST /chat
 │   │   ├── profile.py          ← POST /profile
@@ -38,85 +38,84 @@ lumos/                          ← proje kökü
 │   │   ├── users.py            ← GET|PATCH /users
 │   │   └── health.py           ← GET /health
 │   │
-│   ├── services/               ← [SERVICE] İş mantığı katmanı
+│   ├── services/               ← [SERVICE] business logic layer
 │   │   ├── __init__.py
-│   │   ├── ai_service.py       ← Provider-agnostic AI istemcisi (Gemini/Claude)
-│   │   ├── risk_engine.py      ← Risk skoru hesaplama (1-10)
-│   │   ├── market_data.py      ← yfinance veri çekme
-│   │   ├── tefas_service.py    ← TEFAS fon verisi
-│   │   ├── portfolio_engine.py ← Volatilite ağırlıklı portföy
-│   │   ├── volatility.py       ← Standart sapma / numpy hesapları
-│   │   ├── hybrid_basket.py    ← REIT hibrit sepet mantığı
-│   │   ├── explainer.py        ← Claude ile portföy açıklaması
-│   │   └── cache.py            ← Günlük diskcache katmanı
+│   │   ├── ai_service.py       ← Provider-agnostic AI client (Gemini/Claude)
+│   │   ├── risk_engine.py      ← Risk score computation (1-10)
+│   │   ├── market_data.py      ← yfinance data fetching
+│   │   ├── tefas_service.py    ← TEFAS fund data
+│   │   ├── portfolio_engine.py ← Volatility-weighted portfolio
+│   │   ├── volatility.py       ← Standard deviation / numpy math
+│   │   ├── hybrid_basket.py    ← REIT hybrid basket logic
+│   │   ├── explainer.py        ← Portfolio explanation via LLM
+│   │   └── cache.py            ← Daily diskcache layer
 │   │
-│   ├── models/                 ← [MODEL] Pydantic şemaları & SQLAlchemy ORM
+│   ├── models/                 ← [MODEL] SQLAlchemy ORM models
 │   │   ├── __init__.py
-│   │   ├── user.py             ← User ORM modeli
-│   │   ├── user_profile.py     ← Risk profil şeması
-│   │   ├── risk_score.py       ← Risk skoru şeması
-│   │   └── portfolio.py        ← Portföy şeması
+│   │   ├── user.py             ← User ORM model
+│   │   ├── user_profile.py     ← Risk profile schema
+│   │   ├── risk_score.py       ← Risk score schema
+│   │   └── portfolio.py        ← Portfolio schema
 │   │
-│   ├── middleware/             ← Auth & global hata yakalama
+│   ├── middleware/             ← Auth & global error handling
 │   │   ├── __init__.py
-│   │   ├── verify_clerk.py     ← Clerk JWT doğrulama
+│   │   ├── verify_clerk.py     ← Clerk JWT verification
 │   │   └── error_handler.py    ← Global exception handler
 │   │
-│   ├── db/                     ← Veritabanı bağlantısı & session
+│   ├── db/                     ← Database connection & session
 │   │   ├── __init__.py
 │   │   └── database.py         ← SQLAlchemy engine, AsyncSession
 │   │
-│   ├── prompts/                ← Claude sistem promptları (düz metin)
+│   ├── prompts/                ← LLM system prompts (plain text)
 │   │   ├── system_prompt.txt
 │   │   └── reit_explain_prompt.txt
 │   │
-│   ├── data/                   ← Statik JSON veri dosyaları
-│   │   ├── fund_list.json      ← TEFAS fon listesi
-│   │   └── asset_universe.json ← Tüm varlıklar (hisse, ETF, REIT)
+│   ├── data/                   ← Static JSON data files
+│   │   ├── fund_list.json      ← TEFAS fund list
+│   │   └── asset_universe.json ← All assets (stocks, ETFs, REITs)
 │   │
-│   └── tests/                  ← Backend birim testleri
+│   └── tests/                  ← Backend unit tests
 │       ├── __init__.py
 │       ├── test_risk_engine.py
 │       └── test_chat.py
 │
-├── frontend/                   ← React 18 + Vite uygulaması
+├── frontend/                   ← React 18 + Vite application
 │   ├── src/
-│   │   ├── App.jsx             ← Root bileşen, router tanımı
-│   │   ├── main.jsx            ← ClerkProvider sarmalı
+│   │   ├── App.jsx             ← Root component, router definition
+│   │   ├── main.jsx            ← ClerkProvider wrapper
 │   │   │
-│   │   ├── components/         ← Yeniden kullanılabilir UI bileşenleri
+│   │   ├── components/         ← Reusable UI components
 │   │   │   ├── ChatWindow.jsx
 │   │   │   ├── MessageBubble.jsx
 │   │   │   ├── RiskGauge.jsx
 │   │   │   ├── PortfolioChart.jsx
 │   │   │   ├── AssetCard.jsx
-│   │   │   ├── PerformanceChart.jsx
 │   │   │   ├── ReitCard.jsx
 │   │   │   ├── AssetExplainer.jsx
 │   │   │   └── DisclaimerModal.jsx
 │   │   │
-│   │   ├── pages/              ← Sayfa düzeyinde bileşenler (route başına 1)
+│   │   ├── pages/              ← Page-level components (1 per route)
 │   │   │   ├── OnboardingPage.jsx
 │   │   │   ├── ProfilePage.jsx
 │   │   │   ├── RecommendPage.jsx
 │   │   │   └── DashboardPage.jsx
 │   │   │
-│   │   ├── hooks/              ← Custom React hook'ları
+│   │   ├── hooks/              ← Custom React hooks
 │   │   │   ├── useChat.js
 │   │   │   └── usePortfolio.js
 │   │   │
-│   │   └── utils/              ← Yardımcı fonksiyonlar & hata sınırı
+│   │   └── utils/              ← Helpers & error boundary
 │   │       └── errorBoundary.jsx
 │   │
-│   ├── .env                    ← (commit'leme!)
+│   ├── .env                    ← (never commit!)
 │   └── .env.production
 │
 ├── tests/
-│   └── e2e/                    ← Playwright uçtan uca testler
+│   └── e2e/                    ← End-to-end test scenarios
 │       ├── test_full_flow.py
 │       └── scenarios.json
 │
-├── docs/                       ← Mimari ve API dokümantasyonu
+├── docs/                       ← Architecture and API documentation
 │   ├── architecture.md
 │   ├── api_reference.md
 │   └── case_study.md
@@ -124,749 +123,764 @@ lumos/                          ← proje kökü
 ├── demo/
 │   └── demo_script.md
 │
-├── venv/                       ← Python sanal ortamı ✅ (git'e girmiyor)
+├── venv/                       ← Python virtual environment ✅ (not in git)
 ├── .gitignore                  ✅
 ├── .env.example                ✅
 ├── render.yaml                 ← Render.com deployment config
-├── Dockerfile                  ← Backend Docker imajı
+├── Dockerfile                  ← Backend Docker image
 ├── vercel.json                 ← Vercel deployment config
 ├── README.md
-└── todo.md                     ← Bu dosya
+└── todo.md                     ← This file
 ```
 
 ---
 
 ## Phase 1 — Setup, Scaffolding & Auth
 
-**Süre:** Hafta 1–2  
+**Duration:** Weeks 1–2
 **Stack:** Python 3.11+, FastAPI, React 18, Vite, Git, **Clerk Auth** 🆕
 
 ### Backend
 
-- [x] Python sanal ortamı (venv) oluştur
-- [x] FastAPI ve temel bağımlılıkları yükle
-- [x] Klasör yapısını oluştur: `/backend`, `/frontend`, `/docs`
-- [x] `backend/main.py` — FastAPI app başlangıcı
-- [x] `backend/requirements.txt` — tüm bağımlılıkları listele
-- [x] `backend/routers/` — boş router klasörü, `__init__.py` ekle
-- [x] `backend/.env` — ortam değişkenleri dosyası (commit'leme!)
+- [x] Create Python virtual environment (venv)
+- [x] Install FastAPI and core dependencies
+- [x] Create the folder structure: `/backend`, `/frontend`, `/docs`
+- [x] `backend/main.py` — FastAPI app bootstrap
+- [x] `backend/requirements.txt` — list all dependencies
+- [x] `backend/routers/` — empty router folder with `__init__.py`
+- [x] `backend/.env` — environment variables file (never commit!)
 
 ### Frontend
 
-- [x] Vite ile React 18 projesi oluştur
-- [x] React Router kurulumu ve base sayfa yapısını kur
-- [x] `frontend/src/App.jsx` — ana uygulama bileşeni + ErrorBoundary + BottomNav
-- [x] `frontend/src/components/` — bileşen klasörü oluştur
-- [x] `frontend/.env.example` — frontend ortam değişkenleri şablonu
+- [x] Create React 18 project with Vite
+- [x] Set up React Router and the base page structure
+- [x] `frontend/src/App.jsx` — main app component + ErrorBoundary + bottom nav
+- [x] `frontend/src/components/` — create the component folder
+- [x] `frontend/.env.example` — frontend environment variable template
 
-### Auth — Clerk Entegrasyonu 🆕
+### Auth — Clerk Integration 🆕
 
-- [x] Clerk hesabı oluştur, uygulama kaydet (free tier — 10.000 MAU)
-- [x] Clerk SDK'yı frontend'e kur (`@clerk/clerk-react`)
-- [x] `frontend/src/main.jsx` → `<ClerkProvider>` ile uygulamayı sar
-- [x] `frontend/src/middleware/auth.js` → korunan route'lar için middleware yaz (App.jsx ProtectedRoute)
-  - Kimlik doğrulanmamış kullanıcılar portföy ve chat sayfalarına erişememeli
-- [x] `backend/middleware/verify_clerk.py` → Clerk JWT token doğrulama middleware'i
-- [x] Clerk publishable key ve secret key'i `.env`'e ekle
+- [x] Create a Clerk account, register the app (free tier — 10,000 MAU)
+- [x] Install the Clerk SDK on the frontend (`@clerk/clerk-react`)
+- [x] `frontend/src/main.jsx` → wrap the app with `<ClerkProvider>`
+- [x] Protected-route middleware (App.jsx ProtectedRoute)
+  - Unauthenticated users must not reach portfolio and chat pages
+- [x] `backend/middleware/verify_clerk.py` → Clerk JWT verification middleware
+- [x] Add Clerk publishable and secret keys to `.env`
 
-### Auth — Kullanıcı Profili Kalıcılığı 🆕
+### Auth — User Profile Persistence 🆕
 
-- [x] `backend/models/user.py` — kullanıcı veri modeli
-- [x] `backend/routers/users.py` — kullanıcı endpoint'leri
-- [x] `backend/db/database.py` — DB bağlantısı (SQLite başlangıç, Postgres üretime geçişte)
-- [x] Risk profili sonuçlarını Clerk user ID'ye bağlı DB'ye kaydet
-- [x] Geri dönen kullanıcı kendi portföyünü görüntüleyebilmeli
+- [x] `backend/models/user.py` — user data model
+- [x] `backend/routers/users.py` — user endpoints
+- [x] `backend/db/database.py` — DB connection (SQLite to start, Postgres for production)
+- [x] Persist risk profile results keyed to the Clerk user ID
+- [x] Returning users can view their own portfolio
 
 ### Config & DevOps
 
-- [x] Anthropic API anahtarını al ve `.env`'e ekle
-- [x] Clerk publishable + secret key'leri `.env`'e ekle
-- [x] `.env.example` → tüm değişken isimlerini içeren örnek dosya oluştur
-- [x] `.gitignore` → `.env`, `__pycache__`, `node_modules`, `venv/` ekle
-- [x] Git repo başlat: `main / dev / feature/*` branch modeli
-- [x] İlk commit'i yap
-- [!] GitHub'da `main` branch'ini koru — private repo + free plan'da GitHub branch protection kilitli ("Upgrade to GitHub Pro or make public"); repo public yapılırsa veya Pro'ya geçilirse `gh api repos/.../branches/main/protection` ile tek komutla açılır
-- [x] `README.md` — temel proje açıklaması (158 satır)
+- [x] Obtain the Anthropic API key and add it to `.env`
+- [x] Add Clerk publishable + secret keys to `.env`
+- [x] `.env.example` → sample file listing every variable name
+- [x] `.gitignore` → add `.env`, `__pycache__`, `node_modules`, `venv/`
+- [x] Initialize the git repo: `main / dev / feature/*` branch model
+- [x] Make the first commit
+- [!] Protect the `main` branch on GitHub — branch protection is locked on private repo + free plan ("Upgrade to GitHub Pro or make public"); once the repo goes public or Pro, one command enables it: `gh api repos/.../branches/main/protection`
+- [x] `README.md` — basic project description
 
-> 💡 Clerk ücretsiz tier 10.000 aylık aktif kullanıcıya kadar ücretsizdir.
+> 💡 Clerk's free tier covers up to 10,000 monthly active users.
 
 ---
 
 ## Phase 2 — NLP Engine & Risk Profile Module
 
-**Süre:** Hafta 3–5  
-**Stack:** Claude API (claude-sonnet-4), FastAPI, Pydantic, Python, SQLite / Postgres
+**Duration:** Weeks 3–5
+**Stack:** Claude API, FastAPI, Pydantic, Python, SQLite / Postgres
 
-### AI — Claude API Bağlantısı
+### AI — Claude API Connection
 
-- [x] Anthropic Python SDK'yı kur (`pip install anthropic`)
-- [x] `backend/services/ai_service.py` → Claude API istemcisi ve temel chat fonksiyonu
-- [x] `backend/prompts/system_prompt.txt` → Finansal danışman sistem prompt'u yaz
-  - **ZORUNLU:** Şu uyarıyı ekle: *"This app does not provide investment advice. It is for educational purposes only. Consult a licensed financial advisor."*
-- [x] `backend/routers/chat.py` → `/chat` endpoint'ini aç
+- [x] Install the Anthropic Python SDK (`pip install anthropic`)
+- [x] `backend/services/ai_service.py` → Claude API client and base chat function
+- [x] `backend/prompts/system_prompt.txt` → write the financial-advisor system prompt
+  - **MANDATORY:** include: *"This app does not provide investment advice. It is for educational purposes only. Consult a licensed financial advisor."*
+- [x] `backend/routers/chat.py` → open the `/chat` endpoint
 
-### AI — Risk Profili Çıkarma Akışı
+### AI — Risk Profile Extraction Flow
 
-- [x] 5 soruluk konuşma akışını tasarla:
-  1. Bütçe
-  2. Zaman ufku
-  3. Kayıp toleransı
-  4. Yatırım hedefi
-  5. Deneyim seviyesi
-- [x] `backend/services/risk_engine.py` → cevaplardan 1-10 arasında risk skoru üret
-- [x] `backend/models/user_profile.py` → kullanıcı profil veri modeli (Pydantic)
+- [x] Design the 5-question conversation flow:
+  1. Budget
+  2. Time horizon
+  3. Loss tolerance
+  4. Investment goal
+  5. Experience level
+- [x] `backend/services/risk_engine.py` → produce a 1-10 risk score from answers
+- [x] `backend/models/user_profile.py` → user profile data model (Pydantic)
 
-### API — Profil Kaydetme
+### API — Profile Persistence
 
-- [x] `backend/routers/profile.py` → `POST /profile` endpoint'i
-  - Girdi: 5 soru cevabı → risk skoru hesapla → Clerk user ID'ye bağlı DB'ye kaydet
-- [x] `backend/models/risk_score.py` → risk skoru veri modeli
+- [x] `backend/routers/profile.py` → `POST /profile` endpoint
+  - Input: 5 answers → compute risk score → persist keyed to the Clerk user ID
+- [x] `backend/models/risk_score.py` → risk score data model
 
 ### Testing
 
-- [x] `backend/tests/test_risk_engine.py` → pytest ile risk motoru birim testleri (10/10 ✅)
-- [x] `backend/tests/test_chat.py` → chat endpoint testleri
-- [x] Prompt regresyon testleri: marker/güvenlik/sıfır-bilgi/korku/etik kuralları + extraction JSON şartı (6 test)
+- [x] `backend/tests/test_risk_engine.py` → risk engine unit tests with pytest (10/10 ✅)
+- [x] `backend/tests/test_chat.py` → chat endpoint tests
+- [x] Prompt regression tests: marker/safety/zero-knowledge/fear/ethics rules + extraction JSON requirement (6 tests)
 
 ---
 
 ## Phase 3 — Market Data & Portfolio Engine 🔄 UPDATED
 
-**Süre:** Hafta 5–8  
+**Duration:** Weeks 5–8
 **Stack:** yfinance, pandas, numpy, TEFAS API, ExchangeRate API
 
-### Data — Yahoo Finance Entegrasyonu
+### Data — Yahoo Finance Integration
 
-- [x] `yfinance`, `pandas`, `numpy` kur
-- [x] `backend/services/market_data.py` → varlık fiyatı çekme servisi
-  - BIST hisseleri (XU100)
-  - US ETF'leri (SPY, QQQ)
-  - Altın (GLD)
-- [x] `backend/services/cache.py` → günlük önbellekleme katmanı (rate limit'ten kaçınmak için)
+- [x] Install `yfinance`, `pandas`, `numpy`
+- [x] `backend/services/market_data.py` → asset price fetching service
+  - BIST stocks (XU100)
+  - US ETFs (SPY, QQQ)
+  - Gold (GLD)
+- [x] `backend/services/cache.py` → daily caching layer (to avoid rate limits)
 
-### Data — TEFAS Fon Verisi
+### Data — TEFAS Fund Data
 
-- [x] TEFAS araştırması: resmi public API yok; mevcut servis korunuyor (değerlendirme notu Phase 6'da)
-- [x] `backend/services/tefas_service.py` → Türk yatırım fonlarını çek
-- [x] `backend/data/fund_list.json` → fon listesi oluştur:
-  - Muhafazakâr fonlar
-  - Dengeli fonlar
-  - Agresif fonlar
+- [x] TEFAS research: no official public API; current service kept (assessment note in Phase 6)
+- [x] `backend/services/tefas_service.py` → fetch Turkish mutual funds
+- [x] `backend/data/fund_list.json` → build the fund list:
+  - Conservative funds
+  - Balanced funds
+  - Aggressive funds
 
-### Algorithm — Volatilite Ağırlıklı Portföy Formülü 🆕
+### Algorithm — Volatility-Weighted Portfolio Formula 🆕
 
-- [x] `backend/services/volatility.py` → volatilite hesaplama modülü
-  - Son 252 işlem günü (1 yıl) günlük getirilerini çek
-  - `numpy` ile standart sapma hesapla
-  - Günde bir kez hesapla ve cache'e yaz
-- [x] `backend/services/portfolio_engine.py` → ana portföy motoru (sabit bucket'ları kaldır)
-  - **Formül:**
-    ```
-    Allocation(asset) = (RiskScore × Volatility(asset)) / SUM(RiskScore × Volatility(i))
-    ```
-  - Ağırlıkların toplamının 1'e normalize edilmesi
-- [x] `backend/models/portfolio.py` → portföy veri modeli
+- [x] `backend/services/volatility.py` → volatility computation module
+  - Fetch daily returns for the last 252 trading days (1 year)
+  - Compute standard deviation with `numpy`
+  - Compute once a day and write to cache
+- [x] `backend/services/portfolio_engine.py` → main portfolio engine (fixed buckets removed)
+  - v2 formula `(RiskScore × Vol) / Σ(...)` was replaced on 2026-07-10 by the
+    **v3 risk-blended formula** — see the "Transparency & Realism round" below
+    (v2 cancelled out in normalisation; allocation was risk-independent)
+- [x] `backend/models/portfolio.py` → portfolio data model
 
-### API — Öneri Endpoint'i
+### API — Recommendation Endpoint
 
 - [x] `backend/routers/recommend.py` → `POST /recommend`
-  - Girdi: risk skoru + bütçe
-  - Çıktı: portföy ağırlıkları + düz dil açıklaması
-- [x] `backend/services/explainer.py` → Claude ile portföy açıklaması üret
+  - Input: risk score + budget
+  - Output: portfolio weights + plain-language explanation
+- [x] `backend/services/explainer.py` → generate the portfolio explanation via LLM
 
 ---
 
 ## Phase 3.5 — Real Estate Layer / REIT ETF 🆕 NEW
 
-**Süre:** Hafta 8–10  
+**Duration:** Weeks 8–10
 **Stack:** yfinance, pandas, VNQ, SCHH
 
-### Data — REIT ETF Verisi
+### Data — REIT ETF Data
 
-- [x] `backend/data/asset_universe.json` → VNQ ve SCHH'yi varlık evrenine ekle
-- [x] `backend/services/market_data.py` → mevcut yfinance pipeline'ını genişlet (sıfır yeni API)
+- [x] `backend/data/asset_universe.json` → add VNQ and SCHH to the asset universe
+- [x] `backend/services/market_data.py` → extend the existing yfinance pipeline (zero new APIs)
 
-### Algorithm — Hibrit Sepet Mantığı 🆕
+### Algorithm — Hybrid Basket Logic 🆕
 
-- [x] `backend/services/hybrid_basket.py` → hibrit sepet servisi
-  - Kullanıcı bütçesi gayrimenkul eşiğinin altındaysa REIT ETF'leri otomatik dahil et
-  - Bunu "mülk satın almadan gayrimenkul exposure'ı" olarak sun
-- [x] `backend/services/portfolio_engine.py` → hibrit basket mantığını entegre et
+- [x] `backend/services/hybrid_basket.py` → hybrid basket service
+  - If the user's budget is below the real-estate threshold, auto-include REIT ETFs
+  - Present it as "real estate exposure without buying property"
+- [x] `backend/services/portfolio_engine.py` → integrate the hybrid basket logic
 
-### UI — REIT Kartı 🆕
+### UI — REIT Card 🆕
 
 - [x] `frontend/src/components/ReitCard.jsx`
-  - REIT nedir, neden seçildi, tarihsel getirisi — Türkçe, jargonsuz
-- [x] `frontend/src/components/AssetExplainer.jsx` — genel varlık açıklayıcı bileşen (3 sekmeli: nedir/neden/risk)
+  - What a REIT is, why it was chosen, historical returns — Turkish, jargon-free
+- [x] `frontend/src/components/AssetExplainer.jsx` — generic asset explainer (3 tabs: what/why/risk)
 
-### Content — REIT Açıklayıcı Prompt 🆕
+### Content — REIT Explainer Prompt 🆕
 
 - [x] `backend/prompts/reit_explain_prompt.txt`
-  - Claude'un bu kullanıcıya özel 2 cümlelik dinamik açıklama üretmesi için prompt
-  - Statik template değil — her kullanıcı için kişiselleştirilmiş
+  - Prompt for a personalised 2-sentence dynamic explanation per user
+  - Not a static template — personalised for each user
 
-> 💡 Neden Zillow değil REIT? REIT'ler hisse gibi işlem gördüğünden yfinance kapsar. Zillow ayrı veri modeli + ücretli API gerektirir.
+> 💡 Why REIT instead of Zillow? REITs trade like stocks, so yfinance covers them. Zillow would require a separate data model + a paid API.
 
 ---
 
 ## Phase 4 — Frontend: Chatbot UI & Visualization
 
-**Süre:** Hafta 10–14  
+**Duration:** Weeks 10–14
 **Stack:** React 18, Recharts, Axios, React Router, Clerk
 
-> 📱 **Strateji: Mobile-First Web → Capacitor**  
-> Tüm UI dikey/telefon uyumlu tasarlandı (100dvh, 48px touch targets, bottom nav, safe-area-inset).  
-> Phase 5 sonrası Capacitor ile native iOS/Android uygulamasına sarmalanabilir.
+> 📱 **Strategy: Mobile-First Web → Capacitor**
+> The whole UI is designed portrait/phone-friendly (100dvh, 48px touch targets, bottom nav, safe-area-inset).
+> After Phase 5 it can be wrapped into a native iOS/Android app with Capacitor.
 
-### UI — Chatbot Arayüzü
+### UI — Chatbot Interface
 
 - [x] `frontend/src/components/ChatWindow.jsx`
-  - Mesaj balonları, typing animasyonu, iOS momentum scroll
-  - `enterKeyHint="send"` — mobil klavye gönder butonu
-- [x] `frontend/src/components/MessageBubble.jsx` — kullanıcı/asistan mesaj balonu
-- [x] `frontend/src/hooks/useChat.js` — chat state + Clerk JWT ekleme
+  - Message bubbles, typing animation, iOS momentum scroll
+  - `enterKeyHint="send"` — mobile keyboard send button
+- [x] `frontend/src/components/MessageBubble.jsx` — user/assistant message bubble
+- [x] `frontend/src/hooks/useChat.js` — chat state + Clerk JWT attachment
 
-### UI — Risk Profili Ekranı
+### UI — Risk Profile Screen
 
-- [x] `frontend/src/pages/ProfilePage.jsx` — chat → skor reveal tek sütun akış
-- [x] `frontend/src/components/RiskGauge.jsx` — SVG yarı daire gauge (renk: yeşil→amber→kırmızı)
+- [x] `frontend/src/pages/ProfilePage.jsx` — chat → score reveal, single-column flow
+- [x] `frontend/src/components/RiskGauge.jsx` — SVG half-circle gauge (green→amber→red)
 
-### Charts — Portföy Dağılım Grafiği
+### Charts — Portfolio Allocation Chart
 
 - [x] `frontend/src/components/PortfolioChart.jsx`
-  - Recharts donut chart: hisseler / REIT / fonlar / altın / nakit
-  - Tıklanabilir dilimler → AssetCard açılır
-- [x] `frontend/src/components/AssetCard.jsx` — detay paneli
+  - Recharts donut chart: stocks / REIT / funds / gold / cash
+  - Clickable slices → AssetCard opens
+- [x] `frontend/src/components/AssetCard.jsx` — detail panel
 
-### Charts — Tarihsel Performans Grafiği
+### Charts — Historical Performance Chart
 
-- [x] `frontend/src/components/PerformanceChart.jsx`
-  - 12 aylık çizgi grafiği + karşılaştırma modu
-  - ⚠️ Mock data — Phase 5'te backend cache'e bağlanacak
-- [x] `frontend/src/pages/RecommendPage.jsx` — tek sütun: badge → pie → line → REIT → açıklama
+- [x] ~~`PerformanceChart.jsx` (12-month line chart)~~ — **REMOVED 2026-07-11**: it
+  rendered `Math.random()` curves as "performance"; fabricated data violates the
+  realism principle. The real backtest (Time Machine) covers this need.
+- [x] `frontend/src/pages/RecommendPage.jsx` — single column: badge → pie → REIT → explanation
 
-### UX — Yasal Uyarı & Onboarding
+### UX — Legal Disclaimer & Onboarding
 
 - [x] `frontend/src/components/DisclaimerModal.jsx`
-  - Checkbox zorunlu — kabul etmeden devam yok
-- [x] `frontend/src/pages/OnboardingPage.jsx` — hero + 3 özellik kartı + CTA
+  - Mandatory checkbox — no continue without acceptance
+- [x] `frontend/src/pages/OnboardingPage.jsx` — hero + 3 feature cards + CTA
 
-### UX — Kaydedilmiş Portföy Dashboard'u
+### UX — Saved Portfolio Dashboard
 
 - [x] `frontend/src/pages/DashboardPage.jsx`
-  - Profil kartı + re-run / re-profile butonları + portföy snapshot
-- [x] `frontend/src/hooks/usePortfolio.js` — portföy + profil yönetimi
+  - Profile card + re-run / re-profile buttons + portfolio snapshot
+- [x] `frontend/src/hooks/usePortfolio.js` — portfolio + profile management
 
-### Mobile-First Ekstralar 📱
+### Mobile-First Extras 📱
 
-- [x] `frontend/src/components/BottomNav.jsx` — sabit alt navigasyon (desktop'ta gizli)
+- [x] `frontend/src/components/AppNav.jsx` — responsive nav: fixed bottom bar on mobile, left sidebar on desktop (renamed from BottomNav on 2026-07-11)
 - [x] `frontend/src/index.css` — mobile-first design system (100dvh, touch targets, safe-area)
-- [x] `frontend/index.html` — PWA meta tagları (theme-color, apple-mobile-web-app)
+- [x] `frontend/index.html` — PWA meta tags (theme-color, apple-mobile-web-app)
 - [x] `frontend/src/utils/errorBoundary.jsx` — React Error Boundary
-- [x] `frontend/src/utils/api.js` — Axios istemcisi + Clerk JWT bağlama
+- [x] `frontend/src/utils/api.js` — Axios client + Clerk JWT binding
 
-> 💡 Bu dashboard yalnızca Phase 1'deki Clerk Auth sayesinde mümkün. Auth önce gelir.
+> 💡 This dashboard is only possible thanks to Phase 1's Clerk Auth. Auth comes first.
 
-> 🚀 **Capacitor (Opsiyonel — Phase 5 sonrası)**  
-> `npm install @capacitor/core @capacitor/cli @capacitor/ios @capacitor/android`  
-> `npx cap init && npx cap add ios && npx cap sync`  
-> Tek komutla native uygulama.
+> 🚀 **Capacitor (optional — after Phase 5)**
+> `npm install @capacitor/core @capacitor/cli @capacitor/ios @capacitor/android`
+> `npx cap init && npx cap add ios && npx cap sync`
+> A native app with one command.
 
 ---
 
 ## Phase 5 — Testing, Deployment & Portfolio Presentation
 
-**Süre:** Hafta 14–18  
+**Duration:** Weeks 14–18
 **Stack:** pytest, Playwright, React Testing Library, Render.com, Vercel, GitHub Actions
 
-### Testing — E2E Testler
+### Testing — E2E Tests
 
-- [x] `test_full_flow.py` → API-seviyesi tam akış (TestClient; Playwright yerine pragmatik seçim — Clerk'siz gerçek HTTP yüzeyi)
-- [x] `tests/e2e/scenarios.json` → 5 kullanıcı tipi senaryosu:
-  1. Muhafazakâr (Conservative)
-  2. Orta (Moderate)
-  3. Agresif (Aggressive)
-  4. Kısa vadeli (Short-term)
-  5. Emeklilik (Retirement)
-- [x] Her senaryo: yol seçimi → korku check-in → profil → öneri → "Aldım" → servet özeti → cesaret skoru (5 persona parametrize)
+- [x] `test_full_flow.py` → API-level full flow (TestClient; pragmatic choice over Playwright — real HTTP surface without Clerk)
+- [x] `tests/e2e/scenarios.json` → 5 user-type scenarios:
+  1. Conservative
+  2. Moderate
+  3. Aggressive
+  4. Short-term
+  5. Retirement
+- [x] Each scenario: path selection → fear check-in → profile → recommendation → "I bought it" → wealth summary → readiness score (5 personas, parametrised)
 
-### Testing — Hata Yönetimi & Edge Case'ler
+### Testing — Error Handling & Edge Cases
 
-- [x] `backend/middleware/error_handler.py` → global hata yakalama middleware'i
-  - API çökmesi, saçma input, boş portföy, süresi dolmuş oturum
+- [x] `backend/middleware/error_handler.py` → global error-handling middleware
+  - API crash, nonsense input, empty portfolio, expired session
 - [x] `frontend/src/utils/errorBoundary.jsx` → React Error Boundary
-- [x] Her hata durumu için kullanıcıya anlamlı mesaj göster (Türkçe hata mesajları)
+- [x] Show a meaningful message for every error state (Turkish error copy)
 
 ### Deploy — Backend → Render.com
 
-- [x] `Dockerfile` → FastAPI uygulaması için Docker imajı
-- [x] `render.yaml` → Render.com deployment konfigürasyonu (free plan, Docker, health check)
-- [x] `backend/routers/health.py` → `/health` endpoint'i (uptime monitoring)
-- [ ] Render'a tüm env var'ları ekle: `ANTHROPIC_API_KEY`, `CLERK_SECRET_KEY`, `DATABASE_URL`
-- [ ] Deployment test et, `/health` endpoint'inin döndüğünü doğrula
+- [x] `Dockerfile` → Docker image for the FastAPI app
+- [x] `render.yaml` → Render.com deployment configuration (free plan, Docker, health check)
+- [x] `backend/routers/health.py` → `/health` endpoint (uptime monitoring)
+- [ ] Add all env vars on Render: `ANTHROPIC_API_KEY`, `CLERK_SECRET_KEY`, `DATABASE_URL`
+- [ ] Test the deployment; verify `/health` responds
 
 ### Deploy — Frontend → Vercel
 
-- [x] `vercel.json` → Vercel deployment konfigürasyonu (Vite framework, SPA rewrite, asset caching)
+- [x] `vercel.json` → Vercel deployment configuration (Vite framework, SPA rewrite, asset caching)
 - [x] `frontend/.env.production` → `VITE_BACKEND_URL`, `VITE_CLERK_PUBLISHABLE_KEY`
-- [ ] Clerk production instance'ına bağlan
-- [ ] Vercel'e deploy et ve tam akışı test et
+- [ ] Connect to the Clerk production instance
+- [ ] Deploy to Vercel and test the full flow
 
-### Portfolio — README & Mimari Dokümantasyon
+### Portfolio — README & Architecture Docs
 
-- [x] `README.md` — ne yapar, nasıl çalıştırılır, mimari kararlar + gerekçeleri (158 satır)
-- [x] `docs/architecture.md` — sistem mimarisi diyagramı ve açıklaması (ASCII art + tasarım kararları tablosu)
-- [x] `docs/api_reference.md` — tüm API endpoint'leri ve kullanımları (10 router, 26 endpoint)
+- [x] `README.md` — what it does, how to run it, architecture decisions + rationale
+- [x] `docs/architecture.md` — system architecture diagram and explanation (ASCII art + design-decision table)
+- [x] `docs/api_reference.md` — all API endpoints and usage (10 routers, 26 endpoints)
 
 ### Portfolio — Demo Video & Case Study
 
-- [x] `demo/demo_script.md` → 3 dakikalık sahne sahne demo scripti (çekim notlarıyla)
-  - Tam akış: kayıt → onboarding → chat → risk profili → portföy → dashboard
-- [ ] Ekran kaydı çek (Loom / OBS / QuickTime)
-- [x] `docs/case_study.md` → problem, ürün kararları, 4 teknik zorluk+çözüm, öğrenilenler
-- [ ] Demo videosunu GitHub repo'suna yükle
-- [ ] LinkedIn'de paylaş
+- [x] `demo/demo_script.md` → 3-minute scene-by-scene demo script (with filming notes)
+  - Full flow: sign-up → onboarding → chat → risk profile → portfolio → dashboard
+- [ ] Record the screen capture (Loom / OBS / QuickTime)
+- [x] `docs/case_study.md` → problem, product decisions, 4 technical challenges + solutions, learnings
+- [ ] Upload the demo video to the GitHub repo
+- [ ] Share on LinkedIn
 
-> 💡 Bu faz tamamlanıp MVP yayına girdikten sonra AWS migration anlamlı bir adımdır. Öncesinde değil.
+> 💡 AWS migration becomes meaningful only after this phase ships the MVP. Not before.
 
 ---
 
-## Phase 6 — Teknik Borç & Production Sağlamlaştırma 🆕
+## Phase 6 — Technical Debt & Production Hardening 🆕
 
-**Süre:** Phase 5 sonrası  
-**Kaynak:** Proje analizi raporu (2026-06-16)
+**Duration:** after Phase 5
+**Source:** project analysis report (2026-06-16)
 
-### Test Kapsamı
+### Test Coverage
 
-- [x] `backend/tests/test_chat.py` → chat router integration testi (AI mock'lanmış, 4 test)
-- [x] `backend/tests/test_recommend.py` → recommend endpoint testi (engine + explainer mock'lu, 4 test)
-- [x] `backend/tests/test_profile.py` → profile router testi (in-memory DB, 5 test)
-- [x] AI servis testleri için AI mock fixture'ı (`conftest.py` — `_dispatch` patch + auth bypass)
-- [x] `tests/e2e/` dolduruldu (scenarios.json + backend test_full_flow.py)
+- [x] `backend/tests/test_chat.py` → chat router integration test (AI mocked, 4 tests)
+- [x] `backend/tests/test_recommend.py` → recommend endpoint test (engine + explainer mocked, 4 tests)
+- [x] `backend/tests/test_profile.py` → profile router test (in-memory DB, 5 tests)
+- [x] AI mock fixture for AI service tests (`conftest.py` — `_dispatch` patch + auth bypass)
+- [x] `tests/e2e/` filled (scenarios.json + backend test_full_flow.py)
 
 ### CI/CD
 
-- [x] `.github/workflows/ci.yml` → push/PR'da ruff + pytest (backend, Python 3.9)
-- [x] Aynı workflow'a eslint + build (frontend, Node 22) adımı eklendi — vitest frontend testleri yazılınca eklenecek
-- [!] Branch protection: aynı GitHub Pro/public kısıtı (yukarıdaki maddeyle aynı)
+- [x] `.github/workflows/ci.yml` → ruff + pytest on push/PR (backend)
+- [x] Same workflow gained eslint + build (frontend, Node 22) — vitest frontend tests will be added when written
+- [!] Branch protection: same GitHub Pro/public constraint as above
 
-### Veritabanı
+### Database
 
-
-- [x] `alembic init` (async template) + baseline migration (`04f9da6e7e6d`: users tablosu + indexler); dev DB `alembic stamp head` ile damgalandı
-- [/] `create_all` → migration geçiş planı: dev'de create_all kalıyor (zararsız, checkfirst); yeni şema değişikliği geldiğinde akış = model değiştir → `alembic revision --autogenerate` → `alembic upgrade head`; prod deploy'da startup öncesi `alembic upgrade head` çalıştırılacak, create_all prod'da kaldırılacak
+- [x] `alembic init` (async template) + baseline migration (`04f9da6e7e6d`: users table + indexes); dev DB stamped with `alembic stamp head`
+- [/] `create_all` → migration transition plan: dev keeps create_all (harmless, checkfirst); for new schema changes the flow = edit model → `alembic revision --autogenerate` → `alembic upgrade head`; production deploy runs `alembic upgrade head` before startup, create_all removed in prod
 
 ### Deployment
 
-- [x] `Dockerfile` (backend) — python:3.9-slim, migration + uvicorn startup; build doğrulaması CI'da (lokalde Docker yok)
-- [/] docker-compose.yml hazır (kalıcı volume + healthcheck) — lokal test için Docker Desktop kurulumu gerekiyor
+- [x] `Dockerfile` (backend) — python slim, migration + uvicorn startup; build verified in CI (no local Docker)
+- [/] docker-compose.yml ready (persistent volume + healthcheck) — needs Docker Desktop for local testing
 
-### Veri Sağlayıcı Riski
+### Data-Provider Risk
 
-- [x] yfinance rate-limit / kırılma senaryolarına fallback: 7 günlük stale cache kopyası — indirme çökerse bayat veriyle devam, o da yoksa MarketDataError → 503
-- [x] TEFAS değerlendirmesi: resmi/ücretsiz API yok (fintables vb. ücretli); mevcut tefas_service scraping'i + cache yeterli — Market Pack'te kaynak adaptörü olarak soyutlanacak
-- [x] Cache TTL stratejisi gözden geçirildi: taze 24s + stale 7g çift katman
+- [x] yfinance rate-limit/breakage fallbacks: 7-day stale copy + **never-expiring last-known-good tier (added 2026-07-10)** — download failure serves dated real data; only a totally cold install with the source down raises MarketDataError; volatility additionally falls back to historical baselines so /recommend never dies
+- [x] TEFAS assessment: no official/free API (fintables etc. are paid); current tefas_service scraping + cache suffices — will be abstracted as a source adapter in the Market Pack
+- [x] Cache TTL strategy reviewed: fresh 24h + stale 7d + LKG forever (three tiers)
 
-### AI Servis Gözlemlenebilirliği
+### AI Service Observability
 
-- [x] AI çağrıları için structured logging (`lumos.ai` logger: provider, prompt_version, latency_ms, mesaj sayısı, durum, hata tipi)
-- [x] Prompt versiyonlama: system prompt SHA1 hash'i (`PROMPT_VERSION`) her log satırında — hangi cevabın hangi prompt sürümünden geldiği izlenebilir
-- [x] Anthropic SDK güncellendi (0.39.0 → 0.112.0); prompt caching Anthropic'e geçilirse eklenecek
+- [x] Structured logging for AI calls (`lumos.ai` logger: provider, prompt_version, latency_ms, message count, status, error type)
+- [x] Prompt versioning: system prompt SHA1 hash (`PROMPT_VERSION`) on every log line — traceable which answer came from which prompt version
+- [x] Anthropic SDK updated (0.39.0 → 0.112.0); prompt caching to be added if we switch to Anthropic
 
-### Güvenlik & Compliance
+### Security & Compliance
 
-- [x] `slowapi` ile AI endpoint'lerine rate limiting ekle (chat, recommend)
-- [x] Prompt injection koruması: rol/uzunluk validasyonu (Literal rol, 4000 char, 80 mesaj) + system prompt'a SECURITY RULES bloğu (marker sahteciliği, prompt sızdırma, rol değiştirme reddi)
-- [/] Structured output: risk profili çıkarımı yapılandırıldı (`/chat/extract-profile` + JSON extraction prompt'u) — portföy çıktısı tool-use'a geçirilecek
+- [x] Rate limiting on AI endpoints with `slowapi` (chat, recommend)
+- [x] Prompt-injection protection: role/length validation (Literal role, 4000 chars, 80 messages) + SECURITY RULES block in the system prompt (marker forgery, prompt leaking, role switching refused)
+- [/] Structured output: risk profile extraction structured (`/chat/extract-profile` + JSON extraction prompt) — portfolio output to move to tool-use
 
-### AI Danışman Kalitesi 🆕
+### AI Advisor Quality 🆕
 
-> ✅ **Çözüldü (2026-07-04):** Kopuk profil akışı onarıldı — AI tamamlanınca `[PROFILE_COMPLETE]` işareti veriyor, frontend `/chat/extract-profile` ile yapılandırılmış cevapları çekip skor ekranına geçiyor.
+> ✅ **Solved (2026-07-04):** the broken profile flow was repaired — the AI emits `[PROFILE_COMPLETE]` when done, the frontend pulls structured answers via `/chat/extract-profile` and moves to the score screen.
 
-- [x] `system_prompt.txt`'i derinleştir: MPT/risk-getiri çerçevesine açık referans, karşı soru sorma davranışı, yasal/etik sınırların net ifadesi
-- [x] Few-shot örnek diyaloglar ekle (1 örnek embedded) — danışman tonunu örnekten öğret
-- [x] `reit_explain_prompt.txt`'i derinleştir: 3 cümle yapısı, profil-spesifik ton, dürüst risk uyarısı, MPT bağlamı
-- [x] RAG: `chat_context.py` — günlük piyasa özeti (BIST/SPY/GLD + aylık TÜFE) system prompt'a inject ediliyor, 6 saatlik cache, fail-open (3 test)
-- [ ] Tool-use mimarisi: `get_market_data(ticker)`, `calculate_volatility(asset)`, `get_risk_score(profile)` tool tanımları — Claude veriyi kendi üretmek yerine servislerden çeksin
-- [/] Geri bildirim döngüsü v1: `recommendation_served` structured log + admin/stats holdings kıyası; UI-tabanlı kabul/red eventi sonraki sürüm
-- [ ] Prompt versiyonlarını A/B test et, Anthropic Console Prompt Improver ile mevcut prompt'u güçlendir
-
----
-
-## Phase 7 — Ürün Derinleştirme & Kişisel Yatırım Takibi 🆕
-
-**Süre:** Phase 6 ile paralel yürütülebilir
-**Kaynak:** Ürün vizyonu görüşmesi (2026-06-28)
-
-### AI Sağlayıcı Esnekliği (maliyet çözümü)
-
-- [x] `ai_service.py`'yi provider-agnostic yap: tek `chat()` / `generate_text()` interface'i, arkasında adapter'lar
-- [x] Gemini adapter ekle (`google-generativeai`) — free tier, geliştirme/demo varsayılanı
-- [x] `google-generativeai` → `google-genai` (2.10.0) SDK migrasyonu — deprecated uyarısı gitti, canlı doğrulandı
-- [x] `.env`'e `AI_PROVIDER=gemini|anthropic` seçimi; Claude adapter'ı mevcut kodu sarmalasın
-- [x] Provider'a özel hata yönetimi (kredi bitti / kota doldu → kullanıcıya anlamlı mesaj)
-- [x] Gemini free-tier fallback zinciri: 2.5-flash → 2.5-flash-lite → 2.0-flash — her modelin AYRI ücretsiz kotası olduğundan 429/5xx'te otomatik geçiş; ücretsiz kapasite ~3x, kullanıcı hata görmez (5 test)
-
-### Risk Profili Derinleştirme
-
-- [x] 7 soruya iki boyut yedir: yaş/emekliliğe kalan süre (Q2) + gelir istikrarı (Q7)
-- [x] Dinamik follow-up: profil belirsizse LLM ek soru sorabilsin (7–10 soru arası esnek akış)
-- [x] `risk_engine.py`'yi yeni boyutlara göre güncelle (yaş ve gelir istikrarı skora etki etsin)
-
-### Kişisel Yatırım Takibi 💰 (abi fikri)
-
-- [x] `backend/models/holding.py` — kullanıcı varlık modeli (10 tip: hisse/fon/etf/konut/arsa/araç/altın/kripto/nakit/diğer) + Alembic migration
-- [x] Araç varlık tipi — dürüst çerçeveyle: net servet resminde yer alır AMA amortisman hesabıyla gösterilir (yıllık değer kaybı + kasko/MTV/bakım maliyeti); "Araban serveti mi, gideri mi?" eğitim kartı eşlik eder — AI asla araç almayı yatırım olarak ÖNERMEZ
-- [x] `backend/routers/holdings.py` — CRUD + borsa varlığına ticker zorunluluğu (7 test)
-- [x] Bütçe takibi: `/holdings/summary` — toplam yatırılan, güncel değer, kalan bütçe, tip bazlı dağılım
-- [/] Borsa dışı varlıklar için manuel değerleme alanı ✅; borsa varlıklarının yfinance canlı değerlemesi sonraki adım
-- [x] `frontend/src/pages/HoldingsPage.jsx` — "Varlıklarım": toplam değer + kalan bütçe + Fener skoru + liste + ekleme formu (BottomNav'a eklendi)
-- [x] Dashboard'a özet kart: toplam varlık değeri + kalan bütçe + günlük değişim
-- [x] Gerçek portföy vs önerilen portföy karşılaştırması ("hedef dağılımından sapma" göstergesi)
-
-### Mimari & Kod Kalitesi 🏛️ (clean architecture revizyonu)
-
-> Sıralama önerisi: repository/schema refactor → error handling → RBAC → Python 3.12
-
-- [x] `backend/repositories/` katmanı: user_repository + holding_repository; router'larda inline SQL kalmadı
-- [x] `backend/schemas/` klasörü: user_profile/portfolio/risk_score/holding şemaları taşındı; `models/` sadece ORM (user, holding)
-- [/] Domain exception sınıfları: `MarketDataError` + `AIServiceError` eklendi (`backend/exceptions.py`), error_handler'da 503'e map'leniyor — `QuotaExceededError` kota özelliğiyle gelecek
-- [x] Standart hata zarfı: `{detail, error:{code,message,request_id}}` — detail frontend uyumluluğu için korunuyor
-- [x] `X-Request-ID` middleware: contextvar tabanlı korelasyon — header'da döner, hata zarfında ve loglarda görünür (3 test)
-- [ ] API versiyonlama: tüm router'ları `/api/v1` prefix'i altına al (frontend api.js baseURL güncelle)
-- [x] Hafif RBAC: `role` kolonu (migration 734ca3a1) + `require_role()` + admin-only /admin/stats (kullanıcı/varlık/mesaj hacmi, yol dağılımı) (2 test)
-- [x] Health check'i derinleştir: `/health` DB bağlantısını ve AI provider erişimini gerçekten yoklusın (`{"db": "ok", "ai": "ok"}`)
-- [x] Python 3.9 → 3.12 migrasyonu: venv yeniden kuruldu, Dockerfile+CI 3.12'ye çekildi, `datetime.utcnow` deprecation'ları giderildi (Optional→| None dönüşümü kozmetik, kademeli yapılacak)
-- [x] pre-commit config: ruff + ruff-format + temel hijyen hook'ları (`pip install pre-commit && pre-commit install`)
-- [ ] Sızan Anthropic API anahtarını rotate et (Console → API Keys)
-
-### Mobil Strateji 📱 (karar: 3 kademe — 2026-06-28)
-
-> Kademe 1: mobile-first web ✅ (Phase 4'te yapıldı) → Kademe 2: tam PWA (MVP ile) → Kademe 3: Capacitor native (MVP sonrası, bütçe olunca)
-> React Native/Flutter'a geçiş YOK — mevcut React kod tabanı korunur.
-
-- [x] PWA tamamlandı: manifest.webmanifest + sw.js (network-first, API cache'lenmez) + prod-only kayıt
-- [ ] Capacitor sarma (MVP sonrası): store meşruiyeti + **push notification = davranışsal koçun taşıyıcısı** ("piyasa düştü, sakin ol" gerçek zamanlı ancak push ile çalışır; iOS web push güdük) — Apple $99/yıl + Google $25 bütçesi gerekir
-
-### Kullanım Kotası
-
-- [x] Kullanıcı başına günlük mesaj kotası (users.quota_date/quota_used, DAILY_MESSAGE_QUOTA=50, 429 + kibar TR/EN mesaj)
-- [x] Kota dolunca kibar bilgilendirme (backend mesajı chat error alanında görünüyor)
-
-### Eğitim Katmanı 📚 (vizyonun kalbi — öncelik yükseltildi)
-
-- [ ] Varlık bazlı eğitim: her portföy kalemi için "nedir / neden portföyünde / riski ne" LLM açıklaması (generalize edilmiş explain prompt)
-- [x] `AssetExplainer.jsx`'i bu içeriği gösterecek şekilde doldur — 6 bilinen ticker + 3 kategori fallback, 3 sekmeli statik kart
-- [x] Temel kavramlar sözlüğü (`frontend/src/data/glossary.js`, 12 terim, jargonsuz TR)
-- [ ] Kullanıcının yatırım yaptığı her varlık tipinde ilk alımda otomatik eğitim kartı göster
-- [/] Jargon tooltip sistemi: `IsikTut` bileşeni + 12 terimlik sözlük hazır; tüm sayfalara yayma devam edecek
-- [x] system_prompt'a "sıfır bilgi varsay" kuralı: her cevapta terimleri günlük dille açıkla, kullanıcı bilgi seviyesi gösterirse dili kademeli teknikleştir (+ korku-farkındalık kuralı: endişeyi önce karşıla, sonra cevapla)
-- [ ] UI metin denetimi: tüm sayfalardaki mevcut metinleri jargonsuzluk ilkesine göre elden geçir — RecommendPage + ReitCard Türkçeye çevrildi ✅, diğer sayfalar devam edecek
+- [x] Deepen `system_prompt.txt`: explicit MPT/risk-return framing, counter-question behaviour, clear legal/ethical boundaries
+- [x] Add few-shot example dialogues (1 embedded example) — teach the advisor tone by example
+- [x] Deepen `reit_explain_prompt.txt`: 3-sentence structure, profile-specific tone, honest risk warning, MPT context
+- [x] RAG: `chat_context.py` — daily market summary (BIST/SPY/GLD + monthly CPI) injected into the system prompt, 6-hour cache, fail-open (3 tests)
+- [ ] Tool-use architecture: `get_market_data(ticker)`, `calculate_volatility(asset)`, `get_risk_score(profile)` tool definitions — the LLM pulls data from services instead of inventing it
+- [/] Feedback loop v1: `recommendation_served` structured log + admin/stats holdings comparison; UI-based accept/reject events in a later version
+- [ ] A/B test prompt versions; strengthen the current prompt with Anthropic Console's Prompt Improver
 
 ---
 
-## Phase 8 — Farklılaştırıcı Özellikler 🚀 (piyasa analizi: 2026-06-28)
+## Phase 7 — Product Deepening & Personal Investment Tracking 🆕
 
-> Konumlandırma: Midas/Getir Finans = işlem, robo-advisor'lar = kara kutu öneri, Fintables = analiz.
-> Lumos'un boşluğu: **"anlayarak yatırım"** — öneriyi açıklayan, davranışı koçlayan, Türkiye gerçeklerine göre konuşan asistan.
+**Duration:** can run in parallel with Phase 6
+**Source:** product vision discussion (2026-06-28)
 
-### Zaman Makinesi & Varlık Karakteri 🕰️ (en güçlü demo özelliği)
+### AI Provider Flexibility (cost solution)
 
-- [x] "Bu portföyü 5 yıl önce kursaydın?" — `backtest.py` servisi + POST /backtest (1y/3y/5y)
-- [x] `backend/services/backtest.py` → kümülatif seri + max drawdown + toparlanma süresi + grafik verisi (5 test)
-- [x] Duraklama dönemi tespiti: ±%5 bant algoritması → varlık başına `longest_stagnation_months` (profil eşleştirme rozeti sonraki adım)
-- [ ] Varlık karakter kartı: her varlık için "en uzun duraklama", "en derin düşüş", "toparlanma süresi" özeti — profil uyum rozeti (bu varlık senin sabrına uygun mu?)
-- [x] RecommendPage'e `TimeMachine` bileşeni: 1/3/5 yıl simülasyon + "en kötü anında X TL" dürüst vurgusu + çizgi grafik
-- [x] Risk toleransı sorusunu somutlaştır: soyut "%20 düşerse" yerine kullanıcının kendi bütçesiyle "50.000 TL'n 40.000 TL olurdu" göster
+- [x] Make `ai_service.py` provider-agnostic: single `chat()` / `generate_text()` interface with adapters behind it
+- [x] Add the Gemini adapter (`google-generativeai`) — free tier, default for dev/demo
+- [x] `google-generativeai` → `google-genai` (2.10.0) SDK migration — deprecation warning gone, verified live
+- [x] `AI_PROVIDER=gemini|anthropic` selection in `.env`; the Claude adapter wraps the existing code
+- [x] Provider-specific error handling (credits out / quota exceeded → meaningful user message)
+- [x] Gemini free-tier fallback chain: 2.5-flash → 2.5-flash-lite → 2.0-flash — each model has its OWN free quota, so 429/5xx auto-switches; ~3x free capacity, users never see the error (5 tests)
 
-### Emlak + Borsa Hibrit 🏘️📈 (Midas'a karşı ana koz)
+### Risk Profile Deepening
 
-> Midas yatırım aracıdır ama emlak derinliği sıfır. Lumos'un kimliği: **satın alma yolculuğunun tamamına** rehberlik —
-> "1M TL'm var" → AI bölüşümü önerir → değerlenecek bölgeyi gösterir → ilana yönlendirir → alınca portföye işler → kalanla borsa planı yapar.
+- [x] Fold two dimensions into the questions: age/time to retirement + income stability
+- [x] Dynamic follow-up: the LLM may ask extra questions when the profile is unclear (flexible 7–10 question flow)
+- [x] Update `risk_engine.py` for the new dimensions (age and income stability affect the score)
 
-#### ⚖️ İşlem Modeli (kesin karar — 2026-06-28)
+### Personal Investment Tracking 💰
 
-> **Lumos işlem GERÇEKLEŞTİRMEZ — iki dünyada da model: rehberlik et → dışarıda satın al → uygulamada takip et.**
+- [x] `backend/models/holding.py` — user holding model (10 types: stock/fund/etf/home/land/vehicle/gold/crypto/cash/other) + Alembic migration
+- [x] Vehicle asset type — with honest framing: counts in the net-worth picture BUT shown with depreciation math (annual value loss + insurance/tax/maintenance); accompanied by the "is your car wealth or an expense?" education card — the AI NEVER recommends buying a car as an investment
+- [x] `backend/routers/holdings.py` — CRUD + ticker required for exchange assets (7 tests)
+- [x] Budget tracking: `/holdings/summary` — total invested, current value, remaining budget, per-type breakdown
+- [/] Manual valuation field for off-exchange assets ✅; live yfinance valuation of exchange assets shipped later (see 2026-07-09 round)
+- [x] `frontend/src/pages/HoldingsPage.jsx` — "My Assets": total value + remaining budget + Lantern score + list + add form (added to nav)
+- [x] Dashboard summary card: total asset value + remaining budget + daily change
+- [x] Actual vs recommended portfolio comparison ("drift from target allocation" indicator)
+
+### Architecture & Code Quality 🏛️ (clean-architecture revision)
+
+> Suggested order: repository/schema refactor → error handling → RBAC → Python 3.12
+
+- [x] `backend/repositories/` layer: user_repository + holding_repository; no inline SQL left in routers
+- [x] `backend/schemas/` folder: user_profile/portfolio/risk_score/holding schemas moved; `models/` is ORM only (user, holding)
+- [/] Domain exception classes: `MarketDataError` + `AIServiceError` added (`backend/exceptions.py`), mapped to 503 in error_handler — `QuotaExceededError` comes with the quota feature
+- [x] Standard error envelope: `{detail, error:{code,message,request_id}}` — detail kept for frontend compatibility
+- [x] `X-Request-ID` middleware: contextvar-based correlation — returned in the header, visible in the error envelope and logs (3 tests)
+- [ ] API versioning: move all routers under an `/api/v1` prefix (update frontend api.js baseURL)
+- [x] Light RBAC: `role` column (migration 734ca3a1) + `require_role()` + admin-only /admin/stats (user/holding/message volume, path distribution) (2 tests)
+- [x] Deepen the health check: `/health` genuinely probes DB connectivity and AI provider access (`{"db": "ok", "ai": "ok"}`)
+- [x] Python 3.9 → 3.12 migration: venv rebuilt, Dockerfile+CI moved to 3.12, `datetime.utcnow` deprecations fixed (Optional→| None conversion is cosmetic, gradual)
+- [x] pre-commit config: ruff + ruff-format + basic hygiene hooks (`pip install pre-commit && pre-commit install`)
+- [ ] Rotate the leaked Anthropic API key (Console → API Keys)
+
+### Mobile Strategy 📱 (decision: 3 tiers — 2026-06-28)
+
+> Tier 1: mobile-first web ✅ (done in Phase 4) → Tier 2: full PWA (with MVP) → Tier 3: Capacitor native (post-MVP, when budget allows)
+> NO switch to React Native/Flutter — the existing React codebase is preserved.
+
+- [x] PWA complete: manifest.webmanifest + sw.js (network-first, API never cached) + prod-only registration
+- [ ] Capacitor wrap (post-MVP): store legitimacy + **push notifications = the behavioural coach's carrier** ("market dropped, stay calm" only works in real time via push; iOS web push is weak) — requires Apple $99/yr + Google $25
+
+### Usage Quota
+
+- [x] Daily per-user message quota (users.quota_date/quota_used, DAILY_MESSAGE_QUOTA=50, 429 + polite TR/EN message)
+- [x] Polite notification when the quota is exhausted (backend message shows in the chat error area)
+
+### Education Layer 📚 (the heart of the vision — priority raised)
+
+- [ ] Per-asset education: "what is it / why is it in your portfolio / what's the risk" LLM explanation for every portfolio item (generalised explain prompt)
+- [x] Fill `AssetExplainer.jsx` with this content — 6 known tickers + 3 category fallbacks, 3-tab static card
+- [x] Core-concepts glossary (`frontend/src/data/glossary.js`, 12 terms, jargon-free Turkish)
+- [ ] Auto-show an education card on the first purchase of every asset type the user invests in
+- [/] Jargon tooltip system: `IsikTut` component + 12-term glossary ready; roll-out to all pages continues
+- [x] "Assume zero knowledge" rule in the system prompt: explain terms in everyday language in every answer, gradually technical as the user shows knowledge (+ fear-awareness rule: acknowledge the worry first, then answer)
+- [ ] UI copy audit: revise all existing page copy against the jargon-free principle — RecommendPage + ReitCard done ✅, other pages to follow
+
+---
+
+## Phase 8 — Differentiating Features 🚀 (market analysis: 2026-06-28)
+
+> Positioning: Midas/Getir Finans = execution, robo-advisors = black-box recommendations, Fintables = analysis.
+> Lumos's gap: **"investing with understanding"** — an assistant that explains its advice, coaches behaviour, and speaks to Turkish realities.
+
+### Time Machine & Asset Character 🕰️ (strongest demo feature)
+
+- [x] "What if you'd built this portfolio 5 years ago?" — `backtest.py` service + POST /backtest (1y/3y/5y)
+- [x] `backend/services/backtest.py` → cumulative series + max drawdown + recovery time + chart data (5 tests)
+- [x] Stagnation-period detection: ±5% band algorithm → per-asset `longest_stagnation_months` (profile-match badge later)
+- [ ] Asset character card: "longest stagnation", "deepest drawdown", "recovery time" summary per asset — profile-fit badge (does this asset match your patience?)
+- [x] `TimeMachine` component on RecommendPage: 1/3/5-year simulation + honest "X TL at its worst moment" emphasis + line chart
+- [x] Concretise the risk-tolerance question: instead of an abstract "if it drops 20%", show it with the user's own budget: "your 50.000 TL would become 40.000 TL"
+
+### Real Estate + Stocks Hybrid 🏘️📈 (the main edge over Midas)
+
+> Midas is an execution tool with zero real-estate depth. Lumos's identity: guiding **the entire purchase journey** —
+> "I have 1M TL" → the AI suggests a split → shows appreciating regions → links to listings → records the purchase → plans the remainder in stocks.
+
+#### ⚖️ Execution Model (final decision — 2026-06-28)
+
+> **Lumos does NOT execute transactions — in both worlds the model is: guide → buy outside → track in the app.**
 >
-> | | Borsa | Emlak |
+> | | Stocks | Real estate |
 > |---|---|---|
-> | Neden in-app alım yok | SPK aracı kurum lisansı gerekir (sermaye + denetim + yıllar) | Fiziksel dünya işlemi (tapu) |
-> | Rehberlik | Portföy önerisi + "aracı kurumda nasıl alınır" rehberi | Bölge kartları + ilan köprüsü + değerlendirme asistanı |
-> | Satın alma | Kullanıcının kendi aracı kurumu (Midas, İş Yatırım...) | Sahibinden/emlakçı üzerinden |
-> | Dönüş | "Aldım" → holdings'e işle → portföy güncellenir | "Aldım" → holdings'e işle → portföy güncellenir |
+> | Why no in-app buying | Requires an SPK brokerage licence (capital + audits + years) | Physical-world transaction (title deed) |
+> | Guidance | Portfolio recommendation + "how to buy at your broker" guide | Region cards + listing bridge + evaluation assistant |
+> | Purchase | The user's own broker (Midas, İş Yatırım...) | Via Sahibinden/estate agents |
+> | Return | "I bought it" → record in holdings → portfolio updates | "I bought it" → record in holdings → portfolio updates |
 >
-> Avantajlar: sıfır regülasyon riski, para emanet alınmaz (güven eşiği düşük — korkak başlayan için artı), $0 maliyet korunur.
-> İleri faz (iş geliştirme): aracı kurum API ortaklığı ile "tek tık emir iletimi" — emlak platform ortaklığıyla aynı statüde, MVP dışı.
+> Advantages: zero regulatory risk, no custody of funds (lower trust threshold — a plus for the scared beginner), $0 cost preserved.
+> Later phase (business development): brokerage API partnership for "one-tap order routing" — same status as a real-estate platform partnership, out of MVP.
 
-- [x] Onboarding'de dürüst beklenti cümlesi: "Lumos sana yol gösterir; alım-satımı kendi aracı kurumunda yaparsın, sonra burada takip ederiz"
-- [x] Borsa "Aldım" akışı: `BoughtItBridge` — öneri dağılımını tek tıkla holdings'e işler, kalan bütçe otomatik güncellenir
-- [ ] "Aracı kurum hesabı nasıl açılır" rehberi (Korkusuz Başlangıç'taki rehberli yolculukla aynı madde — çift kayıt değil, referans)
+- [x] Honest expectation line in onboarding: "Lumos shows you the way; you buy at your own broker, then we track it here"
+- [x] Stock "I bought it" flow: `BoughtItBridge` — records the recommended allocation into holdings in one tap, remaining budget auto-updates
+- [ ] "How to open a brokerage account" guide (same item as the guided journey in Fearless Start — a reference, not a duplicate)
 
-#### Akış 0 — Yol Seçimi 🧭 (yapısal ilke: akışlar zorunlu değil, seçilebilir)
+#### Flow 0 — Path Selection 🧭 (structural principle: flows are chosen, never forced)
 
-> ⚠️ Not (2026-07-04): Onboardingdaki yol seçimi + backend `investment_path` alanı canlı çalışıyor. Ama koşullu modül gizleme henüz uygulanamadı çünkü emlağa özel SAYFALAR (bölge kartları, ilan değerlendirme, kira/ev karar UI'ı) henüz yok — sadece backend endpoint'leri hazır (planning router). Bu sayfalar yazılınca gizleme mantığı () eklenecek.
+> ⚠️ Note (2026-07-04): onboarding path selection + backend `investment_path` field work live. Conditional module hiding partially applied (nav filtering ✅); real-estate-specific PAGES came with ExplorePage later.
 
-> Kullanıcı emlak seçmek ZORUNDA değil. Üç eşit yol: sadece borsa (Midas tarzı) / sadece emlak keşfi / karma. Her akış bağımsız çalışır.
+> The user is NEVER forced to pick real estate. Three equal paths: stocks only (Midas style) / real-estate discovery only / mixed. Each flow works independently.
 
-- [x] Onboarding'e yol sorusu: `PathSelectionPage` (4 kart) → PATCH /users/me/investment-path → users.investment_path
-- [x] Yol-bazlı modül uyarlaması: BottomNav seçilen yola göre filtreleniyor (sadece-borsa → Keşfet gizli; sadece-emlak → Portfolio gizli)
-- [ ] "Sadece emlak" yolu: risk profili yine yapılır (vade + likidite kritik) ama çıktı bölge kartları + ilan değerlendirme + eğitim; borsa önerisi dayatılmaz
-- [ ] "Kararsızım" yolu: profil + korku check-in sonucuna göre AI yol önerir ("düzenli birikim + uzun vade → önce borsa fonlarıyla başla, emlak eşiğine gelince haber veririm")
-- [ ] Yol her an değiştirilebilir (ayarlar + dashboard'da "emlak dünyasını keşfet" yumuşak daveti — dayatma yok)
-- [ ] Bütçe bölüşüm danışmanı yalnızca karma/kararsız yolda aktif; tek-yol kullanıcıda bütçenin tamamı seçili dünyaya planlanır
+- [x] Path question in onboarding: `PathSelectionPage` (4 cards) → PATCH /users/me/investment-path → users.investment_path
+- [x] Path-based module adaptation: nav filters by chosen path (stocks-only → Explore hidden; real-estate-only → Portfolio hidden)
+- [ ] "Real estate only" path: the risk profile still runs (horizon + liquidity are critical) but the output is region cards + listing evaluation + education; no stock recommendation forced
+- [ ] "Undecided" path: the AI suggests a path from profile + fear check-in ("regular savings + long horizon → start with stock funds, I'll tell you when you reach the real-estate threshold")
+- [ ] The path can change at any time (settings + a soft "explore the real-estate world" invitation on the dashboard — never forced)
+- [ ] The budget-split advisor is active only on mixed/undecided paths; single-path users get the whole budget planned in their chosen world
 
-#### Akış 1 — Bütçe Bölüşüm Danışmanı (giriş noktası)
+#### Flow 1 — Budget Split Advisor (entry point)
 
-- [ ] Emlağı tahsis edilebilir varlık sınıfı yap: portfolio_engine "1.000.000 TL + profil" → "600K emlak / 300K hisse-fon / 100K nakit yedek" bölüşümü önersin (risk skoru + likidite ihtiyacı + bütçe eşiği girdileriyle)
-- [ ] Bölüşüm gerekçesi LLM anlatımı: neden bu oranlar, hangi profilde nasıl değişirdi (öğreten ton)
-- [ ] REIT vs fiziksel emlak karar noktası: bütçe eşik altındaysa veya likidite ihtiyacı yüksekse "fiziksel yerine REIT" yönlendirmesi (hybrid_basket çift yönlü)
+- [ ] Make real estate an allocatable asset class: portfolio_engine takes "1.000.000 TL + profile" → suggests "600K real estate / 300K stocks-funds / 100K cash reserve" (inputs: risk score + liquidity need + budget threshold)
+- [ ] LLM narration of the split rationale: why these ratios, how they'd differ per profile (teaching tone)
+- [ ] REIT vs physical real-estate decision point: below the budget threshold or with high liquidity needs, steer to "REIT instead of physical" (hybrid_basket both ways)
 
-#### Akış 2 — Bölge Değerlenme İstihbaratı (AI "nereden alayım?" cevabı)
+#### Flow 2 — Region Appreciation Intelligence (the AI's "where should I buy?" answer)
 
-- [x] TCMB Konut Fiyat Endeksi CANLI: 19 NUTS2 bölgesi (TP.KFE.*), 1-3 yıl nominal + reel değerlenme sıralaması (`region_intelligence.py`)
-- [ ] TÜİK nüfus/göç verisi entegrasyonu: net göç alan + genç nüfuslu ilçeler = talep sinyali
-- [x] "Değerlenme Potansiyeli" bölge kartları: GET /planning/region-intelligence + ExplorePage UI (1/2/3 yıl seçimli, reel sıralı, dürüstlük notu) — canlı TCMB verisiyle tarayıcıda doğrulandı; TÜİK göç sinyali sonraki adım
-- [ ] Kullanıcı hedefiyle eşleştir: "20 yıl bekleyebilirim" → uzun vade değerlenme bölgeleri; "5 yılda satarım" → likiditesi yüksek merkezi bölgeler
+- [x] TCMB housing price index LIVE: 19 NUTS2 regions (TP.KFE.*), 1-3 year nominal + real appreciation ranking (`region_intelligence.py`)
+- [ ] TÜİK population/migration data integration: districts with net inbound migration + young populations = demand signal
+- [x] "Appreciation potential" region cards: GET /planning/region-intelligence + ExplorePage UI — verified live with TCMB data; TÜİK migration signal later
+- [ ] Match against the user's goal: "I can wait 20 years" → long-horizon appreciation regions; "I'll sell in 5 years" → central, liquid regions
 
-#### Akış 3 — İlan Köprüsü (satın almaya yönlendirme)
+#### Flow 3 — Listing Bridge (routing to the purchase)
 
-- [x] Filtre-hazır dış linkler: servis + endpoint + ExplorePage "İlanlara Git" kartı (il/ilçe/tip formu → dış linkler)
-- [ ] **İlan değerlendirme asistanı**: kullanıcı beğendiği ilanın bilgilerini yapıştırır (konum, m², fiyat) → AI bölge ortalama m² fiyatıyla kıyaslar: "bölge ortalamasının %20 üstünde" + pazarlık/kontrol listesi (imar durumu, tapu cinsi, yola cephe...)
-- [ ] Satın alma kontrol listesi rehberi: arsa/daire alırken adım adım ne kontrol edilir (statik eğitim içeriği, TR'ye özgü: tapu, imar, DASK...)
-- [ ] (İleri faz — iş geliştirme) Emlak platformu API ortaklığı: gerçek ilan + emlakçı iletişimi in-app gösterim
+- [x] Filter-ready external links: service + endpoint + ExplorePage "Go to listings" card (province/district/type form → external links)
+- [ ] **Listing evaluation assistant**: the user pastes a listing's details (location, m², price) → the AI compares against the region's average m² price: "20% above the region average" + negotiation/inspection checklist (zoning, deed type, road frontage...)
+- [ ] Purchase checklist guide: step-by-step checks when buying land/a flat (static education content, Turkey-specific: deed, zoning, DASK...)
+- [ ] (Later phase — business development) Real-estate platform API partnership: real listings + agent contact in-app
 
-#### Akış 4 — Döngüyü Kapat (alım sonrası)
+#### Flow 4 — Close the Loop (after the purchase)
 
-- [ ] "Aldım" akışı: ilan değerlendirmeden tek tıkla holdings'e kayıt (Phase 7 formu ön dolu gelir)
-- [ ] Kalan bütçeyi otomatik yeniden planla: "600K'yı arsaya bağladın, kalan 400K için hisse-fon planın hazır" → recommend akışına köprü
-- [ ] TCMB endeksiyle emlak varlığının değerini dönemsel güncelle ("endekse göre tahmin" etiketiyle)
-- [ ] Kira getirisi vs temettü verimi karşılaştırması: "bu daire yıllık %4 kira getirir, bu temettü portföyü %6 öder"
-- [x] Likidite skoru: Fener'in %40 ağırlıklı bileşeni — illikit ağırlıklı portföyde uyarı notu üretiyor
-- [ ] "500.000 TL'lik arsa mı, 500.000 TL'lik portföy mü?" karşılaştırma ekranı: aynı tutar, geçmiş 5 yıl, konut endeksi vs portföy getirisi yan yana (+ likidite ve masraf farkları tablosu)
+- [ ] "I bought it" flow: one-tap record into holdings from the listing evaluation (Phase 7 form pre-filled)
+- [ ] Auto-replan the remaining budget: "you locked 600K into land; your stock-fund plan for the remaining 400K is ready" → bridge into the recommend flow
+- [ ] Periodically update the real-estate holding's value with the TCMB index (labelled "index-based estimate")
+- [ ] Rent yield vs dividend yield comparison: "this flat yields 4% rent a year; this dividend portfolio pays 6%"
+- [x] Liquidity score: the Lantern's 40%-weighted component — produces a warning note for illiquid-heavy portfolios
+- [ ] "A 500.000 TL plot or a 500.000 TL portfolio?" comparison screen: same amount, past 5 years, housing index vs portfolio returns side by side (+ liquidity and cost differences table)
 
-#### Akış 5 — Kira & Ev Kararları 🏠 (giriş kapısı özelliği)
+#### Flow 5 — Rent & Home Decisions 🏠 (gateway feature)
 
-> Türkiye'de yatırım bilmeyenin ilk finansal sorusu: "kirada mı oturayım, ev mi alayım?" — bu soruya cevap veren araç, uygulamaya kullanıcı çeken kapı olur.
+> In Turkey, the first financial question of a non-investor is "should I rent or buy?" — the tool that answers it becomes the door that brings users in.
 
-- [x] "Kirada mı otur, ev mi al?" karar aracı: servis + endpoint + ExplorePage UI kartı (iki senaryo yan yana + duygusal değer notu) — canlı doğrulandı
-- [ ] Karar aracına duygu boyutu: "ev sahibi olma güvencesi"nin parasal olmayan değerini de anlat (vizyon ilkesi: korku/duygu = veri)
-- [ ] Aylık ödenen kirayı profil girdisi yap: yatırılabilir gerçek tutar = gelir − kira − zorunlu giderler → bütçe bölüşüm danışmanı bu net tutarla konuşsun
-- [x] Kapsam sınırı (bilinçli karar): kiralık ilan arama / mortgage pazaryeri EKLENMEDİ — listing_bridge.py sadece filtre-hazır dış link üretir, ilan verisi hiç saklanmaz
+- [x] "Rent or buy?" decision tool: service + endpoint + ExplorePage UI card (two scenarios side by side + emotional-value note) — verified live
+- [ ] Add the emotion dimension to the tool: also narrate the non-monetary value of "the security of owning a home" (vision principle: fear/emotion = data)
+- [ ] Make monthly rent a profile input: real investable amount = income − rent − essential expenses → the budget-split advisor speaks with this net amount
+- [x] Scope limit (deliberate decision): rental-listing search / mortgage marketplace NOT added — listing_bridge.py only produces filter-ready external links, no listing data is ever stored
 
-### Enflasyon Gerçekliği 🇹🇷 (yerel farklılaştırıcı — kimse yapmıyor)
+### Inflation Reality 🇹🇷 (local differentiator — nobody does this)
 
-- [x] Tüm getirilere nominal + reel çift gösterim: Zaman Makinesi sonucunda `real_return_pct` alanı, UI'da "Enflasyon sonrası (reel)" satırı
-- [x] TÜFE verisi: CANLI TCMB EVDS entegrasyonu (`evds_service.py`, TP.FG.J0, günlük cache) — statik dosya fallback olarak korunuyor
-- [x] Portföyde TL/döviz dağılımı ve kur riski göstergesi — `CurrencyExposure.jsx` (HoldingsPage'e entegre)
-- [x] "Param eriyor mu?" kartı: Varlıklarım sayfasında boştaki bütçe + nakit için aylık reel erime tutarı (5 test)
+- [x] Dual nominal + real display for all returns: `real_return_pct` in Time Machine results, "after inflation (real)" line in the UI
+- [x] CPI data: LIVE TCMB EVDS integration (`evds_service.py`, TP.FG.J0, daily cache) — static file kept as fallback
+- [x] TL/FX split and currency-risk indicator in the portfolio — `CurrencyExposure.jsx` (integrated into HoldingsPage)
+- [x] "Is my money melting?" card: monthly real erosion of idle budget + cash on the holdings page (5 tests)
 
-### Davranışsal Koç 🧠 (robo-advisor'ların yapmadığı)
+### Behavioural Coach 🧠 (what robo-advisors don't do)
 
-- [x] Piyasa hareketi mesajları: `behavior_coach.py` + POST /coach/market-move — loss_tolerance'a göre düşüş/yükseliş mesajı (şablon tabanlı, AI maliyeti yok)
-- [x] Davranış aynası: GET /coach/behavior-mirror — emotion_tag dağılımı + profil/davranış uyumsuzluğunda nazik not
-- [x] Alımda opsiyonel 1-tık duygu etiketi (plan/fomo/tüyo/panik) — `holdings.emotion_tag`; aylık rapor UI'ı sonraki adım
+- [x] Market-move messages: `behavior_coach.py` + POST /coach/market-move — drop/rally messages by loss_tolerance (template-based, zero AI cost)
+- [x] Behaviour mirror: GET /coach/behavior-mirror — emotion_tag distribution + a gentle note on profile/behaviour mismatch
+- [x] Optional one-tap emotion tag on purchases (plan/fomo/tip/panic) — `holdings.emotion_tag`; monthly report UI later
 
-### Hedef Bazlı Yatırım 🎯
+### Goal-Based Investing 🎯
 
-- [x] Hedef tanımlama: servis + endpoint + Dashboard `GoalPlanner` kartı — canlı doğrulandı (800K/3yıl → 17.993 TL/ay)
-- [x] Hedefe ilerleme + sapma: endpoint + UI ilerleme çubuğu — canlı doğrulandı (10K temponla "21 ay gecikir" uyarısı)
-- [x] Hedef sapma uyarısı: UI'da "⏳ Bu tempoda hedefin X ay gecikir" kartı canlı çalışıyor
+- [x] Goal definition: service + endpoint + Dashboard `GoalPlanner` card — verified live (800K/3yr → 17.993 TL/month)
+- [x] Progress + drift: endpoint + UI progress bar — verified live ("21 months late" warning at a 10K pace)
+- [x] Goal-drift warning: "⏳ at this pace your goal slips X months" card live
 
-### Portföy Sağlık Skoru 💯
+### Portfolio Health Score 💯
 
-- [/] Fener skoru v1: çeşitlendirme (HHI) + likidite bileşenleri, 0-100 + jargonsuz notlar (hedef uyum + kur dengesi sonraki sürüm)
-- [ ] Her bileşen için "neden düşük, nasıl yükselir" LLM açıklaması
-- [/] Fener kartı Varlıklarım sayfasında ✅; zaman içinde skor grafiği sonra
-- [x] Cesaret Skoru UI: `ReadinessScore.jsx` — Dashboard'da 5 kilometre taşı + dairesel skor göstergesi, %60 eşiğinde "gerçek yatırıma hazırsın" mesajı
+- [/] Lantern score v1: diversification (HHI) + liquidity components, 0-100 + jargon-free notes (goal fit + currency balance next version)
+- [ ] "Why is it low, how does it rise" LLM explanation per component
+- [/] Lantern card on the holdings page ✅; score-over-time chart later
+- [x] Courage Score UI: `ReadinessScore.jsx` — 5 milestones + circular score on the Dashboard, "ready for real investing" message at the 60% threshold
 
-### What-If Asistanı 🔮
+### What-If Assistant 🔮
 
-- [x] Chat'te senaryo soruları: "10.000 TL daha eklesem?", "daha agresif olsam?" — `what_if.py` tool-use: LLM sadece niyeti JSON'a çıkarır, `portfolio_engine` gerçek before/after hesaplar, LLM sadece sonucu yorumlar (asla matematik uydurmaz); `/chat/what-if` + `WhatIfAssistant` UI kartı, 6 test, canlı Gemini ile doğrulandı
+- [x] Scenario questions in chat: "what if I add 10.000 TL?", "what if I were more aggressive?" — `what_if.py` tool-use: the LLM only extracts intent to JSON, `portfolio_engine` computes the real before/after, the LLM only narrates (never invents math); `/chat/what-if` + `WhatIfAssistant` UI card, 6 tests, verified live on Gemini
 
+### Future Scenarios 🔮 (user idea — 2026-07-05)
 
-### Gelecek Senaryoları 🔮 (kullanıcı fikri — 2026-07-05)
+> The honest answer to "what happens if I put it in SPY for 5 years?": NOT a forecast — the distribution of every N-year window in the asset's own history (bad p10 / typical p50 / good p90).
 
-> "SPY'a koysam 5 yılda ne olur?" sorusunun dürüst cevabı: tahmin DEĞİL, varlığın kendi
-> geçmişindeki tüm N-yıllık pencerelerin dağılımı (kötü p10 / tipik p50 / iyi p90).
+- [x] `projection.py`: rolling-window distribution engine — asset (yfinance 10y, monthly sampling) + region (TCMB KFE) (7 tests)
+- [x] POST /planning/projection/asset + /projection/region — honest refusal on insufficient history ("not enough windows")
+- [x] `FutureScenarios` card on RecommendPage: pick asset + horizon → 3 scenario bars with your budget
+- [x] Region cards on ExplorePage open a scenario band on click: "what would X TL become here in N years?" + real terms + the "60x" anecdote warning — verified live (Ankara 1M → typical +85.9% nominal / +15.15% real)
+- [ ] LLM current-context sentence on the scenario card (fed by the calm news digest, never touching the numbers)
+- [x] Combined scenario band for the whole portfolio (weighted window distribution)
 
-- [x] `projection.py`: kaymalı pencere dağılımı motoru — varlık (yfinance 10y, aylık örnekleme) + bölge (TCMB KFE) (7 test)
-- [x] POST /planning/projection/asset + /projection/region — yetersiz geçmişte dürüst ret ("yeterli pencere yok")
-- [x] RecommendPage `FutureScenarios` kartı: varlık + vade seç → bütçenle 3 senaryo çubuğu
-- [x] ExplorePage bölge kartları tıklanınca senaryo bandı: "X TL burada 2 yılda ne olurdu?" + reel karşılık + "60 kat" anekdot uyarısı — canlı doğrulandı (Ankara 1M → tipik +85.9% nominal / +15.15% reel)
-- [ ] Senaryo kartına LLM güncel bağlam cümlesi (sakin haber özetinden beslenerek, sayılara karışmadan)
-- [ ] Portföyün tamamı için birleşik senaryo bandı (ağırlıklı pencere dağılımı)
+### Panic Button 🫨 (original idea — 2026-07-08, no finance app has one)
 
+> The crisis-moment form of "fear = data": a real button to press when the market gets scary.
+> No dark patterns — selling is never blocked; the user is calmed according to their own profile.
 
-### Panik Düğmesi 🫨 (özgün fikir — 2026-07-08, hiçbir finans uygulamasında yok)
+- [x] POST /coach/panic: profile-based calming + 4 honest static facts (zero LLM cost) + press/resolution logging (behaviour-mirror data) (4 tests)
+- [x] `PanicButton.jsx`: floating button → 3-stage full-screen flow: breathing ring (3 breaths, skippable) → coach message + facts → "I've calmed down / Still worried"
+- [x] "Still worried" → 24-hour wait suggestion + licensed-advisor referral (honest escalation)
+- [x] Verified live: press → coach → resolution message end to end
 
-> "Korku = veri" ilkesinin kriz anı hali: piyasa korkuttuğunda basılacak gerçek bir buton.
-> Karanlık desen yok — satış engellenmez, sadece kullanıcı kendi profiline göre sakinleştirilir.
+### Calm News Feed 📰 (news = education, not noise)
 
-- [x] POST /coach/panic: profil-bazlı sakinleştirme + 4 dürüst statik gerçek (LLM maliyeti sıfır) + basış/çözüm loglama (davranış aynası verisi) (4 test)
-- [x] `PanicButton.jsx`: yüzen buton → 3 aşamalı tam ekran akış: nefes halkası (3 nefes, atlanabilir) → koç mesajı + gerçekler → "Sakinleştim / Hâlâ endişeliyim"
-- [x] "Hâlâ endişeliyim" → 24 saat bekleme + lisanslı danışman önerisi (dürüst yönlendirme)
-- [x] Canlı doğrulandı: basış → koç → çözüm mesajı uçtan uca
+> A raw news feed is a fear machine for a beginner. Lumos filters the news, calms it, teaches with it.
 
-### Sakin Haber Akışı 📰 (haber = eğitim, gürültü değil)
+- [x] RSS integration: AA Ekonomi + Bloomberg HT (httpx + stdlib XML, no new dependency) → `news_service.py`
+- [x] LLM news filter: path-based selection, headline + why_it_matters + calmness_note JSON, daily cache (5 tests)
+- [/] GET /news/digest ready (≤3 items, path-based); dashboard card UI shipped
+- [/] News + coach infrastructure ready (`news_service.py` + `behavior_coach.py`) — the automatic trigger bridge (news → coach) is the next integration step
+- [x] Headline-language training: "what actually happens when you see a MARKET CRASHES headline?" micro-education card — `HeadlineEducation.jsx` (4 scenarios, localStorage)
 
-> Ham haber akışı yeni başlayan için korku makinesidir. Lumos haberi süzer, sakinleştirir, öğretir.
+### Fearless Start 🐣 (the vision itself — highest priority)
 
-- [x] RSS entegrasyonu: AA Ekonomi + Bloomberg HT (httpx + stdlib XML, ek bağımlılık yok) → `news_service.py`
-- [x] LLM haber süzgeci: yol-bazlı seçim, headline + why_it_matters + calmness_note JSON'u, günlük cache (5 test)
-- [/] GET /news/digest hazır (≤3 haber, path-bazlı); dashboard kartı UI'ı sonraki adım
-- [/] Haber + koç altyapısı hazır (`news_service.py` + `behavior_coach.py`) — otomatik tetikleme köprüsü (haber → koç) sonraki entegrasyon adımı
-- [x] Manşet dili eğitimi: "BORSA ÇAKILDI manşeti gördüğünde gerçekte ne olur?" mikro-eğitim kartı — `HeadlineEducation.jsx` (4 senaryo, localStorage)
+> Someone who doesn't know investing must gain confidence before risking real money.
 
-### Korkusuz Başlangıç 🐣 (vizyonun ta kendisi — en yüksek öncelik)
-
-> Yatırım bilmeyen biri gerçek para riske atmadan önce güven kazanmalı.
-
-- [x] Sanal portföy: servis + endpoint + RecommendPage `PracticeMode` kartı ("Önce Sahte Parayla Dene")
-- [x] Haftalık değişim hesabı hazır (weekly_change_amount + biggest_mover); LLM anlatım katmanı sonraki adım
-- [x] İlk yatırım rehberli yolculuğu: adım adım sihirbaz — \"aracı kurum hesabı nedir → nasıl açılır → ilk emir nasıl verilir\" (Türkiye'ye özgü, statik 5 adım) — `BeginnerGuide.jsx`
-- [x] Korku check-in'i: `FearCheckInPage.jsx` + PATCH /users/me/fear-check-in — 4 korku etiketi + anında kişiselleştirilmiş güvence mesajı (canlı doğrulandı)
-- [x] "Bugün öğrendin" mikro-kartları: her oturumda tek küçük kavram ("ETF aslında bir sepettir") — 15 saniyelik okuma, ilerleme sayacı — `DailyTip.jsx` (12 kart, localStorage takibi)
-- [x] Kademeli arayüz: yeni kullanıcıda sade görünüm (3 metrik), "detay göster" ile zenginleşir — `ProgressiveDetails` Dashboard'da, toggle butonu
-- [x] Cesaret göstergesi: GET /users/me/readiness — 5 şeffaf kilometre taşı, 0-100 skor, %60 eşiği "gerçek yatırıma hazır" (canlı doğrulandı: skor 60, eşik geçildi)
+- [x] Practice portfolio: service + endpoint + `PracticeMode` card on RecommendPage ("Try with fake money first")
+- [x] Weekly change computed (weekly_change_amount + biggest_mover); LLM narration layer later
+- [x] Guided first-investment journey: step-by-step wizard — "what is a brokerage account → how to open one → how to place the first order" (Turkey-specific, static 5 steps) — `BeginnerGuide.jsx`
+- [x] Fear check-in: `FearCheckInPage.jsx` + PATCH /users/me/fear-check-in — 4 fear tags + instant personalised reassurance (verified live)
+- [x] "Today you learned" micro-cards: one small concept per session ("an ETF is actually a basket") — 15-second read, progress counter — `DailyTip.jsx` (12 cards, localStorage tracking)
+- [x] Progressive UI: minimal view for new users (3 metrics), enriches via "show details" — `ProgressiveDetails` on the Dashboard, toggle button
+- [x] Courage indicator: GET /users/me/readiness — 5 transparent milestones, 0-100 score, 60% threshold = "ready for real investing" (verified live: score 60, threshold crossed)
 
 ---
 
-## Phase 8.5 — Globalleşme Mimarisi 🌍 "Market Pack" Sistemi
+## Phase 8.5 — Globalization Architecture 🌍 the "Market Pack" System
 
-> Karar (2026-06-28): proje GLOBAL tasarlanacak. Yöntem: ülkeye özgü her şey tek pakette — kod ülke bilmez, pakete sorar.
-> Yeni ülke eklemek = yeni kod değil, yeni config + veri adaptörü + içerik paketi. TR ilk referans pack olarak eksiril yapılır.
+> Decision (2026-06-28): the project is designed GLOBAL. Method: everything country-specific lives in one pack — code never knows the country, it asks the pack.
+> Adding a country = new config + data adapter + content pack, not new code. TR is built out as the reference pack.
 
+### User Feedback Round 🛠️ (2026-07-09)
 
+- [x] **Listing-link realism audit**: the old Emlakjet pattern 301'd → real patterns verified with curl (/satilik-arsa/edirne-kesan → 200, including quarter depth); Sahibinden moved to canonical slugs (satilik-arsa/satilik-daire) + Turkish-character slugify (Keşan→kesan)
+- [x] **Village/quarter depth**: district + village/quarter fields on the province card — "Keşan Çeribaşı köyü" goes to a real Emlakjet path when it resolves, and to Sahibinden's safe search route; with the honesty note "no official price data is published at district/village level"
+- [x] Note: "link blocked" in the preview panel is not an app bug — the panel only opens localhost; links work in a real browser
 
+- [x] **Explore went province-level**: TCMB unit-price series discovered (bie_birimfiyat — 81 provinces, TL/m², quarterly, 2010→today) → concrete per-province prices ("Muğla 79.110 TL/m²") instead of NUTS2 blur; province search + top-12 list; batched fetching (15 series/request, daily cache) (7 tests, verified live)
+- [x] Horizon buttons 1/2/3 → **1/3/5 years** (16 years of quarterly history honestly supports it)
+- [x] Click a province card → 5-year scenario band + that province's Sahibinden/Emlakjet listing links
+- [x] **Math error fixed**: the scenario band's "real" value compared the median of ALL windows against a single period's inflation (Muğla showed a nonsensical −62%) → each window is now deflated by its OWN period inflation (Muğla typical real +137.6%)
 
+- [x] **Permanent "Signature has expired" fix**: Clerk tokens die in ~1 minute and the page-load token went stale → the axios request interceptor now pulls a fresh token from Clerk's getToken() on every request (registered by AuthBridge; free because Clerk caches and auto-refreshes internally)
 
-### Kullanıcı Geri Bildirimi Turu 🛠️ (2026-07-09)
+- [x] **Live holding valuation**: exchange assets auto-revalue with current yfinance prices (units, or units derived from the purchase-date price), real estate/land via the TCMB national housing index ratio — with source labels (📡 live / 📊 index estimate / ✍️ manual) and ▲▼ change badges in the list (7 tests; real estate verified live: Jan 2024 3M home → 5.42M +80.6%)
+- [x] Priority chain: manual > live/index > purchase amount; fail-open to purchase basis if sources die
+- [x] The "I bought it" bridge now writes the purchase date automatically → live tracking starts instantly
+- [x] **Rebuild my portfolio**: "rebuild with remaining X TL" button on the holdings page → new recommendation flow with the current risk score + remaining budget
+- [x] **Questions split to single-topic**: Q2 (horizon+age) and Q7 (obligations+income) were double-barreled → 9 single questions; "each message asks exactly one thing" rule added to the prompt; all "7 questions" copy updated
+- [x] Invisible (black) text on path-selection cards fixed (color: var(--text) on the button) + "Recommended" badge removed
 
-- [x] **İlan linkleri gerçekçilik denetimi**: eski Emlakjet kalıbı 301 atıyordu → gerçek kalıplar curl ile doğrulandı (/satilik-arsa/edirne-kesan → 200, mahalle derinliği dahil); Sahibinden kanonik sluglara (satilik-arsa/satilik-daire) geçildi + Türkçe karakter slugify (Keşan→kesan)
-- [x] **Köy/mahalle derinliği**: il kartında ilçe + köy/mahalle alanları — "Keşan Çeribaşı köyü" Emlakjet'te gerçek yola (edirne-kesan-ceribasi-koyu ✓ 200), Sahibinden'de güvenli arama rotasına gidiyor; "ilçe/köy düzeyinde resmi fiyat verisi yayınlanmıyor" dürüstlük notuyla
-- [x] Not: preview panelindeki "link blocked" uygulama hatası değil — panel yalnızca localhost açar; gerçek tarayıcıda linkler çalışır
+### End-to-End Test Round Findings 🔍 (2026-07-09)
 
-- [x] **Emlak Keşfet il bazına indi**: TCMB birim fiyat serileri keşfedildi (bie_birimfiyat — 81 il, TL/m², çeyreklik, 2010→bugün) → NUTS2 bölge bulanıklığı yerine il il somut fiyatlar ("Muğla 79.110 TL/m²"); il arama + ilk-12 listesi; toplu çekim (15 seri/istek, günlük cache) (7 test, canlı doğrulandı)
-- [x] Ufuk butonları 1/2/3 → **1/3/5 yıl** (16 yıllık çeyreklik geçmiş bunu dürüstçe destekliyor)
-- [x] İl kartına tıkla → 5 yıllık senaryo bandı + o ilin Sahibinden/Emlakjet ilan linkleri
-- [x] **Hesap hatası düzeltildi**: senaryo bandının "reel" değeri tüm pencerelerin medyanını tek dönemin enflasyonuyla kıyaslıyordu (Muğla saçma -%62 gösteriyordu) → her pencere KENDİ dönem enflasyonuyla arındırılıp reel dağılım çıkarılıyor (Muğla tipik reel +%137.6)
+- [x] Tab icon alignment: logo-icon.svg viewBox wasn't square (84×90) and clipped the tail → square (100×100), content-centred viewBox; verified with a fixture (middle of the L = middle of the firefly)
+- [x] Navbar/hero and the tab icon now share the same brand mark (logo-icon.svg)
+- [x] Critical UX gap: a signed-out user deep-linking to a protected route got a BLACK SCREEN → `AuthPending` fallback (firefly + "redirecting" message), including ClerkLoading — verified live
+- [x] Deep health check verified live: /health now probes db+ai
 
-- [x] **"Signature has expired" kalıcı çözümü**: Clerk token'ları ~1dk'da ölüyor, sayfa-yükleme anında alınan token bayatlıyordu → axios request interceptor'ı her istekte Clerk getToken()'dan taze token çekiyor (AuthBridge kaydeder; Clerk içeride cache'leyip otomatik yenilediği için maliyetsiz)
+### Quota Problem — Permanent Solution Pack ⚡ (2026-07-09)
 
-- [x] **Canlı varlık değerlemesi**: borsa varlıkları yfinance güncel fiyatla (adet ya da alış tarihinden türetilen adetle), emlak/arsa TCMB ulusal konut endeksi oranıyla otomatik revalüe — kaynak etiketiyle (📡 canlı / 📊 endeks tahmini / ✍️ manuel) ve ▲▼ değişim rozetiyle listede (7 test; emlak canlı doğrulandı: Oca 2024 3M ev → 5.42M +%80.6)
-- [x] Öncelik zinciri: manuel > canlı/endeks > alış tutarı; kaynaklar çökerse fail-open alış bazına düşer
-- [x] "Aldım" köprüsü artık alış tarihini otomatik yazar → canlı takip anında başlar
-- [x] **Portföyümü Güncelle**: Varlıklarım'da "Kalan X TL ile portföyümü güncelle" butonu → mevcut risk skoru + kalan bütçeyle yeni öneri akışı
-- [x] **Sorular tekliye ayrıldı**: Q2 (vade+yaş) ve Q7 (yükümlülük+gelir) ikişerliydi → 9 tekli soru; "her mesaj tek şey sorar" kuralı prompt'a eklendi; tüm "7 soru" metinleri güncellendi
-- [x] Yol seçimi kartlarındaki görünmez (siyah) metinler düzeltildi (button'a color: var(--text)) + "Önerilen" rozeti kaldırıldı
+- [x] Model-major key matrix: 4 models × 4 keys = 16 independent quota pools — when a key's quota fills, the key changes, not the quality
+- [x] Thinking disabled (2.5 family, thinking_budget=0): invisible token burn gone, warm-path latency down to ~2s
+- [x] 24h cache on deterministic generations (portfolio/REIT explanations) — the same input never burns quota twice
+- [x] Short-TTL cache for empty RAG context: 10.1s → 1.9s while yfinance is down (measured live)
+- [x] 3 new keys verified live; honest ToS note in .env.example (failover framing, the production answer is the paid tier)
+- [x] 3 new tests (multi-key order, thinking-off config, generate_text cache)
 
-### Uçtan Uca Test Turu Bulguları 🔍 (2026-07-09)
+### Transparency & Realism Round 🔍 (2026-07-10 → 2026-07-11)
 
-- [x] Sekme ikonu hizası: logo-icon.svg viewBox'ı kare değildi (84×90) ve içerik kuyruğu kırpılıyordu → kare (100×100), içeriğe ortalı viewBox; fikstürle doğrulandı (L harfi ortası = böcek ortası)
-- [x] Navbar/hero ile sekme ikonu artık aynı marka işareti (logo-icon.svg)
-- [x] Kritik UX açığı: oturumsuz kullanıcı korumalı linke (deep-link) gelince SİYAH EKRAN kalıyordu → `AuthPending` fallback'i (ateş böceği + "yönlendiriliyorsun" mesajı), ClerkLoading dahil — canlı doğrulandı
-- [x] Deep health check canlı doğrulandı: /health artık db+ai probluyor
+> User request: "there must be an explanation for why the portfolio has those ratios; the risk
+> score must explain why it is that number; no logical gaps anywhere."
 
-### Kota Sorunu — Kalıcı Çözüm Paketi ⚡ (2026-07-09)
+- [x] **Portfolio engine v3 (real bug fix)**: the v2 formula `RiskScore × Vol` cancelled out in normalisation — the allocation was independent of the risk profile. v3: `α = score/10; raw = (1-α)·(1/vol) + α·vol` — cautious profiles overweight calm assets, aggressive ones overweight volatile (10 logic tests)
+- [x] **Position-count logic**: dust pruning (<8%) + budget-based cap (75k→≤3, 200k→≤4, else ≤6); every dropped asset reported with its reason in metadata — no silent pruning
+- [x] **AllocationRationale card**: formula + the user's α + per-asset role/weight rationale + the dropped list — "these ratios are the output of a deterministic formula, not the AI's whim"
+- [x] **Risk score breakdown**: every scoring dimension returns a RiskFactor (weight, readable answer, contribution, explanation); ProfilePage renders "where did this score come from?" — contributions sum exactly to the score (verified live: 2.25+1.5+1.75+0.2+0.5 = 6.2)
+- [x] **Score persistence**: age + income_stability now persisted (migration a1c9e4b2) — GET /profile recomputes the exact quiz-time score (closed the 6.2 vs 5.7 inconsistency); ProfilePage loads the stored profile, so a refresh no longer wipes 9 answers
+- [x] **Market data resilience**: yfinance 0.2.51 → 1.5.1 (Yahoo blocked the old version's requests — seen live); third cache tier "last known good" (never expires); volatility falls back to historical baselines — /recommend can no longer die with an error page and never fabricates values
+- [x] **Fake chart removed**: PerformanceChart rendered Math.random() curves as "12-Month Performance" — deleted; the real backtest (Time Machine) covers it
 
-- [x] Model-öncelikli anahtar matrisi: 4 model × 4 anahtar = 16 bağımsız kota havuzu — anahtar kotası dolunca kalite değil anahtar değişir
-- [x] Thinking kapatıldı (2.5 ailesi, thinking_budget=0): görünmez token yakımı bitti, sıcak yol gecikmesi ~2sn'ye indi
-- [x] Deterministik üretimlere 24s cache (portföy/REIT açıklamaları) — aynı girdi kotayı iki kez yakmaz
-- [x] Boş RAG context kısa-TTL cache: yfinance çökükken 10.1sn → 1.9sn (canlı ölçüm)
-- [x] 3 yeni anahtar canlı doğrulandı; .env.example'da dürüst ToS notu (failover çerçevesi, üretim cevabı ücretli tier)
-- [x] 3 yeni test (çoklu-anahtar sırası, thinking-kapalı config, generate_text cache)
+### Universal Compatibility Round 🌍 (2026-07-11)
 
-### Ücretli AI Tier Altyapısı 💳 (billing-ready — 2026-07-08)
+> Plan decisions: desktop sidebar now · currency/locale layer now · full i18n after deploy ·
+> OpenAI/Mistral adapters after billing lands (tier table is already billing-ready).
 
-> Ödeme entegrasyonu bilinçli olarak DAHİL DEĞİL; entegrasyon noktası tek satır: `user.plan = "plus"`.
-> Stripe/Iyzico webhook'u geldiğinde başka hiçbir kod değişmez — modeller, kotalar, fallback'ler tier tablosundan akar.
+- [x] **Desktop sidebar**: BottomNav → AppNav — one component, two surfaces (mobile bottom bar / ≥768px left sidebar); investment_path filter in one place; content offset via body.has-sidebar; duplicate navbar logo hidden; verified live at 375px/1280px
+- [x] **MarketContext + useMarket**: locale number formatting and currency flow from the user's Market Pack; 14 hardcoded 'tr-TR' formatters removed
+- [x] **Currency truth**: `money(n, 'TRY')` pinning — TL-denominated data (TCMB m², TL practice basket, FX exposure) never masquerades as $/€ when the market changes
+- [x] **MarketSwitcher** in the sidebar footer (TR/US/DE); packs without live data labelled "sınırlı veri"; Explore shows an honest "integration on the way" state for non-TR markets (verified live: TR→US switch $ formatting + gate, TR return, persistence across reload)
+- [ ] i18n infrastructure: UI copy + LLM prompts in locale files (react-i18next + language parameter in prompt templates) — **after deploy, separate sprint**
+- [ ] OpenAI/Mistral adapters (single OpenAI-compatible `base_url` adapter covers both + Ollama) — **when billing lands**; keyless tiers must degrade to the free chain instead of crashing
 
-- [x] `ai_tiers.py`: free (Ateş Böceği, Gemini flash zinciri, 50/gün) · plus (Fener, Gemini Pro, 500/gün, ~$4.99) · pro (Şafak, Claude zinciri, 2000/gün, ~$14.99)
-- [x] Adapter'lar model zincirini parametre alıyor — Anthropic zinciri kredi/rate-limit'te Gemini'yle simetrik düşüş yapıyor (kota çözümü premium'a taşındı)
-- [x] `users.plan` kolonu (migration 38f539c3) + chat kotası plan-bazlı + 429 mesajında upgrade ipucu
-- [x] GET /users/me/plans (fiyatlandırma payload'ı, iç model zinciri sızmaz) + PATCH /admin/users/{id}/plan (webhook entegrasyon noktası)
-- [ ] Stripe/Iyzico webhook + ödeme sayfası (gerçek billing — hesap gerektirir)
+### Paid AI Tier Infrastructure 💳 (billing-ready — 2026-07-08)
 
-### Market Pack Çekirdeği
+> Payment integration deliberately NOT included; the integration point is one line: `user.plan = "plus"`.
+> When the Stripe/Iyzico webhook arrives nothing else changes — models, quotas and fallbacks flow from the tier table.
 
-- [x] `backend/markets/` yapısı: `base.py` (frozen dataclass) + `tr.py` (referans, tam bağlı) + `us.py`/`de.py` (araştırılmış iskelet) + registry (bilinmeyen kod → TR'ye güvenli düşüş)
-- [x] Pack içeriği: para birimi/locale, veri kaynağı bildirimleri (TR canlı, US: FRED / DE: Destatis roadmap), ilan köprüleri (Zillow/Realtor, ImmoScout24/Immowelt), regülatör + yerel vergi/aracı kurum eğitim notları (ABD: 401k/IRA + sermaye kazancı vadeleri; DE: Abgeltungsteuer + Sparer-Pauschbetrag) — hepsi 'yerel uzmana danış' disclaimer'lı
-- [/] `users.market` kolonu + PATCH /users/me/market + GET /users/markets ✅; listing_bridge pack-farkında ✅ — enflasyon/endeks servislerinin tam pack-yönlendirmesi US/DE adaptörleri yazılınca
-- [ ] i18n altyapısı: UI metinleri + LLM prompt'ları locale dosyalarında (react-i18next + prompt şablonlarına dil parametresi)
+- [x] `ai_tiers.py`: free (Firefly, Gemini flash chain, 50/day) · plus (Lantern, Gemini Pro, 500/day, ~$4.99) · pro (Dawn, Claude chain, 2000/day, ~$14.99)
+- [x] Adapters take the model chain as a parameter — the Anthropic chain degrades symmetrically with Gemini on credit/rate-limit (the quota solution carried to premium)
+- [x] `users.plan` column (migration 38f539c3) + plan-based chat quota + upgrade hint in the 429 message
+- [x] GET /users/me/plans (pricing payload, internal model chains never leak) + PATCH /admin/users/{id}/plan (webhook integration point)
+- [ ] Stripe/Iyzico webhook + payment page (real billing — requires accounts)
 
-### İçerik Yerelleştirme (LLM avantajı)
+### Market Pack Core
 
-- [ ] Hukuk/vergi eğitim içeriği pack başına LLM ile üretilir + "genel bilgidir, yerel uzmana danış" disclaimer'ı (hukuki iddia yok, eğitim var)
-- [x] Kültürel korku haritası: her pack yerelleştirilmiş fear_options taşıyor (TR/EN/DE)
-- [ ] Kavram sözlüğü çeviri değil yerelleştirme: örnekler yerel para ve yerel ürünlerle ("ETF bir sepettir — içinde THY, Aselsan..." vs "...Apple, Microsoft...")
+- [x] `backend/markets/` structure: `base.py` (frozen dataclass) + `tr.py` (reference, fully wired) + `us.py`/`de.py` (researched skeletons) + registry (unknown code → safe TR fallback)
+- [x] Pack contents: currency/locale, data-source declarations (TR live, US: FRED / DE: Destatis roadmap), listing bridges (Zillow/Realtor, ImmoScout24/Immowelt), regulator + local tax/brokerage education notes (US: 401k/IRA + capital-gains holding periods; DE: Abgeltungsteuer + Sparer-Pauschbetrag) — all with a "consult a local professional" disclaimer
+- [x] `users.market` column + PATCH /users/me/market + GET /users/markets ✅; listing_bridge pack-aware ✅; frontend MarketContext/Switcher ✅ (2026-07-11) — full pack-routing of inflation/index services comes with the US/DE adapters
+- [ ] i18n infrastructure (same item as above — after deploy)
 
-### Uygulama Sırası
+### Content Localization (the LLM advantage)
 
-- [ ] TR pack'i referans implementasyon olarak eksiksiz bitir (MVP = TR)
-- [ ] İkinci pack adayını veriye göre seç (US genel pazar mı, DE gurbetci segmenti mi) — MVP SONRASI
-- [ ] Hardcode denetimi: kod tabanında TL/TÜFE/Sahibinden geçen her yer pack referansına taşınmış mı kontrolü
+- [ ] Legal/tax education content generated per pack by the LLM + "general information, consult a local professional" disclaimer (education, no legal claims)
+- [x] Cultural fear map: every pack carries localized fear_options (TR/EN/DE)
+- [ ] Concept glossary localization, not translation: examples with local currency and local products ("an ETF is a basket — with THY, Aselsan..." vs "...Apple, Microsoft...")
 
-## Phase 9 — Marka & Özgün UI Kimliği ✨ "Işık" Tasarım Dili
+### Rollout Order
 
-> Marka hikayesi = ürün vizyonu: **bilinmezlik karanlıktır, bilgi ışık tutar.** HP'den esinlenilmiş, telif-güvenli özgün yorum.
+- [ ] Finish the TR pack completely as the reference implementation (MVP = TR)
+- [ ] Choose the second pack by data (US general market vs DE expat segment) — POST-MVP
+- [ ] Hardcode audit: verify every TL/CPI/Sahibinden reference in the codebase has moved to a pack reference (frontend format layer done 2026-07-11; backend service routing pending)
 
-### Logo & Marka — KARAR: Ateş Böceği 🪰✨ (2026-06-28)
+## Phase 9 — Brand & Original UI Identity ✨ the "Light" Design Language
 
-- [x] Logo kararı: ateş böceği (karanlıkta yol gösteren minik ışık) — telif-güvenli, sıcak, özgün
-- [x] Logo tasarımı: minimalist SVG ateş böceği (amber ışık halesi + mor/mavi kanatlar) — favicon + navbar LumosLogo bileşeni, nefes alan ışıma animasyonlu
-- [x] Giriş animasyonu: onboarding hero'da 10 CSS-particle ateş böceği başlığa süzülüyor (2.6sn, prefers-reduced-motion saygılı)
-- [x] Ateş böceği boş durum/onboarding illüstrasyonlarında rehber karakter olarak kullanılır
-- [x] Marka manifestosu (onboarding ilk ekran): "Yatırım karanlık bir orman gibi görünür. Lumos, elindeki ışık." — hero section'da aktif
-- [x] Telif kontrolü: şimşek, asa çizimi, HP fontları KULLANILMAZ — ateş böceği + soyut ışık motifi bizim
+> Brand story = product vision: **the unknown is darkness; knowledge holds up a light.** HP-inspired, copyright-safe original interpretation.
 
-### "Aydınlanan Arayüz" 🌗 (imza özellik — başka finans uygulamasında yok)
+### Logo & Brand — DECISION: Firefly 🪰✨ (2026-06-28)
 
-- [x] Aydınlanan Arayüz v1: `useIllumination` hook'u — cesaret skoru 25/50/80 eşiklerinde zemin gece→alacakaranlık→şafak öncesi→şafak (1.2sn yumuşak geçiş)
-- [x] "Öğrendikçe dünyan aydınlanıyor" — skor artınca geçiş anında 1 kerelik yumuşak ışıma animasyonu + tebrik mikro-kartı
+- [x] Logo decision: firefly (a tiny light guiding through the dark) — copyright-safe, warm, original
+- [x] Logo design: minimalist SVG firefly (amber halo + purple/blue wings) — favicon + navbar LumosLogo component with a breathing-glow animation
+- [x] Entry animation: 10 CSS-particle fireflies drift toward the title in the onboarding hero (2.6s, respects prefers-reduced-motion)
+- [x] The firefly appears as the guide character in empty states/onboarding illustrations
+- [x] Brand manifesto (first onboarding screen): "Investing looks like a dark forest. Lumos is the light in your hand." — live in the hero section
+- [x] Copyright check: no lightning bolts, no wand drawings, no HP fonts — the firefly + abstract light motif is ours
 
-### İmza Etkileşimler
+### The "Illuminating UI" 🌗 (signature feature — no other finance app has it)
 
-- [x] "İşık Tut" tooltip: jargon terime tıklayınca minik ışık patlaması + sade açıklama balonu — ateş böceği temalı, amber renk, ok işaretli
-- [x] Sayı animasyonu: değerler ekrana soğuk griden "ısınarak" (amber'e) gelir — `.number-warm` CSS classı
-- [x] Loading state: spinner yerine uçta büyüyen ışık noktası — `.light-loader` CSS animasyonu
-- [x] Eğitim mikro-kartları tılsım kartı çevirme animasyonuyla açılır
-- [x] Portföy sağlık skoru = "Fener": sağlık arttıkça fener ikonu daha gür yanar
+- [x] Illuminating UI v1: `useIllumination` hook — at courage-score thresholds 25/50/80 the background walks night→dusk→pre-dawn→dawn (1.2s soft transition)
+- [x] "Your world brightens as you learn" — a one-time soft glow animation + congratulation micro-card at the moment the score crosses a threshold
 
-### Tasarım Sistemi
+### Signature Interactions
 
-- [x] Palet token'ları: `--firefly/--firefly-soft/--firefly-glow` + `--bg-night/dusk/predawn/dawn` kademeleri index.css'te
-- [x] Tipografi: Outfit fontu eklendi (`'Outfit', 'Inter', system-ui, sans-serif`), yumuşak köşeli sıcak premium sans — gotik/fantezi font YOK
-- [x] Türkçe özellik adlandırması: "Seni Tanıyalım" (profil), "İşık Tut" (açıkla), "Fener" (portföy sağlık), "Şafak Skoru" (hazırlık), "Zaman Makinesi" (backtest) — tüm sayfalarda aktif
-- [x] Boş durumlar (empty state): karanlıkta ateş böceği + radial glow animasyon + cesaretlendiren mesaj (Dashboard + Holdings)
+- [x] "Işık Tut" tooltip: tapping a jargon term fires a tiny light burst + a plain-language bubble — firefly-themed, amber, with a pointer
+- [x] Number animation: values "warm up" onto the screen from cold grey to amber — `.number-warm` CSS class
+- [x] Loading state: a growing light dot instead of a spinner — `.light-loader` CSS animation
+- [x] Education micro-cards open with a card-flip animation
+- [x] Portfolio health score = "Fener" (Lantern): the lantern icon burns brighter as health improves
+
+### Design System
+
+- [x] Palette tokens: `--firefly/--firefly-soft/--firefly-glow` + `--bg-night/dusk/predawn/dawn` steps in index.css
+- [x] Typography: Outfit font added (`'Outfit', 'Inter', system-ui, sans-serif`), soft-cornered warm premium sans — NO gothic/fantasy fonts
+- [x] Turkish feature naming: "Seni Tanıyalım" (profile), "Işık Tut" (explain), "Fener" (portfolio health), "Şafak Skoru" (readiness), "Zaman Makinesi" (backtest) — live on all pages
+- [x] Empty states: firefly in the dark + radial glow animation + encouraging message (Dashboard + Holdings)
 
 ---
 
-## 🔑 Kritik Hatırlatmalar
+## 🔑 Critical Reminders
 
-| # | Kural |
+| # | Rule |
 |---|-------|
-| 1 | `.env` dosyasını **asla** commit etme |
-| 2 | Her sistem prompt'una yasal uyarıyı ekle |
-| 3 | Tüm API çağrılarını günlük cache'e al |
-| 4 | Clerk JWT doğrulamasını backend'de yap |
-| 5 | Tüm hata durumları için fallback UI yaz |
-| 6 | AWS ve Ollama MVP sonrasına ertele |
-| 7 | Temel kural, her işlemden sonra otomatik olarak todo.md dosyasını güncellle |
+| 1 | **Never** commit the `.env` file |
+| 2 | Add the legal disclaimer to every system prompt |
+| 3 | Put every API call behind the daily cache |
+| 4 | Verify Clerk JWTs on the backend |
+| 5 | Write fallback UI for every error state |
+| 6 | Defer AWS and Ollama until after the MVP |
+| 7 | Ground rule: update todo.md automatically after every piece of work |
 
 ---
 
-## 📊 İlerleme Özeti
+## 📊 Progress Summary
 
-| Faz | Başlık | Hafta | Durum |
+| Phase | Title | Weeks | Status |
 |-----|--------|-------|-------|
-| 1 | Setup, Scaffolding & Auth | 1–2 | `[x]` Tamamlandı ✅ |
-| 2 | NLP Engine & Risk Profile | 3–5 | `[x]` Tamamlandı ✅ |
-| 3 | Market Data & Portfolio Engine | 5–8 | `[x]` Tamamlandı ✅ |
-| 3.5 | Real Estate / REIT Layer | 8–10 | `[x]` Tamamlandı ✅ |
-| 4 | Frontend — Mobile-First Chat UI | 10–14 | `[x]` Tamamlandı ✅ |
-| 5 | Testing, Deploy & Portfolio | 14–18 | `[/]` Hata yönetimi ✅ · Deploy bekliyor |
-| 6 | Teknik Borç & Production Sağlamlaştırma | 18+ | `[/]` Test + CI ✅ · Yapısal iyileştirmeler devam |
-| 7 | Ürün Derinleştirme & Yatırım Takibi | 18+ | `[/]` Holdings + coach + goal ✅ · Karşılaştırma bekliyor |
-| 8 | Farklılaştırıcı Özellikler | 20+ | `[/]` Backtest + TCMB + haber ✅ · Varlık kartı bekliyor |
-| 9 | Marka & Özgün UI Kimliği | 20+ | `[/]` Logo + palet + font ✅ · Animasyonlar devam |
-
+| 1 | Setup, Scaffolding & Auth | 1–2 | `[x]` Complete ✅ |
+| 2 | NLP Engine & Risk Profile | 3–5 | `[x]` Complete ✅ |
+| 3 | Market Data & Portfolio Engine | 5–8 | `[x]` Complete ✅ |
+| 3.5 | Real Estate / REIT Layer | 8–10 | `[x]` Complete ✅ |
+| 4 | Frontend — Mobile-First Chat UI | 10–14 | `[x]` Complete ✅ |
+| 5 | Testing, Deploy & Portfolio | 14–18 | `[/]` Error handling ✅ · Deploy pending |
+| 6 | Technical Debt & Production Hardening | 18+ | `[/]` Tests + CI ✅ · Structural improvements ongoing |
+| 7 | Product Deepening & Investment Tracking | 18+ | `[/]` Holdings + coach + goal ✅ · Comparison pending |
+| 8 | Differentiating Features | 20+ | `[/]` Backtest + TCMB + news ✅ · Asset card pending |
+| 8.5 | Globalization (Market Packs) | 20+ | `[/]` Packs + tiers + market layer ✅ · i18n & adapters post-deploy |
+| 9 | Brand & Original UI Identity | 20+ | `[/]` Logo + palette + font ✅ · Animations ongoing |

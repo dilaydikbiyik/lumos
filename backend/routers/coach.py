@@ -13,8 +13,8 @@ from backend.services.behavior_coach import drop_message, rise_message
 router = APIRouter()
 logger = logging.getLogger("lumos.coach")
 
-# Panik anında gösterilen dürüst, statik gerçekler — LLM maliyeti sıfır,
-# alarmizm sıfır. Kaynak: yaygın piyasa tarihi bilgisi, tahmin içermez.
+# Honest, static facts shown in a panic moment — zero LLM cost, zero
+# alarmism. Source: common market history; contains no forecasts.
 PANIC_FACTS = [
     "Tarihte her büyük düşüşün bir toparlanma dönemi oldu — süresi değişir, yönü genelde değişmedi.",
     "Panik anında satanlar, düşüşü 'gerçekleşmiş zarara' çevirir. Satmadığın sürece kayıp kağıt üstündedir.",
@@ -36,7 +36,7 @@ async def market_move_message(
 ):
     """
     Profile-specific calming/grounding message for a market move — the
-    'davranışsal koç' reacts to how THIS user's stated loss tolerance
+    behaviour coach reacts to how THIS user's stated loss tolerance
     should shape their reaction, not a generic headline.
     """
     user = await user_repository.get_or_create(db, user_id)
@@ -51,7 +51,7 @@ async def market_move_message(
 
 
 class PanicRequest(BaseModel):
-    # null = düğmeye yeni basıldı; held/still_worried = akışın sonundaki seçim
+    # null = button just pressed; held/still_worried = the choice at the end of the flow
     resolution: Optional[Literal["held", "still_worried"]] = None
 
 
@@ -62,10 +62,10 @@ async def panic_button(
     db: AsyncSession = Depends(get_db),
 ):
     """
-    Panik Düğmesi 🫨 — piyasa korkuttuğunda basılır. Karanlık desen yok:
-    satışı engellemiyoruz, sadece kullanıcının KENDİ profiline göre
-    sakinleştirip dürüst gerçekleri hatırlatıyoruz. Basış ve sonuç
-    loglanır — davranış aynasının ham verisi.
+    Panic Button 🫨 — pressed when the market gets scary. No dark patterns:
+    we never block selling, we only calm the user according to their OWN
+    profile and recall honest facts. Press and outcome are logged — raw
+    data for the behaviour mirror.
     """
     user = await user_repository.get_or_create(db, user_id)
     loss_tolerance = user.loss_tolerance or "medium"

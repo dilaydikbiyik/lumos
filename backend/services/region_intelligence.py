@@ -1,5 +1,5 @@
 """
-Region intelligence — the honest answer to "nereden ev/arsa alayım?".
+Region intelligence — the honest answer to "where should I buy a home/land?".
 
 Ranks NUTS2 regions by housing-index appreciation (nominal AND real).
 Deliberate honesty constraints (vision principle):

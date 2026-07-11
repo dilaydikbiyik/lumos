@@ -1,10 +1,11 @@
 """
-İl bazında konut fiyat istihbaratı — "nereden ev alayım?"ın somut hali.
+Per-province housing price intelligence — the concrete answer to
+"where should I buy a home?".
 
-TCMB'nin il bazında birim fiyat serileri (TL/m², çeyreklik, 2010→bugün):
-NUTS2 bölge bulanıklığı yerine "Muğla'da m² 79.110 TL, 5 yılda reel +X%"
-diyebiliyoruz. Dürüstlük çerçevesi aynı: il ortalamasıdır, mahalle/parsel
-değildir; geçmiş geleceğin garantisi değildir.
+TCMB per-province unit-price series (TL/m², quarterly, 2010→today): instead
+of blurry NUTS2 regions we can say "79.110 TL per m² in Muğla, +X% real
+over 5 years". Same honesty frame: it is a province average, not a
+quarter/parcel; the past is no guarantee of the future.
 """
 import logging
 from typing import Optional
@@ -30,8 +31,8 @@ def _change_over_quarters(prices: dict[str, float], quarters_back: int) -> Optio
 
 def rank_provinces(horizon_years: int = 3) -> dict:
     """
-    81 ili seçilen ufukta (1/3/5 yıl) REEL değerlenmeye göre sırala.
-    Her satır: il, güncel TL/m², nominal + reel değişim.
+    Rank all 81 provinces by REAL appreciation over the chosen horizon
+    (1/3/5 years). Each row: province, current TL/m², nominal + real change.
     """
     horizon_years = horizon_years if horizon_years in VALID_HORIZONS else 3
     quarters = horizon_years * 4
@@ -82,8 +83,9 @@ def rank_provinces(horizon_years: int = 3) -> dict:
 
 def project_province(code: str, amount: float, years: int) -> dict:
     """
-    'X TL bu ilde N yılda ne olurdu?' — ilin kendi 16 yıllık birim fiyat
-    geçmişindeki tüm kaymalı N-yıl pencerelerinin dağılımı (tahmin değil).
+    "What would X TL become in this province over N years?" — the
+    distribution of every rolling N-year window in the province's own
+    16-year unit-price history (not a forecast).
     """
     from backend.services.projection import _windowed_real_band
 
@@ -96,7 +98,7 @@ def project_province(code: str, amount: float, years: int) -> dict:
 
     months = sorted(entry["prices"])
     values = np.array([entry["prices"][m] for m in months])
-    window = years * 4  # çeyreklik seri
+    window = years * 4  # quarterly series
 
     band, real_band = _windowed_real_band(values, months, window, amount)
     if not band:
@@ -111,7 +113,7 @@ def project_province(code: str, amount: float, years: int) -> dict:
         "amount": amount,
         "years": years,
         **band,
-        "real_band": real_band,  # her pencere KENDİ dönem enflasyonuyla düşürülmüş
+        "real_band": real_band,  # each window deflated by its OWN period inflation
         "honesty_note": (
             f"Bu bir tahmin DEĞİL: {entry['name']} il ortalamasının 2010'dan bugüne kendi "
             f"geçmişindeki tüm {years} yıllık dönemlerin dağılımı. Reel bant, her dönemin "

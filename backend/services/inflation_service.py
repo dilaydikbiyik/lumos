@@ -1,5 +1,5 @@
 """
-Inflation reality layer — nominal returns lie in Turkey; real (TÜFE-adjusted)
+Inflation reality layer — nominal returns lie in Turkey; real (CPI-adjusted)
 returns tell the truth. This is a differentiator: almost no consumer
 investing app in Turkey shows real returns by default.
 

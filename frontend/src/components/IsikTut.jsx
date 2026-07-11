@@ -2,10 +2,10 @@ import { useState } from 'react'
 import GLOSSARY from '../data/glossary'
 
 /**
- * "Işık Tut" — jargon tooltip, ateş böceği temalı.
- *   <IsikTut term="volatilite" />            → terimi kendisi gösterir
- *   <IsikTut term="etf">ETF sepeti</IsikTut> → özel görüntüleme metni
- * Dokunma/tıklama ile sade açıklama balonu açılır.
+ * "Işık Tut" (hold a light) — firefly-themed jargon tooltip.
+ *   <IsikTut term="volatilite" />            → renders the term itself
+ *   <IsikTut term="etf">ETF sepeti</IsikTut> → custom display text
+ * Tap/click opens a plain-language explanation bubble.
  */
 export default function IsikTut({ term, children }) {
   const [open, setOpen] = useState(false)
@@ -36,7 +36,7 @@ export default function IsikTut({ term, children }) {
 
       {open && (
         <>
-          {/* Minik ışık patlaması animasyonu */}
+          {/* Tiny light-burst animation */}
           <span style={{
             position: 'absolute', bottom: '120%', left: '50%',
             width: 60, height: 60, borderRadius: '50%',
@@ -46,7 +46,7 @@ export default function IsikTut({ term, children }) {
             pointerEvents: 'none',
           }} />
 
-          {/* Açıklama balonu */}
+          {/* Explanation bubble */}
           <span
             role="tooltip"
             style={{
@@ -61,7 +61,7 @@ export default function IsikTut({ term, children }) {
               animation: 'fade-in 0.2s ease',
             }}
           >
-            {/* Başlık */}
+            {/* Title */}
             <span style={{
               display: 'flex', alignItems: 'center', gap: 6,
               marginBottom: 6, fontSize: 11, fontWeight: 700,
@@ -73,7 +73,7 @@ export default function IsikTut({ term, children }) {
 
             {explanation}
 
-            {/* Ok işareti (triangle) */}
+            {/* Pointer (triangle) */}
             <span style={{
               position: 'absolute', bottom: -6, left: '50%',
               transform: 'translateX(-50%)',

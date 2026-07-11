@@ -24,17 +24,17 @@ PROMPT_VERSION = hashlib.sha1(_SYSTEM_PROMPT.encode()).hexdigest()[:8]
 
 ANTHROPIC_MODEL = "claude-sonnet-4-6"
 
-# Ücretsiz kota stratejisi: her Gemini modelinin AYRI free-tier kotası var.
-# 429 (kota) veya 503 (aşırı yük) yediğimizde sıradaki modele düşeriz —
-# kullanıcı hata yerine bir tık daha hafif bir modelden cevap alır.
-# Sıralama: kalite ↓, ücretsiz limit ↑ (flash-lite ve 2.0-flash daha cömert).
+# Free-quota strategy: every Gemini model has its OWN free-tier quota.
+# On 429 (quota) or 503 (overload) we fall to the next model — the user
+# gets an answer from a slightly lighter model instead of an error.
+# Order: quality ↓, free limit ↑ (flash-lite and 2.0-flash are more generous).
 GEMINI_MODEL_CHAIN = [
     "gemini-2.5-flash",
     "gemini-2.5-flash-lite",
     "gemini-2.0-flash",
     "gemini-2.0-flash-lite",
 ]
-GEMINI_MODEL = GEMINI_MODEL_CHAIN[0]  # geriye dönük uyumluluk (testler/loglar)
+GEMINI_MODEL = GEMINI_MODEL_CHAIN[0]  # backwards compatibility (tests/logs)
 
 
 # ── Anthropic adapter ──────────────────────────────────────────────────────────────────────
@@ -98,9 +98,9 @@ def _gemini_call_model(client, model: str, contents, system: str, max_tokens: in
         config=genai_types.GenerateContentConfig(
             system_instruction=system,
             max_output_tokens=max_tokens,
-            # 2.5 ailesi görünmez "düşünme" tokenları yakar — kapatmak hem
-            # token tüketimini ciddi düşürür hem cevabı hızlandırır.
-            # (2.0 ailesi thinking desteklemez; ona göndermek 400 verir.)
+            # The 2.5 family burns invisible "thinking" tokens — turning it
+            # off cuts token usage substantially and speeds up replies.
+            # (The 2.0 family doesn't support thinking; sending it returns 400.)
             thinking_config=(
                 genai_types.ThinkingConfig(thinking_budget=0)
                 if model.startswith("gemini-2.5") else None
@@ -125,7 +125,7 @@ def _gemini_chat(
 
     chain = model_chain or GEMINI_MODEL_CHAIN
 
-    # Çoklu API anahtarı — her biri ayrı free-tier kotaya sahip
+    # Multiple API keys — each with its own free-tier quota
     keys = [k for k in [
         settings.GEMINI_API_KEY,
         settings.GEMINI_API_KEY_2,
@@ -142,9 +142,9 @@ def _gemini_chat(
         for m in messages
     ]
 
-    # MODEL-öncelikli sıra: en iyi model TÜM anahtarlarda denenir, sonra
-    # bir alt modele inilir. Böylece tek anahtarın kotası dolduğunda
-    # kullanıcı kaliteden değil, sadece anahtardan feragat eder.
+    # MODEL-major order: the best model is tried on ALL keys before
+    # stepping down a model. When one key's quota runs out the user
+    # sacrifices a key, not quality.
     clients = [genai.Client(api_key=k) for k in keys]
     last_exc: Optional[Exception] = None
     for model_idx, model in enumerate(chain):
@@ -165,9 +165,9 @@ def _gemini_chat(
                     )
                     last_exc = exc
                     continue
-                raise  # 400 vb. gerçek hatalar maskelenmez
+                raise  # real errors (400 etc.) are not masked
 
-    # Tüm anahtarlar ve modeller tükendi
+    # every key and model exhausted
     logger.error("gemini_all_keys_exhausted keys=%d models=%s last=%s", len(keys), chain, last_exc)
     raise HTTPException(
         status_code=503,
@@ -186,8 +186,8 @@ _ADAPTERS = {
 
 def _resolve_tier(tier_name: Optional[str]) -> tuple[str, dict]:
     """
-    Tier adı → (ad, config). tier verilmezse geriye dönük davranış korunur:
-    settings.AI_PROVIDER'a göre free (gemini) ya da pro (anthropic).
+    Tier name → (name, config). Without a tier the legacy behaviour holds:
+    free (gemini) or pro (anthropic) according to settings.AI_PROVIDER.
     """
     from backend.services.ai_tiers import get_tier
 
@@ -243,7 +243,7 @@ def chat(messages: list[dict], tier: Optional[str] = None) -> str:
     Returns:
         The assistant's text reply.
     """
-    # RAG: bugünün piyasa özeti system prompt'a eklenir (fail-open — boşsa eklenmez)
+    # RAG: today's market summary is appended to the system prompt (fail-open — skipped when empty)
     from backend.services.ai_tiers import get_tier
     from backend.services.chat_context import build_market_context
 
@@ -317,8 +317,8 @@ def generate_text(prompt: str, system: Optional[str] = None, cache: bool = False
     Args:
         prompt:  The user-turn prompt.
         system:  Optional override system prompt.
-        cache:   Deterministik çağrılar için günlük cache — aynı portföy
-                 açıklaması için kota tekrar tekrar yakılmaz.
+        cache:   Daily cache for deterministic calls — quota isn't burned
+                 again and again for the same portfolio explanation.
 
     Returns:
         Generated text.

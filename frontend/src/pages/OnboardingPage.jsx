@@ -4,8 +4,8 @@ import LumosLogo from '../components/LumosLogo'
 import { SignInButton, SignedIn, SignedOut, UserButton } from '@clerk/clerk-react'
 import DisclaimerModal from '../components/DisclaimerModal'
 
-// 10 ateş böceği — süzülerek başlığa yaklaşır
-// Her biri farklı başlangıç konumu, süre ve hareket vektörü
+// 10 fireflies — drift toward the title
+// Each with its own start position, duration and motion vector
 const FIREFLY_CONFIG = [
   { left: '8%',  top: '60%', size: '5px', dur: '3.2s', delay: '0.0s', dx: '-12px', dy: '-55px' },
   { left: '20%', top: '75%', size: '4px', dur: '2.8s', delay: '0.18s',dx: '8px',   dy: '-70px' },
@@ -56,7 +56,7 @@ export default function OnboardingPage() {
         {/* ── Hero Section ── */}
         <div style={{ textAlign: 'center', padding: '40px 0 48px', position: 'relative' }}>
 
-          {/* Ateş böceği parçacıkları — başlığa süzülür */}
+          {/* Firefly particles — drift toward the title */}
           <div className="fireflies" aria-hidden="true">
             {FIREFLY_CONFIG.map((ff, i) => (
               <span
@@ -74,7 +74,7 @@ export default function OnboardingPage() {
             ))}
           </div>
 
-          {/* Logo büyük + hero modunda */}
+          {/* Logo large + in hero mode */}
           <div style={{ marginBottom: 28, display: 'flex', justifyContent: 'center' }}>
             <LumosLogo size={48} hero={true} />
           </div>
@@ -151,7 +151,7 @@ export default function OnboardingPage() {
           ))}
         </div>
 
-        {/* Dürüst beklenti cümlesi */}
+        {/* Honest expectation line */}
         <p style={{
           textAlign: 'center', fontSize: 12, color: 'var(--text-dim)',
           lineHeight: 1.65, maxWidth: 360, margin: '0 auto 20px',

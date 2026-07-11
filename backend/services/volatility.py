@@ -23,10 +23,10 @@ logger = logging.getLogger("lumos.volatility")
 
 TRADING_DAYS = 252
 
-# Son çare: taze kurulum + veri kaynağı kapalı senaryosunda portföy önerisi
-# hata sayfasına düşmesin. Değerler uydurma değil — her varlığın çok yıllık
-# tarihsel yıllıklandırılmış oynaklık mertebesidir; canlı veri gelir gelmez
-# yerini gerçek hesaplamaya bırakır.
+# Last resort: a fresh install with the data source down must not turn the
+# portfolio recommendation into an error page. These are not fabricated —
+# each is the asset's multi-year historical annualised volatility level;
+# they yield to the real computation as soon as live data returns.
 BASELINE_VOLATILITY = {
     "XU100.IS": 0.35,
     "SPY": 0.17,
@@ -53,8 +53,8 @@ def compute_volatility(tickers: list[str]) -> dict[str, float]:
     try:
         price_history = fetch_price_history(tickers, period="1y")
     except MarketDataError as exc:
-        # Veri kaynağı ve tüm cache katmanları kapalı: tarihsel taban
-        # oynaklıklarla devam et — kullanıcıya hata sayfası gösterme.
+        # Data source and every cache tier are down: continue with
+        # historical baseline volatilities — never show the user an error page.
         logger.warning("volatility falling back to historical baselines: %s", exc)
         return {t: BASELINE_VOLATILITY.get(t, _DEFAULT_VOL) for t in tickers}
 

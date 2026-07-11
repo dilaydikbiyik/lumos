@@ -1,5 +1,5 @@
 """
-'Kirada mı otur, ev mi al?' — Turkey's most common first financial
+Rent or buy? — Turkey's most common first financial
 question, answered honestly: two side-by-side scenarios, not a verdict.
 
 Scenario A (buy): down payment is locked into the property; it grows

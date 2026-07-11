@@ -3,14 +3,14 @@ import { useAuth } from '@clerk/clerk-react'
 import api, { setAuthToken } from '../utils/api'
 
 /**
- * Aydınlanan Arayüz — imza özellik: kullanıcının hazırlık (cesaret) skoru
- * arttıkça uygulamanın zemini geceden şafağa yürür. Öğrenmenin ödülü
- * ekranın kendisinde hissedilir.
+ * Illuminating UI — signature feature: as the user's readiness (courage)
+ * score grows, the app background walks from night to dawn. The reward
+ * for learning is felt on the screen itself.
  *
- * skor 0-24  -> gece (varsayılan)
- * skor 25-49 -> alacakaranlık
- * skor 50-79 -> şafak öncesi
- * skor 80+   -> şafak
+ * score 0-24  -> night (default)
+ * score 25-49 -> dusk
+ * score 50-79 -> pre-dawn
+ * score 80+   -> dawn
  */
 export default function useIllumination() {
   const { getToken, isSignedIn } = useAuth()
@@ -29,7 +29,7 @@ export default function useIllumination() {
         document.body.classList.remove('illumination-1', 'illumination-2', 'illumination-3')
         if (stage > 0) document.body.classList.add(`illumination-${stage}`)
       } catch {
-        // aydınlatma kozmetik — hata durumunda gece temasında kal
+        // illumination is cosmetic — stay on the night theme on failure
       }
     }
     illuminate()

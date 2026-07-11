@@ -37,7 +37,7 @@ def _market_lines() -> list[str]:
 def _inflation_line() -> str:
     from backend.services.inflation_service import monthly_cash_erosion
 
-    erosion = monthly_cash_erosion(100)  # sadece oranı almak için
+    erosion = monthly_cash_erosion(100)  # only to read the rate
     pct = erosion.get("monthly_inflation_pct")
     return f"- Aylık enflasyon (TÜFE, son veri): %{pct}" if pct else ""
 
@@ -65,8 +65,8 @@ def build_market_context() -> str:
         logger.warning("inflation line for chat context failed: %s", exc)
 
     if not lines:
-        # Boş sonucu da KISA süreliğine cache'le — kaynaklar çökükken her
-        # chat mesajının yfinance timeout'unu beklemesini engeller.
+        # Cache even the empty result BRIEFLY — prevents every chat message
+        # from waiting out the yfinance timeout while sources are down.
         cache_service.set(cache_key, "", ttl=600)
         return ""
 

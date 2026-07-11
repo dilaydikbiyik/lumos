@@ -26,7 +26,7 @@ class ListingBridgeRequest(BaseModel):
     il: str = Field(..., min_length=2, max_length=40)
     ilce: str = Field("", max_length=40)
     asset_type: str = Field("arsa", pattern="^(arsa|daire|konut)$")
-    # Köy/mahalle gibi mikro konum — "Keşan Çeribaşı köyü" gerçekçiliği
+    # Micro-location like a village/quarter — the "Keşan Çeribaşı köyü" realism case
     detail: str = Field("", max_length=60)
 
 
@@ -37,7 +37,7 @@ class AssetProjectionRequest(BaseModel):
 
 
 class RegionProjectionRequest(BaseModel):
-    # NUTS2 kodu (TP.KFE.TR51) veya il kodu (MUGLA) taşır
+    # Carries a NUTS2 code (TP.KFE.TR51) or a province code (MUGLA)
     region_code: str = Field(..., min_length=2, max_length=20)
     amount: float = Field(..., gt=0)
     years: Literal[1, 2, 3, 5] = 3

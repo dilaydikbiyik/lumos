@@ -3,9 +3,9 @@ import { useAuth } from '@clerk/clerk-react'
 import api, { setAuthToken } from '../utils/api'
 
 /**
- * Cesaret Skoru — vizyonun görünür yüzü. Kara kutu değil: 5 şeffaf
- * kilometre taşı, her biri kullanıcının gerçekten yaptığı bir şey.
- * %60 eşiği "gerçek yatırıma hazır" mesajını tetikler.
+ * Courage Score — the visible face of the vision. No black box: 5
+ * transparent milestones, each something the user actually did.
+ * The 60% threshold triggers the "ready for real investing" message.
  */
 export default function ReadinessScore() {
   const { getToken, isSignedIn } = useAuth()

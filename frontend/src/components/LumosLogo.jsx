@@ -1,12 +1,12 @@
 import { useNavigate } from 'react-router-dom'
 
 /**
- * Lumos marka logosu — ateş böceği animasyonu + ışıldayan yazı.
- * CSS class'ları: lumos-brand, lumos-wordmark, lumos-firefly
- * "Karanlıkta yol gösteren minik ışık" — marka hikayesinin kendisi.
+ * Lumos brand logo — firefly animation + glowing wordmark.
+ * CSS classes: lumos-brand, lumos-wordmark, lumos-firefly
+ * "A tiny light guiding through the dark" — the brand story itself.
  */
 
-// 4 ateş böceğinin konumu ve hareket parametreleri
+// Position and motion parameters for the 4 fireflies
 const FIREFLIES = [
   { left: '5%',   top: '-85%', dur: '6.5s', delay: '0s',    dx: '16px',  dy: '-12px' },
   { left: '28%',  top: '-70%', dur: '8s',   delay: '0.9s',  dx: '-14px', dy: '-18px' },
@@ -26,7 +26,7 @@ export default function LumosLogo({ size = 22, hero = false }) {
         background: 'none', border: 'none', cursor: 'pointer', padding: '4px 0',
       }}
     >
-      {/* Ateşböceği ikonu — şeffaf SVG, arka plan yok */}
+      {/* Firefly icon — transparent SVG, no background */}
       <img
         src="/logo-icon.svg"
         alt=""
@@ -38,7 +38,7 @@ export default function LumosLogo({ size = 22, hero = false }) {
         }}
       />
 
-      {/* Yazı + uçuşan ateş böcekleri */}
+      {/* Wordmark + roaming fireflies */}
       <div className={`lumos-brand${hero ? ' lumos-brand--hero' : ''}`}>
         <span
           className="lumos-wordmark"
@@ -47,7 +47,7 @@ export default function LumosLogo({ size = 22, hero = false }) {
           Lumos
         </span>
 
-        {/* 4 uçuşan ateş böceği — yazının üzerinde dolaşır */}
+        {/* 4 roaming fireflies — drift above the wordmark */}
         {FIREFLIES.map((ff, i) => (
           <span
             key={i}

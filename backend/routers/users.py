@@ -35,7 +35,7 @@ class UserRead(BaseModel):
 
 
 class InvestmentPathUpdate(BaseModel):
-    # Akış 0 — chosen journey: stocks-only / real-estate-only / both / let AI suggest
+    # Flow 0 — chosen journey: stocks-only / real-estate-only / both / let AI suggest
     investment_path: Literal["stocks", "real_estate", "hybrid", "undecided"]
 
 
@@ -58,7 +58,7 @@ async def update_investment_path(
     user_id: str = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """PATCH /users/me/investment-path — set the user's chosen journey (Akış 0)."""
+    """PATCH /users/me/investment-path — set the user's chosen journey (Flow 0)."""
     return await user_repository.set_investment_path(db, user_id, body.investment_path)
 
 
@@ -69,7 +69,7 @@ async def fear_check_in(
     db: AsyncSession = Depends(get_db),
 ):
     """
-    Onboarding fear check-in — "yatırımda seni en çok ne korkutuyor?"
+    Onboarding fear check-in — "what scares you most about investing?"
     Returns immediate, tag-specific reassurance (zero AI cost).
     """
     user = await user_repository.set_primary_fear(db, user_id, body.primary_fear)
@@ -85,7 +85,7 @@ async def readiness_score(
     db: AsyncSession = Depends(get_db),
 ):
     """
-    Cesaret göstergesi — a simple, transparent 0-100 readiness score built
+    Courage indicator — a simple, transparent 0-100 readiness score built
     from concrete milestones the user has actually completed. No mystery
     algorithm: every point is explained.
     """
@@ -114,7 +114,7 @@ class MarketUpdate(BaseModel):
 
 @router.get("/markets")
 async def list_markets():
-    """Kullanılabilir Market Pack'ler — market seçici için."""
+    """Available Market Packs — for the market selector."""
     from backend.markets import public_markets
 
     return {"markets": public_markets()}
@@ -126,7 +126,7 @@ async def update_market(
     user_id: str = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """Kullanıcının market pack'ini değiştir (TR/US/DE)."""
+    """Change the user's market pack (TR/US/DE)."""
     from fastapi import HTTPException
 
     from backend.markets import MARKET_PACKS
@@ -144,7 +144,7 @@ async def update_market(
 
 @router.get("/me/plans")
 async def list_plans(user_id: str = Depends(get_current_user)):
-    """AI plan tier'ları — fiyatlandırma sayfası payload'ı (billing-ready)."""
+    """AI plan tiers — pricing page payload (billing-ready)."""
     from backend.services.ai_tiers import public_tiers
 
     return {"plans": public_tiers()}

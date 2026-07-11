@@ -1,24 +1,26 @@
 """
 Risk-blended volatility portfolio engine — v3.
 
-GERÇEKÇİLİK DÜZELTMESİ (2026-07-10): v2 formülü `RiskScore × Vol(asset)` idi;
-risk skoru her varlığı aynı çarptığı için normalizasyonda SADELEŞİYORDU —
-dağılım risk profilinden bağımsızdı ve yüksek oynaklık her profilde daha çok
-ağırlık alıyordu (muhafazakâr için tam ters). v3 bunu düzeltir:
+REALISM FIX (2026-07-10): the v2 formula was `RiskScore × Vol(asset)`; the
+risk score multiplied every asset equally, so it CANCELLED OUT during
+normalisation — the allocation was independent of the risk profile, and
+higher volatility always got more weight (the exact opposite of what a
+conservative profile needs). v3 fixes this:
 
-    α = risk_score / 10                       (risk iştahı, 0.1–1.0)
-    raw(asset) = (1-α)·(1/vol) + α·vol        (defansif ↔ agresif harman)
+    α = risk_score / 10                       (risk appetite, 0.1–1.0)
+    raw(asset) = (1-α)·(1/vol) + α·vol        (defensive ↔ aggressive blend)
     weight     = raw / Σ raw
 
-  - Düşük skor → ters-oynaklık ağırlığı: sakin varlıklar (altın vb.) öne çıkar.
-  - Yüksek skor → oynaklık ağırlığı: büyüme motorları öne çıkar.
-  Her ağırlık tek cümleyle açıklanabilir — mantıksal boşluk yok.
+  - Low score → inverse-volatility weighting: calm assets (gold etc.) rise.
+  - High score → volatility weighting: growth engines rise.
+  Every weight can be explained in one sentence — no logical gaps.
 
-POZİSYON SAYISI MANTIĞI: pasta dilimi süsü değil, gerekçeli sayı:
-  - %{MIN_WEIGHT_PCT} altındaki "kırıntı" pozisyonlar elenir (takip yükü ve
-    işlem maliyeti getirir, portföye ölçülebilir katkısı yoktur).
-  - Küçük bütçe daha az parçaya bölünür (75k → ≤3, 200k → ≤4 pozisyon).
-  Elenen her varlık ve nedeni metadata'da raporlanır — sessiz eleme yok.
+POSITION-COUNT LOGIC: a reasoned number, not pie-chart decoration:
+  - "Dust" positions below MIN_WEIGHT_PCT% are pruned (they add tracking
+    burden and transaction costs without measurable portfolio impact).
+  - Small budgets are split into fewer pieces (75k → ≤3, 200k → ≤4).
+  Every dropped asset and its reason is reported in metadata — no silent
+  pruning.
 """
 
 import json
@@ -30,14 +32,14 @@ from backend.services.volatility import compute_volatility
 
 _ASSET_UNIVERSE_PATH = Path(__file__).parent.parent / "data" / "asset_universe.json"
 
-MIN_WEIGHT_PCT = 8          # bunun altı "kırıntı" — elenir ve raporlanır
-_BUDGET_POSITION_CAPS = [   # (bütçe üst sınırı, azami pozisyon)
+MIN_WEIGHT_PCT = 8          # below this is "dust" — pruned and reported
+_BUDGET_POSITION_CAPS = [   # (budget upper bound, max positions)
     (75_000, 3),
     (200_000, 4),
     (float("inf"), 6),
 ]
 
-# Kategori → portföydeki rolü (varlık-başına gerekçenin çekirdeği)
+# Category → role in the portfolio (core of the per-asset rationale)
 _CATEGORY_ROLES = {
     "stocks": "büyüme motoru — uzun vadeli getiri buradan gelir",
     "gold": "dengeleyici — hisseler düşerken genellikle farklı davranır, portföyü yumuşatır",
@@ -91,7 +93,7 @@ def build_portfolio(risk_score: float, budget: float) -> PortfolioRecommendRespo
     tickers = [a["ticker"] for a in universe]
     volatilities = compute_volatility(tickers)
 
-    # ── v3 harman: risk iştahı dağılımı GERÇEKTEN şekillendirir ──
+    # ── v3 blend: risk appetite GENUINELY shapes the allocation ──
     alpha = min(max(risk_score / 10.0, 0.1), 1.0)
     raw_weights: dict[str, float] = {}
     for asset in universe:
@@ -99,11 +101,11 @@ def build_portfolio(risk_score: float, budget: float) -> PortfolioRecommendRespo
         vol = max(volatilities.get(t, 0.15), 0.01)
         raw_weights[t] = (1 - alpha) * (1.0 / vol) + alpha * vol
 
-    # normalize (birinci tur)
+    # normalise (first pass)
     total = sum(raw_weights.values())
     weights = {t: w / total for t, w in raw_weights.items()}
 
-    # ── pozisyon sayısı mantığı: kırıntı eleme + bütçe sınırı ──
+    # ── position-count logic: dust pruning + budget cap ──
     dropped: list[dict] = []
     min_w = MIN_WEIGHT_PCT / 100.0
 
@@ -118,7 +120,7 @@ def build_portfolio(risk_score: float, budget: float) -> PortfolioRecommendRespo
 
     cap = _position_cap(budget)
     if len(weights) > cap:
-        ranked = sorted(weights, key=weights.get)  # küçükten büyüğe
+        ranked = sorted(weights, key=weights.get)  # ascending
         for t in ranked[: len(weights) - cap]:
             dropped.append({
                 "ticker": t,
@@ -127,7 +129,7 @@ def build_portfolio(risk_score: float, budget: float) -> PortfolioRecommendRespo
             })
             weights.pop(t)
 
-    # yeniden normalize (ikinci tur)
+    # re-normalise (second pass)
     total = sum(weights.values())
     weights = {t: w / total for t, w in weights.items()}
 
@@ -146,7 +148,7 @@ def build_portfolio(risk_score: float, budget: float) -> PortfolioRecommendRespo
             )
         )
 
-    # yuvarlama artığını en büyük pozisyona ekle → toplam tam 1.0
+    # add the rounding remainder to the largest position → sum is exactly 1.0
     rounding_gap = round(1.0 - sum(a.weight for a in allocations), 4)
     if allocations and abs(rounding_gap) > 0:
         allocations[0].weight = round(allocations[0].weight + rounding_gap, 4)

@@ -14,7 +14,7 @@ export default function usePortfolio() {
     setAuthToken(token)
   }
 
-  // useCallback — DashboardPage'deki useEffect dependency'i için
+  // useCallback — needed as a useEffect dependency in DashboardPage
   const loadProfile = useCallback(async () => {
     try {
       await ensureAuth()

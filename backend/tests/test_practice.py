@@ -1,5 +1,5 @@
 """
-Practice mode (sanal portföy) tests — market data mocked.
+Practice mode tests — market data mocked.
 """
 import numpy as np
 import pandas as pd

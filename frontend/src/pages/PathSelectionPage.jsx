@@ -67,7 +67,7 @@ export default function PathSelectionPage() {
       </header>
 
       <div className="page-content" style={{ maxWidth: 560, margin: '0 auto' }}>
-        {/* Başlık */}
+        {/* Header */}
         <div style={{ marginBottom: 28 }}>
           <p style={{
             fontSize: 12, letterSpacing: '0.12em', textTransform: 'uppercase',
@@ -115,7 +115,7 @@ export default function PathSelectionPage() {
                   overflow: 'hidden',
                 }}
               >
-                {/* İkon — hover'da hafif büyür */}
+                {/* Icon — grows slightly on hover */}
                 <span style={{
                   fontSize: 32,
                   flexShrink: 0,

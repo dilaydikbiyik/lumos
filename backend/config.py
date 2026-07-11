@@ -14,9 +14,9 @@ class Settings(BaseSettings):
     AI_PROVIDER: str = "gemini"
     ANTHROPIC_API_KEY: str = ""   # set in .env before using AI features
     GEMINI_API_KEY: str = ""      # https://aistudio.google.com/apikey — free tier
-    GEMINI_API_KEY_2: str = ""    # Opsiyonel: 2. Google hesabından ek kota
-    GEMINI_API_KEY_3: str = ""    # Opsiyonel: 3. Google hesabından ek kota
-    GEMINI_API_KEY_4: str = ""    # Opsiyonel: 4. Google hesabından ek kota
+    GEMINI_API_KEY_2: str = ""    # Optional: extra quota from a 2nd Google account
+    GEMINI_API_KEY_3: str = ""    # Optional: extra quota from a 3rd Google account
+    GEMINI_API_KEY_4: str = ""    # Optional: extra quota from a 4th Google account
 
     # Clerk
     CLERK_PUBLISHABLE_KEY: str = ""
@@ -26,7 +26,7 @@ class Settings(BaseSettings):
     # Exchange Rate (optional)
     EXCHANGE_RATE_API_KEY: str = ""
 
-    # TCMB EVDS — live TÜFE + housing price index (free key)
+    # TCMB EVDS — live CPI (TUFE) + housing price index (free key)
     TCMB_EVDS_API_KEY: str = ""
 
     # Usage limits
@@ -40,7 +40,7 @@ class Settings(BaseSettings):
 
 settings = Settings()
 
-# Geliştirme ortamında kotayı pratikte sınırsız yap
+# Make the quota practically unlimited in development
 if settings.APP_ENV == "development":
     settings.DAILY_MESSAGE_QUOTA = 9999
 

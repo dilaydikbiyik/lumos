@@ -1,5 +1,5 @@
 """
-Sanal portföy (practice mode) — a beginner "builds" the recommended
+Practice portfolio (practice mode) — a beginner "builds" the recommended
 portfolio with fake money and watches it move with REAL market data.
 Zero risk, real learning; the natural on-ramp before touching real cash.
 

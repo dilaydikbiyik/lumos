@@ -17,9 +17,9 @@ class HealthResponse(BaseModel):
 @router.get("/health", response_model=HealthResponse)
 async def health_check():
     """
-    Uptime monitoring endpoint — DB ve AI provider erişimini gerçekten yoklar.
+    Uptime monitoring endpoint — genuinely probes DB and AI provider access.
     """
-    # DB bağlantı kontrolü
+    # DB connectivity check
     db_status = "ok"
     try:
         async with async_engine.connect() as conn:
@@ -27,7 +27,7 @@ async def health_check():
     except Exception:
         db_status = "error"
 
-    # AI provider yapılandırma kontrolü (erişim testi değil, yapılandırma kontrolü)
+    # AI provider configuration check (config only, not an access test)
     ai_status = "ok"
     provider = settings.AI_PROVIDER
     if provider == "anthropic" and not settings.ANTHROPIC_API_KEY:

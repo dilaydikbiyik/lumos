@@ -1,5 +1,5 @@
 """
-Goal-based investing — "3 yılda ev peşinatı için 800.000 TL" turned into
+Goal-based investing — "800.000 TL for a house deposit in 3 years" turned into
 a concrete monthly contribution plan, with drift detection.
 """
 

@@ -59,8 +59,8 @@ def test_chat_endpoint_uses_plan_quota(client, mock_ai):
 
     res = client.post("/chat", json={"messages": [{"role": "user", "content": "selam"}]})
     assert res.status_code == 200
-    # mock_ai patches _dispatch; tier'ın chat()'e ulaştığını quota tarafı kanıtlar:
-    # plus kotası 500 — 50'lik free sınırında takılmadan geçmiş olması yeterli sinyal
+    # mock_ai patches _dispatch; the quota side proves the tier reached chat():
+    # plus quota is 500 — passing without hitting the free limit of 50 is signal enough
 
 
 def test_admin_can_set_plan(client):
@@ -107,19 +107,19 @@ def test_unknown_market_falls_back_to_tr():
 
 def test_tr_listing_links_use_canonical_slugs():
     links = build_listing_links("Ankara", "Çankaya", "arsa", market="TR")
-    # kanonik kalıp + Türkçe karakter sadeleştirme (Çankaya → cankaya)
+    # canonical pattern + Turkish character simplification (Çankaya → cankaya)
     assert any("sahibinden.com/satilik-arsa/ankara-cankaya" in link["url"] for link in links)
     assert any("emlakjet.com/satilik-arsa/ankara-cankaya" in link["url"] for link in links)
 
 
 def test_tr_village_detail_uses_search_fallback():
-    # "Keşan'da Çeribaşı köyü" gerçekçiliği: mikro konum → arama rotası
+    # the "Çeribaşı village in Keşan" realism case: micro-location → search route
     links = build_listing_links("Edirne", "Keşan", "arsa", market="TR", detail="Çeribaşı köyü")
     sahibinden = next(link for link in links if link["site"] == "Sahibinden")
     emlakjet = next(link for link in links if link["site"] == "Emlakjet")
     assert "arama?query_text=" in sahibinden["url"]
     assert "%C3%87eriba%C5%9F%C4%B1" in sahibinden["url"] or "eriba" in sahibinden["url"]
-    # Emlakjet: köy slugu uydurulmaz (404 riski) — garantili ilçe sayfası
+    # Emlakjet: never invent a village slug (404 risk) — guaranteed district page
     assert emlakjet["url"] == "https://www.emlakjet.com/satilik-arsa/edirne-kesan"
 
 
@@ -151,4 +151,4 @@ def test_plans_endpoint(client):
     assert res.status_code == 200
     plans = res.json()["plans"]
     assert {p["plan"] for p in plans} == {"free", "plus", "pro"}
-    assert all("model_chain" not in p for p in plans)  # iç detay sızmaz
+    assert all("model_chain" not in p for p in plans)  # internal details must not leak

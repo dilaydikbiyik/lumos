@@ -48,7 +48,7 @@ async def chat_endpoint(
 
     user = await user_repository.get_or_create(db, user_id)
     tier = get_tier(user.plan)
-    # Dev ortamında tier limiti yerine settings'i kullan (9999)
+    # In development use the settings limit (9999) instead of the tier limit
     effective_quota = settings.DAILY_MESSAGE_QUOTA if settings.APP_ENV == "development" else tier["daily_quota"]
     allowed = await user_repository.consume_quota(db, user_id, effective_quota)
     if not allowed:
@@ -96,8 +96,8 @@ async def what_if_endpoint(
     db: AsyncSession = Depends(get_db),
 ):
     """
-    'Ne olurdu?' asistanı — tool-use: AI matematiği uydurmaz, portfolio_engine'i
-    gerçek before/after olarak çağırır, sadece sonucu yorumlar.
+    "What if?" assistant — tool-use: the AI never invents the math; it calls
+    portfolio_engine for a real before/after and only narrates the result.
     """
     from backend.services.what_if import answer_what_if
 

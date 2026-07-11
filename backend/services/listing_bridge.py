@@ -5,15 +5,17 @@ Lumos never scrapes or hosts listings (legal risk, brittle, against ToS).
 Instead it hands the user a pre-filtered search URL on sites they already
 trust. Zero API keys, zero maintenance burden.
 
-GERÇEKÇİLİK NOTU (2026-07-10 doğrulaması):
-- Emlakjet il-ilçe kalıpları curl ile doğrulandı: /satilik-arsa/edirne-kesan → 200.
-  Mahalle/köy yolları YALNIZCA sitenin veritabanındaki sluglarda çözülüyor
-  (cumhuriyet-mahallesi → 200 ama ceribasi-koyu → 404) — bu yüzden serbest
-  metin detayda yol uydurmuyoruz, ilçe sayfasına iniyoruz.
-- Sahibinden bot koruması dış doğrulamayı engelliyor (her yola 403);
-  kanonik public kalıpları (satilik-arsa/satilik-daire) kullanıyoruz ve
-  köy/mahalle gibi mikro konumlar için sitenin kendi arama rotasına
-  (query_text) düşüyoruz — kırık derin link riskine karşı en sağlam yol.
+REALISM NOTE (verified live 2026-07-10):
+- Emlakjet province-district patterns verified via curl:
+  /satilik-arsa/edirne-kesan → 200. Quarter/village paths resolve ONLY for
+  slugs in the site's own database (cumhuriyet-mahallesi → 200 but
+  ceribasi-koyu → 404) — so we never invent a path from free-text detail;
+  we land on the district page instead.
+- Sahibinden's bot protection blocks external verification (403 on every
+  path); we use the canonical public patterns (satilik-arsa/satilik-daire)
+  and fall back to the site's own search route (query_text) for
+  micro-locations like villages — the most robust defence against broken
+  deep links.
 
 Market-aware: TR keeps hand-tuned deep URLs; other markets use their
 pack's search templates.
@@ -25,7 +27,7 @@ from backend.markets import get_market_pack
 
 _TR_CHAR_MAP = str.maketrans("çğıöşüÇĞİÖŞÜ", "cgiosucgiosu")
 
-# kategori -> (sahibinden slug, emlakjet slug)
+# category -> (sahibinden slug, emlakjet slug)
 _CATEGORY_SLUGS = {
     "arsa": ("satilik-arsa", "satilik-arsa"),
     "daire": ("satilik-daire", "satilik-konut"),
@@ -34,7 +36,7 @@ _CATEGORY_SLUGS = {
 
 
 def _slug(text: str) -> str:
-    """Türkçe karakterleri sadeleştirip URL parçasına çevirir: 'Keşan' → 'kesan'."""
+    """Simplifies Turkish characters into a URL slug: 'Keşan' → 'kesan'."""
     return "-".join(text.strip().lower().translate(_TR_CHAR_MAP).split())
 
 
@@ -46,8 +48,9 @@ def _tr_links(il: str, ilce: str, asset_type: str, detail: Optional[str] = None)
     location = f"{il_s}-{ilce_s}" if ilce_s else il_s
 
     if detail and detail.strip():
-        # Köy/mahalle gibi mikro konum: Sahibinden'de derin yol garantisi yok →
-        # sitenin kendi aramasına tam metinle düşmek en gerçekçi davranış.
+        # Micro-location (village/quarter): no guaranteed deep path on
+        # Sahibinden → falling back to the site's own full-text search is
+        # the most realistic behaviour.
         text = " ".join(part for part in (il, ilce, detail, asset_type) if part).strip()
         return [
             {
@@ -55,10 +58,10 @@ def _tr_links(il: str, ilce: str, asset_type: str, detail: Optional[str] = None)
                 "url": f"https://www.sahibinden.com/arama?query_text={quote(text)}",
             },
             {
-                # Köy slugu UYDURMUYORUZ: Emlakjet yolları yalnızca kendi
-                # veritabanındaki konumlar için çözülüyor (ceribasi-koyu → 404
-                # canlı görüldü). Garantili çözülen il-ilçe sayfasına indirip
-                # mikro filtreyi siteye bırakmak dürüst davranış.
+                # We NEVER invent a village slug: Emlakjet paths resolve
+                # only for locations in its own database (ceribasi-koyu → 404
+                # seen live). Landing on the guaranteed province-district page
+                # and leaving the micro filter to the site is the honest move.
                 "site": "Emlakjet",
                 "url": f"https://www.emlakjet.com/{emlakjet_slug}/{location}",
             },

@@ -2,9 +2,9 @@
 TCMB EVDS client — live Turkish central bank data (free API).
 
 Series used:
-  TP.FG.J0      -> TÜFE (CPI, 2003=100) — feeds the inflation reality layer
-  TP.KFE.<NUTS> -> Konut Fiyat Endeksi by NUTS2 region — feeds region
-                   intelligence ("nereden arsa/ev alayım?")
+  TP.FG.J0      -> TUFE (CPI, 2003=100) — feeds the inflation reality layer
+  TP.KFE.<NUTS> -> housing price index by NUTS2 region — feeds region
+                   intelligence ("where should I buy land/a home?")
 
 All responses are disk-cached for a day; EVDS updates monthly, so this
 keeps us far under any rate limit while staying fresh enough.
@@ -85,8 +85,8 @@ def fetch_series(series_code: str, start: str, end: str) -> dict[str, float]:
 
 def get_live_cpi_index(start: str = "01-01-2020") -> Optional[dict[str, float]]:
     """
-    Live TÜFE index keyed by YYYY-MM, or None when the key is missing or
-    the call fails — callers fall back to the bundled static index.
+    Live CPI (TUFE) index keyed by YYYY-MM, or None when the key is missing
+    or the call fails — callers fall back to the bundled static index.
     """
     if not is_configured():
         return None
@@ -120,9 +120,10 @@ def get_regional_housing_indices(start: str = "01-01-2023") -> dict[str, dict]:
     return out
 
 
-# ── İl bazında konut birim fiyatları (TL/m², çeyreklik, 2010→bugün) ──────────
-# TCMB bie_birimfiyat veri grubu: ulusal + 81 il. NUTS2 bölge endeksinden çok
-# daha somut: "Muğla'da m² 79.110 TL" — kullanıcının istediği spesifiklik.
+# ── Per-province housing unit prices (TL/m², quarterly, 2010→today) ─────────
+# TCMB bie_birimfiyat data group: national + 81 provinces. Far more concrete
+# than the NUTS2 region index: "79.110 TL per m² in Muğla" — exactly the
+# specificity users asked for.
 
 UNIT_PRICE_PREFIX = "TP.BIRIMFIYAT."
 
@@ -158,15 +159,16 @@ PROVINCES: dict[str, str] = {
 
 
 def _quarter_to_month(quarter_label: str) -> str:
-    """'2026-Q1' → '2026-03' (çeyrek sonu ayı — enflasyon kıyası için)."""
+    """'2026-Q1' → '2026-03' (quarter-end month — for inflation comparison)."""
     year, q = quarter_label.split("-Q")
     return f"{year}-{int(q) * 3:02d}"
 
 
 def fetch_quarterly_series_batch(codes: list[str], start: str, end: str) -> dict[str, dict[str, float]]:
     """
-    Çeyreklik serileri TOPLU çeker (tek istekte ~15 seri) — 82 il için
-    6 istek, günlük cache. Dönüş: {code: {"YYYY-MM": değer}} (çeyrek→ay).
+    Fetches quarterly series in BATCHES (~15 series per request) — 6
+    requests for 82 provinces, cached daily.
+    Returns {code: {"YYYY-MM": value}} (quarter→month).
     """
     cache_key = f"evds_batch_q:{hashlib_key(codes)}:{start}:{end}"
     cached = cache_service.get(cache_key)
@@ -202,8 +204,9 @@ def hashlib_key(codes: list[str]) -> str:
 
 def get_province_unit_prices() -> dict[str, dict]:
     """
-    81 il + 3 büyükşehir için TL/m² birim fiyat geçmişi (2010→bugün, çeyreklik).
-    Dönüş: {suffix: {"name": il_adı, "prices": {"YYYY-MM": tl_m2}}}
+    TL/m² unit-price history for 81 provinces + 3 metro areas
+    (2010→today, quarterly).
+    Returns {suffix: {"name": province_name, "prices": {"YYYY-MM": tl_m2}}}
     """
     from datetime import date as _date
 

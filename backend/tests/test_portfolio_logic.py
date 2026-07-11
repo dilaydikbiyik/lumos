@@ -1,11 +1,11 @@
 """
-Portföy motoru v3 mantık testleri — gerçekçilik süzgeci kodda yaşasın:
+Portfolio engine v3 logic tests — keeping the realism filter alive in code:
 
-1. Risk skoru dağılımı GERÇEKTEN değiştirir (v2'de sadeleşiyordu — bug).
-2. Muhafazakâr profilde sakin varlık (altın) ağır; agresifte oynak varlık ağır.
-3. Pozisyon sayısı bütçe mantığına uyar; kırıntı pozisyon kalmaz.
-4. Elemeler sessiz değil — metadata'da tek tek gerekçeli raporlanır.
-5. Her varlığın gerekçesi dolu; risk skoru dökümü toplamı skoru verir.
+1. The risk score GENUINELY changes the allocation (it cancelled out in v2 — bug).
+2. Cautious profiles overweight calm assets (gold); aggressive ones overweight volatile.
+3. Position count follows the budget logic; no dust positions survive.
+4. Pruning is never silent — every drop is reported with a reason in metadata.
+5. Every asset carries a rationale; risk-factor contributions sum to the score.
 """
 from unittest.mock import patch
 
@@ -15,7 +15,7 @@ from backend.schemas.user_profile import RiskProfileAnswers
 from backend.services.portfolio_engine import MIN_WEIGHT_PCT, build_portfolio
 from backend.services.risk_engine import compute_risk_score
 
-# Sabit oynaklıklar: XU100 çok oynak, GLD sakin — ayrım net görülsün
+# Fixed volatilities: XU100 very volatile, GLD calm — makes the contrast obvious
 FAKE_VOLS = {"XU100.IS": 0.45, "SPY": 0.18, "QQQ": 0.28, "GLD": 0.12, "VNQ": 0.20, "SCHH": 0.22}
 
 
@@ -76,10 +76,10 @@ def test_dropped_assets_are_reported_with_reasons():
     p = build_portfolio(risk_score=5, budget=50000)
     logic = p.metadata["allocation_logic"]
     assert logic["position_cap"] == 3
-    # elenen her varlık gerekçeli
+    # every dropped asset carries a reason
     for d in logic["dropped"]:
         assert d["ticker"] and d["reason"]
-    # üniverse(4) → 3 pozisyon: en az 1 eleme raporlanmış olmalı
+    # universe(4) → 3 positions: at least 1 drop must be reported
     assert len(logic["dropped"]) >= 1
 
 
@@ -87,7 +87,7 @@ def test_every_allocation_has_rationale():
     p = build_portfolio(risk_score=6, budget=200000)
     for a in p.allocations:
         assert "Rolü:" in a.explanation and "gerekçesi" in a.explanation
-        assert "%" in a.explanation  # oynaklık ve ağırlık rakamları görünür
+        assert "%" in a.explanation  # volatility and weight figures are visible
 
 
 def test_risk_factors_sum_to_score():
@@ -98,8 +98,8 @@ def test_risk_factors_sum_to_score():
     r = compute_risk_score(answers)
     assert len(r.factors) >= 4
     total = sum(f.contribution for f in r.factors)
-    assert total == pytest.approx(r.risk_score, abs=0.11)  # yuvarlama payı
-    # düzeltmeler de dökümde
+    assert total == pytest.approx(r.risk_score, abs=0.11)  # rounding tolerance
+    # modifiers appear in the breakdown too
     names = " ".join(f.factor for f in r.factors)
     assert "Yaş" in names and "Gelir" in names
 
@@ -111,6 +111,6 @@ def test_risk_factors_expose_weights_and_answers():
     )
     r = compute_risk_score(answers)
     loss = next(f for f in r.factors if "Kayıp" in f.factor)
-    assert "%30" in loss.factor            # ağırlık görünür
-    assert loss.answer == "Düşüşte satarım"  # cevap okunur halde
-    assert loss.explanation               # neden açıklaması var
+    assert "%30" in loss.factor            # weight is visible
+    assert loss.answer == "Düşüşte satarım"  # answer in readable form
+    assert loss.explanation               # has a why-explanation

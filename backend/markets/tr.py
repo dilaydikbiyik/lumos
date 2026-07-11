@@ -12,8 +12,8 @@ TR = MarketPack(
     locale="tr-TR",
     languages=["tr", "en"],
 
-    inflation_source="tcmb_evds",      # canlı TÜFE (backend/services/evds_service.py)
-    housing_index_source="tcmb_evds",  # 19 NUTS2 bölgesi konut fiyat endeksi
+    inflation_source="tcmb_evds",      # live CPI (backend/services/evds_service.py)
+    housing_index_source="tcmb_evds",  # housing price index for 19 NUTS2 regions
     default_index_ticker="XU100.IS",
 
     listing_sites=[

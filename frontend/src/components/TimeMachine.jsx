@@ -5,7 +5,7 @@ import IsikTut from './IsikTut'
 import useMarket from '../hooks/useMarket'
 
 /**
- * Zaman Makinesi — "bu portföyü N yıl önce kursaydın ne olurdu?"
+ * Time Machine — "what if you had built this portfolio N years ago?"
  * Honest framing: shows the worst moment with the user's own money,
  * not just the happy final number.
  */

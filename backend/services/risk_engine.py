@@ -102,7 +102,7 @@ def compute_risk_score(answers: RiskProfileAnswers) -> RiskProfileResponse:
     }
     base = sum(dimension_scores[d] * _WEIGHTS[d] for d in dimension_scores)
 
-    # ── şeffaf döküm: her puanın nereden geldiği ──
+    # ── transparent breakdown: where every point comes from ──
     factor_names = {
         "time_horizon": "Yatırım vaden",
         "loss_tolerance": "Kayıp toleransın",

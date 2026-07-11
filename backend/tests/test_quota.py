@@ -11,7 +11,7 @@ def test_quota_exhaustion_returns_429(client, mock_ai):
 
     app.dependency_overrides[get_current_user] = lambda: "user_quota_test"
     with patch.dict("backend.services.ai_tiers.AI_TIERS", {"free": {**__import__("backend.services.ai_tiers", fromlist=["AI_TIERS"]).AI_TIERS["free"], "daily_quota": 3}}):
-        # Dev bypass'ını devre dışı bırak — bu test üretim kota davranışını doğrular
+        # Disable the dev bypass — this test verifies production quota behaviour
         with patch("backend.routers.chat.settings") as mock_settings:
             mock_settings.APP_ENV = "production"
             mock_settings.DAILY_MESSAGE_QUOTA = 3

@@ -3,8 +3,8 @@ import { useAuth } from '@clerk/clerk-react'
 import api, { setAuthToken } from '../utils/api'
 
 /**
- * "Bugün Ne Oldu?" — En fazla 3 sakin, yeni başlayan dostu haber.
- * Hata durumunda sessiz: haber olmazsa kart hiç görünmez.
+ * "What happened today?" — at most 3 calm, beginner-friendly news items.
+ * Silent on failure: with no news the card simply never appears.
  */
 export default function NewsDigest() {
   const { getToken } = useAuth()
@@ -34,7 +34,7 @@ export default function NewsDigest() {
       border: '1px solid var(--border)',
       overflow: 'hidden',
     }}>
-      {/* Başlık */}
+      {/* Header */}
       <div style={{
         display: 'flex', alignItems: 'center', gap: 8,
         marginBottom: 14,
@@ -74,7 +74,7 @@ export default function NewsDigest() {
                 width: '100%',
               }}
             >
-              {/* Başlık satırı */}
+              {/* Title row */}
               <div style={{
                 display: 'flex', alignItems: 'flex-start', gap: 10,
               }}>
@@ -95,12 +95,12 @@ export default function NewsDigest() {
                     {item.headline}
                   </p>
 
-                  {/* Genişletilmiş detay */}
+                  {/* Expanded detail */}
                   {isExpanded && (
                     <div style={{
                       animation: 'fade-in 0.2s ease',
                     }}>
-                      {/* Neden önemli */}
+                      {/* Why it matters */}
                       <p style={{
                         fontSize: 12.5, color: 'var(--text-muted)', lineHeight: 1.6,
                         marginBottom: 8, paddingLeft: 0,
@@ -108,7 +108,7 @@ export default function NewsDigest() {
                         {item.why_it_matters}
                       </p>
 
-                      {/* Sakinleştirici not */}
+                      {/* Calming note */}
                       <div style={{
                         fontSize: 12, color: 'var(--firefly)',
                         background: 'var(--firefly-dim)',

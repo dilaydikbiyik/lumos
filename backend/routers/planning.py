@@ -27,7 +27,7 @@ async def rent_vs_buy(
     body: RentVsBuyRequest,
     user_id: str = Depends(get_current_user),
 ):
-    """'Kirada mı otur, ev mi al?' — two honest side-by-side projections."""
+    """Rent or buy? — two honest side-by-side projections."""
     return compare_rent_vs_buy(body.down_payment, body.monthly_rent, body.years)
 
 
@@ -64,7 +64,7 @@ async def region_intelligence(
     user_id: str = Depends(get_current_user),
 ):
     """
-    'Değerlenme Potansiyeli' — NUTS2 regions ranked by housing-index
+    Appreciation potential — NUTS2 regions ranked by housing-index
     appreciation, nominal AND real (inflation-adjusted). Region-level
     honesty: no street/parcel claims, past != future.
     """
@@ -97,9 +97,9 @@ async def asset_projection(
     user_id: str = Depends(get_current_user),
 ):
     """
-    Gelecek senaryoları — tahmin değil: varlığın kendi geçmişindeki tüm
-    N-yıllık pencerelerin dağılımı (kötü/tipik/iyi), kullanıcının kendi
-    tutarına uygulanmış.
+    Future scenarios — not a forecast: the distribution of every N-year
+    window in the asset's own history (bad/typical/good), applied to the
+    user's own amount.
     """
     from backend.services.projection import project_asset
 
@@ -113,7 +113,7 @@ async def region_projection(
     body: RegionProjectionRequest,
     user_id: str = Depends(get_current_user),
 ):
-    """Bölge senaryo bandı — TCMB konut endeksi pencere dağılımı + reel karşılık."""
+    """Region scenario band — TCMB housing-index window distribution + real terms."""
     from backend.services.projection import project_region
 
     return project_region(body.region_code, body.amount, body.years)
@@ -127,8 +127,9 @@ async def portfolio_projection(
     user_id: str = Depends(get_current_user),
 ):
     """
-    Birleşik portföy senaryo bandı — tekil varlık değil, ağırlıklı tüm
-    portföyün kendi geçmişindeki dağılımı (çeşitlendirmenin etkisini gösterir).
+    Combined portfolio scenario band — the weighted whole-portfolio
+    distribution over its own history, not a single asset (shows the
+    effect of diversification).
     """
     from backend.services.projection import project_portfolio
 
@@ -147,8 +148,8 @@ async def province_intelligence(
     user_id: str = Depends(get_current_user),
 ):
     """
-    İl bazında konut fiyatları (TCMB birim fiyat, TL/m²) — 81 il,
-    1/3/5 yıllık nominal + reel değerlenme sıralaması.
+    Per-province housing prices (TCMB unit price, TL/m²) — 81 provinces
+    ranked by 1/3/5-year nominal + real appreciation.
     """
     from backend.services.province_intelligence import rank_provinces
 
@@ -159,10 +160,10 @@ async def province_intelligence(
 @limiter.limit("15/minute")
 async def province_projection(
     request: Request,
-    body: RegionProjectionRequest,  # region_code alanı il kodu (örn. MUGLA) taşır
+    body: RegionProjectionRequest,  # the region_code field carries a province code here (e.g. MUGLA)
     user_id: str = Depends(get_current_user),
 ):
-    """İl senaryo bandı — 16 yıllık birim fiyat geçmişinin pencere dağılımı."""
+    """Province scenario band — window distribution of 16 years of unit prices."""
     from backend.services.province_intelligence import project_province
 
     return project_province(body.region_code.upper(), body.amount, body.years)

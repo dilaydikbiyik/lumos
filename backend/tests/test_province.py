@@ -1,5 +1,5 @@
 """
-İl bazında konut istihbaratı testleri — EVDS mock'lu.
+Per-province housing intelligence tests — EVDS mocked.
 """
 from unittest.mock import patch
 
@@ -8,7 +8,7 @@ from backend.services.province_intelligence import project_province, rank_provin
 
 
 def _fake_prices():
-    # 16 yıl çeyreklik: Muğla hızlı, Ankara ılımlı büyüme
+    # 16 years quarterly: Muğla grows fast, Ankara moderately
     def series(start, quarterly_growth):
         out = {}
         val = start
@@ -29,7 +29,7 @@ def test_quarter_to_month_conversion():
 
 
 def test_all_81_provinces_mapped():
-    assert len(PROVINCES) == 81  # 3 büyükşehir özel kod + 78 il
+    assert len(PROVINCES) == 81  # 3 metro special codes + 78 provinces
     assert PROVINCES["MARAS"] == "Kahramanmaraş"
     assert PROVINCES["URFA"] == "Şanlıurfa"
     assert PROVINCES["IST"] == "İstanbul"
@@ -40,7 +40,7 @@ def test_rank_provinces_orders_by_real_change():
                side_effect=lambda: _fake_prices()):
         r = rank_provinces(3)
     assert r["available"] is True
-    assert r["provinces"][0]["province"] == "Muğla"  # daha hızlı büyüyen önde
+    assert r["provinces"][0]["province"] == "Muğla"  # faster growth ranks first
     assert r["provinces"][0]["price_per_m2"] > 0
     assert "İl ortalaması" in r["honesty_note"]
 

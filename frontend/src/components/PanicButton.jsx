@@ -3,11 +3,12 @@ import { useAuth } from '@clerk/clerk-react'
 import api, { setAuthToken } from '../utils/api'
 
 /**
- * Panik Düğmesi 🫨 — piyasa korkuttuğunda basılacak gerçek bir buton.
- * Hiçbir finans uygulamasında yok; vizyonun ("korku = veri") kriz anı hali.
+ * Panic Button 🫨 — a real button to press when the market gets scary.
+ * No finance app has one; the crisis-moment form of the "fear = data" vision.
  *
- * 3 aşama: nefes egzersizi → profiline göre koç mesajı + dürüst gerçekler
- * → "kararın senin" kapanışı. Karanlık desen yok: satışı engellemiyoruz.
+ * 3 stages: breathing exercise → profile-based coach message + honest
+ * facts → a "the decision is yours" close. No dark patterns: we never
+ * block selling.
  */
 export default function PanicButton() {
   const { getToken } = useAuth()
@@ -17,8 +18,9 @@ export default function PanicButton() {
   const [closing, setClosing] = useState(null)
   const [breathCount, setBreathCount] = useState(0)
 
-  // Nefes aşaması: 3 nefes (~4.5sn/nefes), sonra koç aşamasına geç.
-  // Tüm setState'ler timeout callback'inde — effect gövdesinde senkron değil.
+  // Breathing stage: 3 breaths (~4.5s each), then move to the coach stage.
+  // All setStates live in the timeout callback — never synchronous in the
+  // effect body.
   useEffect(() => {
     if (!open || stage !== 'breathe') return
     const t = setTimeout(() => {
@@ -57,7 +59,7 @@ export default function PanicButton() {
 
   return (
     <>
-      {/* Yüzen panik butonu — bottom-nav'ın üstünde */}
+      {/* Floating panic button — above the bottom nav */}
       <button
         onClick={press}
         aria-label="Panik anı desteği"

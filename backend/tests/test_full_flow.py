@@ -37,10 +37,10 @@ def test_full_journey(client, scenario):
     from backend.main import app
     from backend.middleware.verify_clerk import get_current_user
 
-    # her persona kendi kullanıcısı — kota/holdings çakışması olmasın
+    # each persona gets its own user — no quota/holdings collisions
     app.dependency_overrides[get_current_user] = lambda: f"user_e2e_{scenario['name']}"
 
-    # 1) Yol seçimi (Akış 0)
+    # 1) Path selection (Flow 0)
     res = client.patch("/users/me/investment-path", json={"investment_path": "hybrid"})
     assert res.status_code == 200
 
@@ -61,7 +61,7 @@ def test_full_journey(client, scenario):
     if "min_risk_score" in scenario:
         assert score >= scenario["min_risk_score"]
 
-    # 4) Portföy önerisi (motor + açıklayıcı mock)
+    # 4) Portfolio recommendation (engine + mocked explainer)
     with patch("backend.routers.recommend.build_portfolio",
                return_value=_fake_portfolio(score, scenario["answers"]["budget"])), \
          patch("backend.routers.recommend.explain_portfolio", return_value="Açıklama."):
@@ -72,7 +72,7 @@ def test_full_journey(client, scenario):
     allocations = res.json()["allocations"]
     assert abs(sum(a["weight"] for a in allocations) - 1.0) < 1e-9
 
-    # 5) "Aldım" — dağılımı varlıklara işle
+    # 5) "I bought it" — record the allocation into holdings
     for a in allocations:
         res = client.post("/holdings", json={
             "asset_type": "stock" if a["category"] == "stocks" else "gold",
@@ -81,14 +81,14 @@ def test_full_journey(client, scenario):
         })
         assert res.status_code == 201
 
-    # 6) Servet özeti: kalan bütçe ~0 olmalı (tamamı yatırıldı)
+    # 6) Wealth summary: remaining budget should be ~0 (fully invested)
     res = client.get("/holdings/summary")
     assert res.status_code == 200
     summary = res.json()
     assert summary["holdings_count"] == 2
     assert summary["remaining_budget"] == pytest.approx(0, abs=1)
 
-    # 7) Cesaret skoru: profil + yol + varlık tamam -> ciddi ilerleme
+    # 7) Readiness score: profile + path + holdings done -> serious progress
     res = client.get("/users/me/readiness")
     assert res.status_code == 200
     assert res.json()["score"] >= 60

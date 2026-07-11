@@ -60,7 +60,7 @@ export default function FearCheckInPage() {
     }
   }
 
-  /* ── Güvence ekranı ── */
+  /* ── Reassurance screen ── */
   if (reassurance) {
     return (
       <div className="page">
@@ -73,7 +73,7 @@ export default function FearCheckInPage() {
           display: 'flex', flexDirection: 'column', alignItems: 'center',
           justifyContent: 'center', flex: 1, textAlign: 'center', gap: 20,
         }}>
-          {/* Işık halkası animasyonu */}
+          {/* Light-ring animation */}
           <div style={{ position: 'relative', marginBottom: 8 }}>
             <div style={{
               width: 80, height: 80, borderRadius: '50%',
@@ -104,7 +104,7 @@ export default function FearCheckInPage() {
     )
   }
 
-  /* ── Korku seçim ekranı ── */
+  /* ── Fear selection screen ── */
   return (
     <div className="page">
       <header className="navbar">
@@ -113,7 +113,7 @@ export default function FearCheckInPage() {
       </header>
 
       <div className="page-content" style={{ maxWidth: 480, margin: '0 auto' }}>
-        {/* Başlık */}
+        {/* Header */}
         <div style={{ marginBottom: 28 }}>
           <p style={{
             fontSize: 12, letterSpacing: '0.12em', textTransform: 'uppercase',

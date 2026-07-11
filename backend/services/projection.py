@@ -37,9 +37,10 @@ def _windowed_real_band(
     values, months: list[str], window: int, amount: float,
 ) -> tuple[dict, Optional[dict]]:
     """
-    Aylık/çeyreklik seride kaymalı pencerelerin NOMINAL bandı + her pencerenin
-    KENDİ dönem enflasyonuyla düşürülmüş REEL bandı. (Tüm pencerelerin nominal
-    medyanını tek bir dönemin enflasyonuyla kıyaslamak elma-armut hatasıdır.)
+    NOMINAL band of rolling windows over a monthly/quarterly series, plus a
+    REAL band where each window is deflated by its OWN period inflation.
+    (Comparing the nominal median of all windows against a single period's
+    inflation is an apples-to-oranges error.)
     """
     from backend.services import inflation_service
 
@@ -200,7 +201,7 @@ def project_region(region_code: str, amount: float, years: int) -> dict:
 
     band = _band(returns, amount)
 
-    # typical senaryonun reel karşılığı — nominal patlama servet sanılmasın
+    # real terms of the typical scenario — a nominal boom must not be mistaken for wealth
     start_month = months_sorted[max(len(months_sorted) - 1 - window, 0)]
     end_month = months_sorted[-1]
     try:

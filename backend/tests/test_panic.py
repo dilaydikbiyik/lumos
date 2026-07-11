@@ -1,5 +1,5 @@
 """
-Panik Düğmesi testleri — profil-bazlı sakinleştirme + çözüm loglama.
+Panic Button tests — profile-based calming + resolution logging.
 """
 
 
@@ -17,13 +17,13 @@ def test_panic_press_returns_profile_keyed_message(client):
     body = res.json()
     assert body["loss_tolerance"] == "low"
     assert len(body["facts"]) >= 3
-    assert "doğal" in body["message"]  # low-tolerance mesajı endişeyi normalize eder
+    assert "doğal" in body["message"]  # the low-tolerance message normalises the worry
 
 
 def test_panic_facts_contain_no_dark_patterns(client):
     res = client.post("/coach/panic", json={})
     facts = " ".join(res.json()["facts"])
-    # kullanıcının özgürlüğü açıkça teslim edilmeli
+    # the user's freedom must be explicitly acknowledged
     assert "geçerli bir karar" in facts
 
 

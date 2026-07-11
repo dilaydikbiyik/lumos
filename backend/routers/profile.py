@@ -47,8 +47,8 @@ async def get_profile(
     if user is None or user.risk_score is None:
         return None
 
-    # Kayıtlı TÜM cevaplarla yeniden hesapla — yaş/gelir düzeltmeleri dahil,
-    # skor quiz anındakiyle birebir aynı çıkar (tutarlılık = güven).
+    # Recompute with ALL stored answers — age/income modifiers included,
+    # so the score matches the quiz-time score exactly (consistency = trust).
     answers = RiskProfileAnswers(
         budget=user.budget,
         time_horizon=user.time_horizon,

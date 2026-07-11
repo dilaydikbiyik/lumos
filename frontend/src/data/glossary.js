@@ -1,5 +1,5 @@
-// Temel kavramlar sözlüğü — statik içerik, LLM maliyeti sıfır.
-// Her terim: günlük dilde, korkutmayan, tek nefeslik açıklama.
+// Core-concepts glossary — static content, zero LLM cost.
+// Every term: everyday language, non-scary, one breath long.
 const GLOSSARY = {
   volatilite: 'Fiyatın ne kadar inişli çıkışlı olduğu. Yüksek volatilite = büyük dalgalar; risk de fırsat da büyür.',
   çeşitlendirme: 'Yumurtaları tek sepete koymamak. Farklı varlıklara dağıtınca tek bir kötü gün her şeyini götürmez.',

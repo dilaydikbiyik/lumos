@@ -1,9 +1,9 @@
 import { useState } from 'react'
 
 /**
- * BeginnerGuide — "İlk Yatırım Rehberli Yolculuğu"
- * Türkiye'ye özgü, adım adım aracı kurum rehberi.
- * Statik içerik — LLM bağımlılığı yok, her an erişilebilir.
+ * BeginnerGuide — the guided first-investment journey.
+ * Turkey-specific, step-by-step brokerage walkthrough.
+ * Static content — no LLM dependency, always available.
  */
 
 const STEPS = [
@@ -50,7 +50,7 @@ export default function BeginnerGuide({ defaultExpanded = false }) {
 
   return (
     <div className="card" style={{ border: '1px solid var(--firefly-dim)' }}>
-      {/* Başlık — tıkla/aç */}
+      {/* Header — tap to expand */}
       <button
         onClick={() => setExpanded(!expanded)}
         style={{
@@ -77,7 +77,7 @@ export default function BeginnerGuide({ defaultExpanded = false }) {
 
       {expanded && (
         <div style={{ marginTop: 16 }}>
-          {/* Adım seçici */}
+          {/* Step selector */}
           <div style={{ display: 'flex', gap: 6, marginBottom: 16, overflowX: 'auto', paddingBottom: 4 }}>
             {STEPS.map((s, i) => (
               <button
@@ -96,7 +96,7 @@ export default function BeginnerGuide({ defaultExpanded = false }) {
             ))}
           </div>
 
-          {/* Aktif adım */}
+          {/* Active step */}
           <div style={{
             padding: 16, borderRadius: 'var(--radius-xs)',
             background: 'var(--bg)', border: '1px solid var(--border)',
@@ -119,7 +119,7 @@ export default function BeginnerGuide({ defaultExpanded = false }) {
             </div>
           </div>
 
-          {/* İleri/Geri */}
+          {/* Next/back */}
           <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
             <button
               className="btn btn-ghost"

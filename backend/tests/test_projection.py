@@ -38,7 +38,7 @@ def test_asset_projection_applies_amount():
 
 
 def test_asset_projection_refuses_thin_history():
-    short = {"NEW": _GROWTH.iloc[:300]}  # ~1.2 yıl veri
+    short = {"NEW": _GROWTH.iloc[:300]}  # ~1.2 years of data
     with patch("backend.services.projection.fetch_price_history", return_value=short):
         r = project_asset("NEW", amount=10000, years=5)
     assert r["available"] is False
@@ -46,7 +46,7 @@ def test_asset_projection_refuses_thin_history():
 
 
 def _fake_regions(start="01-01-2023"):
-    # 40 ay, aylık ~%2 artış
+    # 40 months, ~2% monthly growth
     index = {f"{2023 + m // 12}-{m % 12 + 1:02d}": 100 * (1.02 ** m) for m in range(40)}
     return {"TP.KFE.TR51": {"region": "Ankara", "index": index}}
 
@@ -70,7 +70,7 @@ def test_region_projection_honest_about_short_history():
 
 
 def test_portfolio_projection_combines_weighted_series():
-    # İki farklı büyüme profili — çeşitlendirme bandı tekil varlıktan dar olmalı
+    # Two different growth profiles — the diversified band must be narrower than a single asset's
     n = 2520
     rng2 = np.random.default_rng(11)
     calm = pd.Series(

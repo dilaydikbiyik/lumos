@@ -33,8 +33,8 @@ app = FastAPI(
 
 # ── Rate Limiting ─────────────────────────────────────────────────────────────
 app.state.limiter = limiter
-# cast: slowapi handler'ının signature'ı Starlette'in beklediği generic
-# (Request, Exception) tipinden daha dar — cast ile tip kontrolünü atlatıyoruz
+# cast: slowapi's handler signature is narrower than the generic
+# (Request, Exception) Starlette expects — cast sidesteps the type check
 app.add_exception_handler(
     RateLimitExceeded,
     cast(Callable[[Request, Exception], Response], _rate_limit_exceeded_handler),

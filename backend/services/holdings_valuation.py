@@ -1,16 +1,16 @@
 """
-Live holding valuation — "SPY'ım ikiye katlandı, görecek miyim?" sorusunun cevabı.
+Live holding valuation — answers "my SPY doubled, will I see it?".
 
-Değer kaynağı önceliği (dürüstlük etiketiyle birlikte döner):
-  1. manual   — kullanıcının girdiği güncel değer her şeyi ezer
-  2. live     — borsa varlıkları: yfinance güncel fiyat × adet
-                (adet girilmediyse alış tarihi fiyatından türetilir)
-  3. index    — emlak/arsa: TCMB ulusal konut endeksi oranıyla tahmin
-                ("endekse göre tahmin" — parsel iddiası değil)
-  4. purchase — hiçbir kaynak yoksa alış tutarı (değişim gösterilmez)
+Value-source priority (returned with an honesty label):
+  1. manual   — a user-entered current value overrides everything
+  2. live     — exchange assets: current yfinance price × units
+                (units derived from the purchase-date price if not given)
+  3. index    — real estate/land: estimate via the TCMB national housing
+                index ratio ("index-based estimate" — not a parcel claim)
+  4. purchase — with no source at all, the purchase amount (no change shown)
 
-Fail-open: veri kaynakları çökerse sessizce purchase basis'e düşülür —
-varlık listesi asla kırılmaz.
+Fail-open: if data sources fail we quietly fall back to purchase basis —
+the holdings list never breaks.
 """
 import logging
 from datetime import date
@@ -28,7 +28,7 @@ NATIONAL_KFE_SERIES = "TP.KFE.TR"
 
 
 def _price_on_or_before(series, target: date) -> Optional[float]:
-    """En yakın (hedef tarihte veya öncesindeki) kapanış fiyatı."""
+    """Closest closing price at or before the target date."""
     try:
         eligible = series[series.index.date <= target]
         if len(eligible) == 0:
@@ -39,7 +39,7 @@ def _price_on_or_before(series, target: date) -> Optional[float]:
 
 
 def _exchange_values(holdings) -> dict[int, dict]:
-    """Borsa varlıkları için canlı değerler — tek toplu yfinance çağrısı."""
+    """Live values for exchange assets — one batched yfinance call."""
     tickers = sorted({
         h.ticker for h in holdings
         if h.asset_type in EXCHANGE_TYPES and h.ticker
@@ -70,7 +70,7 @@ def _exchange_values(holdings) -> dict[int, dict]:
                 units = h.purchase_amount / entry_price
 
         if units is None:
-            # Adet de alış tarihi de yok — canlı takip için veri yetersiz
+            # No units and no purchase date — not enough data for live tracking
             continue
 
         live_value = round(units * latest, 2)
@@ -84,7 +84,7 @@ def _exchange_values(holdings) -> dict[int, dict]:
 
 
 def _real_estate_values(holdings) -> dict[int, dict]:
-    """Emlak/arsa için ulusal KFE endeksi oranıyla tahmini güncel değer."""
+    """Estimated current value for real estate/land via the national KFE index ratio."""
     re_holdings = [
         h for h in holdings
         if h.asset_type in REAL_ESTATE_TYPES and h.purchase_date is not None
@@ -112,7 +112,7 @@ def _real_estate_values(holdings) -> dict[int, dict]:
     out: dict[int, dict] = {}
     for h in re_holdings:
         purchase_month = h.purchase_date.strftime("%Y-%m")
-        # alış ayı veya öncesindeki en yakın endeks noktası
+        # closest index point at or before the purchase month
         base_months = [m for m in months if m <= purchase_month]
         if not base_months:
             continue
@@ -131,14 +131,14 @@ def _real_estate_values(holdings) -> dict[int, dict]:
 
 def enrich_holdings(holdings) -> dict[int, dict]:
     """
-    holding.id -> {"value", "source", "change_pct"} haritası.
-    Öncelik: manual > live/index > purchase (haritada olmayanlar purchase'tır).
+    Map of holding.id -> {"value", "source", "change_pct"}.
+    Priority: manual > live/index > purchase (absent entries mean purchase).
     """
     enrichment: dict[int, dict] = {}
     enrichment.update(_exchange_values(holdings))
     enrichment.update(_real_estate_values(holdings))
 
-    # manual her şeyi ezer
+    # manual overrides everything
     for h in holdings:
         if h.manual_current_value is not None:
             enrichment[h.id] = {
@@ -151,7 +151,7 @@ def enrich_holdings(holdings) -> dict[int, dict]:
 
 
 def current_value(holding, enrichment: dict[int, dict]) -> float:
-    """Tek varlığın bilinen en iyi değeri."""
+    """Best known value for a single holding."""
     info = enrichment.get(holding.id)
     if info:
         return info["value"]

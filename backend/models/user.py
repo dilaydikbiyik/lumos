@@ -23,8 +23,9 @@ class User(Base):
     loss_tolerance: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     goal: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     experience: Mapped[Optional[str]] = mapped_column(String, nullable=True)
-    # Skoru etkileyen HER cevap kalıcı olmalı — yoksa GET /profile quiz'dekinden
-    # farklı skor hesaplar (yaş/gelir düzeltmeleri kaybolur). Tutarlılık = güven.
+    # EVERY answer that affects the score must persist — otherwise GET /profile
+    # computes a different score than the quiz did (age/income modifiers lost).
+    # Consistency = trust.
     age: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
     income_stability: Mapped[Optional[str]] = mapped_column(String, nullable=True)
 
@@ -38,7 +39,7 @@ class User(Base):
     # Access role: user (default) / admin — admin unlocks /admin/stats
     role: Mapped[str] = mapped_column(String, default="user", nullable=False, server_default="user")
 
-    # Chosen journey: stocks / real_estate / hybrid / undecided (Akış 0)
+    # Chosen journey: stocks / real_estate / hybrid / undecided (Flow 0)
     investment_path: Mapped[Optional[str]] = mapped_column(String, nullable=True)
 
     # Onboarding fear check-in: param_eriyor / kandirilirim / anlamiyorum / batiririm

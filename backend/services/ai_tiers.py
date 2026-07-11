@@ -15,7 +15,7 @@ AI_TIERS: dict[str, dict] = {
     "free": {
         "label": "Ateş Böceği",
         "provider": "gemini",
-        # Her modelin AYRI free kotası var — zincir, ücretsiz kapasiteyi katlar
+        # Each model has its OWN free quota — the chain multiplies free capacity
         "model_chain": ["gemini-2.5-flash", "gemini-2.5-flash-lite", "gemini-2.0-flash", "gemini-2.0-flash-lite"],
         "daily_quota": 50,
         "max_tokens": 4096,
@@ -25,7 +25,7 @@ AI_TIERS: dict[str, dict] = {
     "plus": {
         "label": "Fener",
         "provider": "gemini",
-        # Ücretli Gemini: pro model önde, flash zinciri yedekte
+        # Paid Gemini: pro model first, flash chain as backup
         "model_chain": ["gemini-2.5-pro", "gemini-2.5-flash", "gemini-2.5-flash-lite"],
         "daily_quota": 500,
         "max_tokens": 8192,
@@ -35,7 +35,7 @@ AI_TIERS: dict[str, dict] = {
     "pro": {
         "label": "Şafak",
         "provider": "anthropic",
-        # Claude ailesi: en güçlü model önde, hafif model kota/kredi yedeği
+        # Claude family: strongest model first, light model as quota/credit backup
         "model_chain": ["claude-sonnet-4-6", "claude-haiku-4-5"],
         "daily_quota": 2000,
         "max_tokens": 8192,

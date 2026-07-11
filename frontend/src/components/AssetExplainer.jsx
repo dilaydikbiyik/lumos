@@ -1,8 +1,8 @@
 import { useState } from 'react'
 
 /**
- * Her portföy kalemi için "nedir / neden portföyünde / riski ne" açıklama kartı.
- * Statik sözlük tabanlı — LLM çağrısı yok, sıfır maliyet.
+ * "What is it / why is it in your portfolio / what's the risk" card for
+ * every portfolio item. Static dictionary based — no LLM call, zero cost.
  */
 
 const ASSET_INFO = {
@@ -56,7 +56,7 @@ const ASSET_INFO = {
   },
 }
 
-// Bilinmeyen ticker'lar için genel açıklama
+// Generic explanation for unknown tickers
 const DEFAULT_INFO = {
   stocks: {
     type: 'Hisse / Hisse ETF',
@@ -86,7 +86,7 @@ const DEFAULT_INFO = {
 
 function getAssetInfo(allocation) {
   if (ASSET_INFO[allocation.ticker]) return ASSET_INFO[allocation.ticker]
-  // Fallback: kategori bazlı genel açıklama
+  // Fallback: category-based generic explanation
   const category = allocation.category || 'stocks'
   return DEFAULT_INFO[category] || DEFAULT_INFO.stocks
 }
@@ -121,7 +121,7 @@ export default function AssetExplainer({ allocation, onClose }) {
         ✕
       </button>
 
-      {/* Başlık */}
+      {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
         <span style={{
           fontSize: 28,
@@ -143,7 +143,7 @@ export default function AssetExplainer({ allocation, onClose }) {
         </div>
       </div>
 
-      {/* Tab seçici */}
+      {/* Tab selector */}
       <div style={{
         display: 'flex', gap: 4, marginBottom: 14,
         background: 'var(--bg)', borderRadius: 'var(--radius-xs)',
@@ -170,7 +170,7 @@ export default function AssetExplainer({ allocation, onClose }) {
         ))}
       </div>
 
-      {/* Tab içeriği */}
+      {/* Tab content */}
       <p style={{
         fontSize: 13.5, lineHeight: 1.7, color: 'var(--text)',
         animation: 'fade-in 0.2s ease',

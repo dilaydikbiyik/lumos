@@ -1,8 +1,8 @@
 import { useState } from 'react'
 
 /**
- * "Bugün Öğrendin" — her oturumda tek kavram, 15 saniyelik okuma.
- * Kullanıcı kapatınca localStorage'da kayıt tutulur, aynı kartı tekrar görmez.
+ * Daily tip — one concept per session, a 15-second read.
+ * Dismissals are stored in localStorage so the same card never returns.
  */
 
 const TIPS = [
@@ -68,7 +68,7 @@ export default function DailyTip() {
         ✕
       </button>
 
-      {/* Başlık */}
+      {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
         <span style={{
           fontSize: 11, fontWeight: 700, color: 'var(--firefly)',
@@ -83,7 +83,7 @@ export default function DailyTip() {
         </span>
       </div>
 
-      {/* İçerik */}
+      {/* Content */}
       <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
         <span style={{
           fontSize: 28, flexShrink: 0,
@@ -95,7 +95,7 @@ export default function DailyTip() {
         </div>
       </div>
 
-      {/* İlerleme çubuğu */}
+      {/* Progress bar */}
       <div style={{
         marginTop: 12, height: 3, background: 'var(--bg)',
         borderRadius: 2, overflow: 'hidden',

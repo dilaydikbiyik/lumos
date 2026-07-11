@@ -167,9 +167,9 @@ all hang off a single tier table. A future Stripe/Iyzico webhook flips one field
 
 | Plan | Provider & chain | Daily quota | Price (planned) |
 |---|---|---|---|
-| **free** — Ateş Böceği | Gemini flash chain (3 models) | 50 msg/day | $0 forever |
-| **plus** — Fener | Gemini 2.5 Pro → flash chain | 500 msg/day | ~$4.99/mo |
-| **pro** — Şafak | Claude Sonnet → Haiku | 2000 msg/day | ~$14.99/mo |
+| **free** — "Ateş Böceği" (Firefly) | Gemini flash chain (3 models) | 50 msg/day | $0 forever |
+| **plus** — "Fener" (Lantern) | Gemini 2.5 Pro → flash chain | 500 msg/day | ~$4.99/mo |
+| **pro** — "Şafak" (Dawn) | Claude Sonnet → Haiku | 2000 msg/day | ~$14.99/mo |
 
 The provider adapter interface is symmetrical: Anthropic's chain handles credit-exhaustion and
 rate limits exactly like Gemini's handles quota — so premium models inherit the same resilience.

@@ -14,7 +14,7 @@
   --text-muted:   #8E90AC;
   --text-dim:     #4E5070;
 
-  /* ── Firefly: Ana tema rengi (turuncu/amber — ateş böceği) ── */
+  /* ── Firefly: primary theme colour (orange/amber — firefly) ── */
   --firefly:        #F5A524;
   --firefly-bright: #FFB800;
   --firefly-soft:   #FFE9A8;
@@ -22,7 +22,7 @@
   --firefly-glow:   rgba(245,165,36,0.25);
   --firefly-glow-lg:rgba(245,165,36,0.12);
 
-  /* ── Accent: İkincil renk (mor/indigo — uzay, gece gökyüzü) ── */
+  /* ── Accent: secondary colour (purple/indigo — space, night sky) ── */
   --accent:       #7C6FF7;
   --accent-2:     #5B8EF0;
   --accent-glow:  rgba(124,111,247,0.18);
@@ -34,7 +34,7 @@
   --red:          #F5515F;
   --red-glow:     rgba(245,81,95,0.15);
 
-  /* ── Aydınlanan Arayüz: Gece → Şafak ── */
+  /* ── Illuminating UI: night → dawn ── */
   --bg-night:     #0A0B12;
   --bg-dusk:      #0E1020;
   --bg-predawn:   #121528;
@@ -132,8 +132,8 @@ body {
 .bottom-nav-item span:last-child { font-size: 10px; font-weight: 600; letter-spacing: 0.02em; }
 
 /* ── Sidebar Nav (desktop ≥768px) ────────────────────────────────────────── */
-/* Mobilde alt bar, desktop'ta sol sidebar — 768-1024 arası "nav'sız boşluk"
-   bırakmamak için ikisi aynı kırılım noktasında el değiştirir. */
+/* Bottom bar on mobile, left sidebar on desktop — they swap at the same
+   breakpoint so there is never a 768-1024 "no nav at all" gap. */
 .sidebar-nav { display: none; }
 
 @media (min-width: 768px) {
@@ -171,11 +171,11 @@ body {
   .sidebar-item.active { color: var(--firefly); background: var(--firefly-dim); }
   .sidebar-item.active svg { filter: drop-shadow(0 0 6px rgba(245, 165, 36, 0.5)); }
 
-  /* Sidebar görünürken tüm sayfa içeriği sağa kayar */
+  /* While the sidebar is visible, all page content shifts right */
   body.has-sidebar .page { margin-left: var(--sidebar-w); }
 
-  /* Logo zaten sidebar'da — navbar'daki kopyasını gizle, çift marka olmasın.
-     (!important: LumosLogo inline display:flex taşıyor) */
+  /* The logo already lives in the sidebar — hide the navbar copy to avoid
+     double branding. (!important: LumosLogo carries inline display:flex) */
   body.has-sidebar .navbar button[aria-label="Lumos anasayfa"] { display: none !important; }
   body.has-sidebar .navbar { justify-content: flex-end; }
 }
@@ -199,7 +199,7 @@ body {
   box-shadow: var(--shadow), 0 0 20px var(--firefly-glow-lg);
 }
 
-/* Glassmorphism card varyantı */
+/* Glassmorphism card variant */
 .card-glass {
   background: rgba(18,20,31,0.7);
   border: 1px solid rgba(245,165,36,0.12);
@@ -220,7 +220,7 @@ h2 { font-size: clamp(1.2rem, 3.5vw, 1.45rem); font-weight: 700; }
 h3 { font-size: 1rem; font-weight: 600; }
 p  { line-height: 1.65; color: var(--text-muted); }
 
-/* Firefly gradient — turuncu/amber dominant */
+/* Firefly gradient — orange/amber dominant */
 .gradient-text {
   background: linear-gradient(120deg, var(--firefly-bright) 0%, var(--firefly) 50%, #FF8C00 100%);
   -webkit-background-clip: text;
@@ -251,7 +251,7 @@ p  { line-height: 1.65; color: var(--text-muted); }
   overflow: hidden;
 }
 
-/* Shimmer efekti — buton üzerinde parlama */
+/* Shimmer effect — glow across the button */
 .btn::after {
   content: '';
   position: absolute;
@@ -262,7 +262,7 @@ p  { line-height: 1.65; color: var(--text-muted); }
 }
 .btn:hover::after { transform: translateX(100%); }
 
-/* Primary: Turuncu-amber ateş böceği gradyanı */
+/* Primary: orange-amber firefly gradient */
 .btn-primary {
   background: linear-gradient(135deg, var(--firefly-bright) 0%, var(--firefly) 55%, #E8940A 100%);
   color: #0A0B12;
@@ -418,7 +418,7 @@ select.input { cursor: pointer; }
 
 
 /* ══════════════════════════════════════════════════════════════════════════ */
-/* ── Işık Tasarım Dili — Ateş Böceği & Aydınlanan Arayüz ──────────────── */
+/* ── Light design language — firefly & illuminating UI ────────────────── */
 /* ══════════════════════════════════════════════════════════════════════════ */
 
 body.illumination-1 { background: var(--bg-dusk); }
@@ -436,7 +436,7 @@ body.illumination-3 { background: var(--bg-dawn); }
 .lumos-brand {
   position: relative;
   display: inline-block;
-  padding-top: 0.6em;   /* ateş böceklerinin uçuşacağı hava sahası */
+  padding-top: 0.6em;   /* airspace for the fireflies to roam */
 }
 
 .lumos-wordmark {
@@ -454,7 +454,7 @@ body.illumination-3 { background: var(--bg-dawn); }
   50%       { background-position: 100% 0; }
 }
 
-/* Tek bir ateş böceği — parlayan turuncu nokta */
+/* A single firefly — a glowing orange dot */
 .lumos-firefly {
   position: absolute;
   width: 4px; height: 4px;
@@ -484,7 +484,7 @@ body.illumination-3 { background: var(--bg-dawn); }
   65%       { opacity: 0.85; }
 }
 
-/* Hero boyutunda böcekler büyür */
+/* Fireflies grow at hero size */
 .lumos-brand--hero .lumos-firefly {
   width: 5px; height: 5px;
   box-shadow:
@@ -497,8 +497,8 @@ body.illumination-3 { background: var(--bg-dawn); }
   font-size: inherit;
 }
 
-/* ── Onboarding hero — büyük böcek parçacıkları ── */
-/* Kullanım: <div class="firefly-swarm"> x10 <span class="firefly-particle"> */
+/* ── Onboarding hero — large firefly particles ── */
+/* Usage: <div class="firefly-swarm"> x10 <span class="firefly-particle"> */
 .firefly-swarm {
   position: absolute;
   inset: 0;
@@ -534,7 +534,7 @@ body.illumination-3 { background: var(--bg-dawn); }
   70%       { filter: brightness(1.2) blur(0px); }
 }
 
-/* ── Onboarding hero particle sweep — süzülme animasyonu ── */
+/* ── Onboarding hero particle sweep — drift animation ── */
 @keyframes sweep-up {
   0%   { transform: translate(var(--from-x,0), var(--from-y,60px)); opacity: 0; }
   15%  { opacity: 0.9; }
@@ -549,7 +549,7 @@ body.illumination-3 { background: var(--bg-dawn); }
   overflow: visible;
 }
 
-/* span.firefly-particle veya doğrudan span — her ikisi de çalışır */
+/* span.firefly-particle or a bare span — both work */
 .fireflies span,
 .fireflies .firefly-particle {
   position: absolute;
@@ -566,7 +566,7 @@ body.illumination-3 { background: var(--bg-dawn); }
     firefly-blink 1.4s ease-in-out var(--delay, 0s) infinite;
 }
 
-/* ── İmza: sayı ısınma animasyonu ── */
+/* ── Signature: number warm-up animation ── */
 @keyframes number-warmup {
   0%   { color: var(--text-dim); }
   100% { color: var(--firefly); }
@@ -575,7 +575,7 @@ body.illumination-3 { background: var(--bg-dawn); }
   animation: number-warmup 0.8s ease-out forwards;
 }
 
-/* ── Loading: ışık noktası ── */
+/* ── Loading: light dot ── */
 @keyframes light-pulse {
   0%, 100% { box-shadow: 0 0 8px 2px rgba(245,165,36,0.5); transform: scale(1); }
   50%       { box-shadow: 0 0 20px 8px rgba(245,165,36,0.8); transform: scale(1.3); }
@@ -586,7 +586,7 @@ body.illumination-3 { background: var(--bg-dawn); }
   animation: light-pulse 1.2s ease-in-out infinite;
 }
 
-/* ── Aydınlık animasyonu — cesaret skoru zıpladığında ── */
+/* ── Illumination animation — when the courage score jumps ── */
 @keyframes illuminate-flash {
   0%   { opacity: 0; }
   20%  { opacity: 0.18; }
@@ -616,7 +616,7 @@ body.illumination-3 { background: var(--bg-dawn); }
   .btn::after { display: none; }
 }
 
-/* ── Sayı ısınma animasyonu: gri → amber geçişle gelir ── */
+/* ── Number warm-up animation: enters with a grey → amber transition ── */
 @keyframes number-warm {
   0%   { color: var(--text-dim); opacity: 0; transform: translateY(8px); }
   50%  { color: var(--firefly-soft); opacity: 0.7; }
@@ -627,7 +627,7 @@ body.illumination-3 { background: var(--bg-dawn); }
   animation: number-warm 0.8s ease-out forwards;
 }
 
-/* ── Loading: spinner yerine büyüyen ışık noktası ── */
+/* ── Loading: a growing light dot instead of a spinner ── */
 @keyframes light-grow {
   0%   { width: 4px; height: 4px; opacity: 0.3; box-shadow: 0 0 4px var(--firefly-dim); }
   50%  { width: 16px; height: 16px; opacity: 1; box-shadow: 0 0 24px var(--firefly-glow); }
@@ -659,7 +659,7 @@ body.illumination-3 { background: var(--bg-dawn); }
 }
 
 
-/* Panik Düğmesi: nefes halkası — 4.5sn döngü (al 2s, tut 0.5s, ver 2s) */
+/* Panic Button: breathing ring — 4.5s cycle (in 2s, hold 0.5s, out 2s) */
 .panic-breath {
   width: 110px; height: 110px; border-radius: 50%;
   background: radial-gradient(circle, var(--firefly-dim) 0%, transparent 70%);

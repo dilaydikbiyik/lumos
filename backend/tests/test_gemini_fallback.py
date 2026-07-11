@@ -40,7 +40,7 @@ def _ok_response(text="cevap"):
 
 @pytest.fixture
 def genai_client():
-    # Testler tek anahtar varsayımıyla yazıldı — ekstra slotları kapat
+    # Tests assume a single key — disable the extra slots
     with patch("google.genai.Client") as cls, \
          patch.object(settings, "GEMINI_API_KEY_2", ""), \
          patch.object(settings, "GEMINI_API_KEY_3", ""), \
@@ -85,7 +85,7 @@ def test_chain_exhausted_gives_honest_quota_message(genai_client):
 
 
 def test_real_errors_are_not_masked_by_chain(genai_client):
-    # 400 (geçersiz istek) fallback'e girmemeli — anında yüzeye çıkmalı
+    # 400 (invalid request) must not enter the fallback — surface immediately
     client = _client_with([_api_error(400)])
     genai_client.return_value = client
 
@@ -95,7 +95,7 @@ def test_real_errors_are_not_masked_by_chain(genai_client):
 
 
 def test_multi_key_model_major_order():
-    """4 anahtar varken: en iyi model TÜM anahtarlarda denenir, sonra alt model."""
+    """With 4 keys: the best model is tried on ALL keys before stepping down."""
     with patch("google.genai.Client") as cls, \
          patch.object(settings, "GEMINI_API_KEY", "k1"), \
          patch.object(settings, "GEMINI_API_KEY_2", "k2"), \
@@ -108,7 +108,7 @@ def test_multi_key_model_major_order():
         cls.side_effect = [c1, c2]
 
         assert _gemini_chat(MSGS, "sys", 100) == "k2-flash"
-        # İki çağrı da AYNI (en iyi) modele gitti — kalite korunarak anahtar değişti
+        # Both calls went to the SAME (best) model — the key changed, quality didn't
         assert c1.models.generate_content.call_args.kwargs["model"] == GEMINI_MODEL_CHAIN[0]
         assert c2.models.generate_content.call_args.kwargs["model"] == GEMINI_MODEL_CHAIN[0]
 
@@ -131,4 +131,4 @@ def test_generate_text_cache_skips_second_ai_call():
         first = generate_text("aynı prompt", system="s", cache=True)
         second = generate_text("aynı prompt", system="s", cache=True)
     assert first == second == "üretildi"
-    assert m.call_count == 1  # ikinci çağrı cache'ten döndü
+    assert m.call_count == 1  # second call served from cache

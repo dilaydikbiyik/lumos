@@ -21,7 +21,7 @@ async def snapshot(
     user_id: str = Depends(get_current_user),
 ):
     """
-    Sanal portföy — real market data, fake money. The bridge between
+    Practice portfolio — real market data, fake money. The bridge between
     'I understand the recommendation' and 'I'm ready to invest for real'.
     """
     return practice_snapshot(body.weights, body.virtual_budget)

@@ -3,8 +3,8 @@ import { useAuth } from '@clerk/clerk-react'
 import api, { setAuthToken } from '../utils/api'
 
 /**
- * Gerçek portföy vs önerilen portföy karşılaştırması.
- * Hedef dağılımdan sapmaları gösterir + kısa aksiyon önerisi.
+ * Actual vs recommended portfolio comparison.
+ * Shows drift from the target allocation + a short action hint.
  */
 
 const CATEGORY_LABELS = {
@@ -35,7 +35,7 @@ export default function PortfolioComparison() {
       const summary = summaryRes.data
       const profile = profileRes.data
 
-      // Gerçek dağılım (holdings/summary → by_type)
+      // Actual allocation (holdings/summary → by_type)
       if (!summary?.by_type || !profile?.risk_score) return
 
       const totalValue = summary.total_current_value || 0
@@ -46,7 +46,7 @@ export default function PortfolioComparison() {
         actual[type] = (val / totalValue) * 100
       })
 
-      // Basit hedef dağılım (risk skoruna göre)
+      // Simple target allocation (by risk score)
       const riskScore = profile.risk_score
       const target = generateTargetAllocation(riskScore)
 
@@ -72,7 +72,7 @@ export default function PortfolioComparison() {
       comparison.sort((a, b) => Math.abs(b.deviation) - Math.abs(a.deviation))
       setData({ comparison, riskScore })
     } catch {
-      // Karşılaştırma kritik değil
+      // comparison is not critical
     }
   }, [getToken])
 
@@ -100,7 +100,7 @@ export default function PortfolioComparison() {
         </div>
       </div>
 
-      {/* Karşılaştırma bar'ları */}
+      {/* Comparison bars */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
         {data.comparison.map(item => (
           <div key={item.type}>
@@ -122,7 +122,7 @@ export default function PortfolioComparison() {
                 {item.deviation > 0 ? '+' : ''}{item.deviation}%
               </span>
             </div>
-            {/* Çift bar: üstte gerçek, altta hedef */}
+            {/* Dual bar: actual on top, target below */}
             <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
               <span style={{ fontSize: 10, color: 'var(--text-dim)', width: 32 }}>%{item.actual}</span>
               <div style={{ flex: 1, height: 6, background: 'var(--bg)', borderRadius: 3, overflow: 'hidden' }}>
@@ -160,8 +160,8 @@ export default function PortfolioComparison() {
 }
 
 /**
- * Risk skoruna göre basit hedef dağılım üret.
- * Düşük risk → daha çok altın/nakit, yüksek risk → daha çok hisse.
+ * Build a simple target allocation from the risk score.
+ * Low risk → more gold/cash, high risk → more stocks.
  */
 function generateTargetAllocation(riskScore) {
   if (riskScore <= 3) {

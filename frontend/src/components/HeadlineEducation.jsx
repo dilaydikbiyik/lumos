@@ -1,7 +1,8 @@
 /**
- * HeadlineEducation — "Manşet dili eğitimi"
- * "BORSA ÇAKILDI manşetini gördüğünde gerçekte ne olur?" mikro-eğitim kartı.
- * Carousel formatında 4 senaryo, localStorage ile gösterilme takibi.
+ * HeadlineEducation — headline-language training.
+ * Micro-education card: "what actually happens when you see a MARKET
+ * CRASHES headline?". 4 scenarios in a carousel, views tracked in
+ * localStorage.
  */
 
 const SCENARIOS = [
@@ -93,7 +94,7 @@ export default function HeadlineEducation() {
         {scenario.action}
       </p>
 
-      {/* İlerleme */}
+      {/* Progress */}
       <div style={{
         marginTop: 12, height: 3, background: 'var(--bg)',
         borderRadius: 2, overflow: 'hidden',

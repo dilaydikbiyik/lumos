@@ -28,11 +28,11 @@ class RiskProfileAnswers(BaseModel):
 
 
 class RiskFactor(BaseModel):
-    """Skorun tek bir bileşeni — kara kutu yok, her puan izlenebilir."""
-    factor: str          # insan-okur ad, örn. "Kayıp toleransı"
-    answer: str          # kullanıcının cevabı (okunur halde)
-    contribution: float  # skora net katkı (ağırlıklı puan ya da modifier)
-    explanation: str     # neden bu katkı
+    """A single component of the score — no black box, every point is traceable."""
+    factor: str          # human-readable name, e.g. "Kayıp toleransı"
+    answer: str          # the user's answer, in readable form
+    contribution: float  # net contribution to the score (weighted points or modifier)
+    explanation: str     # why this contribution
 
 
 class RiskProfileResponse(BaseModel):

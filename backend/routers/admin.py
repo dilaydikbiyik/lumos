@@ -17,7 +17,7 @@ async def admin_stats(
     user_id: str = Depends(require_role("admin")),
     db: AsyncSession = Depends(get_db),
 ):
-    """Operasyon özeti — sadece admin: kullanıcı/varlık hacmi, bugünkü AI kullanımı."""
+    """Operations summary — admin only: user/holding volume, today's AI usage."""
     total_users = (await db.execute(select(func.count(User.id)))).scalar()
     profiled_users = (await db.execute(
         select(func.count(User.id)).where(User.risk_score.is_not(None))
@@ -59,8 +59,8 @@ async def set_user_plan(
     db: AsyncSession = Depends(get_db),
 ):
     """
-    Billing entegrasyon noktası: bir ödeme webhook'u (Stripe/Iyzico) veya
-    admin planı değiştirir — model zinciri ve kota otomatik uyum sağlar.
+    Billing integration point: a payment webhook (Stripe/Iyzico) or an
+    admin flips the plan — model chain and quota adapt automatically.
     """
     from fastapi import HTTPException
 

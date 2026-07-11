@@ -22,12 +22,13 @@ logger = logging.getLogger("lumos.market_data")
 # Stale copies outlive the fresh cache — used only when yfinance fails
 STALE_TTL_SECONDS = 60 * 60 * 24 * 7  # 7 days
 
-# GERÇEKÇİLİK NOTU (2026-07-10): Yahoo, eski yfinance sürümlerinin isteklerini
-# canlıda bloklamaya başladı ve iki cache katmanı da boş olduğu için kullanıcı
-# sert hata gördü ("Market data temporarily unavailable"). Üçüncü katman eklendi:
-# hiç süresi dolmayan "son bilinen iyi" (LKG) kopya. Bir kez başarılı fetch
-# yapan her kurulum, Yahoo tamamen kapansa bile en son gerçek veriyle çalışmaya
-# devam eder — hata sayfası yerine tarihli gerçek veri, uydurma değer asla.
+# REALISM NOTE (2026-07-10): Yahoo started blocking requests from old
+# yfinance versions in production, and with both cache tiers empty the user
+# saw a hard error ("Market data temporarily unavailable"). A third tier was
+# added: a never-expiring "last known good" (LKG) copy. Any install that has
+# fetched successfully once keeps working on the latest real data even if
+# Yahoo goes fully dark — dated real data instead of an error page, and
+# never a fabricated value.
 
 # ── Default asset universe ────────────────────────────────────────────────────
 DEFAULT_TICKERS = [
@@ -54,7 +55,7 @@ def fetch_price_history(
     tickers = tickers or DEFAULT_TICKERS
     cache_key = f"price_history:{'_'.join(sorted(tickers))}:{period}"
     stale_key = f"stale:{cache_key}"
-    lkg_key = f"lkg:{cache_key}"  # last-known-good: süresiz son çare
+    lkg_key = f"lkg:{cache_key}"  # last-known-good: never-expiring last resort
 
     cached = cache_service.get(cache_key)
     if cached is not None:
@@ -80,7 +81,7 @@ def fetch_price_history(
 
         result = {ticker: closes[ticker].dropna() for ticker in closes.columns}
     except Exception as exc:
-        # Fallback 1: stale copy (≤7 gün) — Fallback 2: last-known-good (süresiz)
+        # Fallback 1: stale copy (≤7 days) — Fallback 2: last-known-good (no expiry)
         for label, key in (("stale", stale_key), ("last-known-good", lkg_key)):
             fallback = cache_service.get(key)
             if fallback is not None:
@@ -93,7 +94,7 @@ def fetch_price_history(
 
     cache_service.set(cache_key, result)
     cache_service.set(stale_key, result, ttl=STALE_TTL_SECONDS)
-    cache_service.set(lkg_key, result, ttl=None)  # asla süresi dolmaz
+    cache_service.set(lkg_key, result, ttl=None)  # never expires
     return result
 
 
