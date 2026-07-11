@@ -1,10 +1,12 @@
+import useMarket from '../hooks/useMarket'
+
 /**
- * TL/Döviz Dağılımı & Kur Riski Göstergesi.
- * Portföydeki varlıkları para birimine göre gruplar
- * ve kur riski hakkında bilgilendirici mesaj gösterir.
+ * TL / FX exposure & currency-risk indicator.
+ * Groups holdings by their currency and shows an educational
+ * message about exchange-rate risk.
  */
 
-// Bilinen ticker → para birimi eşlemesi
+// Known ticker → currency mapping
 const TICKER_CURRENCY = {
   'XU100.IS': 'TRY', 'THYAO.IS': 'TRY', 'GARAN.IS': 'TRY',
   'ASELS.IS': 'TRY', 'BIMAS.IS': 'TRY', 'EREGL.IS': 'TRY',
@@ -13,7 +15,7 @@ const TICKER_CURRENCY = {
   'AAPL': 'USD', 'MSFT': 'USD', 'GOOGL': 'USD', 'AMZN': 'USD',
 }
 
-// Varlık tipine göre varsayılan para birimi
+// Default currency by asset type
 const TYPE_CURRENCY = {
   real_estate: 'TRY', land: 'TRY', vehicle: 'TRY',
   cash: 'TRY', gold: 'USD', crypto: 'USD',
@@ -25,12 +27,12 @@ function getCurrency(holding) {
   }
   if (holding.ticker?.endsWith('.IS')) return 'TRY'
   if (TYPE_CURRENCY[holding.asset_type]) return TYPE_CURRENCY[holding.asset_type]
-  return 'USD' // Yabancı hisse/ETF varsayılan
+  return 'USD' // foreign stock/ETF default
 }
 
-const fmt = n => new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 0 }).format(n)
-
 export default function CurrencyExposure({ holdings }) {
+  // Holding amounts are recorded in TL (TR-market component) — TRY is pinned
+  const { money } = useMarket()
   if (!holdings || holdings.length === 0) return null
 
   let tryTotal = 0
@@ -52,7 +54,7 @@ export default function CurrencyExposure({ holdings }) {
   const tryPct = Math.round((tryTotal / total) * 100)
   const usdPct = 100 - tryPct
 
-  // Kur riski mesajı
+  // Currency-risk message
   let riskLevel, riskMessage, riskColor
   if (tryPct >= 80) {
     riskLevel = 'Yüksek'
@@ -85,7 +87,7 @@ export default function CurrencyExposure({ holdings }) {
         </span>
       </div>
 
-      {/* Çift bar */}
+      {/* Dual bar */}
       <div style={{
         display: 'flex', height: 10, borderRadius: 6, overflow: 'hidden',
         marginBottom: 10, background: 'var(--bg)',
@@ -100,7 +102,7 @@ export default function CurrencyExposure({ holdings }) {
         }} />
       </div>
 
-      {/* Lejant */}
+      {/* Legend */}
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           <span style={{
@@ -108,7 +110,7 @@ export default function CurrencyExposure({ holdings }) {
             background: 'var(--firefly)', display: 'inline-block',
           }} />
           <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>
-            🇹🇷 TL — %{tryPct} · {fmt(tryTotal)} TL
+            🇹🇷 TL — %{tryPct} · {money(tryTotal, 'TRY')}
           </span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -117,12 +119,12 @@ export default function CurrencyExposure({ holdings }) {
             background: 'var(--accent-2)', display: 'inline-block',
           }} />
           <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>
-            🌍 Döviz — %{usdPct} · {fmt(usdTotal)} TL
+            🌍 Döviz — %{usdPct} · {money(usdTotal, 'TRY')}
           </span>
         </div>
       </div>
 
-      {/* Kur riski mesajı */}
+      {/* Currency-risk message */}
       <p style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.6 }}>
         {riskMessage}
       </p>

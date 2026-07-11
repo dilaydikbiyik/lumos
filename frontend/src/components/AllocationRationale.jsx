@@ -1,11 +1,12 @@
-const fmt = n => new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 0 }).format(n)
+import useMarket from '../hooks/useMarket'
 
 /**
- * "Neden bu dağılım?" — motorun deterministik gerekçeleri.
- * Kara kutu yok: formül, her varlığın rolü/ağırlık gerekçesi ve
- * ELENEN varlıklar nedenleriyle görünür (sessiz eleme yapılmaz).
+ * "Why this allocation?" — the engine's deterministic rationale.
+ * No black box: the formula, each asset's role/weight reasoning and
+ * every DROPPED asset (with its reason) are visible — no silent pruning.
  */
 export default function AllocationRationale({ portfolio }) {
+  const { money } = useMarket()
   const logic = portfolio?.metadata?.allocation_logic
   if (!portfolio?.allocations?.length) return null
 
@@ -58,7 +59,7 @@ export default function AllocationRationale({ portfolio }) {
       )}
 
       <p style={{ fontSize: 11, opacity: 0.55, marginTop: 10 }}>
-        Bütçen: {fmt(portfolio.budget)} TL · Azami pozisyon: {logic?.position_cap ?? '—'} ·
+        Bütçen: {money(portfolio.budget)} · Azami pozisyon: {logic?.position_cap ?? '—'} ·
         Kırıntı eşiği: %{logic?.min_weight_pct ?? 8}
       </p>
     </div>

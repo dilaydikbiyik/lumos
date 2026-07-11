@@ -2,8 +2,7 @@ import { useState } from 'react'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 import api from '../utils/api'
 import IsikTut from './IsikTut'
-
-const fmt = n => new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 0 }).format(n)
+import useMarket from '../hooks/useMarket'
 
 /**
  * Zaman Makinesi — "bu portföyü N yıl önce kursaydın ne olurdu?"
@@ -11,6 +10,7 @@ const fmt = n => new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 0 }).fo
  * not just the happy final number.
  */
 export default function TimeMachine({ allocations, budget }) {
+  const { money } = useMarket()
   const [result, setResult] = useState(null)
   const [period, setPeriod] = useState('5y')
   const [loading, setLoading] = useState(false)
@@ -64,12 +64,12 @@ export default function TimeMachine({ allocations, budget }) {
         <>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 12 }}>
             <div>
-              <div style={{ fontSize: 12, opacity: 0.7 }}>{fmt(result.start_value)} TL olurdu…</div>
+              <div style={{ fontSize: 12, opacity: 0.7 }}>{money(result.start_value)} olurdu…</div>
               <div style={{
                 fontSize: 20, fontWeight: 700,
                 color: result.total_return_pct >= 0 ? 'var(--green, #4ade80)' : 'var(--red)',
               }}>
-                {fmt(result.final_value)} TL ({result.total_return_pct > 0 ? '+' : ''}{result.total_return_pct}%)
+                {money(result.final_value)} ({result.total_return_pct > 0 ? '+' : ''}{result.total_return_pct}%)
               </div>
               {result.real_return_pct != null && (
                 <div style={{ fontSize: 11, opacity: 0.65, marginTop: 2 }}>
@@ -80,7 +80,7 @@ export default function TimeMachine({ allocations, budget }) {
             <div>
               <div style={{ fontSize: 12, opacity: 0.7 }}>En kötü anında</div>
               <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--red)' }}>
-                {fmt(result.worst_value)} TL ({result.max_drawdown_pct}%)
+                {money(result.worst_value)} ({result.max_drawdown_pct}%)
               </div>
             </div>
           </div>
@@ -90,7 +90,7 @@ export default function TimeMachine({ allocations, budget }) {
               <LineChart data={result.chart}>
                 <XAxis dataKey="date" hide />
                 <YAxis hide domain={['auto', 'auto']} />
-                <Tooltip formatter={v => [`${fmt(v)} TL`, 'Değer']} labelStyle={{ color: '#333' }} />
+                <Tooltip formatter={v => [money(v), 'Değer']} labelStyle={{ color: '#333' }} />
                 <Line type="monotone" dataKey="value" stroke="#8b8bf5" dot={false} strokeWidth={2} />
               </LineChart>
             </ResponsiveContainer>
@@ -98,7 +98,7 @@ export default function TimeMachine({ allocations, budget }) {
 
           <p style={{ fontSize: 13, marginTop: 10, lineHeight: 1.6 }}>
             {result.max_drawdown_pct <= -15
-              ? `Bir noktada paranın ${fmt(result.start_value - result.worst_value)} TL'si "kaybolmuş" görünecekti. O gün satmasaydın bugün ${result.total_return_pct >= 0 ? 'kârdaydın' : 'toparlanma yolundaydın'} — buna hazır mısın?`
+              ? `Bir noktada paranın ${money(result.start_value - result.worst_value)}'si "kaybolmuş" görünecekti. O gün satmasaydın bugün ${result.total_return_pct >= 0 ? 'kârdaydın' : 'toparlanma yolundaydın'} — buna hazır mısın?`
               : 'Bu portföy geçmişte görece sakin bir yolculuk sunmuş — ama geçmiş, geleceğin garantisi değil.'}
           </p>
         </>

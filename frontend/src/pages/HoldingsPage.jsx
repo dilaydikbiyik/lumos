@@ -4,6 +4,7 @@ import LumosLogo from '../components/LumosLogo'
 import CurrencyExposure from '../components/CurrencyExposure'
 import { UserButton, useAuth } from '@clerk/clerk-react'
 import api, { extractErrorMessage, setAuthToken } from '../utils/api'
+import useMarket from '../hooks/useMarket'
 
 const TYPE_LABELS = {
   stock: '📈 Hisse', fund: '🧺 Fon', etf: '🧺 ETF',
@@ -17,7 +18,7 @@ const EMPTY_FORM = {
   purchase_amount: '', manual_current_value: '', note: '', emotion_tag: '',
 }
 
-// 1-tık duygu etiketi — davranış koçunun veri kaynağı, tamamen opsiyonel
+// One-tap emotion tag — data source for the behaviour coach, fully optional
 const EMOTIONS = [
   { value: '', label: 'Bu kararı ne verdirdi? (ops.)' },
   { value: 'plan', label: '📋 Planımın parçası' },
@@ -26,11 +27,10 @@ const EMOTIONS = [
   { value: 'panik', label: '😰 Panik / acele' },
 ]
 
-const fmt = n => new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 0 }).format(n)
-
 export default function HoldingsPage() {
   const navigate = useNavigate()
   const { getToken } = useAuth()
+  const { money } = useMarket()
   const [holdings, setHoldings] = useState([])
   const [summary, setSummary] = useState(null)
   const [health, setHealth] = useState(null)
@@ -112,12 +112,12 @@ export default function HoldingsPage() {
           <div className="card" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
             <div>
               <div style={{ fontSize: 12, opacity: 0.7 }}>Toplam Değer</div>
-              <div style={{ fontSize: 22, fontWeight: 700 }}>{fmt(summary.total_current_value)} TL</div>
+              <div style={{ fontSize: 22, fontWeight: 700 }}>{money(summary.total_current_value)}</div>
             </div>
             <div>
               <div style={{ fontSize: 12, opacity: 0.7 }}>Kalan Bütçe</div>
               <div style={{ fontSize: 22, fontWeight: 700, color: 'var(--green, #4ade80)' }}>
-                {summary.remaining_budget != null ? `${fmt(summary.remaining_budget)} TL` : '—'}
+                {summary.remaining_budget != null ? money(summary.remaining_budget) : '—'}
               </div>
             </div>
           </div>
@@ -131,8 +131,8 @@ export default function HoldingsPage() {
               <strong style={{ fontSize: 14 }}>Param eriyor mu?</strong>
             </div>
             <p style={{ fontSize: 13, lineHeight: 1.6 }}>
-              Yatırılmamış {fmt(summary.remaining_budget || 0)} TL'nin bu ay enflasyon nedeniyle
-              gerçek değeri ~{fmt(summary.cash_erosion.erosion_amount)} TL azaldı
+              Yatırılmamış {money(summary.remaining_budget || 0)}'nin bu ay enflasyon nedeniyle
+              gerçek değeri ~{money(summary.cash_erosion.erosion_amount)} azaldı
               (aylık enflasyon %{summary.cash_erosion.monthly_inflation_pct}).
             </p>
           </div>
@@ -151,10 +151,10 @@ export default function HoldingsPage() {
           </div>
         )}
 
-        {/* Kur dağılımı — TL vs döviz */}
+        {/* Currency exposure — TL vs FX */}
         <CurrencyExposure holdings={holdings} />
 
-        {/* Portföyü mevcut varlıklarla güncelle */}
+        {/* Rebuild the portfolio with the remaining budget */}
         {profile?.risk_score != null && summary?.remaining_budget > 0 && (
           <button
             className="btn btn-primary btn-full"
@@ -165,7 +165,7 @@ export default function HoldingsPage() {
               },
             })}
           >
-            🔄 Kalan {fmt(summary.remaining_budget)} TL ile portföyümü güncelle
+            🔄 Kalan {money(summary.remaining_budget)} ile portföyümü güncelle
           </button>
         )}
 
@@ -177,9 +177,9 @@ export default function HoldingsPage() {
               <div style={{ flex: 1 }}>
                 <div style={{ fontWeight: 600, fontSize: 14 }}>{h.name}</div>
                 <div style={{ fontSize: 12, opacity: 0.7 }}>
-                  Alış: {fmt(h.purchase_amount)} TL
+                  Alış: {money(h.purchase_amount)}
                   {h.current_value != null && h.value_source !== 'purchase' && (
-                    <> · Güncel: <strong style={{ color: 'var(--text)' }}>{fmt(h.current_value)} TL</strong>
+                    <> · Güncel: <strong style={{ color: 'var(--text)' }}>{money(h.current_value)}</strong>
                       {h.value_change_pct != null && (
                         <span style={{
                           marginLeft: 6, fontWeight: 700,
@@ -208,7 +208,7 @@ export default function HoldingsPage() {
               textAlign: 'center', padding: '36px 24px',
               position: 'relative', overflow: 'hidden',
             }}>
-              {/* Arka plan ışıltı */}
+              {/* Background glow */}
               <div style={{
                 position: 'absolute', top: '40%', left: '50%',
                 width: 140, height: 140, borderRadius: '50%',
@@ -241,7 +241,7 @@ export default function HoldingsPage() {
             </select>
             <input className="input" placeholder="Ad (örn: Gölbaşı arsa, SPY ETF)" required
                    value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
-            {/* 🚗 Araç uyarısı — "Araban serveti mi, gideri mi?" */}
+            {/* 🚗 Vehicle warning — "is your car wealth or an expense?" */}
             {isVehicle && (
               <div style={{
                 padding: '12px 14px', borderRadius: 'var(--radius-xs)',

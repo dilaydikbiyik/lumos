@@ -1,13 +1,16 @@
 import { useState } from 'react'
 import api, { extractErrorMessage } from '../utils/api'
-
-const fmt = n => new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 0 }).format(n)
+import useMarket from '../hooks/useMarket'
 
 /**
- * Sanal portföy — gerçek para riske atmadan, önerilen portföyü sahte
- * 100.000 TL ile gerçek piyasa verisinde izle. Korkusuz başlangıcın kalbi.
+ * Practice portfolio — follow the recommended portfolio with virtual
+ * 100.000 TL on real market data, without risking real money. The heart
+ * of the fearless start.
+ * Note: the virtual basket is TL-denominated (XU100 + TL-priced data),
+ * hence money(n, 'TRY').
  */
 export default function PracticeMode({ allocations }) {
+  const { money } = useMarket()
   const [snapshot, setSnapshot] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
@@ -45,7 +48,7 @@ export default function PracticeMode({ allocations }) {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
             <div>
               <div style={{ fontSize: 12, opacity: 0.7 }}>Sanal 100.000 TL şu an</div>
-              <div style={{ fontSize: 20, fontWeight: 700 }}>{fmt(snapshot.current_value)} TL</div>
+              <div style={{ fontSize: 20, fontWeight: 700 }}>{money(snapshot.current_value, 'TRY')}</div>
             </div>
             <div>
               <div style={{ fontSize: 12, opacity: 0.7 }}>Bu hafta</div>
@@ -53,7 +56,7 @@ export default function PracticeMode({ allocations }) {
                 fontSize: 20, fontWeight: 700,
                 color: snapshot.weekly_change_pct >= 0 ? 'var(--green, #4ade80)' : 'var(--red)',
               }}>
-                {snapshot.weekly_change_pct >= 0 ? '+' : ''}{fmt(snapshot.weekly_change_amount)} TL
+                {snapshot.weekly_change_pct >= 0 ? '+' : ''}{money(snapshot.weekly_change_amount, 'TRY')}
               </div>
             </div>
           </div>

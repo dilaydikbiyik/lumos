@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import api, { extractErrorMessage } from '../utils/api'
 import IsikTut from './IsikTut'
-
-const fmt = n => new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 0 }).format(n)
+import useMarket from '../hooks/useMarket'
 
 function BandRow({ label, tone, data, amount }) {
+  const { fmt, money } = useMarket()
   const colors = { bad: 'var(--red)', mid: 'var(--firefly, #F5A524)', good: 'var(--green, #3DD68C)' }
   const gain = data.value - amount
   return (
@@ -17,7 +17,7 @@ function BandRow({ label, tone, data, amount }) {
         }} />
       </div>
       <div style={{ textAlign: 'right', minWidth: 120 }}>
-        <span style={{ fontSize: 14, fontWeight: 700, color: colors[tone] }}>{fmt(data.value)} TL</span>
+        <span style={{ fontSize: 14, fontWeight: 700, color: colors[tone] }}>{money(data.value)}</span>
         <span style={{ fontSize: 11, opacity: 0.65, display: 'block' }}>
           {gain >= 0 ? '+' : ''}{fmt(gain)} ({data.return_pct > 0 ? '+' : ''}{data.return_pct}%)
         </span>
@@ -27,12 +27,14 @@ function BandRow({ label, tone, data, amount }) {
 }
 
 /**
- * Gelecek Senaryoları — "SPY'a param 5 yılda ne olur?" sorusunun dürüst hali.
- * Tahmin yok: varlığın kendi geçmişindeki tüm N-yıllık pencerelerin dağılımı.
+ * Future Scenarios — the honest version of "what happens to my money in
+ * SPY over 5 years?". No forecasting: the distribution of every N-year
+ * window in the asset's own history.
  */
 const PORTFOLIO_OPTION = '__portfolio__'
 
 export default function FutureScenarios({ allocations, budget }) {
+  const { money } = useMarket()
   const [ticker, setTicker] = useState(PORTFOLIO_OPTION)
   const [years, setYears] = useState(5)
   const [result, setResult] = useState(null)
@@ -92,7 +94,7 @@ export default function FutureScenarios({ allocations, budget }) {
       {result?.available && (
         <>
           <p style={{ fontSize: 13, marginBottom: 4 }}>
-            <strong>{fmt(budget)} TL</strong>, {result.isPortfolio ? 'tüm portföyünde' : result.ticker} {years} yıl kalsaydı
+            <strong>{money(budget)}</strong>, {result.isPortfolio ? 'tüm portföyünde' : result.ticker} {years} yıl kalsaydı
             (geçmiş {result.history_years} yılın {result.windows_analysed} dönemine göre):
           </p>
           <BandRow label="Kötü dönem"  tone="bad"  data={result.pessimistic} amount={budget} />

@@ -3,7 +3,12 @@ import { UserButton, useAuth } from '@clerk/clerk-react'
 import api, { extractErrorMessage, setAuthToken } from '../utils/api'
 import LumosLogo from '../components/LumosLogo'
 import IsikTut from '../components/IsikTut'
+import useMarket from '../hooks/useMarket'
 
+// EVERY amount on this page is TCMB TL/m² data — it stays pinned to
+// TRY + tr-TR regardless of the user's market (pretending to convert
+// currencies would be a lie). For non-TR markets the page shows an
+// honest "integration on the way" state instead.
 const fmt = n => new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 0 }).format(n)
 
 function ProvinceScenario({ province, amount }) {
@@ -253,6 +258,7 @@ function ListingLinks() {
 
 export default function ExplorePage() {
   const { getToken } = useAuth()
+  const { pack } = useMarket()
   const [provinces, setProvinces] = useState(null)
   const [horizon, setHorizon] = useState(3)
   const [scenarioAmount, setScenarioAmount] = useState('1000000')
@@ -286,6 +292,33 @@ export default function ExplorePage() {
         ? provinces.provinces.filter(p => p.province.toLocaleLowerCase('tr').includes(q))
         : provinces.provinces.slice(0, 12))
     : []
+
+  // Honesty gate: this whole page is TCMB (TR) data. For non-TR markets
+  // we say so plainly instead of dressing TL data up as dollars/euros.
+  if (!pack.live_housing_index) {
+    return (
+      <div className="page">
+        <header className="navbar">
+          <LumosLogo />
+          <UserButton afterSignOutUrl="/" />
+        </header>
+        <div className="page-content">
+          <h2>Emlak Keşfet</h2>
+          <div className="card" style={{ marginTop: 16, textAlign: 'center', padding: 28 }}>
+            <div style={{ fontSize: 32, marginBottom: 10 }}>🌍</div>
+            <p style={{ fontSize: 14, lineHeight: 1.7 }}>
+              <strong>{pack.name}</strong> pazarı için canlı konut verisi entegrasyonu yolda.
+              Bu sayfa şu an yalnızca Türkiye (TCMB) verisiyle çalışıyor — sana
+              başka bir ülkenin verisini "buymuş gibi" göstermeyiz.
+            </p>
+            <p style={{ fontSize: 12, opacity: 0.65, marginTop: 10 }}>
+              Pazarı sol menüden 🇹🇷 Türkiye'ye alarak il il m² fiyatlarını görebilirsin.
+            </p>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="page">

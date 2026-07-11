@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import api, { extractErrorMessage } from '../utils/api'
+import useMarket from '../hooks/useMarket'
 
 const SUGGESTIONS = [
   '10.000 TL daha eklesem ne değişir?',
@@ -7,13 +8,12 @@ const SUGGESTIONS = [
   'Daha agresif olsam ne olurdu?',
 ]
 
-const fmt = n => new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 0 }).format(n)
-
 /**
- * "Ne olurdu?" asistanı — tool-use: AI matematiği uydurmaz, gerçek portföy
- * motorunu iki kez çağırıp (önce/sonra) sadece sonucu yorumlar.
+ * "What if?" assistant — tool-use: the AI never invents the math; it calls
+ * the real portfolio engine twice (before/after) and only narrates the diff.
  */
 export default function WhatIfAssistant({ riskScore, budget }) {
+  const { money } = useMarket()
   const [question, setQuestion] = useState('')
   const [result, setResult] = useState(null)
   const [loading, setLoading] = useState(false)
@@ -93,7 +93,7 @@ export default function WhatIfAssistant({ riskScore, budget }) {
             </div>
           )}
           <p style={{ fontSize: 11, opacity: 0.55, marginTop: 8 }}>
-            {fmt(result.diff.before_budget)} TL → {fmt(result.diff.after_budget)} TL ·
+            {money(result.diff.before_budget)} → {money(result.diff.after_budget)} ·
             Risk {result.diff.before_risk_score} → {result.diff.after_risk_score}
           </p>
         </>

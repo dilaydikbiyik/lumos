@@ -1,21 +1,22 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import api, { extractErrorMessage } from '../utils/api'
+import useMarket from '../hooks/useMarket'
 
-// portföy kategorisi -> holding varlık tipi
+// portfolio category -> holding asset type
 const CATEGORY_TO_TYPE = {
   stocks: 'stock', reit: 'etf', fund: 'fund', gold: 'gold', cash: 'cash',
 }
 const NO_TICKER_TYPES = new Set(['cash'])
 
-const fmt = n => new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 0 }).format(n)
-
 /**
- * "Aldım" köprüsü — işlem modelimizin son halkası: kullanıcı alımı kendi
- * aracı kurumunda yapar, burada tek tıkla portföyünü varlıklarına işler.
+ * "I bought it" bridge — the last link of our execution model: the user
+ * buys at their own broker, then records the portfolio into holdings here
+ * with one tap.
  */
 export default function BoughtItBridge({ allocations, budget }) {
   const navigate = useNavigate()
+  const { money } = useMarket()
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState(null)
 
@@ -31,7 +32,7 @@ export default function BoughtItBridge({ allocations, budget }) {
           asset_type: type,
           name: a.name,
           purchase_amount: amount,
-          // alış tarihi = bugün → canlı fiyat takibi otomatik devreye girer
+          // purchase date = today → live price tracking kicks in automatically
           purchase_date: new Date().toISOString().slice(0, 10),
         }
         if (!NO_TICKER_TYPES.has(type)) body.ticker = a.ticker
@@ -54,7 +55,7 @@ export default function BoughtItBridge({ allocations, budget }) {
       <button className="btn btn-primary btn-full" onClick={transfer} disabled={saving}>
         {saving
           ? <span className="spinner" style={{ width: 18, height: 18 }} />
-          : `Aldım — ${fmt(budget)} TL'lik dağılımı işle`}
+          : `Aldım — ${money(budget)}'lik dağılımı işle`}
       </button>
       {error && <p style={{ color: 'var(--red)', fontSize: 13, marginTop: 10 }}>{error}</p>}
     </div>

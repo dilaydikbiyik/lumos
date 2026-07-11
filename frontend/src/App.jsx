@@ -3,6 +3,7 @@ import { useEffect } from 'react'
 import { ClerkLoading, SignedIn, SignedOut, RedirectToSignIn, useAuth } from '@clerk/clerk-react'
 import AppNav from './components/AppNav'
 import PanicButton from './components/PanicButton'
+import { MarketProvider } from './contexts/MarketContext'
 import ErrorBoundary from './utils/errorBoundary'
 import useIllumination from './hooks/useIllumination'
 import { registerTokenGetter } from './utils/api'
@@ -20,8 +21,8 @@ function Illumination() {
   return null
 }
 
-/** Clerk token'ı her API isteğinde taze çekilsin diye interceptor'a kaydeder —
-    "Signature has expired" hatasının kalıcı çözümü. */
+/** Registers Clerk's getToken with the axios interceptor so every API
+    request carries a fresh token — permanent fix for "Signature has expired". */
 function AuthBridge() {
   const { getToken } = useAuth()
   useEffect(() => {
@@ -31,8 +32,8 @@ function AuthBridge() {
   return null
 }
 
-/** Clerk yüklenirken ve yönlendirme sırasında görünür durum —
-    korumalı linke oturumsuz gelen kullanıcı asla siyah ekran görmez. */
+/** Visible state while Clerk loads and during the sign-in redirect —
+    a signed-out visitor on a protected link never sees a black screen. */
 function AuthPending() {
   return (
     <div className="page" style={{ alignItems: 'center', justifyContent: 'center', minHeight: '100dvh' }}>
@@ -61,6 +62,11 @@ export default function App() {
   return (
     <ErrorBoundary>
       <BrowserRouter>
+        {/* Fresh Clerk token per request (interceptor) — must be registered
+            BEFORE MarketProvider's fetch */}
+        <AuthBridge />
+
+        <MarketProvider>
         <Routes>
           <Route path="/"          element={<OnboardingPage />} />
           <Route path="/path"      element={<ProtectedRoute><PathSelectionPage /></ProtectedRoute>} />
@@ -73,17 +79,15 @@ export default function App() {
           <Route path="*"          element={<Navigate to="/" replace />} />
         </Routes>
 
-        {/* Her istekte taze Clerk token'ı (interceptor) */}
-        <AuthBridge />
-
-        {/* Aydınlanan Arayüz: cesaret skoru zemini geceden şafağa taşır */}
+        {/* Illuminating UI: the courage score moves the background from night to dawn */}
         <Illumination />
 
-        {/* Responsive nav: mobilde alt bar, desktop'ta sol sidebar (CSS seçer) */}
+        {/* Responsive nav: bottom bar on mobile, left sidebar on desktop (CSS decides) */}
         <AppNav />
 
-        {/* Panik Düğmesi — kriz anı desteği (sadece giriş yapmışken) */}
+        {/* Panic Button — crisis-moment support (signed-in only) */}
         <SignedIn><PanicButton /></SignedIn>
+        </MarketProvider>
       </BrowserRouter>
     </ErrorBoundary>
   )

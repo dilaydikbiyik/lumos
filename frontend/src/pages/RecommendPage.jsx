@@ -3,7 +3,6 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { UserButton } from '@clerk/clerk-react'
 import LumosLogo from '../components/LumosLogo'
 import PortfolioChart from '../components/PortfolioChart'
-import PerformanceChart from '../components/PerformanceChart'
 import ReitCard from '../components/ReitCard'
 import AssetExplainer from '../components/AssetExplainer'
 import TimeMachine from '../components/TimeMachine'
@@ -14,10 +13,12 @@ import PracticeMode from '../components/PracticeMode'
 import BoughtItBridge from '../components/BoughtItBridge'
 import BeginnerGuide from '../components/BeginnerGuide'
 import usePortfolio from '../hooks/usePortfolio'
+import useMarket from '../hooks/useMarket'
 
 export default function RecommendPage() {
   const { state: profileState } = useLocation()
   const navigate = useNavigate()
+  const { money } = useMarket()
   const { portfolio, isLoading, error, recommend } = usePortfolio()
   const [selectedTicker, setSelectedTicker] = useState(null)
 
@@ -56,7 +57,7 @@ export default function RecommendPage() {
       </header>
 
       <div className="page-content" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-        {/* Başlık */}
+        {/* Header */}
         <div>
           <h2 style={{ marginBottom: 6 }}>
             <span className="gradient-text">Portföyün Hazır</span> 🎉
@@ -64,19 +65,19 @@ export default function RecommendPage() {
           <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
             <span className="badge badge-amber">Risk {portfolio.risk_score}/10</span>
             <span className="badge" style={{ background: 'var(--bg-input)', color: 'var(--text-muted)', border: '1px solid var(--border)' }}>
-              {portfolio.budget?.toLocaleString('tr-TR')} TL bütçe
+              {money(portfolio.budget ?? 0)} bütçe
             </span>
             {portfolio.includes_reits && <span className="badge badge-green">REIT dahil ✓</span>}
           </div>
         </div>
 
-        {/* Portföy dağılım grafiği — tıklama AssetExplainer açar */}
+        {/* Allocation chart — clicking a slice opens AssetExplainer */}
         <PortfolioChart allocations={portfolio.allocations} onSliceClick={setSelectedTicker} />
 
-        {/* Neden bu dağılım? — deterministik formül + elenen varlıklar */}
+        {/* Why this allocation? — deterministic formula + dropped assets */}
         <AllocationRationale portfolio={portfolio} />
 
-        {/* Varlık açıklayıcı — seçili varlık için nedir/neden/risk */}
+        {/* Asset explainer — what/why/risk for the selected asset */}
         {selectedAlloc && (
           <AssetExplainer
             allocation={selectedAlloc}
@@ -84,25 +85,22 @@ export default function RecommendPage() {
           />
         )}
 
-        {/* Tarihsel performans */}
-        <PerformanceChart tickers={portfolio.allocations?.map(a => a.ticker)} selected={selectedTicker} />
-
-        {/* Sanal portföy — gerçek para riske atmadan dene */}
+        {/* Practice portfolio — try it without risking real money */}
         <PracticeMode allocations={portfolio.allocations} />
 
-        {/* Zaman Makinesi — dürüst tarihsel simülasyon */}
+        {/* Time Machine — honest historical simulation */}
         <TimeMachine allocations={portfolio.allocations} budget={portfolio.budget} />
 
-        {/* Gelecek Senaryoları — tahmin değil, geçmiş pencere dağılımı */}
+        {/* Future Scenarios — not a forecast: historical window distribution */}
         <FutureScenarios allocations={portfolio.allocations} budget={portfolio.budget} />
 
-        {/* Ne olurdu? — tool-use: AI matematiği uydurmaz, gerçek motoru çağırır */}
+        {/* What if? — tool-use: the AI calls the real engine, never invents math */}
         <WhatIfAssistant riskScore={portfolio.risk_score} budget={portfolio.budget} />
 
-        {/* REIT kartı */}
+        {/* REIT card */}
         {portfolio.includes_reits && <ReitCard explanation={portfolio.metadata?.reit_explanation} />}
 
-        {/* Portföy açıklaması */}
+        {/* Portfolio explanation */}
         {portfolio.plain_explanation && (
           <div className="card">
             <h3 style={{ marginBottom: 10, display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -113,15 +111,15 @@ export default function RecommendPage() {
           </div>
         )}
 
-        {/* Yasal uyarı */}
+        {/* Legal disclaimer */}
         <div className="disclaimer">
           ⚠️ Bu bilgiler yalnızca eğitim amaçlıdır. Geçmiş performans, gelecek sonuçların garantisi değildir. Yatırım kararlarınız için lisanslı bir finansal danışmana başvurun.
         </div>
 
-        {/* "İlk Adımı At" rehberi — aracı kurum gösterimi */}
+        {/* "Take the first step" guide — broker walkthrough */}
         <BeginnerGuide />
 
-        {/* "Aldım" köprüsü — no-execution modelinin son halkası */}
+        {/* "I bought it" bridge — the last link of the no-execution model */}
         <BoughtItBridge allocations={portfolio.allocations} budget={portfolio.budget} />
 
         <button className="btn btn-ghost btn-full" onClick={() => navigate('/dashboard')}>

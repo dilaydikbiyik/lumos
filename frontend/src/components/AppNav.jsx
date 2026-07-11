@@ -3,8 +3,9 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import { SignedIn, useAuth } from '@clerk/clerk-react'
 import api, { setAuthToken } from '../utils/api'
 import LumosLogo from './LumosLogo'
+import MarketSwitcher from './MarketSwitcher'
 
-/* ── Inline SVG ikonları — hafif, emoji yerine crisp ── */
+/* ── Inline SVG icons — lightweight, crisp alternative to emoji ── */
 const icons = {
   explore: (active) => (
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={active ? 'var(--firefly)' : 'currentColor'} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -44,9 +45,10 @@ const NAV_ITEMS = [
 ]
 
 /**
- * Tek nav bileşeni, iki yüzey: mobilde alt bar, desktop'ta (≥768px) sol
- * sidebar. Hangisinin görüneceğine CSS karar verir — investment_path fetch'i
- * ve modül filtresi tek yerde yaşar, iki menü asla birbirinden sapamaz.
+ * One nav component, two surfaces: bottom bar on mobile, left sidebar on
+ * desktop (≥768px). CSS decides which one is visible — the investment_path
+ * fetch and module filter live in one place, so the two menus can never
+ * drift apart.
  */
 function NavSurfaces() {
   const navigate = useNavigate()
@@ -54,7 +56,7 @@ function NavSurfaces() {
   const { getToken, isSignedIn } = useAuth()
   const [investmentPath, setInvestmentPath] = useState(null)
 
-  // Akış 0 sözü: seçilen yola göre modüller uyarlanır — dayatma yok
+  // Flow 0 promise: modules adapt to the chosen path — nothing is forced
   useEffect(() => {
     if (!isSignedIn) return
     let cancelled = false
@@ -64,14 +66,14 @@ function NavSurfaces() {
         const res = await api.get('/users/me')
         if (!cancelled) setInvestmentPath(res.data.investment_path)
       } catch {
-        // nav için kritik değil — varsayılan: her şeyi göster
+        // not critical for nav — default: show everything
       }
     }
     load()
     return () => { cancelled = true }
   }, [isSignedIn, getToken, pathname])
 
-  // Sidebar görünürken sayfa içeriği sağa kayar (CSS: body.has-sidebar)
+  // While the sidebar is visible, page content shifts right (CSS: body.has-sidebar)
   useEffect(() => {
     document.body.classList.add('has-sidebar')
     return () => document.body.classList.remove('has-sidebar')
@@ -85,7 +87,7 @@ function NavSurfaces() {
 
   return (
     <>
-      {/* Desktop: sol sidebar */}
+      {/* Desktop: left sidebar */}
       <aside className="sidebar-nav">
         <div className="sidebar-logo">
           <LumosLogo />
@@ -106,9 +108,14 @@ function NavSurfaces() {
             )
           })}
         </nav>
+
+        {/* Footer: market selector — currency and data sources follow it */}
+        <div style={{ marginTop: 'auto', padding: '12px 10px 4px' }}>
+          <MarketSwitcher />
+        </div>
       </aside>
 
-      {/* Mobil: alt bar */}
+      {/* Mobile: bottom bar */}
       <nav className="bottom-nav">
         {items.map(item => {
           const active = pathname === item.path

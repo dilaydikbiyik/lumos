@@ -1,13 +1,14 @@
 import { useState } from 'react'
 import api, { extractErrorMessage } from '../utils/api'
-
-const fmt = n => new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 0 }).format(n)
+import useMarket from '../hooks/useMarket'
 
 /**
- * Hedef bazlı yatırım — "3 yılda ev peşinatı 800.000 TL" gibi bir hedefi
- * somut aylık katkıya çevirir; mevcut tempoyla gecikme uyarısı verir.
+ * Goal-based investing — turns a goal like "800.000 TL house deposit in
+ * 3 years" into a concrete monthly contribution, and warns about the
+ * delay implied by the user's current pace.
  */
 export default function GoalPlanner() {
+  const { money } = useMarket()
   const [form, setForm] = useState({ target_amount: '', years: 3, current_savings: '', monthly: '' })
   const [plan, setPlan] = useState(null)
   const [progress, setProgress] = useState(null)
@@ -72,14 +73,14 @@ export default function GoalPlanner() {
           ) : (
             <p style={{ fontSize: 14 }}>
               Hedefe zamanında ulaşmak için ayda yaklaşık{' '}
-              <strong style={{ fontSize: 17 }}>{fmt(plan.monthly_contribution)} TL</strong> biriktirmelisin.
+              <strong style={{ fontSize: 17 }}>{money(plan.monthly_contribution)}</strong> biriktirmelisin.
             </p>
           )}
 
           {progress && (
             <div style={{ marginTop: 10, padding: 10, borderRadius: 10, border: '1px solid var(--border)' }}>
               <div style={{ fontSize: 13, marginBottom: 6 }}>
-                Mevcut temponla ({fmt(form.monthly)} TL/ay):
+                Mevcut temponla ({money(form.monthly)}/ay):
               </div>
               {progress.on_track ? (
                 <p style={{ fontSize: 14, color: 'var(--green, #4ade80)' }}>✓ Hedefe zamanında ulaşıyorsun.</p>

@@ -10,15 +10,14 @@ import DailyTip from '../components/DailyTip'
 import HeadlineEducation from '../components/HeadlineEducation'
 import ReadinessScore from '../components/ReadinessScore'
 import usePortfolio from '../hooks/usePortfolio'
+import useMarket from '../hooks/useMarket'
 import api, { setAuthToken } from '../utils/api'
 import { useState } from 'react'
 
-const fmt = n => new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 0 }).format(n)
-
-/** Kademeli arayüz: Yeni kullanıcıda sade görünüm, "Daha Fazla" ile derinleşir */
+/** Progressive UI: minimal view for new users, deepens via "Show More" */
 function ProgressiveDetails({ holdingsSummary, portfolio }) {
   const [expanded, setExpanded] = useState(false)
-  // Hiç holding yoksa detay bölümü gösterme
+  // No holdings → hide the details section
   const hasData = holdingsSummary?.total_current_value > 0 || portfolio
   if (!hasData) return null
   return (
@@ -51,9 +50,10 @@ function ProgressiveDetails({ holdingsSummary, portfolio }) {
 export default function DashboardPage() {
   const navigate = useNavigate()
   const { getToken } = useAuth()
+  const { fmt, money, unit } = useMarket()
   const { portfolio, profile, isLoading, loadProfile, recommend } = usePortfolio()
 
-  // Holdings özet — Dashboard kart için
+  // Holdings summary — for the dashboard card
   const [holdingsSummary, setHoldingsSummary] = useState(null)
 
   const loadSummary = useCallback(async () => {
@@ -62,11 +62,10 @@ export default function DashboardPage() {
       const res = await api.get('/holdings/summary')
       setHoldingsSummary(res.data)
     } catch {
-      // summary kritik değil
+      // summary is not critical
     }
   }, [getToken])
 
-  // ESLint fix: loadProfile ve loadSummary dependency'de
   /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     loadProfile()
@@ -96,7 +95,7 @@ export default function DashboardPage() {
 
       <div className="page-content" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
 
-        {/* ── Selamlama başlığı ── */}
+        {/* ── Greeting header ── */}
         <div>
           <h2 style={{ marginBottom: 4 }}>
             <span className="gradient-text">Kontrol Paneli</span>
@@ -104,13 +103,13 @@ export default function DashboardPage() {
           <p style={{ fontSize: 13 }}>Tüm servetin, tek bakışta.</p>
         </div>
 
-        {/* ── Cesaret Skoru — vizyonun görünür yüzü ── */}
+        {/* ── Courage Score — the visible face of the vision ── */}
         <ReadinessScore />
 
-        {/* ── Bugün Öğrendin ── */}
+        {/* ── Daily tip ── */}
         <DailyTip />
 
-        {/* ── Özet Kart (todo: dashboard summary card) ── */}
+        {/* ── Summary card ── */}
         {holdingsSummary && (
           <div className="card" style={{
             background: 'linear-gradient(135deg, var(--bg-card) 0%, var(--bg-card-2) 100%)',
@@ -124,11 +123,11 @@ export default function DashboardPage() {
               <div>
                 <div style={{ fontSize: 11, color: 'var(--text-dim)', marginBottom: 4 }}>Toplam Değer</div>
                 <div style={{ fontSize: 24, fontWeight: 800, color: 'var(--firefly)' }}>
-                  {fmt(holdingsSummary.total_current_value)} <span style={{ fontSize: 13, fontWeight: 500 }}>TL</span>
+                  {fmt(holdingsSummary.total_current_value)} <span style={{ fontSize: 13, fontWeight: 500 }}>{unit}</span>
                 </div>
                 {holdingsSummary.total_purchase_amount > 0 && (
                   <div style={{ fontSize: 11, color: 'var(--text-dim)', marginTop: 3 }}>
-                    Alış: {fmt(holdingsSummary.total_purchase_amount)} TL
+                    Alış: {money(holdingsSummary.total_purchase_amount)}
                   </div>
                 )}
               </div>
@@ -139,19 +138,19 @@ export default function DashboardPage() {
                   color: holdingsSummary.remaining_budget > 0 ? 'var(--green)' : 'var(--text-muted)',
                 }}>
                   {holdingsSummary.remaining_budget != null
-                    ? <>{fmt(holdingsSummary.remaining_budget)} <span style={{ fontSize: 13, fontWeight: 500 }}>TL</span></>
+                    ? <>{fmt(holdingsSummary.remaining_budget)} <span style={{ fontSize: 13, fontWeight: 500 }}>{unit}</span></>
                     : '—'
                   }
                 </div>
                 {holdingsSummary.cash_erosion && (
                   <div style={{ fontSize: 11, color: 'var(--red)', marginTop: 3 }}>
-                    ↓ {fmt(holdingsSummary.cash_erosion.erosion_amount)} TL/ay eriyor
+                    ↓ {money(holdingsSummary.cash_erosion.erosion_amount)}/ay eriyor
                   </div>
                 )}
               </div>
             </div>
 
-            {/* Tip bazlı dağılım mini-bar */}
+            {/* Per-type allocation mini bar */}
             {holdingsSummary.by_type && Object.keys(holdingsSummary.by_type).length > 0 && (
               <div style={{ marginTop: 16 }}>
                 <div style={{ display: 'flex', gap: 4, height: 6, borderRadius: 6, overflow: 'hidden', marginBottom: 8 }}>
@@ -196,19 +195,19 @@ export default function DashboardPage() {
           </div>
         )}
 
-        {/* ── Haber Özeti ── */}
+        {/* ── News digest ── */}
         <NewsDigest />
 
-        {/* ── Manset Dili Eğitimi ── */}
+        {/* ── Headline-language education ── */}
         <HeadlineEducation />
 
-        {/* ── Kademe: Detay Göster toggle ── */}
+        {/* ── Progressive details toggle ── */}
         <ProgressiveDetails holdingsSummary={holdingsSummary} portfolio={portfolio} />
 
-        {/* ── Risk Profili / Portföy ── */}
+        {/* ── Risk profile / portfolio ── */}
         {!profile ? (
           <div className="card" style={{ textAlign: 'center', padding: '40px 24px', position: 'relative', overflow: 'hidden' }}>
-            {/* Ateş böceği ışık efekti */}
+            {/* Firefly glow effect */}
             <div style={{
               position: 'absolute', top: '50%', left: '50%',
               width: 120, height: 120, borderRadius: '50%',
@@ -229,7 +228,7 @@ export default function DashboardPage() {
           </div>
         ) : (
           <>
-            {/* Profil kartı */}
+            {/* Profile card */}
             <div className="card">
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
                 <div>
@@ -248,7 +247,7 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            {/* Portföy snapshot */}
+            {/* Portfolio snapshot */}
             {portfolio ? (
               <PortfolioChart allocations={portfolio.allocations} />
             ) : (

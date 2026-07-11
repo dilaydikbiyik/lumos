@@ -5,8 +5,9 @@ import LumosLogo from '../components/LumosLogo'
 import ChatWindow from '../components/ChatWindow'
 import RiskGauge from '../components/RiskGauge'
 import usePortfolio from '../hooks/usePortfolio'
+import useMarket from '../hooks/useMarket'
 
-// Risk skoru → kullanıcı dostu etiket ve renk
+// Risk score → user-friendly label and colour
 const RISK_META = {
   low:    { emoji: '🌿', color: 'var(--green)',   label: 'Muhafazakâr'  },
   medium: { emoji: '⚖️', color: 'var(--firefly)', label: 'Dengeli'      },
@@ -22,17 +23,18 @@ function getRiskMeta(score) {
 export default function ProfilePage() {
   const navigate = useNavigate()
   const { saveProfile, loadProfile, profile } = usePortfolio()
+  const { money } = useMarket()
   const [quizResult, setQuizResult] = useState(null)
   const [checkedStore, setCheckedStore] = useState(false)
   const [retaking, setRetaking] = useState(false)
 
-  // Kayıtlı profil varsa quiz'i atlayıp skoru göster — sayfa yenilenince
-  // 9 sorunun kaybolması güven kırar; skor kalıcı olmalı.
+  // If a stored profile exists, skip the quiz and show the score — losing
+  // 9 answers on a page refresh breaks trust; the score must persist.
   useEffect(() => {
     loadProfile().finally(() => setCheckedStore(true))
   }, [loadProfile])
 
-  // Türetilmiş görünüm: quiz sonucu > kayıtlı profil (yeniden test istenmedikçe)
+  // Derived view: quiz result > stored profile (unless a retake was requested)
   const riskResult = quizResult ?? (!retaking && profile?.risk_score ? profile : null)
 
   async function handleProfileComplete(answers) {
@@ -57,7 +59,7 @@ export default function ProfilePage() {
           </p>
         ) : !riskResult ? (
           <>
-            {/* Başlık — jargonsuz Türkçe */}
+            {/* Header — jargon-free copy */}
             <div style={{ marginBottom: 16 }}>
               <p style={{
                 fontSize: 12, letterSpacing: '0.12em', textTransform: 'uppercase',
@@ -73,9 +75,9 @@ export default function ProfilePage() {
             <ChatWindow onProfileComplete={handleProfileComplete} />
           </>
         ) : (
-          /* Skor gösterimi — tam sayfa akış */
+          /* Score reveal — full-page flow */
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-            {/* Başarı başlığı */}
+            {/* Success header */}
             <div style={{ textAlign: 'center', padding: '12px 0' }}>
               <div style={{ fontSize: 40, marginBottom: 10 }}>
                 {getRiskMeta(riskResult.risk_score).emoji}
@@ -88,7 +90,7 @@ export default function ProfilePage() {
 
             <RiskGauge score={riskResult.risk_score} label={riskResult.label} />
 
-            {/* Özet kart */}
+            {/* Summary card */}
             <div className="card" style={{
               borderColor: getRiskMeta(riskResult.risk_score).color + '44',
               background: 'var(--bg-card)',
@@ -106,7 +108,7 @@ export default function ProfilePage() {
               <p style={{ fontSize: 14, lineHeight: 1.75, color: 'var(--text)' }}>
                 {riskResult.summary}
               </p>
-              {/* Somutlaştırılmış risk mesajı — kendi bütçesiyle göster */}
+              {/* Concretised risk message — shown with the user's own budget */}
               {riskResult.answers?.budget && (
                 <div style={{
                   marginTop: 12, padding: '10px 14px',
@@ -114,17 +116,17 @@ export default function ProfilePage() {
                   fontSize: 13, lineHeight: 1.6, color: 'var(--text)',
                 }}>
                   💡 Senin bütçen <strong>
-                    {Number(riskResult.answers.budget).toLocaleString('tr-TR')} TL
+                    {money(riskResult.answers.budget)}
                   </strong>. En kötü senaryoda portföyün geçici olarak{' '}
                   <strong>
-                    {Math.round(riskResult.answers.budget * 0.8).toLocaleString('tr-TR')} TL
+                    {money(riskResult.answers.budget * 0.8)}
                   </strong>'ye düşebilir.
                   Bu normal bir dalgalanma — satmadığın sürece zarar kesinleşmez.
                 </div>
               )}
             </div>
 
-            {/* Skor dökümü — kara kutu yok: her puanın kaynağı */}
+            {/* Score breakdown — no black box: the source of every point */}
             {riskResult.factors?.length > 0 && (
               <div className="card">
                 <h3 style={{ marginBottom: 4, fontSize: 15 }}>🧮 Bu skor nereden geldi?</h3>
