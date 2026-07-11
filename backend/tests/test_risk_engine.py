@@ -41,7 +41,7 @@ def test_conservative_profile_low_score():
     )
     result = compute_risk_score(answers)
     assert result.risk_score <= 3
-    assert result.label == "Conservative"
+    assert result.label == "Muhafazakâr"
 
 
 # ── Moderate user ─────────────────────────────────────────────────────────────
@@ -55,7 +55,7 @@ def test_moderate_profile_mid_score():
     )
     result = compute_risk_score(answers)
     assert 3 < result.risk_score <= 6
-    assert result.label == "Moderate"
+    assert result.label == "Dengeli"
 
 
 # ── Aggressive user ───────────────────────────────────────────────────────────
@@ -69,7 +69,7 @@ def test_aggressive_profile_high_score():
     )
     result = compute_risk_score(answers)
     assert result.risk_score >= 8
-    assert result.label == "Aggressive"
+    assert result.label == "Atılgan"
 
 
 # ── Short-term user ───────────────────────────────────────────────────────────
@@ -102,7 +102,7 @@ def test_retirement_profile():
 def test_response_has_all_fields():
     result = compute_risk_score(_answers())
     assert result.risk_score is not None
-    assert result.label in {"Conservative", "Moderate", "Growth", "Aggressive"}
+    assert result.label in {"Muhafazakâr", "Dengeli", "Büyüme Odaklı", "Atılgan"}
     assert len(result.summary) > 10
     assert result.answers is not None
 

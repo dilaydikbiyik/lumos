@@ -16,7 +16,7 @@ def test_save_profile_returns_score(client):
     assert res.status_code == 200
     body = res.json()
     assert 1 <= body["risk_score"] <= 10
-    assert body["label"] in ("Conservative", "Moderate", "Growth", "Aggressive")
+    assert body["label"] in ("Muhafazakâr", "Dengeli", "Büyüme Odaklı", "Atılgan")
     assert body["answers"]["budget"] == 50000
 
 

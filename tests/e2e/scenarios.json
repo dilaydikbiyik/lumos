@@ -8,7 +8,7 @@
         "budget": 500000, "time_horizon": "short",
         "loss_tolerance": "low", "goal": "preservation", "experience": "none"
       },
-      "expected_label_in": ["Conservative", "Moderate"],
+      "expected_label_in": ["Muhafazakâr", "Dengeli"],
       "max_risk_score": 4.5
     },
     {
@@ -18,7 +18,7 @@
         "budget": 200000, "time_horizon": "medium",
         "loss_tolerance": "medium", "goal": "growth", "experience": "beginner"
       },
-      "expected_label_in": ["Moderate", "Growth"],
+      "expected_label_in": ["Dengeli", "Büyüme Odaklı"],
       "max_risk_score": 8
     },
     {
@@ -28,7 +28,7 @@
         "budget": 100000, "time_horizon": "long",
         "loss_tolerance": "high", "goal": "speculation", "experience": "advanced"
       },
-      "expected_label_in": ["Growth", "Aggressive"],
+      "expected_label_in": ["Büyüme Odaklı", "Atılgan"],
       "min_risk_score": 6
     },
     {
@@ -38,7 +38,7 @@
         "budget": 150000, "time_horizon": "short",
         "loss_tolerance": "medium", "goal": "income", "experience": "beginner"
       },
-      "expected_label_in": ["Conservative", "Moderate"],
+      "expected_label_in": ["Muhafazakâr", "Dengeli"],
       "max_risk_score": 6
     },
     {
@@ -48,7 +48,7 @@
         "budget": 1000000, "time_horizon": "long",
         "loss_tolerance": "low", "goal": "income", "experience": "intermediate"
       },
-      "expected_label_in": ["Conservative", "Moderate", "Growth"],
+      "expected_label_in": ["Muhafazakâr", "Dengeli", "Büyüme Odaklı"],
       "max_risk_score": 7
     }
   ]

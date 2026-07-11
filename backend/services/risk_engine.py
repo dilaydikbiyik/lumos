@@ -48,14 +48,16 @@ _INCOME_MODIFIER = {
 
 
 def _label(score: float) -> str:
+    # Turkish labels — the UI language is Turkish; an English "Growth" badge
+    # inside Turkish copy was an inconsistency (fixed 2026-07-11)
     if score <= 3:
-        return "Conservative"
+        return "Muhafazakâr"
     elif score <= 6:
-        return "Moderate"
+        return "Dengeli"
     elif score <= 8:
-        return "Growth"
+        return "Büyüme Odaklı"
     else:
-        return "Aggressive"
+        return "Atılgan"
 
 
 def _age_modifier(age: int | None) -> float:
@@ -154,11 +156,13 @@ def compute_risk_score(answers: RiskProfileAnswers) -> RiskProfileResponse:
     elif answers.income_stability == "variable":
         modifier_note += " Değişken geliriniz hafifçe dikkate alındı."
 
+    # Readable Turkish answers — raw enum values ("long", "growth") leaked
+    # English words into a Turkish sentence
     summary = (
         f"Risk skoru {score}/10 ({label}). "
-        f"{answers.time_horizon.capitalize()} yatırım ufku, "
-        f"{answers.loss_tolerance} kayıp toleransı ve "
-        f"{answers.goal} hedefi temel alındı.{modifier_note}"
+        f"{_ANSWER_LABELS['time_horizon'][answers.time_horizon]} yatırım ufku, "
+        f"\"{_ANSWER_LABELS['loss_tolerance'][answers.loss_tolerance]}\" kayıp toleransı ve "
+        f"{_ANSWER_LABELS['goal'][answers.goal].lower()} hedefi temel alındı.{modifier_note}"
     )
 
     return RiskProfileResponse(
