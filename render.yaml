@@ -1,4 +1,4 @@
-databases: []
+databases: []  # DB lives on Neon (see DATABASE_URL)
 
 services:
   - type: web
