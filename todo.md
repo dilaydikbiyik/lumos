@@ -399,15 +399,15 @@ lumos/                          ← project root
 - [x] `Dockerfile` → Docker image for the FastAPI app
 - [x] `render.yaml` → Render.com deployment configuration (free plan, Docker, health check)
 - [x] `backend/routers/health.py` → `/health` endpoint (uptime monitoring)
-- [ ] Add all env vars on Render: `ANTHROPIC_API_KEY`, `CLERK_SECRET_KEY`, `DATABASE_URL`
-- [ ] Test the deployment; verify `/health` responds
+- [x] All env vars set on Render (4 Gemini keys, Anthropic, Clerk, TCMB, Neon `DATABASE_URL`)
+- [x] Deployment tested live: `/health` → `{db: ok, ai: ok}`, CORS verified for the Vercel origin, Render↔Neon connection observed in pg_stat_activity (2026-07-12)
 
 ### Deploy — Frontend → Vercel
 
 - [x] `vercel.json` → Vercel deployment configuration (Vite framework, SPA rewrite, asset caching)
 - [x] `frontend/.env.production` → `VITE_BACKEND_URL`, `VITE_CLERK_PUBLISHABLE_KEY`
-- [ ] Connect to the Clerk production instance
-- [ ] Deploy to Vercel and test the full flow
+- [/] Clerk runs on the development instance for now (works end to end; production instance requires a custom domain — deferred until one is purchased)
+- [x] Deployed to Vercel: https://lumos-sooty.vercel.app (root=frontend, Vite preset) → backend https://lumos-backend-u6il.onrender.com → Neon Postgres (Frankfurt) (2026-07-12)
 
 ### Portfolio — README & Architecture Docs
 
