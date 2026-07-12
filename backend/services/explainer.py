@@ -29,9 +29,10 @@ def explain_portfolio(portfolio: PortfolioRecommendResponse, user_profile: dict)
         "profile, don't be generic.\n"
         "3. One honest sentence about what could go wrong (e.g. temporary drops) and why "
         "the mix is designed to soften it — calm, not alarming.\n"
-        "Respond in the same language the user has been using (Turkish or English).\n\n"
-        "⚠️ Always end with: 'This is for educational purposes only and does not constitute "
-        "investment advice. Please consult a licensed financial advisor.'"
+        "Respond in TURKISH — the app's UI language is Turkish; even though this "
+        "prompt is English, the reader is a Turkish beginner.\n\n"
+        "⚠️ Always end with: 'Bu içerik yalnızca eğitim amaçlıdır ve yatırım tavsiyesi "
+        "niteliği taşımaz. Lütfen lisanslı bir finansal danışmana başvurun.'"
     )
     return generate_text(prompt, cache=True)
 
