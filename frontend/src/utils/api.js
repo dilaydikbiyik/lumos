@@ -40,6 +40,54 @@ export function setAuthToken(token) {
 }
 
 /**
+ * Cold-start resilience: Render's free tier spins the backend down after
+ * inactivity; the first request during wake-up can hit the proxy's 502/503
+ * (or take ~30-50s). Instead of surfacing a scary error, retry with backoff
+ * and let the UI show an honest "server is waking up" banner via window
+ * events ('lumos:waking' / 'lumos:awake').
+ *
+ * Retry safety: 502/503 come from Render's proxy BEFORE the app processes
+ * the request, so any method is safe to retry. On pure network errors and
+ * 504 the app may have processed the request, so only idempotent methods
+ * are retried (never POST — e.g. a duplicate holding must be impossible).
+ */
+const RETRY_DELAYS_MS = [2000, 5000, 10000, 20000]
+const IDEMPOTENT = new Set(['get', 'head', 'options', 'put', 'delete', 'patch'])
+
+function announce(event) {
+  window.dispatchEvent(new CustomEvent(event))
+}
+
+api.interceptors.response.use(
+  (res) => {
+    announce('lumos:awake')
+    return res
+  },
+  async (error) => {
+    const cfg = error.config
+    if (!cfg || error.code === 'ERR_CANCELED') return Promise.reject(error)
+
+    const status = error.response?.status
+    const method = (cfg.method || 'get').toLowerCase()
+    const proxyLevel = status === 502 || status === 503
+    const maybeProcessed = !error.response || status === 504
+    const retryable = proxyLevel || (maybeProcessed && IDEMPOTENT.has(method))
+
+    cfg.__retryCount = cfg.__retryCount || 0
+    if (!retryable || cfg.__retryCount >= RETRY_DELAYS_MS.length) {
+      announce('lumos:awake')
+      return Promise.reject(error)
+    }
+
+    announce('lumos:waking')
+    const delay = RETRY_DELAYS_MS[cfg.__retryCount]
+    cfg.__retryCount += 1
+    await new Promise(r => setTimeout(r, delay))
+    return api.request(cfg)
+  }
+)
+
+/**
  * FastAPI error 'detail' is a string for our own HTTPExceptions, but
  * Pydantic validation errors (422) return an array of objects — render
  * either safely instead of letting React print "[object Object]".

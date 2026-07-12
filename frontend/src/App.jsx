@@ -4,6 +4,7 @@ import { ClerkLoading, SignedIn, SignedOut, RedirectToSignIn, useAuth } from '@c
 import AppNav from './components/AppNav'
 import PanicButton from './components/PanicButton'
 import { MarketProvider } from './contexts/MarketContext'
+import WakingBanner from './components/WakingBanner'
 import ErrorBoundary from './utils/errorBoundary'
 import useIllumination from './hooks/useIllumination'
 import { registerTokenGetter } from './utils/api'
@@ -87,6 +88,9 @@ export default function App() {
 
         {/* Panic Button — crisis-moment support (signed-in only) */}
         <SignedIn><PanicButton /></SignedIn>
+
+        {/* Honest cold-start banner (free-tier backend wake-up) */}
+        <WakingBanner />
         </MarketProvider>
       </BrowserRouter>
     </ErrorBoundary>

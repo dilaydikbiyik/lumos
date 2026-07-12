@@ -1,0 +1,17 @@
+# Keeps the Render free instance awake so users never hit the 30-50s
+# cold start ("Seçim kaydedilemedi" class of errors). A single always-on
+# free service fits within Render's 750 instance-hours/month.
+name: Keep backend awake
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"   # every 10 minutes (Render sleeps after 15)
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping /health
+        run: |
+          curl -sf --max-time 80 https://lumos-backend-u6il.onrender.com/health
