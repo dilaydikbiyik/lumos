@@ -42,9 +42,7 @@ export function setAuthToken(token) {
 /**
  * Cold-start resilience: Render's free tier spins the backend down after
  * inactivity; the first request during wake-up can hit the proxy's 502/503
- * (or take ~30-50s). Instead of surfacing a scary error, retry with backoff
- * and let the UI show an honest "server is waking up" banner via window
- * events ('lumos:waking' / 'lumos:awake').
+ * (or take ~30-50s). Instead of surfacing an error, retry with backoff.
  *
  * Retry safety: 502/503 come from Render's proxy BEFORE the app processes
  * the request, so any method is safe to retry. On pure network errors and
@@ -54,15 +52,8 @@ export function setAuthToken(token) {
 const RETRY_DELAYS_MS = [2000, 5000, 10000, 20000]
 const IDEMPOTENT = new Set(['get', 'head', 'options', 'put', 'delete', 'patch'])
 
-function announce(event) {
-  window.dispatchEvent(new CustomEvent(event))
-}
-
 api.interceptors.response.use(
-  (res) => {
-    announce('lumos:awake')
-    return res
-  },
+  (res) => res,
   async (error) => {
     const cfg = error.config
     if (!cfg || error.code === 'ERR_CANCELED') return Promise.reject(error)
@@ -75,11 +66,9 @@ api.interceptors.response.use(
 
     cfg.__retryCount = cfg.__retryCount || 0
     if (!retryable || cfg.__retryCount >= RETRY_DELAYS_MS.length) {
-      announce('lumos:awake')
       return Promise.reject(error)
     }
 
-    announce('lumos:waking')
     const delay = RETRY_DELAYS_MS[cfg.__retryCount]
     cfg.__retryCount += 1
     await new Promise(r => setTimeout(r, delay))

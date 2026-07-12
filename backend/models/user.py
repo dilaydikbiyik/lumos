@@ -13,8 +13,11 @@ class User(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     clerk_user_id: Mapped[str] = mapped_column(String, unique=True, index=True, nullable=False)
     email: Mapped[Optional[str]] = mapped_column(String, nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
-    updated_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
+    # DateTime(timezone=True): the defaults are timezone-aware (UTC) and
+    # asyncpg rejects aware values on naive TIMESTAMP columns — SQLite let
+    # this slide, Postgres broke EVERY user insert in production.
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 
     # Risk profile (denormalised for fast reads)
     risk_score: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
