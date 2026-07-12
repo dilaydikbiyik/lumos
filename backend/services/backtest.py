@@ -9,9 +9,9 @@ import logging
 
 import pandas as pd
 
-from backend.exceptions import MarketDataError
 from backend.services import inflation_service
 from backend.services.market_data import fetch_price_history
+from backend.services.portfolio_series import build_normalized_series
 
 logger = logging.getLogger("lumos.backtest")
 
@@ -74,14 +74,13 @@ def run_backtest(weights: dict[str, float], budget: float, period: str = "5y") -
     """
     history = fetch_price_history(list(weights), period=period)
 
-    # Align all series on common dates
-    frame = pd.DataFrame(history).dropna()
-    if frame.empty:
-        raise MarketDataError(f"No overlapping history for {list(weights)}")
-
-    normalised = frame / frame.iloc[0]  # each asset starts at 1.0
-    portfolio = sum(normalised[t] * w for t, w in weights.items() if t in normalised)
+    # Renormalized, coverage-guarded portfolio series (starts at 1.0) —
+    # prevents partial yfinance data from misrepresenting the return.
+    portfolio = build_normalized_series(history, weights)
     value_series = portfolio * budget
+
+    # Per-asset frame for character metrics (aligned on common dates)
+    frame = pd.DataFrame({t: s for t, s in history.items() if s is not None and not s.empty}).dropna()
 
     drawdown = _max_drawdown(value_series)
 

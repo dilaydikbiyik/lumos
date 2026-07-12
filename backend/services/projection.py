@@ -11,11 +11,11 @@ import logging
 from typing import Optional
 
 import numpy as np
-import pandas as pd
 
 from backend.exceptions import MarketDataError
 from backend.services import evds_service, inflation_service
 from backend.services.market_data import fetch_price_history
+from backend.services.portfolio_series import build_normalized_series
 
 logger = logging.getLogger("lumos.projection")
 
@@ -135,12 +135,9 @@ def project_portfolio(weights: dict[str, float], amount: float, years: int) -> d
     so diversification's smoothing effect shows up in the band width.
     """
     history = fetch_price_history(list(weights), period="10y")
-    frame = pd.DataFrame(history).dropna()
-    if frame.empty:
-        raise MarketDataError(f"No overlapping history for {list(weights)}")
-
-    normalised = frame / frame.iloc[0]
-    portfolio_series = sum(normalised[t] * w for t, w in weights.items() if t in normalised)
+    # Renormalized, coverage-guarded series (starts at 1.0) — partial
+    # yfinance data can no longer shrink the portfolio into a fake tiny return.
+    portfolio_series = build_normalized_series(history, weights)
     values = portfolio_series.to_numpy()
 
     window = years * TRADING_DAYS_PER_YEAR
