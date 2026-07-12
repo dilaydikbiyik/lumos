@@ -3,6 +3,7 @@ import { useEffect } from 'react'
 import { ClerkLoading, SignedIn, SignedOut, RedirectToSignIn, useAuth } from '@clerk/clerk-react'
 import AppNav from './components/AppNav'
 import PanicButton from './components/PanicButton'
+import AdvisorChat from './components/AdvisorChat'
 import { MarketProvider } from './contexts/MarketContext'
 import ErrorBoundary from './utils/errorBoundary'
 import useIllumination from './hooks/useIllumination'
@@ -87,6 +88,9 @@ export default function App() {
 
         {/* Panic Button — crisis-moment support (signed-in only) */}
         <SignedIn><PanicButton /></SignedIn>
+
+        {/* Advisor chat — always-available education Q&A (signed-in only) */}
+        <AdvisorChat />
 
         </MarketProvider>
       </BrowserRouter>

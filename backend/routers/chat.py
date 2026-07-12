@@ -64,6 +64,56 @@ async def chat_endpoint(
     return {"reply": reply}
 
 
+def _advisor_context(user) -> str:
+    """A compact 'USER CONTEXT' block so the advisor answers personally."""
+    lines = []
+    if user.risk_score is not None:
+        lines.append(f"- Risk skoru: {user.risk_score}/10")
+    if user.budget:
+        lines.append(f"- Bütçe: {user.budget:,.0f} TL")
+    if user.time_horizon:
+        lines.append(f"- Vade tercihi: {user.time_horizon}")
+    if user.goal:
+        lines.append(f"- Hedef: {user.goal}")
+    if user.experience:
+        lines.append(f"- Deneyim: {user.experience}")
+    if user.investment_path:
+        lines.append(f"- Seçtiği yol: {user.investment_path}")
+    if user.primary_fear:
+        lines.append(f"- Onboarding korkusu: {user.primary_fear}")
+    if not lines:
+        return "\n\nUSER CONTEXT: (Kullanıcı henüz risk profilini tamamlamadı.)\n"
+    return "\n\nUSER CONTEXT (bu kullanıcının gerçek profili):\n" + "\n".join(lines) + "\n"
+
+
+@router.post("/advisor", response_model=ChatResponse)
+@limiter.limit("20/minute")
+async def advisor_endpoint(
+    request: Request,
+    body: ChatRequest,
+    user_id: str = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Free-form education assistant reachable from anywhere (NOT the risk quiz)."""
+    from backend.services.ai_tiers import get_tier
+
+    user = await user_repository.get_or_create(db, user_id)
+    tier = get_tier(user.plan)
+    effective_quota = settings.DAILY_MESSAGE_QUOTA if settings.APP_ENV == "development" else tier["daily_quota"]
+    allowed = await user_repository.consume_quota(db, user_id, effective_quota)
+    if not allowed:
+        raise HTTPException(
+            status_code=429,
+            detail=(
+                f"Günlük mesaj hakkın doldu ({tier['daily_quota']}/gün) — yarın yenilenir. "
+                "Daha fazla mesaj için planını yükseltebilirsin. / Daily limit reached; resets tomorrow."
+            ),
+        )
+    messages = [m.model_dump() for m in body.messages]
+    reply = ai_chat(messages, tier=user.plan, mode="advisor", context=_advisor_context(user))
+    return {"reply": reply}
+
+
 @router.post("/extract-profile", response_model=RiskProfileAnswers)
 @limiter.limit("10/minute")
 async def extract_profile_endpoint(

@@ -152,3 +152,46 @@ def test_plans_endpoint(client):
     plans = res.json()["plans"]
     assert {p["plan"] for p in plans} == {"free", "plus", "pro"}
     assert all("model_chain" not in p for p in plans)  # internal details must not leak
+
+
+# ── Advisor chat (free-form, not the quiz) ──────────────────────────────────────
+
+def test_advisor_endpoint_uses_advisor_mode_with_context(client):
+    """The advisor route must call chat() in advisor mode with the user's context."""
+    import asyncio
+
+    from backend.main import app
+    from backend.middleware.verify_clerk import get_current_user
+    from backend.repositories import user_repository
+    from backend.routers import chat as chat_router
+    from backend.tests.conftest import _TestSession
+
+    app.dependency_overrides[get_current_user] = lambda: "user_advisor_1"
+
+    async def seed():
+        async with _TestSession() as db:
+            user = await user_repository.get_or_create(db, "user_advisor_1")
+            user.risk_score = 6.2
+            user.budget = 100000
+            user.goal = "growth"
+            await db.commit()
+
+    asyncio.run(seed())
+
+    captured = {}
+
+    def fake_chat(messages, tier=None, mode="profiling", context=""):
+        captured["mode"] = mode
+        captured["context"] = context
+        return "ETF, hazır bir sepettir."
+
+    original = chat_router.ai_chat
+    chat_router.ai_chat = fake_chat
+    try:
+        res = client.post("/chat/advisor", json={"messages": [{"role": "user", "content": "ETF nedir?"}]})
+        assert res.status_code == 200, res.text
+        assert res.json()["reply"] == "ETF, hazır bir sepettir."
+        assert captured["mode"] == "advisor"
+        assert "6.2/10" in captured["context"]  # real profile injected
+    finally:
+        chat_router.ai_chat = original

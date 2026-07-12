@@ -18,6 +18,7 @@ from backend.config import settings
 logger = logging.getLogger("lumos.ai")
 
 _SYSTEM_PROMPT = (Path(__file__).parent.parent / "prompts" / "system_prompt.txt").read_text()
+_ADVISOR_PROMPT = (Path(__file__).parent.parent / "prompts" / "advisor_prompt.txt").read_text()
 
 # Short content hash — lets logs tie a response to the exact prompt version
 PROMPT_VERSION = hashlib.sha1(_SYSTEM_PROMPT.encode()).hexdigest()[:8]
@@ -231,7 +232,12 @@ def _dispatch(
 
 # ── Public API (unchanged signatures) ─────────────────────────────────────────
 
-def chat(messages: list[dict], tier: Optional[str] = None) -> str:
+def chat(
+    messages: list[dict],
+    tier: Optional[str] = None,
+    mode: str = "profiling",
+    context: str = "",
+) -> str:
     """
     Send a conversation history to the AI provider resolved from the
     user's plan tier (None = legacy default from settings.AI_PROVIDER).
@@ -239,6 +245,10 @@ def chat(messages: list[dict], tier: Optional[str] = None) -> str:
     Args:
         messages: List of {"role": "user"|"assistant", "content": str}
         tier: plan name from ai_tiers (free/plus/pro)
+        mode: "profiling" runs the 9-question risk quiz; "advisor" is the
+              free-form education assistant reachable from anywhere.
+        context: optional "USER CONTEXT" block appended in advisor mode so
+                 answers reference the user's real profile/holdings.
 
     Returns:
         The assistant's text reply.
@@ -247,7 +257,8 @@ def chat(messages: list[dict], tier: Optional[str] = None) -> str:
     from backend.services.ai_tiers import get_tier
     from backend.services.chat_context import build_market_context
 
-    system = _SYSTEM_PROMPT + build_market_context()
+    base = _ADVISOR_PROMPT if mode == "advisor" else _SYSTEM_PROMPT
+    system = base + (context or "") + build_market_context()
 
     # Generous budget: gemini-2.5-flash spends "thinking" tokens from the same
     # pool, and the final profile summary must not be truncated before the
