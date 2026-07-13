@@ -1,6 +1,6 @@
 const CATEGORY_LABELS = {
   stocks: 'Equities', reit: 'Real Estate', fund: 'Investment Fund',
-  gold: 'Commodity', cash: 'Cash / Money Market',
+  gold: 'Commodity', bond: 'Bonds / Fixed Income', cash: 'Cash / Money Market',
 }
 
 export default function AssetCard({ allocation, onClose }) {

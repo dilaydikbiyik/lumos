@@ -416,14 +416,72 @@ select.input { cursor: pointer; }
 /* ── Safe area for notched phones ────────────────────────────────────────── */
 .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
 
+/* ── Floating action buttons (advisor + panic) ───────────────────────────────
+   Anchored on the LEFT so they never collide with a page's own bottom-right
+   send button (e.g. the risk-quiz chat input). On mobile they sit above the
+   bottom nav; on desktop they clear the left sidebar. */
+.fab {
+  position: fixed; left: 14px; z-index: 40;
+  width: 52px; height: 52px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 22px;
+}
+.fab-panic   { bottom: calc(84px + env(safe-area-inset-bottom)); }
+.fab-advisor { bottom: calc(148px + env(safe-area-inset-bottom)); }
+@media (min-width: 768px) {
+  .fab         { left: calc(var(--sidebar-w) + 16px); }
+  .fab-panic   { bottom: 20px; }
+  .fab-advisor { bottom: 84px; }
+}
+
+/* ── Advisor chat panel ──────────────────────────────────────────────────────
+   Full-screen on phones (no more "half-shown" clipped card); a floating
+   bottom-right card on wider screens. */
+.advisor-overlay {
+  position: fixed; inset: 0; z-index: 60;
+  display: flex; align-items: stretch; justify-content: stretch;
+  background: rgba(0,0,0,0.45); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+}
+.advisor-panel {
+  display: flex; flex-direction: column; overflow: hidden; padding: 0;
+  width: 100%; height: 100dvh;
+  margin: 0; border-radius: 0;
+}
+@media (min-width: 480px) {
+  .advisor-overlay { align-items: flex-end; justify-content: flex-end; padding: 14px; }
+  .advisor-panel {
+    width: min(420px, calc(100vw - 28px));
+    height: min(640px, calc(100dvh - 28px));
+    border-radius: var(--radius);
+  }
+}
+
 
 /* ══════════════════════════════════════════════════════════════════════════ */
 /* ── Light design language — firefly & illuminating UI ────────────────── */
 /* ══════════════════════════════════════════════════════════════════════════ */
 
+/* ── Illuminating UI: night → dawn as readiness (courage) grows ───────────────
+   Not just a lighter navy — a warm amber/ember light rises from the horizon,
+   the firefly's glow becoming dawn. The reward for learning, felt on-screen.
+   Cosmetic; night is the default and any failure stays on night. */
+body::after {
+  content: "";
+  position: fixed; left: 0; right: 0; bottom: 0; height: 62vh;
+  z-index: -1; pointer-events: none; opacity: 0;
+  background: radial-gradient(150% 100% at 50% 132%,
+    rgba(245,165,36,0.22) 0%, rgba(232,102,63,0.10) 42%, transparent 72%);
+  transition: opacity 1.6s ease;
+}
 body.illumination-1 { background: var(--bg-dusk); }
 body.illumination-2 { background: var(--bg-predawn); }
 body.illumination-3 { background: var(--bg-dawn); }
+body.illumination-1::after { opacity: 0.5; }
+body.illumination-2::after { opacity: 0.78; }
+body.illumination-3::after { opacity: 1; }
+@media (prefers-reduced-motion: reduce) {
+  body::after { transition: none; }
+}
 
 /* ─────────────────────────────────────────────────────────────────────────
    Lumos Wordmark — shimmer + ateş böceği uçuşu
@@ -656,23 +714,4 @@ body.illumination-3 { background: var(--bg-dawn); }
   background-size: 200% 100%;
   animation: shimmer 1.8s ease-in-out infinite;
   border-radius: var(--radius-xs);
-}
-
-
-/* Panic Button: breathing ring — 4.5s cycle (in 2s, hold 0.5s, out 2s) */
-.panic-breath {
-  width: 110px; height: 110px; border-radius: 50%;
-  background: radial-gradient(circle, var(--firefly-dim) 0%, transparent 70%);
-  border: 2px solid var(--firefly);
-  box-shadow: 0 0 30px var(--firefly-glow);
-  animation: panic-breathe 4.5s ease-in-out infinite;
-}
-@keyframes panic-breathe {
-  0%   { transform: scale(0.72); }
-  44%  { transform: scale(1.18); }
-  55%  { transform: scale(1.18); }
-  100% { transform: scale(0.72); }
-}
-@media (prefers-reduced-motion: reduce) {
-  .panic-breath { animation: none; transform: scale(1); }
 }

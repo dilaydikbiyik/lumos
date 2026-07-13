@@ -6,16 +6,22 @@ import api, { extractErrorMessage, setAuthToken } from '../utils/api'
 const GREETING = {
   role: 'assistant',
   content:
-    'Merhaba, ben Lumos 🪰\n\nAklına takılan her şeyi sorabilirsin — "ETF nedir?", ' +
-    '"altın neden portföyümde?", "risk skorum ne anlama geliyor?", "ya düşerse?" gibi. ' +
-    'Jargon yok, baskı yok.',
+    'Lumos Danışman.\n\nYatırım ve bu uygulamayla ilgili aklına takılan her şeyi ' +
+    'kendi cümlelerinle yazabilirsin — hazır sorulardan seçmek zorunda değilsin. ' +
+    'Kavramları açıklarım, portföyündeki bir kararın nedenini anlatırım, bir haberi ' +
+    'yorumlarım.\n\nTek sınır: belirli bir hisse/fon için "al" ya da "sat" demem ve ' +
+    'piyasanın yönünü tahmin etmem — bunlar kimsenin dürüstçe bilemeyeceği şeyler. ' +
+    'Bunun dışında sorabileceğin şey sınırlı değil.',
 }
 
+// Example prompts — shown only as starting points; the input is always free-form.
 const SUGGESTIONS = [
-  'ETF nedir?',
+  'ETF nedir, örnekle anlat',
   'Risk skorum ne anlama geliyor?',
-  'Şimdi almak için doğru zaman mı?',
+  'Enflasyonda param neden eriyor?',
+  'Portföyümde neden altın var?',
   'Piyasa düşerse ne yapmalıyım?',
+  'Dolar mı altın mı tutmalıyım?',
 ]
 
 /**
@@ -59,29 +65,14 @@ function AdvisorPanel({ onClose }) {
   }
 
   return (
-    <div
-      style={{
-        position: 'fixed', inset: 0, zIndex: 60,
-        display: 'flex', alignItems: 'flex-end', justifyContent: 'flex-end',
-        background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(4px)',
-      }}
-      onClick={onClose}
-    >
-      <div
-        onClick={e => e.stopPropagation()}
-        className="card"
-        style={{
-          margin: 14, width: 'min(420px, calc(100vw - 28px))',
-          height: 'min(620px, calc(100dvh - 28px))',
-          display: 'flex', flexDirection: 'column', padding: 0, overflow: 'hidden',
-        }}
-      >
+    <div className="advisor-overlay" onClick={onClose}>
+      <div onClick={e => e.stopPropagation()} className="card advisor-panel">
         {/* Header */}
         <div style={{
           display: 'flex', alignItems: 'center', gap: 8, padding: '14px 16px',
           borderBottom: '1px solid var(--border)',
         }}>
-          <span style={{ fontSize: 20 }}>🪰</span>
+          <img src="/favicon.svg" alt="" width={22} height={22} style={{ filter: 'drop-shadow(0 0 5px rgba(245,165,36,0.5))' }} />
           <div style={{ flex: 1 }}>
             <div style={{ fontWeight: 700, fontSize: 15 }}>Lumos Danışman</div>
             <div style={{ fontSize: 11, color: 'var(--text-dim)' }}>Sorularını yanıtlar — tavsiye değil, eğitim</div>
@@ -102,12 +93,17 @@ function AdvisorPanel({ onClose }) {
           )}
           {error && <p style={{ color: 'var(--red)', fontSize: 13 }}>{error}</p>}
           {messages.length === 1 && !loading && (
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 4 }}>
-              {SUGGESTIONS.map(s => (
-                <button key={s} className="btn btn-ghost" style={{ fontSize: 12 }} onClick={() => send(s)}>
-                  {s}
-                </button>
-              ))}
+            <div style={{ marginTop: 4 }}>
+              <div style={{ fontSize: 11, color: 'var(--text-dim)', marginBottom: 6 }}>
+                Örnek başlangıçlar — ya da aşağıya kendi sorunu yaz:
+              </div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                {SUGGESTIONS.map(s => (
+                  <button key={s} className="btn btn-ghost" style={{ fontSize: 12 }} onClick={() => send(s)}>
+                    {s}
+                  </button>
+                ))}
+              </div>
             </div>
           )}
           <div ref={bottomRef} />
@@ -133,14 +129,11 @@ export default function AdvisorChat() {
         <button
           onClick={() => setOpen(true)}
           aria-label="Danışmana sor"
+          className="fab fab-advisor"
           style={{
-            // Stacked above the Panic button (right:14, bottom:76) so neither
-            // collides with the desktop left sidebar.
-            position: 'fixed', right: 14, bottom: 140, zIndex: 40,
-            width: 52, height: 52, borderRadius: '50%', border: 'none', cursor: 'pointer',
+            border: 'none',
             background: 'var(--firefly, #F5A524)', color: '#1a1205', fontSize: 24,
             boxShadow: '0 4px 16px rgba(245,165,36,0.45)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}
         >
           💬

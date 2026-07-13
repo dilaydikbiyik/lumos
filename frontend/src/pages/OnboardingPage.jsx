@@ -107,7 +107,7 @@ export default function OnboardingPage() {
                 className="btn btn-primary"
                 style={{ maxWidth: 320, width: '100%', margin: '0 auto', fontSize: 16, display: 'flex' }}
               >
-                ✨ Başlayalım
+                Başlayalım
               </button>
             </SignInButton>
           </SignedOut>

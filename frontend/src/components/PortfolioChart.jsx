@@ -4,12 +4,15 @@ import { useState } from 'react'
 
 const COLORS = ['#7C6FF7', '#5B8EF0', '#3DD68C', '#F5A524', '#F5515F', '#A78BFA', '#34D399']
 
+// Pie-slice palette — gece / ateşböceği(altın) / kahve / ember / teal / mor.
+// Gold stays amber (a gold asset shown in any other colour reads wrong).
 const CATEGORY_COLORS = {
-  stocks: '#7C6FF7',
-  reit:   '#5B8EF0',
+  gold:   '#F5A524',  // ateşböceği amber
+  stocks: '#E8663F',  // ember
+  reit:   '#7A4A93',  // mor / erik
+  bond:   '#1FB2A6',  // teal
+  cash:   '#6E3E22',  // kahve (koyu — ember'den net ayrışır)
   fund:   '#3DD68C',
-  gold:   '#F5A524',
-  cash:   '#8B8CA8',
 }
 
 export default function PortfolioChart({ allocations = [], onSliceClick }) {

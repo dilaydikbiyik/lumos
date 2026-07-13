@@ -31,7 +31,7 @@ export default function PracticeMode({ allocations }) {
 
   return (
     <div className="card" style={{ border: '1px dashed var(--accent, #8b8bf5)' }}>
-      <h3 style={{ marginBottom: 4 }}>🐣 Önce Sahte Parayla Dene</h3>
+      <h3 style={{ marginBottom: 4 }}>Önce Sahte Parayla Dene</h3>
       <p style={{ fontSize: 13, opacity: 0.8, marginBottom: 12 }}>
         Gerçek para riske atmadan bu portföyü sanal 100.000 TL ile kur —
         gerçek piyasa verisiyle nasıl hareket ettiğini gör.
@@ -64,7 +64,7 @@ export default function PracticeMode({ allocations }) {
             Bu haftanın en hareketli varlığı <strong>{snapshot.biggest_mover.ticker}</strong>{' '}
             ({snapshot.biggest_mover.weekly_change_pct > 0 ? '+' : ''}{snapshot.biggest_mover.weekly_change_pct}%).
             Bu dalgalanmayı hissettin mi? Gerçek parayla da böyle olacak — fark, şimdi hiçbir şey
-            kaybetmiyor olman. 🕯️
+            kaybetmiyor olman.
           </p>
         </>
       )}

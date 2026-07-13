@@ -82,7 +82,7 @@ export default function FearCheckInPage() {
               boxShadow: '0 0 32px rgba(245,165,36,0.2)',
               animation: 'light-pulse 2s ease-in-out infinite',
             }}>
-              <span style={{ fontSize: 36 }}>💛</span>
+              <img src="/favicon.svg" alt="" width={40} height={40} style={{ filter: 'drop-shadow(0 0 10px rgba(245,165,36,0.5))' }} />
             </div>
           </div>
 

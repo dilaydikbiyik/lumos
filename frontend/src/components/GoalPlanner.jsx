@@ -68,12 +68,20 @@ export default function GoalPlanner() {
         <div style={{ marginTop: 14 }}>
           {plan.already_on_track ? (
             <p style={{ fontSize: 14, color: 'var(--green, #4ade80)' }}>
-              🎉 Mevcut birikimin hedefe kendi kendine ulaşıyor — ekstra katkı gerekmiyor.
+              Mevcut birikimin hedefe kendi kendine ulaşıyor — ekstra katkı gerekmiyor.
             </p>
           ) : (
             <p style={{ fontSize: 14 }}>
               Hedefe zamanında ulaşmak için ayda yaklaşık{' '}
               <strong style={{ fontSize: 17 }}>{money(plan.monthly_contribution)}</strong> biriktirmelisin.
+            </p>
+          )}
+
+          {plan.target_real_value != null && (
+            <p style={{ fontSize: 12, opacity: 0.7, marginTop: 8, lineHeight: 1.5 }}>
+              ℹ️ %{plan.annual_inflation_pct} enflasyon varsayımıyla, {money(Number(form.target_amount))} hedefin
+              o gün bugünün parasıyla ≈ <strong>{money(plan.target_real_value)}</strong> değerinde olacak.
+              Sabit bir TL hedefi zamanla alım gücü kaybeder — hedefi buna göre gözden geçirmek isteyebilirsin.
             </p>
           )}
 

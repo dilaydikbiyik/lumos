@@ -9,9 +9,9 @@ import useMarket from '../hooks/useMarket'
 
 // Risk score → user-friendly label and colour
 const RISK_META = {
-  low:    { emoji: '🌿', color: 'var(--green)',   label: 'Muhafazakâr'  },
-  medium: { emoji: '⚖️', color: 'var(--firefly)', label: 'Dengeli'      },
-  high:   { emoji: '🚀', color: 'var(--accent)',  label: 'Atılgan'      },
+  low:    { color: 'var(--green)',   label: 'Muhafazakâr'  },
+  medium: { color: 'var(--firefly)', label: 'Dengeli'      },
+  high:   { color: 'var(--accent)',  label: 'Atılgan'      },
 }
 
 function getRiskMeta(score) {
@@ -67,7 +67,7 @@ export default function ProfilePage() {
               }}>
                 Adım 3 / 3
               </p>
-              <h2>Seni Tanıyalım 👋</h2>
+              <h2>Seni Tanıyalım</h2>
               <p style={{ fontSize: 13, marginTop: 6 }}>
                 9 kısa soru — yapay zeka profilini çıkaracak, portföyünü buna göre kişiselleştirecek.
               </p>
@@ -79,9 +79,7 @@ export default function ProfilePage() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             {/* Success header */}
             <div style={{ textAlign: 'center', padding: '12px 0' }}>
-              <div style={{ fontSize: 40, marginBottom: 10 }}>
-                {getRiskMeta(riskResult.risk_score).emoji}
-              </div>
+              <img src="/favicon.svg" alt="" width={44} height={44} style={{ display: 'block', margin: '0 auto 10px', filter: 'drop-shadow(0 0 12px rgba(245,165,36,0.4))' }} />
               <h2>Risk Profilin Hazır</h2>
               <p style={{ fontSize: 13, marginTop: 6 }}>
                 Cevapların analiz edildi — sana özel portföy hesaplanıyor.
@@ -108,22 +106,28 @@ export default function ProfilePage() {
               <p style={{ fontSize: 14, lineHeight: 1.75, color: 'var(--text)' }}>
                 {riskResult.summary}
               </p>
-              {/* Concretised risk message — shown with the user's own budget */}
-              {riskResult.answers?.budget && (
-                <div style={{
-                  marginTop: 12, padding: '10px 14px',
-                  background: 'var(--firefly-dim)', borderRadius: 'var(--radius-xs)',
-                  fontSize: 13, lineHeight: 1.6, color: 'var(--text)',
-                }}>
-                  💡 Senin bütçen <strong>
-                    {money(riskResult.answers.budget)}
-                  </strong>. En kötü senaryoda portföyün geçici olarak{' '}
-                  <strong>
-                    {money(riskResult.answers.budget * 0.8)}
-                  </strong>'ye düşebilir.
-                  Bu normal bir dalgalanma — satmadığın sürece zarar kesinleşmez.
-                </div>
-              )}
+              {/* Concretised risk message — the worst-case drawdown scales with
+                  the risk score, so an aggressive profile is shown an honestly
+                  larger potential fall (not a flat -20% for everyone). */}
+              {riskResult.answers?.budget && (() => {
+                // ~ -15% conservative → ~ -45% aggressive; historically grounded
+                const dropPct = Math.round(10 + riskResult.risk_score * 3.8)
+                const worst = riskResult.answers.budget * (1 - dropPct / 100)
+                return (
+                  <div style={{
+                    marginTop: 12, padding: '10px 14px',
+                    background: 'var(--firefly-dim)', borderRadius: 'var(--radius-xs)',
+                    fontSize: 13, lineHeight: 1.6, color: 'var(--text)',
+                  }}>
+                    💡 Senin bütçen <strong>{money(riskResult.answers.budget)}</strong>.
+                    Bu risk seviyesinde, sert bir düşüşte portföyün geçici olarak
+                    yaklaşık <strong>%{dropPct}</strong> gerileyip{' '}
+                    <strong>{money(worst)}</strong>'ye inebilir.
+                    Bu, bu profil için normal bir dalgalanma aralığı — satmadığın sürece
+                    zarar kesinleşmez.
+                  </div>
+                )
+              })()}
             </div>
 
             {/* Score breakdown — no black box: the source of every point */}
@@ -161,7 +165,7 @@ export default function ProfilePage() {
               className="btn btn-primary btn-full"
               onClick={() => navigate('/recommend', { state: riskResult })}
             >
-              Portföyümü Gör ✨
+              Portföyümü Gör
             </button>
             <button
               className="btn btn-ghost btn-full"

@@ -38,7 +38,7 @@ function AuthBridge() {
 function AuthPending() {
   return (
     <div className="page" style={{ alignItems: 'center', justifyContent: 'center', minHeight: '100dvh' }}>
-      <img src="/logo-icon.svg" alt="" width={40} height={40} className="firefly-mark" />
+      <img src="/favicon.svg" alt="" width={40} height={40} className="firefly-mark" />
       <p style={{ marginTop: 14, fontSize: 13, color: 'var(--text-muted)' }}>
         Giriş sayfasına yönlendiriliyorsun…
       </p>

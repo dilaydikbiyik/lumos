@@ -53,7 +53,7 @@ export default function ReadinessScore() {
           <strong style={{ fontSize: 14 }}>Cesaret Skoru</strong>
           <p style={{ fontSize: 12, opacity: 0.7, margin: 0 }}>
             {ready_for_real_investing
-              ? 'Gerçek yatırıma hazırsın 🎉'
+              ? 'Gerçek yatırıma hazırsın'
               : 'Her adım seni biraz daha hazırlıyor'}
           </p>
         </div>

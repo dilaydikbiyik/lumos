@@ -10,25 +10,25 @@ const SCENARIOS = [
     id: 'headline-crash',
     headline: '📰 "BORSA ÇAKILDI"',
     reality: 'BIST 100 büyük ihtimalle %2–4 düştü. Tarihsel olarak bu düşüşler 3–6 ayda telafi edilir. "Çakılmak" manşet için cazip, yatırımcı için norm.',
-    action: '👉 Sakin kal. Bugün satmak, kaybı gerçeğe dönüştürür.',
+    action: 'Sakin kal. Bugün satmak, kaybı gerçeğe dönüştürür.',
   },
   {
     id: 'headline-crash-global',
     headline: '📰 "KRİZ GELİYOR"',
     reality: 'Kriz öngörüleri medyada sürekli var — çoğu gerçekleşmez. Gerçekleşen krizlerin %80\'i de 2–5 yılda portföyleri eski seviyeye getirdi.',
-    action: '👉 Panikle değil, çeşitlendirmeyle hazırlan.',
+    action: 'Panikle değil, çeşitlendirmeyle hazırlan.',
   },
   {
     id: 'headline-gold',
     headline: '📰 "ALTIN REKORA KOŞTU"',
     reality: 'Altın yükselince genellikle belirsizlik var demektir. Bu, diğer varlıklarının değersizleştiği anlamına gelmez — her varlık farklı koşulda parlar.',
-    action: '👉 Tek varlığa bağlı kalmak risklidir. Denge önemli.',
+    action: 'Tek varlığa bağlı kalmak risklidir. Denge önemli.',
   },
   {
     id: 'headline-dolar',
     headline: '📰 "DOLAR PATLIYOR"',
     reality: 'TL değer kaybedince döviz bazlı varlıkların TL karşılığı yükselir. Portföyünde SPY veya GLD varsa bu manşet seni koruyabilir.',
-    action: '👉 Kur riski için portföyde döviz bazlı varlık tut.',
+    action: 'Kur riski için portföyde döviz bazlı varlık tut.',
   },
 ]
 

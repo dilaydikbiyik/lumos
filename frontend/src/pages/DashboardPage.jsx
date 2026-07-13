@@ -216,7 +216,7 @@ export default function DashboardPage() {
               animation: 'pulse 3s ease-in-out infinite',
             }} />
             <div style={{ position: 'relative', zIndex: 1 }}>
-              <div style={{ fontSize: 36, marginBottom: 12, filter: 'drop-shadow(0 0 12px rgba(245,165,36,0.4))' }}>🪲</div>
+              <img src="/favicon.svg" alt="" width={48} height={48} style={{ display: 'block', margin: '0 auto 12px', filter: 'drop-shadow(0 0 12px rgba(245,165,36,0.4))' }} />
               <p style={{ fontSize: 15, fontWeight: 600, marginBottom: 6 }}>Yolculuğun burada başlıyor</p>
               <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 20 }}>
                 Seni tanıyalım, korkularını dinleyelim ve sana özel bir portföy oluşturalım.
@@ -252,11 +252,11 @@ export default function DashboardPage() {
               <PortfolioChart allocations={portfolio.allocations} />
             ) : (
               <div className="card" style={{ textAlign: 'center', padding: '32px 24px' }}>
-                <div style={{ fontSize: 28, marginBottom: 10, filter: 'drop-shadow(0 0 8px rgba(245,165,36,0.3))' }}>✨</div>
+                <img src="/favicon.svg" alt="" width={40} height={40} style={{ display: 'block', margin: '0 auto 10px', filter: 'drop-shadow(0 0 8px rgba(245,165,36,0.3))' }} />
                 <p style={{ fontSize: 14, marginBottom: 6 }}>Profilin hazır, sıra portföyde!</p>
                 <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 18 }}>Senin risk profiline uygun bir portföy oluşturalım.</p>
                 <button className="btn btn-primary" onClick={handleRerun}>
-                  Portföyümü Oluştur ✨
+                  Portföyümü Oluştur
                 </button>
               </div>
             )}

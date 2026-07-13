@@ -141,63 +141,119 @@ function ProvinceCard({ province, amount }) {
 }
 
 function RentVsBuy() {
-  const [form, setForm] = useState({ down_payment: '', monthly_rent: '', years: 10 })
+  const [form, setForm] = useState({ down_payment: '', monthly_rent: '', home_price: '', years: 10 })
   const [result, setResult] = useState(null)
   const [error, setError] = useState(null)
+  const [loading, setLoading] = useState(false)
 
   async function run(e) {
     e.preventDefault()
     setError(null)
+    setLoading(true)
     try {
       const res = await api.post('/planning/rent-vs-buy', {
         down_payment: Number(form.down_payment),
         monthly_rent: Number(form.monthly_rent),
         years: Number(form.years),
+        ...(form.home_price ? { home_price: Number(form.home_price) } : {}),
       })
       setResult(res.data)
     } catch (err) {
       setError(extractErrorMessage(err, 'Hesaplanamadı'))
+    } finally {
+      setLoading(false)
     }
   }
+
+  const buyWins = result?.verdict === 'buy'
 
   return (
     <div className="card">
       <h3 style={{ marginBottom: 4 }}>🏠 Kirada mı otur, ev mi al?</h3>
       <p style={{ fontSize: 13, opacity: 0.8, marginBottom: 12 }}>
-        İki senaryoyu dürüstçe yan yana koyarız — ev almak her zaman kazanç değildir.
+        Aynı evi iki senaryoda karşılaştırırız: peşinat + kredi ile satın almak, ya da
+        kirada kalıp farkı yatırmak. Ev almak her zaman kazanç değildir.
       </p>
       <form onSubmit={run} style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
         <input className="input" type="number" placeholder="Peşinat / birikimin (TL)" required min="1"
                value={form.down_payment} onChange={e => setForm({ ...form, down_payment: e.target.value })} />
         <input className="input" type="number" placeholder="Şu anki aylık kiran (TL)" required min="1"
                value={form.monthly_rent} onChange={e => setForm({ ...form, monthly_rent: e.target.value })} />
+        <input className="input" type="number" placeholder="Evin fiyatı (opsiyonel — boşsa kiradan tahmin edilir)" min="1"
+               value={form.home_price} onChange={e => setForm({ ...form, home_price: e.target.value })} />
         <select className="input" value={form.years} onChange={e => setForm({ ...form, years: e.target.value })}>
           {[5, 10, 20].map(y => <option key={y} value={y}>{y} yıllık projeksiyon</option>)}
         </select>
-        <button className="btn btn-primary" type="submit">Karşılaştır</button>
+        <button className="btn btn-primary" type="submit" disabled={loading}>
+          {loading ? 'Hesaplanıyor…' : 'Karşılaştır'}
+        </button>
       </form>
 
       {result && (
-        <div style={{ marginTop: 14, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-          <div style={{ padding: 12, borderRadius: 10, border: '1px solid var(--border)' }}>
-            <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 6 }}>🏠 Ev alırsan</div>
-            <div style={{ fontSize: 12, opacity: 0.75 }}>Evin tahmini değeri</div>
-            <div style={{ fontSize: 17, fontWeight: 700 }}>{fmt(result.buy.property_value)} TL</div>
-            <div style={{ fontSize: 12, opacity: 0.75, marginTop: 6 }}>Kira ödemezsin</div>
+        <div style={{ marginTop: 14 }}>
+          {/* Consistency line — the same home under both scenarios */}
+          <div style={{ fontSize: 12, opacity: 0.8, marginBottom: 10, lineHeight: 1.5 }}>
+            Karşılaştırılan ev: <strong>{fmt(result.home_price)} TL</strong>
+            {result.home_price_estimated && ' (kiradan tahmin edildi)'} · aylık kredi taksiti
+            ≈ <strong>{fmt(result.monthly_mortgage)} TL</strong>
           </div>
-          <div style={{ padding: 12, borderRadius: 10, border: '1px solid var(--border)' }}>
-            <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 6 }}>📊 Kirada kalırsan</div>
-            <div style={{ fontSize: 12, opacity: 0.75 }}>Portföyün + ödenen kira sonrası net</div>
-            <div style={{ fontSize: 17, fontWeight: 700 }}>{fmt(result.rent.net_position)} TL</div>
-            <div style={{ fontSize: 12, opacity: 0.75, marginTop: 6 }}>
-              (Ödenen kira: {fmt(result.rent.total_rent_paid)} TL)
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+            <div style={{
+              padding: 12, borderRadius: 10,
+              border: `1px solid ${buyWins ? 'var(--firefly)' : 'var(--border)'}`,
+              background: buyWins ? 'var(--firefly-dim)' : 'transparent',
+            }}>
+              <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 6 }}>
+                🏠 Ev alırsan {buyWins && '✓'}
+              </div>
+              <div style={{ fontSize: 12, opacity: 0.75 }}>{result.years} yıl sonra net servetin</div>
+              <div style={{ fontSize: 17, fontWeight: 700 }}>{fmt(result.buy.net_worth)} TL</div>
+              <div style={{ fontSize: 11, opacity: 0.6, marginTop: 2 }}>
+                bugünkü alım gücüyle ≈ {fmt(result.buy.net_worth_real)} TL
+              </div>
+              <div style={{ fontSize: 12, opacity: 0.7, marginTop: 6, lineHeight: 1.5 }}>
+                Ev değeri {fmt(result.buy.home_value)} − kalan kredi {fmt(result.buy.remaining_loan)}
+              </div>
+            </div>
+            <div style={{
+              padding: 12, borderRadius: 10,
+              border: `1px solid ${!buyWins ? 'var(--firefly)' : 'var(--border)'}`,
+              background: !buyWins ? 'var(--firefly-dim)' : 'transparent',
+            }}>
+              <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 6 }}>
+                📊 Kirada kalırsan {!buyWins && '✓'}
+              </div>
+              <div style={{ fontSize: 12, opacity: 0.75 }}>{result.years} yıl sonra net servetin</div>
+              <div style={{ fontSize: 17, fontWeight: 700 }}>{fmt(result.rent.net_worth)} TL</div>
+              <div style={{ fontSize: 11, opacity: 0.6, marginTop: 2 }}>
+                bugünkü alım gücüyle ≈ {fmt(result.rent.net_worth_real)} TL
+              </div>
+              <div style={{ fontSize: 12, opacity: 0.7, marginTop: 6, lineHeight: 1.5 }}>
+                Peşinat + fark yatırımda · ödenen kira {fmt(result.rent.total_rent_paid)} TL
+              </div>
             </div>
           </div>
-          <p style={{ gridColumn: '1 / -1', fontSize: 12, opacity: 0.65, lineHeight: 1.5 }}>
-            Varsayımlar: konut yıllık %{result.assumptions.housing_annual_growth_pct},
-            portföy yıllık %{result.assumptions.portfolio_annual_growth_pct} büyüme.
-            Ev sahibi olma güvencesinin parasal olmayan değeri bu hesapta yok — o kararın duygusal
-            tarafı da meşrudur.
+
+          <div style={{
+            marginTop: 12, padding: '10px 14px', borderRadius: 'var(--radius-xs)',
+            background: 'var(--bg-input)', fontSize: 13, lineHeight: 1.6,
+          }}>
+            {buyWins
+              ? <>Bu varsayımlarla <strong>satın almak</strong> yaklaşık{' '}
+                  <strong>{fmt(result.difference)} TL</strong> daha avantajlı görünüyor.</>
+              : <>Bu varsayımlarla <strong>kirada kalıp yatırım yapmak</strong> yaklaşık{' '}
+                  <strong>{fmt(result.difference)} TL</strong> daha avantajlı görünüyor.</>}
+          </div>
+
+          <p style={{ fontSize: 12, opacity: 0.6, lineHeight: 1.5, marginTop: 10 }}>
+            Varsayımlar: konut +%{result.assumptions.housing_annual_growth_pct}/yıl,
+            portföy +%{result.assumptions.portfolio_annual_growth_pct}/yıl,
+            kredi %{result.assumptions.mortgage_annual_rate_pct}/yıl ({result.assumptions.mortgage_term_years} yıl vade),
+            enflasyon %{result.assumptions.annual_inflation_pct}/yıl.
+            Büyük TL rakamları çoğunlukla enflasyondan şişer; “bugünkü alım gücü” satırı gerçek
+            değeri gösterir. Vergi, aidat, tapu ve bakım masrafları ile ev sahibi olmanın parasal
+            olmayan değeri bu hesaba dahil değildir — o kararın duygusal tarafı da meşrudur.
           </p>
         </div>
       )}

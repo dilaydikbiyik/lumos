@@ -28,7 +28,7 @@ export default function LumosLogo({ size = 22, hero = false }) {
     >
       {/* Firefly icon — transparent SVG, no background */}
       <img
-        src="/logo-icon.svg"
+        src="/favicon.svg"
         alt=""
         width={size * 1.4}
         height={size * 1.4}

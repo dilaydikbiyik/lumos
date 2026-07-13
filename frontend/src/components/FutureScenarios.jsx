@@ -62,7 +62,7 @@ export default function FutureScenarios({ allocations, budget }) {
 
   return (
     <div className="card">
-      <h3 style={{ marginBottom: 4 }}>🔮 Gelecek Senaryoları</h3>
+      <h3 style={{ marginBottom: 4 }}>Gelecek Senaryoları</h3>
       <p style={{ fontSize: 13, opacity: 0.8, marginBottom: 12 }}>
         "Param {years} yılda ne olur?" — <IsikTut term="volatilite">tahmin değil</IsikTut>,
         varlığın kendi geçmişinde yaşanmış tüm {years} yıllık dönemlerin aralığı.

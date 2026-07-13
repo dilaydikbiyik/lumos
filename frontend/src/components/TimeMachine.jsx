@@ -33,7 +33,7 @@ export default function TimeMachine({ allocations, budget }) {
 
   return (
     <div className="card">
-      <h3 style={{ marginBottom: 4 }}>🕰️ Zaman Makinesi</h3>
+      <h3 style={{ marginBottom: 4 }}>Zaman Makinesi</h3>
       <p style={{ fontSize: 13, marginBottom: 12, opacity: 0.8 }}>
         Bu portföyü geçmişte kursaydın ne olurdu? Sadece kazancı değil,
         en kötü anı da gösteririz — <IsikTut term="drawdown">dibi görmek</IsikTut> cesaretin gerçek testi.

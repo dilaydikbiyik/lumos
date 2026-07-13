@@ -1,0 +1,38 @@
+<!-- Lumos app icon — the brand firefly on a night ground. Full-bleed so OS
+     maskable cropping is safe; the firefly sits in the centre ~40% (safe zone).
+     Same mark as favicon.svg / the entry logo, just on a dark square. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <defs>
+    <radialGradient id="ai-bg" cx="50%" cy="16%" r="90%">
+      <stop offset="0%" stop-color="#191A2C"/>
+      <stop offset="62%" stop-color="#0A0B12"/>
+      <stop offset="100%" stop-color="#07070E"/>
+    </radialGradient>
+    <linearGradient id="ai-body" x1="256" y1="150" x2="256" y2="360" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FFB300"/>
+      <stop offset="45%" stop-color="#FF8C00"/>
+      <stop offset="100%" stop-color="#E64A00"/>
+    </linearGradient>
+    <filter id="ai-glow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="5" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="ai-wglow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="2.2" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <rect width="512" height="512" fill="url(#ai-bg)"/>
+
+  <!-- firefly (favicon mark) — 120-unit viewBox at ~64% of the icon, centred -->
+  <g transform="translate(92,92) scale(2.73)">
+    <path d="M60 52 C50 38, 24 32, 26 52 C27 62, 42 70, 56 66" stroke="#D8B457" stroke-width="2" stroke-linecap="round" fill="none" filter="url(#ai-wglow)" opacity="0.9"/>
+    <path d="M60 58 C54 46, 34 40, 34 56 C34 64, 44 69, 56 67" stroke="#D8B457" stroke-width="1.3" stroke-linecap="round" fill="none" opacity="0.55"/>
+    <path d="M60 52 C70 38, 96 32, 94 52 C93 62, 78 70, 64 66" stroke="#D8B457" stroke-width="2" stroke-linecap="round" fill="none" filter="url(#ai-wglow)" opacity="0.9"/>
+    <path d="M60 58 C66 46, 86 40, 86 56 C86 64, 76 69, 64 67" stroke="#D8B457" stroke-width="1.3" stroke-linecap="round" fill="none" opacity="0.55"/>
+    <path d="M60 28 C60 28, 64 38, 64 54 C64 68, 62 80, 60 88 C58 80, 56 68, 56 54 C56 38, 60 28, 60 28 Z" fill="url(#ai-body)" filter="url(#ai-glow)"/>
+    <circle cx="60" cy="27" r="5.2" fill="#FFD740" filter="url(#ai-glow)"/>
+    <circle cx="60" cy="60" r="3.3" fill="#ffffff" opacity="0.95" filter="url(#ai-glow)"/>
+  </g>
+</svg>

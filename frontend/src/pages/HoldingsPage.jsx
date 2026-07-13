@@ -23,8 +23,8 @@ const EMOTIONS = [
   { value: '', label: 'Bu kararı ne verdirdi? (ops.)' },
   { value: 'plan', label: '📋 Planımın parçası' },
   { value: 'fomo', label: '🔥 Kaçırma korkusu (FOMO)' },
-  { value: 'tuyo', label: '🗣️ Tüyo / tavsiye' },
-  { value: 'panik', label: '😰 Panik / acele' },
+  { value: 'tuyo', label: 'Tüyo / tavsiye' },
+  { value: 'panik', label: 'Panik / acele' },
 ]
 
 export default function HoldingsPage() {
@@ -217,10 +217,10 @@ export default function HoldingsPage() {
                 animation: 'pulse 3s ease-in-out infinite',
               }} />
               <div style={{ position: 'relative', zIndex: 1 }}>
-                <div style={{
-                  fontSize: 36, marginBottom: 10,
+                <img src="/favicon.svg" alt="" width={46} height={46} style={{
+                  display: 'block', margin: '0 auto 10px',
                   filter: 'drop-shadow(0 0 12px rgba(245,165,36,0.35))',
-                }}>🪲</div>
+                }} />
                 <p style={{ fontSize: 14, fontWeight: 600, marginBottom: 4 }}>
                   Henüz varlığın yok
                 </p>

@@ -3,37 +3,35 @@ import { useAuth } from '@clerk/clerk-react'
 import api, { setAuthToken } from '../utils/api'
 
 /**
- * Panic Button 🫨 — a real button to press when the market gets scary.
- * No finance app has one; the crisis-moment form of the "fear = data" vision.
+ * Panic Button — press it when a market drop makes you want to sell everything.
+ * Purpose is behavioural, not decorative: a deliberate pause before an
+ * irreversible decision. Panic-selling into a fall is the single most common
+ * and most expensive mistake retail investors make.
  *
- * 3 stages: breathing exercise → profile-based coach message + honest
- * facts → a "the decision is yours" close. No dark patterns: we never
- * block selling.
+ * 3 stages: a short forced pause → profile-based facts → an honest
+ * "the decision is yours" close. No dark patterns: we never block selling.
  */
 export default function PanicButton() {
   const { getToken } = useAuth()
   const [open, setOpen] = useState(false)
-  const [stage, setStage] = useState('breathe')     // breathe | coach | done
+  const [stage, setStage] = useState('pause')     // pause | coach | done
   const [coach, setCoach] = useState(null)
   const [closing, setClosing] = useState(null)
-  const [breathCount, setBreathCount] = useState(0)
+  const [secondsLeft, setSecondsLeft] = useState(10)
 
-  // Breathing stage: 3 breaths (~4.5s each), then move to the coach stage.
-  // All setStates live in the timeout callback — never synchronous in the
-  // effect body.
+  // Pause stage: a 10-second countdown before the facts appear. The wait is
+  // the point — it breaks the reflex to act instantly. Skippable.
   useEffect(() => {
-    if (!open || stage !== 'breathe') return
-    const t = setTimeout(() => {
-      if (breathCount + 1 >= 3) setStage('coach')
-      else setBreathCount(breathCount + 1)
-    }, 4500)
+    if (!open || stage !== 'pause') return
+    if (secondsLeft <= 0) { setStage('coach'); return }
+    const t = setTimeout(() => setSecondsLeft(secondsLeft - 1), 1000)
     return () => clearTimeout(t)
-  }, [open, stage, breathCount])
+  }, [open, stage, secondsLeft])
 
   async function press() {
     setOpen(true)
-    setStage('breathe')
-    setBreathCount(0)
+    setStage('pause')
+    setSecondsLeft(10)
     setClosing(null)
     try {
       setAuthToken(await getToken())
@@ -41,8 +39,8 @@ export default function PanicButton() {
       setCoach(res.data)
     } catch {
       setCoach({
-        message: 'Derin bir nefes al. Şu an hiçbir şey yapmak zorunda değilsin.',
-        facts: ['Bu ekranı kapattıktan sonra hiçbir şey yapmaman da tamamen geçerli bir karardır.'],
+        message: 'Acele bir karar vermek zorunda değilsin. Bir düşüş, ancak sattığında kesinleşir.',
+        facts: ['Bu ekranı kapatıp hiçbir şey yapmamak da geçerli bir karardır.'],
       })
     }
   }
@@ -52,23 +50,21 @@ export default function PanicButton() {
       const res = await api.post('/coach/panic', { resolution: choice })
       setClosing(res.data.message)
     } catch {
-      setClosing('Yanındayız. Acele bir karar vermek zorunda değilsin.')
+      setClosing('Karar senin. Acele etmene gerek yok — rakamlar yerinde duruyor.')
     }
     setStage('done')
   }
 
   return (
     <>
-      {/* Floating panic button — above the bottom nav */}
+      {/* Floating panic button — left side, above the bottom nav */}
       <button
         onClick={press}
         aria-label="Panik anı desteği"
+        className="fab fab-panic"
         style={{
-          position: 'fixed', right: 14, bottom: 76, zIndex: 40,
-          width: 52, height: 52, borderRadius: '50%',
           background: 'var(--bg-card)', border: '1px solid var(--firefly-dim)',
           boxShadow: '0 4px 18px rgba(245,165,36,0.18)',
-          fontSize: 22, cursor: 'pointer',
         }}
       >
         🫨
@@ -85,25 +81,36 @@ export default function PanicButton() {
             justifyContent: 'center', padding: 24, textAlign: 'center',
           }}
         >
-          {stage === 'breathe' && (
+          {stage === 'pause' && (
             <>
-              <div className="panic-breath" aria-hidden="true" />
-              <p style={{ fontSize: 17, fontWeight: 600, marginTop: 28 }}>
-                Önce birlikte nefes alalım
+              <div style={{
+                fontSize: 44, fontWeight: 700, fontVariantNumeric: 'tabular-nums',
+                color: 'var(--firefly)',
+              }}>
+                {secondsLeft}
+              </div>
+              <p style={{ fontSize: 17, fontWeight: 600, marginTop: 18 }}>
+                Karar vermeden önce dur
               </p>
-              <p style={{ fontSize: 14, opacity: 0.75, marginTop: 6 }}>
-                Halka büyürken al, küçülürken ver · {3 - breathCount} nefes kaldı
+              <p style={{ fontSize: 14, opacity: 0.75, marginTop: 8, maxWidth: 360, lineHeight: 1.6 }}>
+                Düşüşte acele satış, yatırımcıların en sık yaptığı ve en pahalıya mal olan hatadır.
+                Birkaç saniye sonra elindeki gerçek rakamları göstereceğim.
               </p>
               <button className="btn btn-ghost" style={{ marginTop: 24, fontSize: 13 }}
                       onClick={() => setStage('coach')}>
-                Atla →
+                Rakamları şimdi göster →
               </button>
             </>
           )}
 
           {stage === 'coach' && coach && (
             <div style={{ maxWidth: 460 }}>
-              <div style={{ fontSize: 30, marginBottom: 14 }}>🕯️</div>
+              <p style={{
+                fontSize: 12, fontWeight: 700, letterSpacing: '0.08em',
+                textTransform: 'uppercase', color: 'var(--firefly)', marginBottom: 14,
+              }}>
+                Senin durumun
+              </p>
               <p style={{ fontSize: 15, lineHeight: 1.7, marginBottom: 18 }}>{coach.message}</p>
               <div style={{ textAlign: 'left', display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 22 }}>
                 {coach.facts?.map((f, i) => (
@@ -115,7 +122,7 @@ export default function PanicButton() {
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 <button className="btn btn-primary btn-full" onClick={() => resolve('held')}>
-                  Sakinleştim — planımdayım
+                  Planıma sadık kalıyorum
                 </button>
                 <button className="btn btn-ghost btn-full" onClick={() => resolve('still_worried')}>
                   Hâlâ endişeliyim
@@ -126,7 +133,6 @@ export default function PanicButton() {
 
           {stage === 'done' && (
             <div style={{ maxWidth: 420 }}>
-              <div style={{ fontSize: 30, marginBottom: 14 }}>🪰✨</div>
               <p style={{ fontSize: 15, lineHeight: 1.7, marginBottom: 22 }}>{closing}</p>
               <button className="btn btn-primary" onClick={() => setOpen(false)}>
                 Kapat

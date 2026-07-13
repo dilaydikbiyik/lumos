@@ -40,7 +40,7 @@ export default function WhatIfAssistant({ riskScore, budget }) {
 
   return (
     <div className="card">
-      <h3 style={{ marginBottom: 4 }}>💭 Ne olurdu?</h3>
+      <h3 style={{ marginBottom: 4 }}>Ne olurdu?</h3>
       <p style={{ fontSize: 13, opacity: 0.8, marginBottom: 12 }}>
         Portföyünle ilgili "ya şöyle olsaydı" sorularını sor — cevap gerçek
         hesaplamadan gelir, tahmin değil.

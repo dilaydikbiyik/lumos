@@ -60,7 +60,7 @@ export default function RecommendPage() {
         {/* Header */}
         <div>
           <h2 style={{ marginBottom: 6 }}>
-            <span className="gradient-text">Portföyün Hazır</span> 🎉
+            <span className="gradient-text">Portföyün Hazır</span>
           </h2>
           <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
             <span className="badge badge-amber">Risk {portfolio.risk_score}/10</span>
