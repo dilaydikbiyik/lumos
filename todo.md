@@ -884,3 +884,26 @@ lumos/                          ← project root
 | 8 | Differentiating Features | 20+ | `[/]` Backtest + TCMB + news ✅ · Asset card pending |
 | 8.5 | Globalization (Market Packs) | 20+ | `[/]` Packs + tiers + market layer ✅ · i18n & adapters post-deploy |
 | 9 | Brand & Original UI Identity | 20+ | `[/]` Logo + palette + font ✅ · Animations ongoing |
+
+---
+
+## 🛠️ Session Log — 2026-07-13 (realism + reliability + brand pass)
+
+**AI reliability — quota wall removed (root fix):**
+- Free tier now uses a **cross-provider failover chain** (`ai_tiers.py` `provider_chain`): Gemini → Groq → OpenRouter `:free`. Each is an independent free tier, so the three rarely run dry at once. `_dispatch` walks the chain; only when ALL providers are spent does the user see a 503. Covers chat, advisor, `extract_profile` (the risk-quiz final step that used to fail), and explainers.
+- New OpenAI-compatible adapter (`_openai_compatible_chat`) for Groq + OpenRouter via httpx. New env: `GROQ_API_KEY`, `OPENROUTER_API_KEY`.
+- NOTE: no auto-key-farming (Google ToS ban risk). Anthropic has no usable free access — never route the free path to it.
+
+**Financial realism / consistency:**
+- `rent_vs_buy.py` rewritten — same home under both strategies, real mortgage + equal monthly outflow (fixed the "249 TL house" bug). Optional `home_price`, else estimated from rent.
+- `portfolio_engine.py` v4 — glide-path with a risk-sized **defensive sleeve** (cash + bonds). Conservative ≈ 55% defensive, aggressive ≈ 0%; per-position cap 45%; every weight explainable. Fixes "risk score barely changes allocation".
+- `assumptions.py` (single source) — inflation read **live from TCMB CPI** (`inflation_service.trailing_annual_inflation_pct`); housing/portfolio/rent as real spreads over it. Goal planner + rent-vs-buy show REAL (inflation-adjusted) figures. ProfilePage worst-case drawdown now scales with risk score.
+
+**Brand / professional UI:**
+- Removed childish emoji app-wide (🪲🪰🎉🚀🐣😰🔮💭 …); brand firefly used in empty/success states; informational icons kept.
+- Panic button de-flowered (10s "pause before an irreversible decision", no breathing/hearts). Advisor greeting clarified (free-form). FABs moved left (no collision with quiz send). Advisor panel full-screen on mobile.
+- Night→dawn **illumination** enhanced: warm amber horizon glow rising with readiness score.
+- **PWA icon fixed** — was pointing at a screenshot. New `app-icon.svg` + `apple-touch-icon.png` / `icon-192/512.png` (brand firefly on night, rasterised pure-Python), wired into `manifest.webmanifest` + `index.html`.
+- Portfolio pie palette: gece / ateşböceği(altın) / kahve / ember / teal / mor (GYO=mor dominant).
+
+**Still open:** verify UI visually via `npm run dev`; add `OPENROUTER_API_KEY` (+ `GROQ_API_KEY`) to Render env; tune `assumptions` inflation/spreads if desired; consider paid-tier routing to a frontier model for the advisor.
