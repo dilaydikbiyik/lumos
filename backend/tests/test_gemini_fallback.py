@@ -13,7 +13,11 @@ from fastapi import HTTPException
 from google.genai import errors as genai_errors
 
 from backend.config import settings
-from backend.services.ai_service import GEMINI_MODEL_CHAIN, _gemini_chat
+from backend.services.ai_service import (
+    GEMINI_MODEL_CHAIN,
+    _ProviderUnavailable,
+    _gemini_chat,
+)
 
 MSGS = [{"role": "user", "content": "merhaba"}]
 
@@ -74,14 +78,14 @@ def test_overload_503_falls_back_too(genai_client):
     assert client.models.generate_content.call_count == 3
 
 
-def test_chain_exhausted_gives_honest_quota_message(genai_client):
+def test_chain_exhausted_signals_provider_unavailable(genai_client):
+    # When every Gemini model is spent, the adapter no longer errors the user —
+    # it raises _ProviderUnavailable so _dispatch can fall to Groq/OpenRouter.
     client = _client_with([_api_error(429)] * len(GEMINI_MODEL_CHAIN))
     genai_client.return_value = client
 
-    with pytest.raises(HTTPException) as exc:
+    with pytest.raises(_ProviderUnavailable):
         _gemini_chat(MSGS, "sys", 100)
-    assert exc.value.status_code == 503
-    assert "yarın" in exc.value.detail
 
 
 def test_real_errors_are_not_masked_by_chain(genai_client):

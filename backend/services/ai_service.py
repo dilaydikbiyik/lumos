@@ -25,6 +25,15 @@ PROMPT_VERSION = hashlib.sha1(_SYSTEM_PROMPT.encode()).hexdigest()[:8]
 
 ANTHROPIC_MODEL = "claude-sonnet-4-6"
 
+
+class _ProviderUnavailable(Exception):
+    """
+    One provider's models/keys are all exhausted, rate-limited, or the
+    provider simply isn't configured. Signals _dispatch to move on to the
+    NEXT provider in the chain rather than failing the whole request. Only
+    when EVERY provider raises this does the user see an error.
+    """
+
 # Free-quota strategy: every Gemini model has its OWN free-tier quota.
 # On 429 (quota) or 503 (overload) we fall to the next model — the user
 # gets an answer from a slightly lighter model instead of an error.
@@ -48,6 +57,9 @@ def _anthropic_chat(
     from anthropic import Anthropic
     from anthropic.types import Message, MessageParam
     from typing import cast as tcast
+
+    if not settings.ANTHROPIC_API_KEY:
+        raise _ProviderUnavailable("anthropic: no API key configured")
 
     chain = model_chain or [ANTHROPIC_MODEL]
     client = Anthropic(api_key=settings.ANTHROPIC_API_KEY)
@@ -80,11 +92,8 @@ def _anthropic_chat(
                 continue
             raise
 
-    logger.error("anthropic_chain_exhausted models=%s last=%s", chain, last_exc)
-    raise HTTPException(
-        status_code=503,
-        detail="AI service is temporarily unavailable (provider quota). Please try again later.",
-    )
+    logger.warning("anthropic_chain_exhausted models=%s last=%s", chain, last_exc)
+    raise _ProviderUnavailable(f"anthropic exhausted: {last_exc}")
 
 
 # ── Gemini adapter (google-genai SDK) ─────────────────────────────────────────
@@ -168,20 +177,110 @@ def _gemini_chat(
                     continue
                 raise  # real errors (400 etc.) are not masked
 
-    # every key and model exhausted
-    logger.error("gemini_all_keys_exhausted keys=%d models=%s last=%s", len(keys), chain, last_exc)
-    raise HTTPException(
-        status_code=503,
-        detail=(
-            "Günlük ücretsiz AI kotası doldu — yarın otomatik yenilenir. / "
-            "Daily free AI quota reached across all models; resets tomorrow."
-        ),
+    # every key and model exhausted — hand off to the next provider in the chain
+    logger.warning("gemini_all_keys_exhausted keys=%d models=%s last=%s", len(keys), chain, last_exc)
+    raise _ProviderUnavailable(f"gemini exhausted (keys={len(keys)}): {last_exc}")
+
+
+# ── OpenAI-compatible adapter (Groq, OpenRouter, and any /chat/completions API) ─
+
+def _openai_compatible_chat(
+    provider: str, base_url: str, api_key: str,
+    messages: list[dict], system: str, max_tokens: int,
+    model_chain: list[str], extra_headers: Optional[dict] = None,
+) -> str:
+    """
+    Chat via any OpenAI-compatible /chat/completions endpoint. Groq and
+    OpenRouter both speak this dialect, so one adapter covers both — the
+    system prompt becomes a leading {"role": "system"} message.
+
+    Walks model_chain on 429/402/5xx (each model = separate free capacity);
+    a missing key or 401 raises _ProviderUnavailable so the provider chain
+    moves on cleanly instead of erroring the user.
+    """
+    import httpx
+
+    if not api_key:
+        raise _ProviderUnavailable(f"{provider}: no API key configured")
+
+    payload_messages = [{"role": "system", "content": system}] + [
+        {"role": m["role"], "content": m["content"]} for m in messages
+    ]
+    headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
+    if extra_headers:
+        headers.update(extra_headers)
+
+    last_status: object = None
+    for i, model in enumerate(model_chain):
+        try:
+            resp = httpx.post(
+                f"{base_url}/chat/completions",
+                headers=headers,
+                json={"model": model, "messages": payload_messages, "max_tokens": max_tokens},
+                timeout=60.0,
+            )
+        except httpx.RequestError as exc:
+            logger.warning("%s model=%s network error — trying next (%s)", provider, model, exc)
+            last_status = f"network:{exc}"
+            continue
+
+        if resp.status_code == 200:
+            data = resp.json()
+            content = (data.get("choices") or [{}])[0].get("message", {}).get("content") or ""
+            if not content:
+                last_status = "empty"
+                continue
+            if i > 0:
+                logger.info("%s_fallback served_by=%s", provider, model)
+            return content
+
+        # 429 quota, 402 credits, 5xx overload → next model (own free pool each)
+        if resp.status_code in (429, 402, 500, 502, 503, 504):
+            logger.warning("%s model=%s unavailable (code=%s) — trying next", provider, model, resp.status_code)
+            last_status = resp.status_code
+            continue
+        # 401/403 = bad/absent key for this provider → skip whole provider
+        if resp.status_code in (401, 403):
+            raise _ProviderUnavailable(f"{provider}: auth failed ({resp.status_code})")
+        # 400 and friends are real bugs — surface them, don't mask
+        raise HTTPException(
+            status_code=502,
+            detail=f"{provider} error {resp.status_code}: {resp.text[:200]}",
+        )
+
+    raise _ProviderUnavailable(f"{provider}: all models exhausted (last={last_status})")
+
+
+def _groq_chat(messages, system, max_tokens, model_chain=None) -> str:
+    return _openai_compatible_chat(
+        "groq", "https://api.groq.com/openai/v1", settings.GROQ_API_KEY,
+        messages, system, max_tokens,
+        model_chain or ["llama-3.3-70b-versatile", "llama-3.1-8b-instant"],
+    )
+
+
+def _openrouter_chat(messages, system, max_tokens, model_chain=None) -> str:
+    # Optional attribution headers OpenRouter recommends (harmless if unused)
+    return _openai_compatible_chat(
+        "openrouter", "https://openrouter.ai/api/v1", settings.OPENROUTER_API_KEY,
+        messages, system, max_tokens,
+        model_chain or [
+            "meta-llama/llama-3.3-70b-instruct:free",
+            "deepseek/deepseek-chat-v3-0324:free",
+            "google/gemini-2.0-flash-exp:free",
+        ],
+        extra_headers={
+            "HTTP-Referer": settings.FRONTEND_URL,
+            "X-Title": "Lumos",
+        },
     )
 
 
 _ADAPTERS = {
     "anthropic": _anthropic_chat,
     "gemini": _gemini_chat,
+    "groq": _groq_chat,
+    "openrouter": _openrouter_chat,
 }
 
 
@@ -197,37 +296,69 @@ def _resolve_tier(tier_name: Optional[str]) -> tuple[str, dict]:
     return tier_name, get_tier(tier_name)
 
 
+def _provider_chain(tier_cfg: dict) -> list[dict]:
+    """
+    Normalise a tier into an ordered list of {provider, model_chain} steps.
+    Tiers may declare an explicit `provider_chain` (cross-provider free
+    failover); legacy single-provider tiers are wrapped into one step.
+    """
+    chain = tier_cfg.get("provider_chain")
+    if chain:
+        return chain
+    return [{"provider": tier_cfg["provider"], "model_chain": tier_cfg["model_chain"]}]
+
+
 def _dispatch(
     messages: list[dict], system: str, max_tokens: int,
     tier: Optional[str] = None,
 ) -> str:
     tier_name, tier_cfg = _resolve_tier(tier)
-    adapter = _ADAPTERS.get(tier_cfg["provider"])
-    if adapter is None:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Unknown AI provider '{tier_cfg['provider']}' for tier '{tier_name}'.",
-        )
+    steps = _provider_chain(tier_cfg)
 
     started = time.monotonic()
-    try:
-        reply = adapter(messages, system, max_tokens, model_chain=tier_cfg["model_chain"])
-    except Exception as exc:
-        logger.error(
-            "ai_call tier=%s provider=%s prompt_version=%s messages=%d max_tokens=%d "
-            "latency_ms=%d status=error error=%s",
-            tier_name, tier_cfg["provider"], PROMPT_VERSION, len(messages), max_tokens,
-            (time.monotonic() - started) * 1000, type(exc).__name__,
-        )
-        raise
+    last_unavailable: Optional[Exception] = None
+    for step in steps:
+        provider = step["provider"]
+        adapter = _ADAPTERS.get(provider)
+        if adapter is None:
+            logger.warning("unknown_provider=%s in tier=%s — skipping", provider, tier_name)
+            continue
+        try:
+            reply = adapter(messages, system, max_tokens, model_chain=step.get("model_chain"))
+        except _ProviderUnavailable as exc:
+            # This provider is spent/misconfigured — fall through to the next one
+            last_unavailable = exc
+            logger.warning("provider_unavailable provider=%s — trying next (%s)", provider, exc)
+            continue
+        except Exception as exc:
+            logger.error(
+                "ai_call tier=%s provider=%s prompt_version=%s messages=%d max_tokens=%d "
+                "latency_ms=%d status=error error=%s",
+                tier_name, provider, PROMPT_VERSION, len(messages), max_tokens,
+                (time.monotonic() - started) * 1000, type(exc).__name__,
+            )
+            raise
 
-    logger.info(
-        "ai_call tier=%s provider=%s prompt_version=%s messages=%d max_tokens=%d "
-        "latency_ms=%d status=ok reply_chars=%d",
-        tier_name, tier_cfg["provider"], PROMPT_VERSION, len(messages), max_tokens,
-        (time.monotonic() - started) * 1000, len(reply),
+        logger.info(
+            "ai_call tier=%s provider=%s prompt_version=%s messages=%d max_tokens=%d "
+            "latency_ms=%d status=ok reply_chars=%d",
+            tier_name, provider, PROMPT_VERSION, len(messages), max_tokens,
+            (time.monotonic() - started) * 1000, len(reply),
+        )
+        return reply
+
+    # Every provider in the chain was unavailable
+    logger.error(
+        "ai_call tier=%s prompt_version=%s status=all_providers_unavailable providers=%s last=%s",
+        tier_name, PROMPT_VERSION, [s["provider"] for s in steps], last_unavailable,
     )
-    return reply
+    raise HTTPException(
+        status_code=503,
+        detail=(
+            "Yapay zeka servisine şu an ulaşılamıyor — lütfen birkaç dakika sonra tekrar dene. / "
+            "AI service is temporarily unavailable; please try again shortly."
+        ),
+    )
 
 
 # ── Public API (unchanged signatures) ─────────────────────────────────────────

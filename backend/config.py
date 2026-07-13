@@ -18,6 +18,11 @@ class Settings(BaseSettings):
     GEMINI_API_KEY_3: str = ""    # Optional: extra quota from a 3rd Google account
     GEMINI_API_KEY_4: str = ""    # Optional: extra quota from a 4th Google account
 
+    # Free failover providers — when Gemini's free quota is spent the free tier
+    # falls to these (each has its own independent free tier). No card required.
+    GROQ_API_KEY: str = ""        # https://console.groq.com/keys — free, very fast (Llama)
+    OPENROUTER_API_KEY: str = ""  # https://openrouter.ai/keys — free `:free` models
+
     # Clerk
     CLERK_PUBLISHABLE_KEY: str = ""
     CLERK_SECRET_KEY: str = ""

@@ -39,6 +39,58 @@ def test_dispatch_routes_by_tier():
     assert captured["chain"] == AI_TIERS["plus"]["model_chain"]
 
 
+def test_free_tier_declares_cross_provider_chain():
+    # The free tier must be able to fail over past Gemini so a spent free quota
+    # is never a dead end for the core journey.
+    chain = AI_TIERS["free"]["provider_chain"]
+    providers = [step["provider"] for step in chain]
+    assert providers == ["gemini", "groq", "openrouter"]
+    assert all(step["model_chain"] for step in chain)
+
+
+def test_dispatch_falls_through_provider_chain():
+    """gemini spent → groq spent → openrouter answers; user never sees an error."""
+    from backend.services import ai_service
+    from backend.services.ai_service import _ProviderUnavailable
+
+    calls = []
+
+    def spent(name):
+        def _adapter(messages, system, max_tokens, model_chain=None):
+            calls.append(name)
+            raise _ProviderUnavailable(f"{name} spent")
+        return _adapter
+
+    def answers(messages, system, max_tokens, model_chain=None):
+        calls.append("openrouter")
+        return "cevap"
+
+    with patch.dict(ai_service._ADAPTERS, {
+        "gemini": spent("gemini"), "groq": spent("groq"), "openrouter": answers,
+    }):
+        reply = ai_service._dispatch([{"role": "user", "content": "hi"}], "sys", 100, tier="free")
+    assert reply == "cevap"
+    assert calls == ["gemini", "groq", "openrouter"]
+
+
+def test_dispatch_surfaces_503_only_when_all_providers_spent():
+    from fastapi import HTTPException
+
+    from backend.services import ai_service
+    from backend.services.ai_service import _ProviderUnavailable
+    import pytest
+
+    def spent(messages, system, max_tokens, model_chain=None):
+        raise _ProviderUnavailable("spent")
+
+    with patch.dict(ai_service._ADAPTERS, {
+        "gemini": spent, "groq": spent, "openrouter": spent,
+    }):
+        with pytest.raises(HTTPException) as exc:
+            ai_service._dispatch([{"role": "user", "content": "hi"}], "sys", 100, tier="free")
+    assert exc.value.status_code == 503
+
+
 def test_chat_endpoint_uses_plan_quota(client, mock_ai):
     import asyncio
 
