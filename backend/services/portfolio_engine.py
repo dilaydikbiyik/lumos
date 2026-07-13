@@ -1,26 +1,33 @@
 """
-Risk-blended volatility portfolio engine — v3.
+Risk-blended portfolio engine — v4 (glide-path + defensive sleeve).
 
-REALISM FIX (2026-07-10): the v2 formula was `RiskScore × Vol(asset)`; the
-risk score multiplied every asset equally, so it CANCELLED OUT during
-normalisation — the allocation was independent of the risk profile, and
-higher volatility always got more weight (the exact opposite of what a
-conservative profile needs). v3 fixes this:
+WHY v4 (2026-07-13): v3 blended every asset with an inverse-/direct-volatility
+mix keyed on the risk score. Two realism gaps surfaced in an end-to-end audit:
+  1. The universe had no cash/bond, so even the most conservative profile was
+     ~100% equities+gold — irresponsible for a cautious/older/irregular-income
+     beginner.
+  2. The risk score barely moved the allocation (a risk-2 and a risk-9 portfolio
+     looked almost identical).
 
-    α = risk_score / 10                       (risk appetite, 0.1–1.0)
-    raw(asset) = (1-α)·(1/vol) + α·vol        (defensive ↔ aggressive blend)
-    weight     = raw / Σ raw
+v4 splits the portfolio into two sleeves whose SIZES are set by the risk score,
+so the profile genuinely shapes the result:
 
-  - Low score → inverse-volatility weighting: calm assets (gold etc.) rise.
-  - High score → volatility weighting: growth engines rise.
-  Every weight can be explained in one sentence — no logical gaps.
+    defensive_target = clamp(0.60 − 0.055·risk, 0, 0.60)   (→0 for aggressive)
+    growth_target    = 1 − defensive_target
 
-POSITION-COUNT LOGIC: a reasoned number, not pie-chart decoration:
-  - "Dust" positions below MIN_WEIGHT_PCT% are pruned (they add tracking
-    burden and transaction costs without measurable portfolio impact).
-  - Small budgets are split into fewer pieces (75k → ≤3, 200k → ≤4).
-  Every dropped asset and its reason is reported in metadata — no silent
-  pruning.
+  • DEFENSIVE sleeve (cash + bonds): capital-preservation weight. Cash is the
+    safest; bonds a low-volatility buffer. cash_share falls as risk rises.
+  • GROWTH sleeve (equities + gold + REIT): the existing volatility blend
+    (α = risk/10) decides the mix WITHIN this sleeve, then it's scaled to
+    growth_target.
+
+A per-position cap (MAX_POSITION_PCT) prevents any single asset from dominating
+a small portfolio, and a small-weight floor removes dust. The result: defensive
+weight decreases monotonically with the risk score, and every weight is still
+explainable in one sentence.
+
+Cash/bond are sized directly (not fetched), so compute_volatility is only ever
+called on the real, fetchable growth tickers.
 """
 
 import json
@@ -32,20 +39,28 @@ from backend.services.volatility import compute_volatility
 
 _ASSET_UNIVERSE_PATH = Path(__file__).parent.parent / "data" / "asset_universe.json"
 
-MIN_WEIGHT_PCT = 8          # below this is "dust" — pruned and reported
+MIN_WEIGHT_PCT = 5          # below this is "dust" — pruned and reported
+MAX_POSITION_PCT = 45       # no single asset may exceed this (concentration guard)
 _BUDGET_POSITION_CAPS = [   # (budget upper bound, max positions)
     (75_000, 3),
     (200_000, 4),
     (float("inf"), 6),
 ]
 
+# Defensive sleeve — sized by the glide path, but REAL fetchable tickers so
+# every downstream feature (projection, time-machine, backtest, what-if) can
+# pull their history. BIL = 1-3 month T-bills (cash-like), BND = total bond.
+_CASH_ASSET = {"ticker": "BIL", "name": "Nakit / Kısa Vade", "category": "cash"}
+_BOND_ASSET = {"ticker": "BND", "name": "Tahvil Fonu (geniş tabanlı)", "category": "bond"}
+
 # Category → role in the portfolio (core of the per-asset rationale)
 _CATEGORY_ROLES = {
     "stocks": "büyüme motoru — uzun vadeli getiri buradan gelir",
     "gold": "dengeleyici — hisseler düşerken genellikle farklı davranır, portföyü yumuşatır",
     "reit": "gayrimenkul penceresi — mülk almadan emlak getirisine ortaklık",
+    "bond": "sabit getirili tampon — hisse dalgalanmasını yumuşatır, düzenli faiz üretir",
+    "cash": "güvenlik yastığı — düşüşte değer kaybetmez, fırsat ve acil durum likiditesi",
     "fund": "hazır sepet — tek kalemde çeşitlendirme",
-    "cash": "güvenlik yastığı — fırsat ve acil durum likiditesi",
 }
 
 
@@ -61,7 +76,32 @@ def _position_cap(budget: float) -> int:
     return _BUDGET_POSITION_CAPS[-1][1]
 
 
-def _asset_rationale(category: str, vol: float, weight: float, alpha: float) -> str:
+def _clamp(x: float, lo: float, hi: float) -> float:
+    return max(lo, min(hi, x))
+
+
+def _apply_max_position(weights: dict[str, float]) -> dict[str, float]:
+    """Cap any position at MAX_POSITION_PCT, redistributing the excess
+    proportionally onto the uncapped positions (iterated to convergence)."""
+    cap = MAX_POSITION_PCT / 100.0
+    w = dict(weights)
+    for _ in range(40):
+        over = [t for t, x in w.items() if x > cap + 1e-9]
+        if not over:
+            break
+        excess = sum(w[t] - cap for t in over)
+        for t in over:
+            w[t] = cap
+        under = [t for t in w if w[t] < cap - 1e-9]
+        under_sum = sum(w[t] for t in under)
+        if under_sum <= 0:
+            break
+        for t in under:
+            w[t] += excess * (w[t] / under_sum)
+    return w
+
+
+def _growth_rationale(category: str, vol: float, weight: float, alpha: float) -> str:
     role = _CATEGORY_ROLES.get(category, "çeşitlendirici")
     vol_pct = round(vol * 100)
     if alpha < 0.45:
@@ -73,42 +113,85 @@ def _asset_rationale(category: str, vol: float, weight: float, alpha: float) -> 
     return f"Rolü: {role}. Ağırlığın gerekçesi: {tilt} → %{round(weight * 100, 1)}."
 
 
+def _defensive_rationale(category: str, weight: float, defensive_target: float) -> str:
+    role = _CATEGORY_ROLES.get(category, "koruma")
+    return (
+        f"Rolü: {role}. Ağırlığın gerekçesi: risk profilin portföyün ~%{round(defensive_target * 100)}'ünü "
+        f"savunmaya (nakit/tahvil) ayırmayı gerektiriyor → %{round(weight * 100, 1)}."
+    )
+
+
 def build_portfolio(risk_score: float, budget: float) -> PortfolioRecommendResponse:
     """
-    Compute a risk-blended, volatility-aware portfolio allocation.
+    Compute a glide-path portfolio: a risk-sized defensive sleeve (cash + bonds)
+    plus a volatility-blended growth sleeve (equities + gold + REIT).
 
     Args:
         risk_score: 1-10 score from the risk engine
         budget:     Investment budget in TRY
 
     Returns:
-        PortfolioRecommendResponse with per-asset weights, per-asset
-        rationale, and fully transparent allocation logic in metadata.
+        PortfolioRecommendResponse with per-asset weights, per-asset rationale,
+        and fully transparent allocation logic in metadata.
     """
-    universe = _load_universe()
     include_reits = should_include_reits(budget)
+    growth_universe = _load_universe()
     if include_reits:
-        universe = universe + get_reit_assets()
+        growth_universe = growth_universe + get_reit_assets()
 
-    tickers = [a["ticker"] for a in universe]
-    volatilities = compute_volatility(tickers)
+    # Fetch volatility ONLY for the real, fetchable growth tickers
+    growth_tickers = [a["ticker"] for a in growth_universe]
+    volatilities = compute_volatility(growth_tickers)
 
-    # ── v3 blend: risk appetite GENUINELY shapes the allocation ──
-    alpha = min(max(risk_score / 10.0, 0.1), 1.0)
-    raw_weights: dict[str, float] = {}
-    for asset in universe:
+    alpha = _clamp(risk_score / 10.0, 0.1, 1.0)
+
+    # ── Sleeve sizing (glide path) — the risk score sets the split ──
+    defensive_target = _clamp(0.60 - 0.055 * risk_score, 0.0, 0.60)
+    if defensive_target < 0.10:            # aggressive: a clean, cash-free growth mix
+        defensive_target = 0.0
+    growth_target = 1.0 - defensive_target
+    cash_share = _clamp(0.75 - 0.05 * risk_score, 0.30, 0.75)
+
+    cap = _position_cap(budget)
+    n_defensive = 0 if defensive_target == 0 else min(2, max(cap - 2, 1))
+    growth_slots = max(cap - n_defensive, 1)
+
+    # ── Growth sleeve: volatility blend, keep the top `growth_slots` ──
+    raw: dict[str, float] = {}
+    for asset in growth_universe:
         t = asset["ticker"]
         vol = max(volatilities.get(t, 0.15), 0.01)
-        raw_weights[t] = (1 - alpha) * (1.0 / vol) + alpha * vol
+        raw[t] = (1 - alpha) * (1.0 / vol) + alpha * vol
+    total_raw = sum(raw.values())
+    growth_w = {t: v / total_raw for t, v in raw.items()}
 
-    # normalise (first pass)
-    total = sum(raw_weights.values())
-    weights = {t: w / total for t, w in raw_weights.items()}
-
-    # ── position-count logic: dust pruning + budget cap ──
+    kept = sorted(growth_w, key=growth_w.get, reverse=True)[:growth_slots]
     dropped: list[dict] = []
-    min_w = MIN_WEIGHT_PCT / 100.0
+    for t in growth_w:
+        if t not in kept:
+            dropped.append({
+                "ticker": t,
+                "weight_pct": round(growth_w[t] * 100, 1),
+                "reason": f"{budget:,.0f} TL bütçe için azami {cap} pozisyon hedeflendi — küçük bütçeyi çok parçaya bölmek pratik değil",
+            })
+    growth_w = {t: growth_w[t] for t in kept}
+    gsum = sum(growth_w.values()) or 1.0
+    weights = {t: (v / gsum) * growth_target for t, v in growth_w.items()}
 
+    # ── Defensive sleeve: sized directly, split cash/bond by risk ──
+    defensive_categories: dict[str, str] = {}
+    if n_defensive == 1:
+        weights[_CASH_ASSET["ticker"]] = defensive_target
+        defensive_categories[_CASH_ASSET["ticker"]] = "cash"
+    elif n_defensive == 2:
+        weights[_CASH_ASSET["ticker"]] = defensive_target * cash_share
+        weights[_BOND_ASSET["ticker"]] = defensive_target * (1 - cash_share)
+        defensive_categories[_CASH_ASSET["ticker"]] = "cash"
+        defensive_categories[_BOND_ASSET["ticker"]] = "bond"
+
+    # ── Dust floor first, then the concentration guard as the LAST step so no
+    #    position can exceed the cap after the final re-normalisation ──
+    min_w = MIN_WEIGHT_PCT / 100.0
     dust = [t for t, w in weights.items() if w < min_w]
     for t in dust:
         dropped.append({
@@ -118,33 +201,31 @@ def build_portfolio(risk_score: float, budget: float) -> PortfolioRecommendRespo
         })
         weights.pop(t)
 
-    cap = _position_cap(budget)
-    if len(weights) > cap:
-        ranked = sorted(weights, key=weights.get)  # ascending
-        for t in ranked[: len(weights) - cap]:
-            dropped.append({
-                "ticker": t,
-                "weight_pct": round(weights[t] * 100, 1),
-                "reason": f"{budget:,.0f} TL bütçe için azami {cap} pozisyon hedeflendi — küçük bütçeyi çok parçaya bölmek pratik değil",
-            })
-            weights.pop(t)
-
-    # re-normalise (second pass)
-    total = sum(weights.values())
+    total = sum(weights.values()) or 1.0
     weights = {t: w / total for t, w in weights.items()}
+    weights = _apply_max_position(weights)  # sum-preserving; final cap wins
 
-    by_ticker = {a["ticker"]: a for a in universe}
+    # ── Assemble allocations with per-asset rationale ──
+    by_ticker = {a["ticker"]: a for a in growth_universe}
+    by_ticker[_CASH_ASSET["ticker"]] = _CASH_ASSET
+    by_ticker[_BOND_ASSET["ticker"]] = _BOND_ASSET
+
     allocations = []
     for t, weight in sorted(weights.items(), key=lambda kv: -kv[1]):
         asset = by_ticker[t]
-        vol = volatilities.get(t, 0.15)
+        category = asset.get("category", "other")
+        if t in defensive_categories:
+            explanation = _defensive_rationale(category, weight, defensive_target)
+        else:
+            vol = volatilities.get(t, 0.15)
+            explanation = _growth_rationale(category, vol, weight, alpha)
         allocations.append(
             AssetAllocation(
                 ticker=t,
                 name=asset.get("name", t),
                 weight=round(weight, 4),
-                category=asset.get("category", "other"),
-                explanation=_asset_rationale(asset.get("category", "other"), vol, weight, alpha),
+                category=category,
+                explanation=explanation,
             )
         )
 
@@ -159,13 +240,19 @@ def build_portfolio(risk_score: float, budget: float) -> PortfolioRecommendRespo
         allocations=allocations,
         plain_explanation="",  # filled by explainer service
         includes_reits=include_reits and any(a.category == "reit" for a in allocations),
-        formula_used="risk-blended-volatility-v3",
+        formula_used="glide-path-defensive-sleeve-v4",
         metadata={
             "volatilities": {k: round(v, 4) for k, v in volatilities.items()},
             "allocation_logic": {
                 "alpha": round(alpha, 2),
-                "formula": "ağırlık ∝ (1-α)·(1/oynaklık) + α·oynaklık — α senin risk iştahın (skor/10)",
+                "defensive_target_pct": round(defensive_target * 100, 1),
+                "growth_target_pct": round(growth_target * 100, 1),
+                "formula": (
+                    "savunma_payı = clamp(60 − 5.5·risk, 0, 60)% — nakit+tahvil; "
+                    "kalan büyüme kovası ağırlık ∝ (1-α)·(1/oynaklık) + α·oynaklık, α=skor/10"
+                ),
                 "position_cap": cap,
+                "max_position_pct": MAX_POSITION_PCT,
                 "min_weight_pct": MIN_WEIGHT_PCT,
                 "dropped": dropped,
             },

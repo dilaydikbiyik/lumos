@@ -1,18 +1,25 @@
 """
-Portfolio engine v3 logic tests — keeping the realism filter alive in code:
+Portfolio engine v4 logic tests — keeping the realism filter alive in code:
 
 1. The risk score GENUINELY changes the allocation (it cancelled out in v2 — bug).
 2. Cautious profiles overweight calm assets (gold); aggressive ones overweight volatile.
 3. Position count follows the budget logic; no dust positions survive.
 4. Pruning is never silent — every drop is reported with a reason in metadata.
 5. Every asset carries a rationale; risk-factor contributions sum to the score.
+6. v4: a risk-sized DEFENSIVE sleeve (cash + bonds) — conservative profiles hold
+   a real capital-preservation weight; it shrinks monotonically as risk rises;
+   no single position exceeds the concentration cap.
 """
 from unittest.mock import patch
 
 import pytest
 
 from backend.schemas.user_profile import RiskProfileAnswers
-from backend.services.portfolio_engine import MIN_WEIGHT_PCT, build_portfolio
+from backend.services.portfolio_engine import (
+    MAX_POSITION_PCT,
+    MIN_WEIGHT_PCT,
+    build_portfolio,
+)
 from backend.services.risk_engine import compute_risk_score
 
 # Fixed volatilities: XU100 very volatile, GLD calm — makes the contrast obvious
@@ -88,6 +95,42 @@ def test_every_allocation_has_rationale():
     for a in p.allocations:
         assert "Rolü:" in a.explanation and "gerekçesi" in a.explanation
         assert "%" in a.explanation  # volatility and weight figures are visible
+
+
+def _defensive_weight(portfolio):
+    return sum(a.weight for a in portfolio.allocations if a.category in ("cash", "bond"))
+
+
+def test_conservative_profile_holds_a_defensive_sleeve():
+    # A cautious beginner must NOT be ~100% equities+gold — v4's core fix.
+    p = build_portfolio(risk_score=2, budget=150000)
+    cats = {a.category for a in p.allocations}
+    assert cats & {"cash", "bond"}, "muhafazakâr profilde nakit/tahvil olmalı"
+    assert _defensive_weight(p) > 0.30, "muhafazakârda savunma payı anlamlı olmalı"
+
+
+def test_defensive_weight_decreases_as_risk_rises():
+    weights = [_defensive_weight(build_portfolio(risk_score=r, budget=300000))
+               for r in range(1, 11)]
+    for earlier, later in zip(weights, weights[1:]):
+        assert later <= earlier + 1e-9, f"savunma payı riskle artmamalı: {weights}"
+    assert weights[0] > weights[-1] + 0.3, "muhafazakâr ≫ atılgan savunma farkı olmalı"
+
+
+def test_aggressive_profile_is_growth_heavy():
+    p = build_portfolio(risk_score=10, budget=300000)
+    growth = sum(a.weight for a in p.allocations if a.category in ("stocks", "gold", "reit"))
+    assert growth > 0.9, "en atılgan profil büyüme ağırlıklı olmalı"
+
+
+def test_no_position_exceeds_concentration_cap():
+    for risk in (1, 4, 7, 10):
+        for budget in (50000, 150000, 600000):
+            p = build_portfolio(risk_score=risk, budget=budget)
+            for a in p.allocations:
+                assert a.weight <= MAX_POSITION_PCT / 100.0 + 1e-9, (
+                    f"{a.ticker} tek başına %{MAX_POSITION_PCT} üstünde: {a.weight}"
+                )
 
 
 def test_risk_factors_sum_to_score():

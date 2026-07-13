@@ -1,12 +1,15 @@
-from typing import Literal
+from typing import Literal, Optional
 
 from pydantic import BaseModel, Field
 
 
 class RentVsBuyRequest(BaseModel):
-    down_payment: float = Field(..., gt=0)
-    monthly_rent: float = Field(..., gt=0)
+    down_payment: float = Field(..., gt=0, description="Cash available now (peşinat/birikim)")
+    monthly_rent: float = Field(..., gt=0, description="Current monthly rent for the same home")
     years: int = Field(..., ge=1, le=40)
+    # Optional: the real property price. If omitted it's estimated from the rent
+    # so buy and rent describe the SAME home (consistency).
+    home_price: Optional[float] = Field(None, gt=0, description="Property price (optional; estimated from rent if absent)")
 
 
 class GoalPlanRequest(BaseModel):

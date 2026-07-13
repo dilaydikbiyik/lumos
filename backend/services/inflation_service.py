@@ -59,6 +59,23 @@ def cpi_change_pct(start_month: str, end_month: str) -> float:
     return (end_idx / start_idx - 1) * 100
 
 
+def trailing_annual_inflation_pct() -> float:
+    """
+    Realized inflation over the last ~12 months from the CPI index (live TCMB
+    when configured, else the bundled static file). This is a MEASURED number,
+    not a guess — it's what planning tools use as the live inflation assumption.
+    Returns 0.0 only if the index has too few points to compute.
+    """
+    index = _get_index()
+    months = sorted(index)
+    if len(months) < 2:
+        return 0.0
+    latest = months[-1]
+    year, month = latest.split("-")
+    a_year_ago = f"{int(year) - 1}-{month}"  # cpi_change_pct snaps to nearest prior month
+    return round(cpi_change_pct(a_year_ago, latest), 2)
+
+
 def real_return_pct(nominal_return_pct: float, start_month: str, end_month: str) -> float:
     """
     Fisher-adjusted real return: what the nominal gain is actually worth

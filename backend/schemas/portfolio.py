@@ -6,7 +6,7 @@ class AssetAllocation(BaseModel):
     ticker: str
     name: str
     weight: float = Field(..., ge=0, le=1, description="Portfolio weight 0–1")
-    category: str  # stocks / reit / fund / gold / cash
+    category: str  # stocks / reit / fund / gold / bond / cash
     explanation: str = ""
 
 

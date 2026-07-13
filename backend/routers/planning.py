@@ -27,8 +27,10 @@ async def rent_vs_buy(
     body: RentVsBuyRequest,
     user_id: str = Depends(get_current_user),
 ):
-    """Rent or buy? — two honest side-by-side projections."""
-    return compare_rent_vs_buy(body.down_payment, body.monthly_rent, body.years)
+    """Rent or buy? — two honest side-by-side projections of the SAME home."""
+    return compare_rent_vs_buy(
+        body.down_payment, body.monthly_rent, body.years, home_price=body.home_price,
+    )
 
 
 @router.post("/goal-plan")

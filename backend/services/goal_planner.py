@@ -1,20 +1,29 @@
 """
 Goal-based investing — "800.000 TL for a house deposit in 3 years" turned into
 a concrete monthly contribution plan, with drift detection.
+
+Growth defaults come from the single source of truth (assumptions.py) so this
+tool and rent-vs-buy stay coherent, and results are also reported in REAL
+(inflation-adjusted) terms — a nominal target erodes over the horizon.
 """
+
+from backend.services import assumptions
 
 
 def required_monthly_contribution(
     target_amount: float,
     years: float,
     current_savings: float = 0.0,
-    annual_growth_pct: float = 15.0,
+    annual_growth_pct: float | None = None,
 ) -> dict:
     """
     Standard future-value-of-annuity solve: how much must be added each
     month, given existing savings grow at annual_growth_pct, to reach
     target_amount by the deadline.
     """
+    if annual_growth_pct is None:
+        annual_growth_pct = assumptions.portfolio_growth_pct()
+    inflation_pct = assumptions.annual_inflation_pct()
     months = max(round(years * 12), 1)
     monthly_rate = (1 + annual_growth_pct / 100) ** (1 / 12) - 1
 
@@ -26,6 +35,8 @@ def required_monthly_contribution(
             "monthly_contribution": 0.0,
             "already_on_track": True,
             "projected_shortfall_or_surplus": round(-remaining, 2),
+            "target_real_value": round(assumptions.real_value(target_amount, years, inflation_pct), 2),
+            "annual_inflation_pct": inflation_pct,
         }
 
     if monthly_rate == 0:
@@ -38,6 +49,10 @@ def required_monthly_contribution(
         "monthly_contribution": round(monthly_contribution, 2),
         "already_on_track": False,
         "projected_shortfall_or_surplus": 0.0,
+        # What the nominal target is worth in today's money at the deadline —
+        # a reminder that a fixed TL goal loses purchasing power over time.
+        "target_real_value": round(assumptions.real_value(target_amount, years, inflation_pct), 2),
+        "annual_inflation_pct": inflation_pct,
     }
 
 
@@ -46,12 +61,15 @@ def progress_and_drift(
     years_remaining: float,
     current_savings: float,
     actual_monthly_contribution: float,
-    annual_growth_pct: float = 15.0,
+    annual_growth_pct: float | None = None,
 ) -> dict:
     """
     Given what the user is ACTUALLY contributing, project whether they'll
     hit the goal on time, early, or late — "bu tempoda hedefin 8 ay gecikir".
     """
+    if annual_growth_pct is None:
+        annual_growth_pct = assumptions.portfolio_growth_pct()
+    inflation_pct = assumptions.annual_inflation_pct()
     months = max(round(years_remaining * 12), 1)
     monthly_rate = (1 + annual_growth_pct / 100) ** (1 / 12) - 1
 
@@ -76,6 +94,8 @@ def progress_and_drift(
     return {
         "progress_pct": progress_pct,
         "projected_value_at_deadline": round(projected_at_deadline, 2),
+        "projected_value_real": round(assumptions.real_value(projected_at_deadline, years_remaining, inflation_pct), 2),
         "on_track": projected_at_deadline >= target_amount,
         "delay_months": delay_months,
+        "annual_inflation_pct": inflation_pct,
     }
