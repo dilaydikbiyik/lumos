@@ -155,7 +155,7 @@ export default function DashboardPage() {
               <div style={{ marginTop: 16 }}>
                 <div style={{ display: 'flex', gap: 4, height: 6, borderRadius: 6, overflow: 'hidden', marginBottom: 8 }}>
                   {Object.entries(holdingsSummary.by_type).map(([type, val], i) => {
-                    const colors = ['var(--firefly)', 'var(--accent)', 'var(--green)', 'var(--accent-2)', '#9B59B6']
+                    const colors = ['#F5A524', '#7A4A93', '#1FB2A6', '#E8663F', '#9C5A34']
                     const pct = holdingsSummary.total_current_value > 0
                       ? (val.current_value / holdingsSummary.total_current_value) * 100
                       : 0
@@ -170,7 +170,7 @@ export default function DashboardPage() {
                 </div>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px 12px' }}>
                   {Object.entries(holdingsSummary.by_type).map(([type, val], i) => {
-                    const colors = ['var(--firefly)', 'var(--accent)', 'var(--green)', 'var(--accent-2)', '#9B59B6']
+                    const colors = ['#F5A524', '#7A4A93', '#1FB2A6', '#E8663F', '#9C5A34']
                     const pct = holdingsSummary.total_current_value > 0
                       ? Math.round((val.current_value / holdingsSummary.total_current_value) * 100)
                       : 0

@@ -111,7 +111,7 @@ function AdvisorPanel({ onClose }) {
 
         {/* Input */}
         <form onSubmit={e => { e.preventDefault(); send() }}
-          style={{ display: 'flex', gap: 8, padding: 12, borderTop: '1px solid var(--border)' }}>
+          className="advisor-input-row">
           <input ref={inputRef} className="input" style={{ flex: 1 }} placeholder="Bir şey sor…"
             value={input} onChange={e => setInput(e.target.value)} enterKeyHint="send" />
           <button className="btn btn-primary" type="submit" disabled={loading} aria-label="Gönder">→</button>

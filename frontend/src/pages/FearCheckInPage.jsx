@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import LumosLogo from '../components/LumosLogo'
 import { useNavigate } from 'react-router-dom'
-import { UserButton, useAuth } from '@clerk/clerk-react'
-import api, { extractErrorMessage, setAuthToken } from '../utils/api'
+import { UserButton } from '@clerk/clerk-react'
+import api from '../utils/api'
 
 const FEARS = [
   {
@@ -39,25 +39,28 @@ const FEARS = [
   },
 ]
 
+// Local copy of reassurance messages — matches backend exactly so we can show
+// them instantly without waiting for the DB write (optimistic UX).
+const REASSURANCE = {
+  param_eriyor: 'Anlıyoruz — bu yüzden her portföyde enflasyona karşı reel getiriyi de göstereceğiz, sadece nominal sayıyı değil.',
+  kandirilirim: 'Bu haklı bir endişe. Lumos sana hiçbir hisse/fon satmıyor, komisyon almıyor — sadece bilgi veriyor. Kararı hep sen verirsin.',
+  anlamiyorum:  'Sorun değil, kimse doğuştan bilmiyor. Her terimi günlük dille açıklayacağız — anlamadığın hiçbir şeyi geçmeyeceğiz.',
+  batiririm:    'Bu korku çoğu yeni başlayanda var. Küçük adımlarla, sanal pratikle başlayacağız — gerçek parayla asla acele etmeyeceksin.',
+}
+
 export default function FearCheckInPage() {
   const navigate = useNavigate()
-  const { getToken } = useAuth()
   const [saving, setSaving] = useState(null)
   const [reassurance, setReassurance] = useState(null)
-  const [error, setError] = useState(null)
   const [hovered, setHovered] = useState(null)
 
-  async function choose(fearId) {
+  function choose(fearId) {
     setSaving(fearId)
-    setError(null)
-    try {
-      setAuthToken(await getToken())
-      const res = await api.patch('/users/me/fear-check-in', { primary_fear: fearId })
-      setReassurance(res.data.reassurance)
-    } catch (err) {
-      setError(extractErrorMessage(err, 'Kaydedilemedi — tekrar dener misin?'))
-      setSaving(null)
-    }
+    // Show reassurance immediately — no waiting for the backend.
+    // Fire the save in the background; failure here is non-critical
+    // (the fear tag is re-derivable and the reassurance is local).
+    setReassurance(REASSURANCE[fearId])
+    api.patch('/users/me/fear-check-in', { primary_fear: fearId }).catch(() => {})
   }
 
   /* ── Reassurance screen ── */
@@ -186,11 +189,6 @@ export default function FearCheckInPage() {
           })}
         </div>
 
-        {error && (
-          <p style={{ color: 'var(--red)', fontSize: 13, marginTop: 14, textAlign: 'center' }}>
-            {error}
-          </p>
-        )}
       </div>
     </div>
   )

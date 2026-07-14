@@ -1,3 +1,4 @@
+import asyncio
 from fastapi import APIRouter, Depends, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -23,4 +24,6 @@ async def news_digest(
     """
     user = await user_repository.get_or_create(db, user_id)
     path = user.investment_path or "hybrid"
-    return {"path": path, "items": get_daily_digest(path)}
+    # get_daily_digest calls generate_text + httpx on first call (cached after)
+    items = await asyncio.to_thread(get_daily_digest, path)
+    return {"path": path, "items": items}

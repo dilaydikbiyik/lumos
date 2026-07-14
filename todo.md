@@ -907,3 +907,49 @@ lumos/                          ← project root
 - Portfolio pie palette: gece / ateşböceği(altın) / kahve / ember / teal / mor (GYO=mor dominant).
 
 **Still open:** verify UI visually via `npm run dev`; add `OPENROUTER_API_KEY` (+ `GROQ_API_KEY`) to Render env; tune `assumptions` inflation/spreads if desired; consider paid-tier routing to a frontier model for the advisor.
+
+---
+
+## 🛠️ Session Log — 2026-07-14 (comprehensive audit + async event-loop fix)
+
+### Root cause fixed — "şu an cevap veremedim" (advisor never responds)
+
+The real bug was **synchronous blocking I/O inside async FastAPI route handlers**. `ai_chat()` (which calls Gemini/Groq/OpenRouter via blocking HTTP and the google-genai SDK's synchronous client) was called directly inside `async def` endpoints — this froze the entire asyncio event loop for up to 60 seconds, making the server look dead to all concurrent users. Fixed by wrapping **every** blocking AI call in `asyncio.to_thread()`:
+
+| File | Function wrapped |
+|------|-----------------|
+| `backend/routers/chat.py` | `ai_chat` (chat + advisor endpoints), `extract_profile`, `answer_what_if` |
+| `backend/routers/recommend.py` | `explain_portfolio`, `explain_reit_inclusion` |
+| `backend/routers/news.py` | `get_daily_digest` |
+
+### Onboarding flow — no more "takılı kalıyor"
+
+- **`FearCheckInPage.jsx`**: Converted to fully optimistic — local `REASSURANCE` map (mirrors backend text exactly) is shown **instantly** when a fear is selected, DB write fires in the background via `.catch(() => {})`. No awaiting the backend at all.
+- **`PathSelectionPage.jsx`**: Was already optimistic from previous session ✅
+
+### Advisor input mobile (iOS keyboard hides input)
+
+- Added `.advisor-input-row` CSS class with `padding-bottom: max(12px, env(safe-area-inset-bottom))` — ensures the input row is always above the iOS home bar, even when the keyboard is open.
+- `.advisor-overlay` z-index is 200 (above bottom-nav at 100) ✅
+
+### Logo alignment
+
+- `LumosLogo.jsx`: `alignItems: 'flex-end'` + `marginBottom: '0.4em'` on the icon — visually centres the ateşböceği icon with the cap-height of the "L" in Lumos. The wordmark div's `padding-top` airspace was causing the mismatch.
+
+### UI direction V5 palette compliance
+
+- `PortfolioChart.jsx`: heading "Portfolio Allocation" → "Dağılımın" (Turkish), cash color `#9C5A34` (V5 kahve), legend % uses `var(--text)` not purple `var(--accent)`
+- `DashboardPage.jsx`: allocation mini-bar uses V5 palette `[#F5A524, #7A4A93, #1FB2A6, #E8663F, #9C5A34]`
+- `index.css` body::before: amber dawn glow strengthened from `rgba(245,165,36,0.15)` → `0.22`, height 46vh → 52vh, wider radial spread
+
+### Build verification
+
+- Frontend: `vite build` ✅ 731 modules, 0 errors
+- Backend: All changes are logic-level (asyncio wrapper), no structural schema changes
+- Git: committed + pushed → `main 660de85`
+
+### Still open
+
+- [ ] Verify advisor response on production after deploy (Render cold-start + new asyncio wrapper)
+- [ ] Add `GROQ_API_KEY` + `OPENROUTER_API_KEY` to Render env if not already set
+- [ ] Optionally: code-split the JS bundle (currently 846 kB / 253 kB gzip — within acceptable range for now)

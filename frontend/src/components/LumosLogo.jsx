@@ -22,11 +22,14 @@ export default function LumosLogo({ size = 22, hero = false }) {
       onClick={() => navigate('/')}
       aria-label="Lumos anasayfa"
       style={{
-        display: 'flex', alignItems: 'center', gap: 8,
+        display: 'flex', alignItems: 'flex-end', gap: 8,
         background: 'none', border: 'none', cursor: 'pointer', padding: '4px 0',
       }}
     >
-      {/* Firefly icon — transparent SVG, no background */}
+      {/* Firefly icon — sit at the baseline of the wordmark so the visual
+          centres align: the wordmark div has padding-top for firefly airspace,
+          so align-items:flex-end + a small bottom nudge centres the icon with
+          the cap-height of the "L". */}
       <img
         src="/favicon.svg"
         alt=""
@@ -35,6 +38,7 @@ export default function LumosLogo({ size = 22, hero = false }) {
         style={{
           filter: 'drop-shadow(0 0 5px rgba(245,165,36,0.55))',
           flexShrink: 0,
+          marginBottom: '0.4em',
         }}
       />
 

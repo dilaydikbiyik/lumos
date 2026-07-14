@@ -130,7 +130,6 @@ def _gemini_chat(
     model_chain: Optional[list[str]] = None,
 ) -> str:
     from google import genai
-    from google.genai import errors as genai_errors
     from google.genai import types as genai_types
 
     chain = model_chain or GEMINI_MODEL_CHAIN
@@ -166,16 +165,19 @@ def _gemini_chat(
                         "gemini_fallback served_by=%s key_slot=%d", model, key_idx + 1
                     )
                 return reply
-            except genai_errors.APIError as exc:
+            except Exception as exc:
+                # ANY failure (quota 429, overload 5xx, bad-request 400, invalid
+                # key, safety block, empty response) — try the next key/model,
+                # then hand off to the next PROVIDER. One provider's error must
+                # never crash the whole request; that was defeating the failover
+                # chain (Gemini erroring meant OpenRouter was never reached).
                 code = getattr(exc, "code", None)
-                if code == 429 or (isinstance(code, int) and code >= 500):
-                    logger.warning(
-                        "gemini key=%d model=%s unavailable (code=%s) — trying next",
-                        key_idx + 1, model, code,
-                    )
-                    last_exc = exc
-                    continue
-                raise  # real errors (400 etc.) are not masked
+                logger.warning(
+                    "gemini key=%d model=%s failed (code=%s type=%s) — trying next",
+                    key_idx + 1, model, code, type(exc).__name__,
+                )
+                last_exc = exc
+                continue
 
     # every key and model exhausted — hand off to the next provider in the chain
     logger.warning("gemini_all_keys_exhausted keys=%d models=%s last=%s", len(keys), chain, last_exc)
@@ -242,11 +244,14 @@ def _openai_compatible_chat(
         # 401/403 = bad/absent key for this provider → skip whole provider
         if resp.status_code in (401, 403):
             raise _ProviderUnavailable(f"{provider}: auth failed ({resp.status_code})")
-        # 400 and friends are real bugs — surface them, don't mask
-        raise HTTPException(
-            status_code=502,
-            detail=f"{provider} error {resp.status_code}: {resp.text[:200]}",
+        # Anything else (400 stale/unknown model id, 404, safety) — skip THIS
+        # model and try the next; if all fail the provider chain moves on.
+        logger.warning(
+            "%s model=%s failed (code=%s) %s — trying next",
+            provider, model, resp.status_code, resp.text[:120],
         )
+        last_status = resp.status_code
+        continue
 
     raise _ProviderUnavailable(f"{provider}: all models exhausted (last={last_status})")
 
@@ -331,13 +336,15 @@ def _dispatch(
             logger.warning("provider_unavailable provider=%s — trying next (%s)", provider, exc)
             continue
         except Exception as exc:
-            logger.error(
-                "ai_call tier=%s provider=%s prompt_version=%s messages=%d max_tokens=%d "
-                "latency_ms=%d status=error error=%s",
-                tier_name, provider, PROMPT_VERSION, len(messages), max_tokens,
-                (time.monotonic() - started) * 1000, type(exc).__name__,
+            # ANY unexpected provider failure — degrade to the next provider
+            # rather than crashing the whole request. Only when EVERY provider
+            # fails does the user see the 503 below.
+            last_unavailable = exc
+            logger.warning(
+                "ai_call tier=%s provider=%s status=error error=%s — trying next provider",
+                tier_name, provider, type(exc).__name__,
             )
-            raise
+            continue
 
         logger.info(
             "ai_call tier=%s provider=%s prompt_version=%s messages=%d max_tokens=%d "

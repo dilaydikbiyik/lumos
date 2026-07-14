@@ -1,3 +1,4 @@
+import asyncio
 from typing import Literal
 
 from fastapi import APIRouter, Depends, HTTPException, Request
@@ -60,7 +61,9 @@ async def chat_endpoint(
             ),
         )
     messages = [m.model_dump() for m in body.messages]
-    reply = ai_chat(messages, tier=user.plan)
+    # ai_chat uses blocking I/O (httpx sync + google-genai SDK) — run in a
+    # thread pool so the async event loop stays free for other requests.
+    reply = await asyncio.to_thread(ai_chat, messages, user.plan)
     return {"reply": reply}
 
 
@@ -110,7 +113,11 @@ async def advisor_endpoint(
             ),
         )
     messages = [m.model_dump() for m in body.messages]
-    reply = ai_chat(messages, tier=user.plan, mode="advisor", context=_advisor_context(user))
+    context = _advisor_context(user)
+    # ai_chat is synchronous (blocking I/O) — run off the event loop
+    reply = await asyncio.to_thread(
+        ai_chat, messages, user.plan, "advisor", context
+    )
     return {"reply": reply}
 
 
@@ -127,7 +134,7 @@ async def extract_profile_endpoint(
     Validation against RiskProfileAnswers happens via the response model.
     """
     messages = [m.model_dump() for m in body.messages]
-    answers = extract_profile(messages)
+    answers = await asyncio.to_thread(extract_profile, messages)
     try:
         return RiskProfileAnswers(**answers)
     except ValidationError:
@@ -155,4 +162,4 @@ async def what_if_endpoint(
     if not allowed:
         raise HTTPException(status_code=429, detail="Günlük mesaj hakkın doldu — yarın yenilenir.")
 
-    return answer_what_if(body.question, body.risk_score, body.budget)
+    return await asyncio.to_thread(answer_what_if, body.question, body.risk_score, body.budget)

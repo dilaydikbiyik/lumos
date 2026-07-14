@@ -11,7 +11,7 @@ const CATEGORY_COLORS = {
   stocks: '#E8663F',  // ember
   reit:   '#7A4A93',  // mor / erik
   bond:   '#1FB2A6',  // teal
-  cash:   '#6E3E22',  // kahve (koyu — ember'den net ayrışır)
+  cash:   '#9C5A34',  // kahve (V5 palette)
   fund:   '#3DD68C',
 }
 
@@ -35,7 +35,7 @@ export default function PortfolioChart({ allocations = [], onSliceClick }) {
 
   return (
     <div className="card">
-      <h3 style={{ marginBottom: 16 }}>Portfolio Allocation</h3>
+      <h3 style={{ marginBottom: 16 }}>Dağılımın</h3>
       <ResponsiveContainer width="100%" height={240}>
         <PieChart>
           <Pie
@@ -79,7 +79,7 @@ export default function PortfolioChart({ allocations = [], onSliceClick }) {
           >
             <span style={{ width: 10, height: 10, borderRadius: '50%', background: CATEGORY_COLORS[d.category] || COLORS[i % COLORS.length], flexShrink: 0 }} />
             <span style={{ fontSize: 13, flex: 1 }}>{d.name}</span>
-            <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--accent)' }}>{d.value}%</span>
+            <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>{d.value}%</span>
           </div>
         ))}
       </div>

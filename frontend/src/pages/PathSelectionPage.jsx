@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import LumosLogo from '../components/LumosLogo'
 import { useNavigate } from 'react-router-dom'
-import { UserButton, useAuth } from '@clerk/clerk-react'
-import api, { extractErrorMessage, setAuthToken } from '../utils/api'
+import { UserButton } from '@clerk/clerk-react'
+import api from '../utils/api'
 
 const PATHS = [
   {
@@ -41,22 +41,19 @@ const PATHS = [
 
 export default function PathSelectionPage() {
   const navigate = useNavigate()
-  const { getToken } = useAuth()
   const [saving, setSaving] = useState(null)
   const [error, setError] = useState(null)
   const [hovered, setHovered] = useState(null)
 
-  async function choose(pathId) {
+  function choose(pathId) {
     setSaving(pathId)
     setError(null)
-    try {
-      setAuthToken(await getToken())
-      await api.patch('/users/me/investment-path', { investment_path: pathId })
-      navigate('/fear-check-in')
-    } catch (err) {
-      setError(extractErrorMessage(err, 'Seçim kaydedilemedi — tekrar dener misin?'))
-      setSaving(null)
-    }
+    // Move on instantly — the save is not worth blocking the UI on (a cold-
+    // started backend can take 30-60s). Fire it in the background; the token
+    // interceptor attaches auth, and a failure here is non-critical (the path
+    // is re-selectable and re-derived on the next screen's load).
+    api.patch('/users/me/investment-path', { investment_path: pathId }).catch(() => {})
+    navigate('/fear-check-in')
   }
 
   return (

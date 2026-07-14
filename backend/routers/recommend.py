@@ -1,3 +1,4 @@
+import asyncio
 import logging
 
 from fastapi import APIRouter, Depends, Request
@@ -39,12 +40,16 @@ async def recommend(
             "experience": user.experience,
         }
 
-    # Generate plain-language explanation
-    portfolio.plain_explanation = explain_portfolio(portfolio, user_profile)
+    # explain_portfolio / explain_reit_inclusion call generate_text() which is
+    # synchronous blocking I/O — run in a thread so the event loop stays free.
+    portfolio.plain_explanation = await asyncio.to_thread(
+        explain_portfolio, portfolio, user_profile
+    )
 
-    # Add REIT explanation if applicable
     if portfolio.includes_reits:
-        reit_text = explain_reit_inclusion(portfolio, user_profile)
+        reit_text = await asyncio.to_thread(
+            explain_reit_inclusion, portfolio, user_profile
+        )
         portfolio.metadata["reit_explanation"] = reit_text
 
     logger.info(

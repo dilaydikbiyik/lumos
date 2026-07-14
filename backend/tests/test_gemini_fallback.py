@@ -88,14 +88,15 @@ def test_chain_exhausted_signals_provider_unavailable(genai_client):
         _gemini_chat(MSGS, "sys", 100)
 
 
-def test_real_errors_are_not_masked_by_chain(genai_client):
-    # 400 (invalid request) must not enter the fallback — surface immediately
-    client = _client_with([_api_error(400)])
+def test_any_error_fails_over_to_next_provider(genai_client):
+    # A 400 (bad key / bad request / safety) no longer crashes the request —
+    # it falls over so _dispatch can reach the next provider. Every model
+    # failing -> _ProviderUnavailable (never a hard raise up the chain).
+    client = _client_with([_api_error(400)] * len(GEMINI_MODEL_CHAIN))
     genai_client.return_value = client
 
-    with pytest.raises(genai_errors.APIError):
+    with pytest.raises(_ProviderUnavailable):
         _gemini_chat(MSGS, "sys", 100)
-    assert client.models.generate_content.call_count == 1
 
 
 def test_multi_key_model_major_order():

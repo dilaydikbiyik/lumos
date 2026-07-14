@@ -2,6 +2,9 @@ import axios from 'axios'
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000',
+  // Bound infinite hangs (Render cold-start + slow AI) — a timed-out request
+  // becomes a retryable "no response" for idempotent calls below.
+  timeout: 60000,
 })
 
 /**
