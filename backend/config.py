@@ -37,6 +37,11 @@ class Settings(BaseSettings):
     # Usage limits
     DAILY_MESSAGE_QUOTA: int = 50
 
+    # Admin bootstrap: comma-separated Clerk user IDs that are auto-promoted
+    # to role='admin' on startup. Set this in the Render env panel.
+    # e.g. ADMIN_CLERK_IDS=user_2abc,user_2xyz
+    ADMIN_CLERK_IDS: str = ""
+
     model_config = SettingsConfigDict(
         env_file=".env",
         extra="ignore",
@@ -48,4 +53,3 @@ settings = Settings()
 # Make the quota practically unlimited in development
 if settings.APP_ENV == "development":
     settings.DAILY_MESSAGE_QUOTA = 9999
-

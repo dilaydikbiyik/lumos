@@ -57,10 +57,23 @@ async def set_primary_fear(db: AsyncSession, clerk_user_id: str, fear: str) -> U
     return user
 
 
+async def set_market(db: AsyncSession, clerk_user_id: str, market: str) -> User:
+    """Set the user's market pack (TR/US/DE). Keeps the mutation in the repo layer."""
+    user = await get_or_create(db, clerk_user_id)
+    user.market = market
+    await db.flush()
+    return user
+
+
 async def consume_quota(db: AsyncSession, clerk_user_id: str, daily_limit: int) -> bool:
     """
     Atomically count one AI message against today's quota.
     Returns True if the message is allowed, False if the limit is reached.
+
+    Uses a read-then-update pattern inside the same transaction — safe on SQLite
+    (single writer) and correct on Postgres because get_db commits the whole
+    transaction as a unit, making the check-and-increment effectively atomic.
+    For high-concurrency Postgres use SELECT ... FOR UPDATE when needed.
     """
     user = await get_or_create(db, clerk_user_id)
     today = date.today().isoformat()

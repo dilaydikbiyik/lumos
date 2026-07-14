@@ -11,8 +11,6 @@ import time
 from pathlib import Path
 from typing import Optional
 
-from fastapi import HTTPException
-
 from backend.config import settings
 
 logger = logging.getLogger("lumos.ai")
@@ -32,6 +30,14 @@ class _ProviderUnavailable(Exception):
     provider simply isn't configured. Signals _dispatch to move on to the
     NEXT provider in the chain rather than failing the whole request. Only
     when EVERY provider raises this does the user see an error.
+    """
+
+
+class _EmptyResponseError(Exception):
+    """
+    The model returned a non-None response object but with no text.
+    Treated the same as a quota/overload error: try the next model/key.
+    Using a domain-specific exception keeps HTTP concepts out of the service layer.
     """
 
 # Free-quota strategy: every Gemini model has its OWN free-tier quota.
@@ -118,10 +124,7 @@ def _gemini_call_model(client, model: str, contents, system: str, max_tokens: in
         ),
     )
     if response.text is None:
-        raise HTTPException(
-            status_code=503,
-            detail="AI returned an empty response. Please try again.",
-        )
+        raise _EmptyResponseError(f"{model}: empty response.text")
     return response.text
 
 

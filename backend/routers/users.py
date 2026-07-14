@@ -136,10 +136,7 @@ async def update_market(
     if code not in MARKET_PACKS:
         raise HTTPException(status_code=422, detail=f"Unknown market '{code}'. Available: {list(MARKET_PACKS)}")
 
-    user = await user_repository.get_or_create(db, user_id)
-    user.market = code
-    await db.flush()
-    return user
+    return await user_repository.set_market(db, user_id, code)
 
 
 @router.get("/me/plans")

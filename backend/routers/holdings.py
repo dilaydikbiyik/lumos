@@ -1,7 +1,10 @@
-from fastapi import APIRouter, Depends, HTTPException
+import asyncio
+
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.db.database import get_db
+from backend.limiter import limiter
 from backend.middleware.verify_clerk import get_current_user
 from backend.repositories import holding_repository, user_repository
 from backend.schemas.holding import (
@@ -28,13 +31,16 @@ def _serialize(holding, enrichment: dict) -> HoldingRead:
 
 
 @router.get("", response_model=list[HoldingRead])
+@limiter.limit("30/minute")
 async def list_holdings(
+    request: Request,
     user_id: str = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     user = await user_repository.get_or_create(db, user_id)
     holdings = await holding_repository.list_for_user(db, user.id)
-    enrichment = enrich_holdings(holdings)
+    # enrich_holdings calls yfinance (sync HTTP) — run in thread pool
+    enrichment = await asyncio.to_thread(enrich_holdings, holdings)
     return [_serialize(h, enrichment) for h in holdings]
 
 
@@ -82,7 +88,9 @@ async def delete_holding(
 
 
 @router.get("/health")
+@limiter.limit("20/minute")
 async def health_score(
+    request: Request,
     user_id: str = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
@@ -91,7 +99,7 @@ async def health_score(
 
     user = await user_repository.get_or_create(db, user_id)
     holdings = await holding_repository.list_for_user(db, user.id)
-    enrichment = enrich_holdings(holdings)
+    enrichment = await asyncio.to_thread(enrich_holdings, holdings)
     by_type: dict[str, float] = {}
     for h in holdings:
         by_type[h.asset_type] = by_type.get(h.asset_type, 0.0) + current_value(h, enrichment)
@@ -99,7 +107,9 @@ async def health_score(
 
 
 @router.get("/summary", response_model=PortfolioSummary)
+@limiter.limit("20/minute")
 async def portfolio_summary(
+    request: Request,
     user_id: str = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
@@ -110,7 +120,7 @@ async def portfolio_summary(
     user = await user_repository.get_or_create(db, user_id)
     holdings = await holding_repository.list_for_user(db, user.id)
 
-    enrichment = enrich_holdings(holdings)
+    enrichment = await asyncio.to_thread(enrich_holdings, holdings)
     total_invested = sum(h.purchase_amount for h in holdings)
     total_value = sum(current_value(h, enrichment) for h in holdings)
     by_type: dict[str, float] = {}

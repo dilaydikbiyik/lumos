@@ -21,6 +21,27 @@ async def lifespan(app: FastAPI):
     Schema is owned by Alembic — run `alembic upgrade head` before starting
     (the Dockerfile CMD does this automatically).
     """
+    # Admin bootstrap: promote any IDs listed in ADMIN_CLERK_IDS to admin.
+    # Safe to run on every start (idempotent — won't downgrade existing admins).
+    if settings.ADMIN_CLERK_IDS:
+        import logging
+        from backend.db.database import AsyncSessionLocal
+        from backend.repositories import user_repository
+
+        _log = logging.getLogger("lumos.startup")
+        ids = [uid.strip() for uid in settings.ADMIN_CLERK_IDS.split(",") if uid.strip()]
+        async with AsyncSessionLocal() as db:
+            for clerk_id in ids:
+                try:
+                    user = await user_repository.get_or_create(db, clerk_id)
+                    if user.role != "admin":
+                        user.role = "admin"
+                        await db.flush()
+                        _log.info("Admin promoted: %s", clerk_id)
+                    await db.commit()
+                except Exception as exc:
+                    _log.warning("Admin bootstrap failed for %s: %s", clerk_id, exc)
+                    await db.rollback()
     yield
 
 

@@ -2,14 +2,29 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, dev]
   pull_request:
     branches: [main]
 
 jobs:
   backend:
-    name: Backend — ruff + pytest
+    name: Backend — ruff + pytest + alembic
     runs-on: ubuntu-latest
+
+    env:
+      # All env vars needed by tests — no real keys required
+      APP_ENV: development
+      DATABASE_URL: sqlite+aiosqlite:///./ci_scratch.db
+      GEMINI_API_KEY: ""
+      ANTHROPIC_API_KEY: ""
+      GROQ_API_KEY: ""
+      OPENROUTER_API_KEY: ""
+      CLERK_JWT_ISSUER: "https://example.clerk.accounts.dev/.well-known/jwks.json"
+      CLERK_SECRET_KEY: ""
+      CLERK_PUBLISHABLE_KEY: ""
+      ADMIN_CLERK_IDS: ""
+      PYTHONPATH: .
+
     steps:
       - uses: actions/checkout@v4
 
@@ -22,16 +37,21 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -r backend/requirements.txt
-          pip install ruff
+          pip install ruff pytest-cov
 
       - name: Lint (ruff)
         run: ruff check backend/
 
-      - name: Tests (pytest)
-        run: python -m pytest backend/tests/ -q
+      - name: Tests (pytest + coverage ≥50%)
+        run: |
+          python -m pytest backend/tests/ \
+            --cov=backend \
+            --cov-report=term-missing \
+            --cov-fail-under=50 \
+            -q
 
-      - name: Migrations apply to a fresh database
-        run: DATABASE_URL="sqlite+aiosqlite:///./ci_scratch.db" alembic upgrade head
+      - name: Migrations apply to fresh database
+        run: alembic upgrade head
 
   docker:
     name: Docker — image builds
@@ -65,3 +85,6 @@ jobs:
 
       - name: Build (vite)
         run: npm run build
+        env:
+          VITE_CLERK_PUBLISHABLE_KEY: pk_test_placeholder
+          VITE_API_BASE_URL: https://example.onrender.com

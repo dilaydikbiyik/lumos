@@ -950,6 +950,41 @@ The real bug was **synchronous blocking I/O inside async FastAPI route handlers*
 
 ### Still open
 
-- [ ] Verify advisor response on production after deploy (Render cold-start + new asyncio wrapper)
+- [x] Verify advisor response on production after deploy (Render cold-start + new asyncio wrapper)
 - [ ] Add `GROQ_API_KEY` + `OPENROUTER_API_KEY` to Render env if not already set
 - [ ] Optionally: code-split the JS bundle (currently 846 kB / 253 kB gzip — within acceptable range for now)
+
+---
+
+## 🛠️ Session Log — 2026-07-14 (köklü mimari analiz — P0/P1/P2 tümü kapatıldı)
+
+### P0 — Kalan event loop blocking sorunları giderildi
+
+| Dosya | Fonksiyon | Düzeltme |
+|-------|-----------|----------|
+| `backend/routers/holdings.py` | `enrich_holdings` (yfinance HTTP) | `asyncio.to_thread` × 3 endpoint |
+| `backend/routers/planning.py` | `project_asset/region/portfolio/province` (yfinance) | `asyncio.to_thread` × 4 endpoint |
+
+Rate limit eklendi: `list_holdings:30/min`, `health:20/min`, `summary:20/min`.
+
+### P1 — Mimari tutarsızlıklar
+
+- `user_repository.py`: `set_market()` eklendi → ORM mutation'lar artık tümüyle repo katmanında
+- `users.py`: `update_market` artık `user_repository.set_market()` kullanıyor (direkt ORM erişimi kaldırıldı)
+- `config.py` + `main.py`: **Admin bootstrap** — `ADMIN_CLERK_IDS` env var ile başlangıçta otomatik admin promotion (idempotent)
+- `.github/workflows/ci.yml`: env var'lar eklendi, `pytest-cov --cov-fail-under=50`, `dev` branch'i, `VITE_` env'ler
+
+### P2 — Kod kalitesi
+
+- `ai_service.py`: `_gemini_call_model`'daki `HTTPException(503)` → `_EmptyResponseError` (HTTP kavramı servis katmanından çıkarıldı)
+
+### Logo hizalaması
+
+- `LumosLogo.jsx`: `alignItems: flex-end` + `marginBottom` → `alignItems: center` + `marginTop: 0.55em`
+- Ateşböceği simgesi artık "L" harfinin cap-height merkeziyle hizalı
+
+### Hâlâ açık
+
+- [ ] `GROQ_API_KEY` + `OPENROUTER_API_KEY` Render env'e ekle
+- [ ] Kendi Clerk kullanıcı ID'ni `ADMIN_CLERK_IDS`'e ekle (Render env paneli)
+- [ ] JS bundle code-split (isteğe bağlı, 253 kB gzip kabul edilebilir)

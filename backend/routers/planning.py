@@ -1,3 +1,5 @@
+import asyncio
+
 from fastapi import APIRouter, Depends, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -104,8 +106,8 @@ async def asset_projection(
     user's own amount.
     """
     from backend.services.projection import project_asset
-
-    return project_asset(body.ticker.upper(), body.amount, body.years)
+    # project_asset fetches yfinance price history (blocking HTTP)
+    return await asyncio.to_thread(project_asset, body.ticker.upper(), body.amount, body.years)
 
 
 @router.post("/projection/region")
@@ -117,8 +119,7 @@ async def region_projection(
 ):
     """Region scenario band — TCMB housing-index window distribution + real terms."""
     from backend.services.projection import project_region
-
-    return project_region(body.region_code, body.amount, body.years)
+    return await asyncio.to_thread(project_region, body.region_code, body.amount, body.years)
 
 
 @router.post("/projection/portfolio")
@@ -139,7 +140,7 @@ async def portfolio_projection(
     if not 0.95 <= total <= 1.05:
         from fastapi import HTTPException
         raise HTTPException(status_code=422, detail=f"Weights must sum to ~1 (got {total:.2f}).")
-    return project_portfolio(body.weights, body.amount, body.years)
+    return await asyncio.to_thread(project_portfolio, body.weights, body.amount, body.years)
 
 
 @router.get("/province-intelligence")
@@ -167,5 +168,4 @@ async def province_projection(
 ):
     """Province scenario band — window distribution of 16 years of unit prices."""
     from backend.services.province_intelligence import project_province
-
-    return project_province(body.region_code.upper(), body.amount, body.years)
+    return await asyncio.to_thread(project_province, body.region_code.upper(), body.amount, body.years)
