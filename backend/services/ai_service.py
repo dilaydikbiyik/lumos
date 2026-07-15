@@ -7,14 +7,13 @@ development default; Anthropic can be enabled by switching the env var.
 """
 import hashlib
 import logging
-
-from fastapi import HTTPException
 import time
 from pathlib import Path
 from typing import Optional
 
-from backend.config import settings
+from fastapi import HTTPException
 
+from backend.config import settings
 logger = logging.getLogger("lumos.ai")
 
 _SYSTEM_PROMPT = (Path(__file__).parent.parent / "prompts" / "system_prompt.txt").read_text()
@@ -219,44 +218,56 @@ def _openai_compatible_chat(
 
     last_status: object = None
     for i, model in enumerate(model_chain):
-        try:
-            resp = httpx.post(
-                f"{base_url}/chat/completions",
-                headers=headers,
-                json={"model": model, "messages": payload_messages, "max_tokens": max_tokens},
-                timeout=60.0,
+        for attempt in range(2):  # attempt 0 = first try; attempt 1 = after 5s RPM backoff
+            try:
+                resp = httpx.post(
+                    f"{base_url}/chat/completions",
+                    headers=headers,
+                    json={"model": model, "messages": payload_messages, "max_tokens": max_tokens},
+                    timeout=60.0,
+                )
+            except httpx.RequestError as exc:
+                logger.warning("%s model=%s network error — trying next (%s)", provider, model, exc)
+                last_status = f"network:{exc}"
+                break  # network error — skip to next model immediately
+
+            if resp.status_code == 200:
+                data = resp.json()
+                content = (data.get("choices") or [{}])[0].get("message", {}).get("content") or ""
+                if not content:
+                    last_status = "empty"
+                    break
+                if i > 0:
+                    logger.info("%s_fallback served_by=%s", provider, model)
+                return content
+
+            # 429: could be RPM (transient) or daily quota (permanent).
+            # On first hit: wait 5s and retry the same model — resolves RPM limits.
+            # On second hit: fall through to the next model (quota exhausted).
+            if resp.status_code == 429 and attempt == 0:
+                logger.info(
+                    "%s model=%s got 429 — waiting 5s (RPM backoff) before retry",
+                    provider, model,
+                )
+                import time as _time
+                _time.sleep(5)
+                continue  # retry same model
+
+            # 429 (second attempt), 402 credits, 5xx overload → next model
+            if resp.status_code in (429, 402, 500, 502, 503, 504):
+                logger.warning("%s model=%s unavailable (code=%s) — trying next", provider, model, resp.status_code)
+                last_status = resp.status_code
+                break
+            # 401/403 = bad/absent key for this provider → skip whole provider
+            if resp.status_code in (401, 403):
+                raise _ProviderUnavailable(f"{provider}: auth failed ({resp.status_code})")
+            # Anything else (400, 404, safety) — skip this model
+            logger.warning(
+                "%s model=%s failed (code=%s) %s — trying next",
+                provider, model, resp.status_code, resp.text[:120],
             )
-        except httpx.RequestError as exc:
-            logger.warning("%s model=%s network error — trying next (%s)", provider, model, exc)
-            last_status = f"network:{exc}"
-            continue
-
-        if resp.status_code == 200:
-            data = resp.json()
-            content = (data.get("choices") or [{}])[0].get("message", {}).get("content") or ""
-            if not content:
-                last_status = "empty"
-                continue
-            if i > 0:
-                logger.info("%s_fallback served_by=%s", provider, model)
-            return content
-
-        # 429 quota, 402 credits, 5xx overload → next model (own free pool each)
-        if resp.status_code in (429, 402, 500, 502, 503, 504):
-            logger.warning("%s model=%s unavailable (code=%s) — trying next", provider, model, resp.status_code)
             last_status = resp.status_code
-            continue
-        # 401/403 = bad/absent key for this provider → skip whole provider
-        if resp.status_code in (401, 403):
-            raise _ProviderUnavailable(f"{provider}: auth failed ({resp.status_code})")
-        # Anything else (400 stale/unknown model id, 404, safety) — skip THIS
-        # model and try the next; if all fail the provider chain moves on.
-        logger.warning(
-            "%s model=%s failed (code=%s) %s — trying next",
-            provider, model, resp.status_code, resp.text[:120],
-        )
-        last_status = resp.status_code
-        continue
+            break
 
     raise _ProviderUnavailable(f"{provider}: all models exhausted (last={last_status})")
 

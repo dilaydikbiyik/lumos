@@ -43,8 +43,10 @@ def _ok_response(text="cevap"):
 
 @pytest.fixture
 def genai_client():
-    # Tests assume a single key — disable the extra slots
+    # Tests assume a single key — give key-1 a fake value so the `if k` filter
+    # keeps it, then zero out the extra slots so the loop runs exactly once.
     with patch("google.genai.Client") as cls, \
+         patch.object(settings, "GEMINI_API_KEY", "test-key-1"), \
          patch.object(settings, "GEMINI_API_KEY_2", ""), \
          patch.object(settings, "GEMINI_API_KEY_3", ""), \
          patch.object(settings, "GEMINI_API_KEY_4", ""):
