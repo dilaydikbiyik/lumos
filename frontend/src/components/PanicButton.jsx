@@ -21,10 +21,14 @@ export default function PanicButton() {
 
   // Pause stage: a 10-second countdown before the facts appear. The wait is
   // the point — it breaks the reflex to act instantly. Skippable.
+  // All state transitions live in the timeout callback (never synchronously
+  // in the effect body — react-hooks/set-state-in-effect).
   useEffect(() => {
     if (!open || stage !== 'pause') return
-    if (secondsLeft <= 0) { setStage('coach'); return }
-    const t = setTimeout(() => setSecondsLeft(secondsLeft - 1), 1000)
+    const t = setTimeout(() => {
+      if (secondsLeft <= 1) setStage('coach')
+      else setSecondsLeft(secondsLeft - 1)
+    }, 1000)
     return () => clearTimeout(t)
   }, [open, stage, secondsLeft])
 

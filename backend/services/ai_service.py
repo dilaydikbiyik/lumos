@@ -7,6 +7,8 @@ development default; Anthropic can be enabled by switching the env var.
 """
 import hashlib
 import logging
+
+from fastapi import HTTPException
 import time
 from pathlib import Path
 from typing import Optional

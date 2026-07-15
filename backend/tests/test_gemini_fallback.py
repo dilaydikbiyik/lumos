@@ -9,7 +9,6 @@ honest exhausted-message at the end.
 from unittest.mock import MagicMock, patch
 
 import pytest
-from fastapi import HTTPException
 from google.genai import errors as genai_errors
 
 from backend.config import settings

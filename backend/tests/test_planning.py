@@ -1,6 +1,9 @@
 """
 Rent-vs-buy and listing bridge tests.
 """
+import pytest
+
+from backend.services.goal_planner import required_monthly_contribution
 from backend.services.listing_bridge import build_listing_links
 from backend.services.rent_vs_buy import compare_rent_vs_buy
 

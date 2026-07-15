@@ -37,9 +37,14 @@ services:
         sync: false
       - key: FRONTEND_URL
         sync: false
-      # ⚠️ Render free-plan disks are EPHEMERAL: a SQLite file is wiped on every
-      # deploy/restart — user profiles and holdings would vanish. Before real
-      # users arrive, point this at a managed Postgres
-      # (postgresql+asyncpg://...) and add asyncpg to requirements.txt.
+      # Free-tier cross-provider fallback keys (gemini -> groq -> openrouter);
+      # optional — the chain skips providers whose key is missing
+      - key: GROQ_API_KEY
+        sync: false
+      - key: OPENROUTER_API_KEY
+        sync: false
+      # sync:false — the real value is the Neon Postgres URL set in the
+      # dashboard. A hardcoded value here would OVERWRITE it on every
+      # blueprint sync (silently flipping prod back to ephemeral SQLite).
       - key: DATABASE_URL
-        value: sqlite+aiosqlite:///./lumos.db
+        sync: false

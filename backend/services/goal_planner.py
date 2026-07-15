@@ -7,6 +7,8 @@ tool and rent-vs-buy stay coherent, and results are also reported in REAL
 (inflation-adjusted) terms — a nominal target erodes over the horizon.
 """
 
+import math
+
 from backend.services import assumptions
 
 
@@ -45,8 +47,12 @@ def required_monthly_contribution(
         # Future value of an ordinary annuity, solved for payment
         monthly_contribution = remaining * monthly_rate / ((1 + monthly_rate) ** months - 1)
 
+    # Round UP to the next kuruş: "follow the plan" must guarantee reaching
+    # the target — rounding down leaves the user a hair short at the deadline.
+    monthly_contribution = math.ceil(monthly_contribution * 100) / 100
+
     return {
-        "monthly_contribution": round(monthly_contribution, 2),
+        "monthly_contribution": monthly_contribution,
         "already_on_track": False,
         "projected_shortfall_or_surplus": 0.0,
         # What the nominal target is worth in today's money at the deadline —
