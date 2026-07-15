@@ -4,11 +4,12 @@ import useChat from '../hooks/useChat'
 
 const INTRO = "Merhaba! Ben Lumos.\n\nSana 9 kısa soru soracağım ve kişisel risk profilini oluşturacağım. Hazır mısın?\n\n**1️⃣ Başlayalım: Yatırıma ayırabileceğin bütçen nedir?** (Örn: 50.000 TL)"
 
-export default function ChatWindow({ onProfileComplete }) {
+export default function ChatWindow({ onProfileComplete, onFirstMessage }) {
   const { messages, isLoading, error, sendMessage } = useChat(onProfileComplete)
   const [input, setInput] = useState('')
   const bottomRef = useRef(null)
   const inputRef = useRef(null)
+  const startedRef = useRef(false)
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -17,6 +18,12 @@ export default function ChatWindow({ onProfileComplete }) {
   async function handleSend(e) {
     e.preventDefault()
     if (!input.trim() || isLoading) return
+    if (!startedRef.current) {
+      // Lets the parent know the quiz is genuinely in progress (e.g. so a
+      // late-arriving stored profile doesn't yank the user to the reveal).
+      startedRef.current = true
+      onFirstMessage?.()
+    }
     const text = input
     setInput('')
     await sendMessage(text)

@@ -25,17 +25,21 @@ export default function ProfilePage() {
   const { saveProfile, loadProfile, profile } = usePortfolio()
   const { money } = useMarket()
   const [quizResult, setQuizResult] = useState(null)
-  const [checkedStore, setCheckedStore] = useState(false)
   const [retaking, setRetaking] = useState(false)
+  const [quizStarted, setQuizStarted] = useState(false)
 
-  // If a stored profile exists, skip the quiz and show the score — losing
-  // 9 answers on a page refresh breaks trust; the score must persist.
+  // Fetch any stored profile in the background — the quiz renders IMMEDIATELY
+  // (its intro is a local constant; gating it on this request made the page
+  // feel frozen whenever the backend was cold).
   useEffect(() => {
-    loadProfile().finally(() => setCheckedStore(true))
+    loadProfile()
   }, [loadProfile])
 
-  // Derived view: quiz result > stored profile (unless a retake was requested)
-  const riskResult = quizResult ?? (!retaking && profile?.risk_score ? profile : null)
+  // Derived view: quiz result > stored profile. The stored profile is only
+  // swapped in while the user hasn't started answering — a late response must
+  // never yank a half-finished quiz away.
+  const riskResult =
+    quizResult ?? (!retaking && !quizStarted && profile?.risk_score ? profile : null)
 
   async function handleProfileComplete(answers) {
     const result = await saveProfile(answers)
@@ -53,11 +57,7 @@ export default function ProfilePage() {
       </header>
 
       <div className="page-content">
-        {!checkedStore && !riskResult ? (
-          <p style={{ textAlign: 'center', padding: '48px 0', fontSize: 13, opacity: 0.6 }}>
-            Profilin yükleniyor…
-          </p>
-        ) : !riskResult ? (
+        {!riskResult ? (
           <>
             {/* Header — jargon-free copy */}
             <div style={{ marginBottom: 16 }}>
@@ -72,7 +72,10 @@ export default function ProfilePage() {
                 9 kısa soru — yapay zeka profilini çıkaracak, portföyünü buna göre kişiselleştirecek.
               </p>
             </div>
-            <ChatWindow onProfileComplete={handleProfileComplete} />
+            <ChatWindow
+              onProfileComplete={handleProfileComplete}
+              onFirstMessage={() => setQuizStarted(true)}
+            />
           </>
         ) : (
           /* Score reveal — full-page flow */
@@ -169,7 +172,7 @@ export default function ProfilePage() {
             </button>
             <button
               className="btn btn-ghost btn-full"
-              onClick={() => { setRetaking(true); setQuizResult(null) }}
+              onClick={() => { setRetaking(true); setQuizStarted(false); setQuizResult(null) }}
             >
               ← Testi Yeniden Yap
             </button>

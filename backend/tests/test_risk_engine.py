@@ -1,6 +1,6 @@
 """
 Tests for the risk engine.
-10 scenarios covering all user types described in Phase 5.
+10 scenarios covering the persona types from tests/e2e/scenarios.json.
 """
 
 from backend.schemas.user_profile import RiskProfileAnswers

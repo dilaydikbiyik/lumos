@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { useEffect } from 'react'
 import { ClerkLoading, SignedIn, SignedOut, RedirectToSignIn, useAuth } from '@clerk/clerk-react'
 import AppNav from './components/AppNav'
@@ -19,6 +19,16 @@ import DashboardPage from './pages/DashboardPage'
 
 function Illumination() {
   useIllumination()
+  return null
+}
+
+/** React Router keeps the window scroll position across navigations; on
+    mobile that makes every new page open "shifted up" mid-content. */
+function ScrollToTop() {
+  const { pathname } = useLocation()
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [pathname])
   return null
 }
 
@@ -66,6 +76,7 @@ export default function App() {
         {/* Fresh Clerk token per request (interceptor) — must be registered
             BEFORE MarketProvider's fetch */}
         <AuthBridge />
+        <ScrollToTop />
 
         <MarketProvider>
         <Routes>
