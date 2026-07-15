@@ -22,32 +22,54 @@ function getRiskMeta(score) {
 
 export default function ProfilePage() {
   const navigate = useNavigate()
-  const { saveProfile, loadProfile, profile } = usePortfolio()
+  const { saveProfile, loadProfile } = usePortfolio()
   const { money } = useMarket()
-  const [quizResult, setQuizResult] = useState(null)
-  const [retaking, setRetaking] = useState(false)
-  const [quizStarted, setQuizStarted] = useState(false)
+  const [displayProfile, setDisplayProfile] = useState(null)   // what we show
+  const [profileLoading, setProfileLoading] = useState(true)   // true until first fetch completes
+  const [retaking, setRetaking] = useState(false)               // user chose to redo
 
-  // Fetch any stored profile in the background — the quiz renders IMMEDIATELY
-  // (its intro is a local constant; gating it on this request made the page
-  // feel frozen whenever the backend was cold).
+  // On mount: fetch stored profile. Do NOT call setState synchronously in the
+  // effect body — profileLoading starts as true so the spinner shows immediately.
   useEffect(() => {
-    loadProfile()
-  }, [loadProfile])
-
-  // Derived view: quiz result > stored profile. The stored profile is only
-  // swapped in while the user hasn't started answering — a late response must
-  // never yank a half-finished quiz away.
-  const riskResult =
-    quizResult ?? (!retaking && !quizStarted && profile?.risk_score ? profile : null)
+    let cancelled = false
+    loadProfile().then(result => {
+      if (!cancelled) {
+        setDisplayProfile(result || null)
+        setProfileLoading(false)
+      }
+    }).catch(() => {
+      if (!cancelled) setProfileLoading(false)
+    })
+    return () => { cancelled = true }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   async function handleProfileComplete(answers) {
     const result = await saveProfile(answers)
     if (result) {
       setRetaking(false)
-      setQuizResult(result)
+      setDisplayProfile(result)
     }
   }
+
+  // While fetching, show a subtle loading indicator — don't start the quiz yet
+  if (profileLoading) {
+    return (
+      <div className="page">
+        <header className="navbar">
+          <LumosLogo />
+          <UserButton afterSignOutUrl="/" />
+        </header>
+        <div className="page-content" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1 }}>
+          <img src="/favicon.svg" alt="" width={36} height={36} className="firefly-mark" style={{ marginBottom: 12 }} />
+          <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>Profil yükleniyor…</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Show result if we have a saved profile AND the user hasn't asked to redo
+  const showResult = !retaking && displayProfile?.risk_score != null
 
   return (
     <div className="page">
@@ -57,7 +79,7 @@ export default function ProfilePage() {
       </header>
 
       <div className="page-content">
-        {!riskResult ? (
+        {!showResult ? (
           <>
             {/* Header — jargon-free copy */}
             <div style={{ marginBottom: 16 }}>
@@ -74,13 +96,12 @@ export default function ProfilePage() {
             </div>
             <ChatWindow
               onProfileComplete={handleProfileComplete}
-              onFirstMessage={() => setQuizStarted(true)}
             />
           </>
         ) : (
-          /* Score reveal — full-page flow */
+          /* Score reveal — full-page result */
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-            {/* Success header */}
+            {/* Header */}
             <div style={{ textAlign: 'center', padding: '12px 0' }}>
               <img src="/favicon.svg" alt="" width={44} height={44} style={{ display: 'block', margin: '0 auto 10px', filter: 'drop-shadow(0 0 12px rgba(245,165,36,0.4))' }} />
               <h2>Risk Profilin Hazır</h2>
@@ -89,43 +110,39 @@ export default function ProfilePage() {
               </p>
             </div>
 
-            <RiskGauge score={riskResult.risk_score} label={riskResult.label} />
+            <RiskGauge score={displayProfile.risk_score} label={displayProfile.label} />
 
             {/* Summary card */}
             <div className="card" style={{
-              borderColor: getRiskMeta(riskResult.risk_score).color + '44',
+              borderColor: getRiskMeta(displayProfile.risk_score).color + '44',
               background: 'var(--bg-card)',
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
                 <span style={{
                   fontSize: 12, fontWeight: 700, letterSpacing: '0.08em',
-                  color: getRiskMeta(riskResult.risk_score).color,
+                  color: getRiskMeta(displayProfile.risk_score).color,
                   textTransform: 'uppercase',
                 }}>
-                  {getRiskMeta(riskResult.risk_score).label} Profil
+                  {getRiskMeta(displayProfile.risk_score).label} Profil
                 </span>
-                <span className="badge badge-amber">{riskResult.risk_score}/10</span>
+                <span className="badge badge-amber">{displayProfile.risk_score}/10</span>
               </div>
               <p style={{ fontSize: 14, lineHeight: 1.75, color: 'var(--text)' }}>
-                {riskResult.summary}
+                {displayProfile.summary}
               </p>
-              {/* Concretised risk message — the worst-case drawdown scales with
-                  the risk score, so an aggressive profile is shown an honestly
-                  larger potential fall (not a flat -20% for everyone). */}
-              {riskResult.answers?.budget && (() => {
-                // ~ -15% conservative → ~ -45% aggressive; historically grounded
-                const dropPct = Math.round(10 + riskResult.risk_score * 3.8)
-                const worst = riskResult.answers.budget * (1 - dropPct / 100)
+              {displayProfile.answers?.budget && (() => {
+                const dropPct = Math.round(10 + displayProfile.risk_score * 3.8)
+                const worst = displayProfile.answers.budget * (1 - dropPct / 100)
                 return (
                   <div style={{
                     marginTop: 12, padding: '10px 14px',
                     background: 'var(--firefly-dim)', borderRadius: 'var(--radius-xs)',
                     fontSize: 13, lineHeight: 1.6, color: 'var(--text)',
                   }}>
-                    💡 Senin bütçen <strong>{money(riskResult.answers.budget)}</strong>.
+                    💡 Senin bütçen <strong>{money(displayProfile.answers.budget)}</strong>.
                     Bu risk seviyesinde, sert bir düşüşte portföyün geçici olarak
                     yaklaşık <strong>%{dropPct}</strong> gerileyip{' '}
-                    <strong>{money(worst)}</strong>'ye inebilir.
+                    <strong>{money(worst)}</strong>&apos;ye inebilir.
                     Bu, bu profil için normal bir dalgalanma aralığı — satmadığın sürece
                     zarar kesinleşmez.
                   </div>
@@ -133,15 +150,15 @@ export default function ProfilePage() {
               })()}
             </div>
 
-            {/* Score breakdown — no black box: the source of every point */}
-            {riskResult.factors?.length > 0 && (
+            {/* Score breakdown */}
+            {displayProfile.factors?.length > 0 && (
               <div className="card">
                 <h3 style={{ marginBottom: 4, fontSize: 15 }}>🧮 Bu skor nereden geldi?</h3>
                 <p style={{ fontSize: 12, opacity: 0.7, marginBottom: 12 }}>
                   Kara kutu yok — her puanın kaynağı ve gerekçesi:
                 </p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                  {riskResult.factors.map((f, i) => (
+                  {displayProfile.factors.map((f, i) => (
                     <div key={i} style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
                       <span style={{
                         minWidth: 52, textAlign: 'center', padding: '3px 6px',
@@ -159,22 +176,22 @@ export default function ProfilePage() {
                   ))}
                 </div>
                 <p style={{ fontSize: 12, opacity: 0.6, marginTop: 12, borderTop: '1px solid var(--border)', paddingTop: 8 }}>
-                  Toplam ≈ <strong>{riskResult.risk_score}/10</strong> (katkıların toplamı, 1-10 aralığına sabitlenir)
+                  Toplam ≈ <strong>{displayProfile.risk_score}/10</strong> (katkıların toplamı, 1-10 aralığına sabitlenir)
                 </p>
               </div>
             )}
 
             <button
               className="btn btn-primary btn-full"
-              onClick={() => navigate('/recommend', { state: riskResult })}
+              onClick={() => navigate('/recommend', { state: displayProfile })}
             >
               Portföyümü Gör
             </button>
             <button
               className="btn btn-ghost btn-full"
-              onClick={() => { setRetaking(true); setQuizStarted(false); setQuizResult(null) }}
+              onClick={() => setRetaking(true)}
             >
-              ← Testi Yeniden Yap
+              ← Risk Analizini Güncelle
             </button>
           </div>
         )}

@@ -14,14 +14,18 @@ export default function usePortfolio() {
     setAuthToken(token)
   }
 
-  // useCallback — needed as a useEffect dependency in DashboardPage
+  // useCallback — needed as a useEffect dependency in DashboardPage.
+  // Returns the profile data so callers can use it directly without
+  // waiting for the async state update (avoids race conditions).
   const loadProfile = useCallback(async () => {
     try {
       await ensureAuth()
       const res = await api.get('/profile')
       setProfile(res.data)
+      return res.data
     } catch {
       setProfile(null)
+      return null
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [getToken])

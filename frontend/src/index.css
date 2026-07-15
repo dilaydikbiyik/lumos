@@ -97,7 +97,9 @@ body {
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--border);
-  padding: 12px var(--page-pad);
+  /* iOS safe area: push content below the status bar (clock, carrier icons)
+     max() ensures we always have at least 12px even on non-notch devices. */
+  padding: max(12px, calc(env(safe-area-inset-top) + 8px)) var(--page-pad) 12px;
   display: flex; align-items: center; justify-content: space-between;
 }
 
