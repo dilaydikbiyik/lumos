@@ -34,6 +34,9 @@ class Settings(BaseSettings):
     # TCMB EVDS — live CPI (TUFE) + housing price index (free key)
     TCMB_EVDS_API_KEY: str = ""
 
+    # ── Observability (optional) ──
+    SENTRY_DSN: str = ""          # sentry.io — leave empty to disable error monitoring
+
     # Usage limits
     DAILY_MESSAGE_QUOTA: int = 50
 

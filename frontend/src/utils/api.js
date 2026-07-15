@@ -52,8 +52,16 @@ export function setAuthToken(token) {
  * 504 the app may have processed the request, so only idempotent methods
  * are retried (never POST — e.g. a duplicate holding must be impossible).
  */
-const RETRY_DELAYS_MS = [2000, 5000, 10000, 20000]
+export const RETRY_DELAYS_MS = [2000, 5000, 10000, 20000]
 const IDEMPOTENT = new Set(['get', 'head', 'options', 'put', 'delete', 'patch'])
+
+/** Exported for tests — the safety-critical retry decision in one place. */
+export function shouldRetry({ hasResponse, status, method, retryCount }) {
+  const proxyLevel = status === 502 || status === 503
+  const maybeProcessed = !hasResponse || status === 504
+  const retryable = proxyLevel || (maybeProcessed && IDEMPOTENT.has(method))
+  return retryable && retryCount < RETRY_DELAYS_MS.length
+}
 
 api.interceptors.response.use(
   (res) => res,
@@ -61,16 +69,14 @@ api.interceptors.response.use(
     const cfg = error.config
     if (!cfg || error.code === 'ERR_CANCELED') return Promise.reject(error)
 
-    const status = error.response?.status
-    const method = (cfg.method || 'get').toLowerCase()
-    const proxyLevel = status === 502 || status === 503
-    const maybeProcessed = !error.response || status === 504
-    const retryable = proxyLevel || (maybeProcessed && IDEMPOTENT.has(method))
-
     cfg.__retryCount = cfg.__retryCount || 0
-    if (!retryable || cfg.__retryCount >= RETRY_DELAYS_MS.length) {
-      return Promise.reject(error)
-    }
+    const ok = shouldRetry({
+      hasResponse: !!error.response,
+      status: error.response?.status,
+      method: (cfg.method || 'get').toLowerCase(),
+      retryCount: cfg.__retryCount,
+    })
+    if (!ok) return Promise.reject(error)
 
     const delay = RETRY_DELAYS_MS[cfg.__retryCount]
     cfg.__retryCount += 1

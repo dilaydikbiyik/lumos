@@ -63,7 +63,7 @@ jobs:
         run: docker build -t lumos-backend .
 
   frontend:
-    name: Frontend — eslint + build
+    name: Frontend — eslint + vitest + build
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -82,6 +82,9 @@ jobs:
 
       - name: Lint (eslint)
         run: npm run lint
+
+      - name: Tests (vitest)
+        run: npm test
 
       - name: Build (vite)
         run: npm run build

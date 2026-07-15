@@ -9,7 +9,7 @@ import MarketContext from '../contexts/MarketContext'
  *                         even when the user switches markets
  * Outside the provider (tests / isolated renders) TR defaults apply.
  */
-const FALLBACK = {
+export const FALLBACK_MARKET = {
   market: 'TR',
   pack: { code: 'TR', currency: 'TRY', locale: 'tr-TR', live_inflation: true, live_housing_index: true },
   packs: [],
@@ -20,5 +20,5 @@ const FALLBACK = {
 }
 
 export default function useMarket() {
-  return useContext(MarketContext) ?? FALLBACK
+  return useContext(MarketContext) ?? FALLBACK_MARKET
 }

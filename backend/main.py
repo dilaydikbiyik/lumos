@@ -9,6 +9,18 @@ from slowapi.errors import RateLimitExceeded
 
 from backend.config import settings
 from backend.limiter import limiter
+
+# Error monitoring — activates only when SENTRY_DSN is configured; a fresh
+# clone without an account runs exactly as before.
+if settings.SENTRY_DSN:
+    import sentry_sdk
+
+    sentry_sdk.init(
+        dsn=settings.SENTRY_DSN,
+        environment=settings.APP_ENV,
+        traces_sample_rate=0.1,
+        send_default_pii=False,  # never ship user content to a third party
+    )
 from backend.middleware.error_handler import register_error_handlers
 from backend.middleware.request_id import RequestIDMiddleware
 from backend.routers import admin, backtest, chat, coach, health, holdings, news, planning, practice, profile, recommend, users

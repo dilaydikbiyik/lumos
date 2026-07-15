@@ -29,6 +29,9 @@ alembic==1.15.2
 # ── Caching ───────────────────────────────────────────────────────────────────
 diskcache==5.6.3
 
+# ── Observability (optional, enabled via SENTRY_DSN) ────────────────────────
+sentry-sdk[fastapi]==2.19.2
+
 # ── Rate Limiting ─────────────────────────────────────────────────────────────
 slowapi==0.1.10
 

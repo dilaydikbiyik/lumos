@@ -48,3 +48,5 @@ services:
       # blueprint sync (silently flipping prod back to ephemeral SQLite).
       - key: DATABASE_URL
         sync: false
+      - key: SENTRY_DSN
+        sync: false
