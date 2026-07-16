@@ -1,4 +1,5 @@
 import { useEffect, useCallback } from 'react'
+import Icon from '../components/Icon'
 import { useNavigate } from 'react-router-dom'
 import { UserButton, useAuth } from '@clerk/clerk-react'
 import LumosLogo from '../components/LumosLogo'
@@ -28,7 +29,7 @@ function ProgressiveDetails({ holdingsSummary, portfolio }) {
           className="btn btn-ghost"
           style={{ width: '100%', fontSize: 13, border: '1px dashed var(--border)' }}
         >
-          📊 Detayları Göster (karşılaştırma & hedef)
+          <Icon name="chart" size={14} /> Detayları Göster (karşılaştırma & hedef)
         </button>
       ) : (
         <>

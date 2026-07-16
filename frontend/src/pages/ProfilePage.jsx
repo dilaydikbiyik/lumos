@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import Icon from '../components/Icon'
 import { useNavigate } from 'react-router-dom'
 import { UserButton, useAuth } from '@clerk/clerk-react'
 import LumosLogo from '../components/LumosLogo'
@@ -48,8 +49,10 @@ export default function ProfilePage() {
     loadProfile().then(result => {
       if (cancelled) return
       if (result?.risk_score != null) {
-        // Fresh server copy — adopt it unless the user is mid-quiz
-        if (!quizStartedRef.current) setDisplayProfile(result)
+        // Fresh server copy — adopt it unless the user is mid-quiz, and only
+        // when it actually differs (identical swaps re-render the gauge).
+        const changed = JSON.stringify(result) !== JSON.stringify(displayProfile)
+        if (!quizStartedRef.current && changed) setDisplayProfile(result)
         if (cacheKey) localStorage.setItem(cacheKey, JSON.stringify(result))
       } else if (result === null) {
         // Server DEFINITIVELY has no profile — drop any stale cache
@@ -144,7 +147,7 @@ export default function ProfilePage() {
                     background: 'var(--firefly-dim)', borderRadius: 'var(--radius-xs)',
                     fontSize: 13, lineHeight: 1.6, color: 'var(--text)',
                   }}>
-                    💡 Senin bütçen <strong>{money(displayProfile.answers.budget)}</strong>.
+                    <Icon name="bulb" size={14} /> Senin bütçen <strong>{money(displayProfile.answers.budget)}</strong>.
                     Bu risk seviyesinde, sert bir düşüşte portföyün geçici olarak
                     yaklaşık <strong>%{dropPct}</strong> gerileyip{' '}
                     <strong>{money(worst)}</strong>&apos;ye inebilir.

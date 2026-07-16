@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import Icon from './Icon'
 import { useAuth } from '@clerk/clerk-react'
 import api, { setAuthToken } from '../utils/api'
 
@@ -71,7 +72,7 @@ export default function PanicButton() {
           boxShadow: '0 4px 18px rgba(245,165,36,0.18)',
         }}
       >
-        🫨
+        <Icon name="lifebuoy" size={24} />
       </button>
 
       {open && (

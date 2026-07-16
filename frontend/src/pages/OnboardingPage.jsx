@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import LumosLogo from '../components/LumosLogo'
 import { SignInButton, SignedIn, SignedOut, UserButton } from '@clerk/clerk-react'
 import DisclaimerModal from '../components/DisclaimerModal'
+import Icon from '../components/Icon'
 
 // 10 fireflies — drift toward the title
 // Each with its own start position, duration and motion vector
@@ -21,17 +22,17 @@ const FIREFLY_CONFIG = [
 
 const FEATURES = [
   {
-    icon: '🎯',
+    icon: 'target',
     title: 'Seni Tanıyalım',
     desc: '9 soru, yapay zeka destekli risk profili — jargon yok, baskı yok.',
   },
   {
-    icon: '📊',
+    icon: 'chart',
     title: 'Akıllı Portföy',
     desc: 'Risk profiline göre hazırlanan kişisel yatırım planı — her kuruşun nereye gittiğini bilirsin.',
   },
   {
-    icon: '🏠',
+    icon: 'home',
     title: 'Emlak + Borsa',
     desc: 'Küçük bütçeyle bile gayrimenkul getirisine ortak ol — iki dünya, tek çatı.',
   },
@@ -145,12 +146,8 @@ export default function OnboardingPage() {
                 animationDelay: `${idx * 0.12}s`,
               }}
             >
-              <div style={{
-                fontSize: 28,
-                marginBottom: 10,
-                filter: 'drop-shadow(0 0 8px rgba(245,165,36,0.4))',
-              }}>
-                {f.icon}
+              <div style={{ marginBottom: 10 }}>
+                <Icon name={f.icon} size={28} glow />
               </div>
               <h3 style={{ fontSize: 13, marginBottom: 6, color: 'var(--text)' }}>{f.title}</h3>
               <p style={{ fontSize: 12, lineHeight: 1.55 }}>{f.desc}</p>
@@ -166,13 +163,13 @@ export default function OnboardingPage() {
           background: 'var(--bg-card)',
           border: '1px solid var(--border)',
         }}>
-          💡 Lumos sana yol gösterir; alım-satımı kendi aracı kurumunda yaparsın,
+          <Icon name="bulb" size={14} /> Lumos sana yol gösterir; alım-satımı kendi aracı kurumunda yaparsın,
           sonra burada takip ederiz. Hiçbir zaman senin adına işlem yapmayız.
         </p>
 
         {/* Disclaimer */}
         <div className="disclaimer" style={{ textAlign: 'center' }}>
-          ⚠️ <strong>Yalnızca eğitim amaçlıdır.</strong> Yatırım tavsiyesi değildir.
+          <Icon name="warning" size={14} /> <strong>Yalnızca eğitim amaçlıdır.</strong> Yatırım tavsiyesi değildir.
           Lisanslı bir finansal danışmana başvurun.
         </div>
       </div>

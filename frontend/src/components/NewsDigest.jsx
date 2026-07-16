@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import Icon from './Icon'
 import { useAuth } from '@clerk/clerk-react'
 import api, { setAuthToken } from '../utils/api'
 
@@ -42,7 +43,7 @@ export default function NewsDigest() {
         <span style={{
           fontSize: 18,
           filter: 'drop-shadow(0 0 6px rgba(245,165,36,0.4))',
-        }}>📰</span>
+        }}><Icon name="news" size={18} glow /></span>
         <h3 style={{ fontSize: 14, fontWeight: 700, color: 'var(--text)' }}>
           Bugün Ne Oldu?
         </h3>

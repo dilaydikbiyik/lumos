@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
+import Icon from '../components/Icon'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { UserButton } from '@clerk/clerk-react'
 import LumosLogo from '../components/LumosLogo'
 import PortfolioChart from '../components/PortfolioChart'
+import { sliceColor } from '../utils/palette'
 import ReitCard from '../components/ReitCard'
 import AssetExplainer from '../components/AssetExplainer'
 import TimeMachine from '../components/TimeMachine'
@@ -93,6 +95,7 @@ export default function RecommendPage() {
         {selectedAlloc && (
           <AssetExplainer
             allocation={selectedAlloc}
+            color={sliceColor(selectedAlloc, portfolio.allocations.findIndex(a => a.ticker === selectedTicker))}
             onClose={() => setSelectedTicker(null)}
           />
         )}
@@ -116,7 +119,7 @@ export default function RecommendPage() {
         {portfolio.plain_explanation && (
           <div className="card">
             <h3 style={{ marginBottom: 10, display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span style={{ fontSize: 18 }}>💡</span>
+              <Icon name="bulb" size={18} />
               Neden Bu Portföy?
             </h3>
             <p style={{ fontSize: 14, whiteSpace: 'pre-line', lineHeight: 1.7 }}>{portfolio.plain_explanation}</p>
@@ -125,7 +128,7 @@ export default function RecommendPage() {
 
         {/* Legal disclaimer */}
         <div className="disclaimer">
-          ⚠️ Bu bilgiler yalnızca eğitim amaçlıdır. Geçmiş performans, gelecek sonuçların garantisi değildir. Yatırım kararlarınız için lisanslı bir finansal danışmana başvurun.
+          <Icon name="warning" size={13} /> Bu bilgiler yalnızca eğitim amaçlıdır. Geçmiş performans, gelecek sonuçların garantisi değildir. Yatırım kararlarınız için lisanslı bir finansal danışmana başvurun.
         </div>
 
         {/* "Take the first step" guide — broker walkthrough */}

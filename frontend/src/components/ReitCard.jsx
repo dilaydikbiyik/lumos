@@ -1,3 +1,5 @@
+import Icon from './Icon'
+
 export default function ReitCard({ explanation }) {
   return (
     <div className="card" style={{
@@ -20,7 +22,7 @@ export default function ReitCard({ explanation }) {
             içinde onlarca ticari bina ve konut barındıran sepetlerdir — mülk almadan emlak getirisine ortak olursun.
           </p>
           <div style={{ fontSize: 12, color: 'var(--text-dim)', marginBottom: explanation ? 12 : 0 }}>
-            📊 <strong>VNQ</strong> (Vanguard REIT) · <strong>SCHH</strong> (Schwab US REIT)
+            <Icon name="chart" size={14} /> <strong>VNQ</strong> (Vanguard REIT) · <strong>SCHH</strong> (Schwab US REIT)
           </div>
           {explanation && (
             <div style={{

@@ -1,19 +1,10 @@
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts'
+import { COLORS, CATEGORY_COLORS } from '../utils/palette'
 import AssetCard from './AssetCard'
 import { useState } from 'react'
 
-const COLORS = ['#7C6FF7', '#5B8EF0', '#3DD68C', '#F5A524', '#F5515F', '#A78BFA', '#34D399']
 
-// Pie-slice palette — gece / ateşböceği(altın) / kahve / ember / teal / mor.
-// Gold stays amber (a gold asset shown in any other colour reads wrong).
-const CATEGORY_COLORS = {
-  gold:   '#F5A524',  // ateşböceği amber
-  stocks: '#E8663F',  // ember
-  reit:   '#7A4A93',  // mor / erik
-  bond:   '#1FB2A6',  // teal
-  cash:   '#9C5A34',  // kahve (V5 palette)
-  fund:   '#3DD68C',
-}
+
 
 export default function PortfolioChart({ allocations = [], onSliceClick }) {
   const [active, setActive] = useState(null)
@@ -44,6 +35,7 @@ export default function PortfolioChart({ allocations = [], onSliceClick }) {
             innerRadius={60} outerRadius={95}
             paddingAngle={3}
             dataKey="value"
+            animationDuration={500}
             onClick={handleClick}
             cursor="pointer"
           >

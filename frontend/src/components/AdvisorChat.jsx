@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import Icon from './Icon'
 import { SignedIn, useAuth } from '@clerk/clerk-react'
 import MessageBubble from './MessageBubble'
 import api, { extractErrorMessage, setAuthToken } from '../utils/api'
@@ -139,7 +140,7 @@ export default function AdvisorChat() {
             boxShadow: '0 4px 16px rgba(245,165,36,0.45)',
           }}
         >
-          💬
+          <Icon name="chat" size={24} color="#1a1205" />
         </button>
       )}
       {open && <AdvisorPanel onClose={() => setOpen(false)} />}

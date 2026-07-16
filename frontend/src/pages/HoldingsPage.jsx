@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from 'react'
+import Icon from '../components/Icon'
 import { useNavigate } from 'react-router-dom'
 import LumosLogo from '../components/LumosLogo'
 import CurrencyExposure from '../components/CurrencyExposure'
@@ -7,9 +8,9 @@ import api, { extractErrorMessage, setAuthToken } from '../utils/api'
 import useMarket from '../hooks/useMarket'
 
 const TYPE_LABELS = {
-  stock: '📈 Hisse', fund: '🧺 Fon', etf: '🧺 ETF',
-  real_estate: '🏠 Konut', land: '🌍 Arsa', vehicle: '🚗 Araç',
-  gold: '🥇 Altın', crypto: '🪙 Kripto', cash: '💵 Nakit', other: '📦 Diğer',
+  stock: 'Hisse', fund: 'Fon', etf: 'ETF',
+  real_estate: 'Konut', land: 'Arsa', vehicle: 'Araç',
+  gold: 'Altın', crypto: 'Kripto', cash: 'Nakit', other: 'Diğer',
 }
 const OFF_EXCHANGE = ['real_estate', 'land', 'vehicle', 'cash', 'other']
 
@@ -21,8 +22,8 @@ const EMPTY_FORM = {
 // One-tap emotion tag — data source for the behaviour coach, fully optional
 const EMOTIONS = [
   { value: '', label: 'Bu kararı ne verdirdi? (ops.)' },
-  { value: 'plan', label: '📋 Planımın parçası' },
-  { value: 'fomo', label: '🔥 Kaçırma korkusu (FOMO)' },
+  { value: 'plan', label: 'Planımın parçası' },
+  { value: 'fomo', label: 'Kaçırma korkusu (FOMO)' },
   { value: 'tuyo', label: 'Tüyo / tavsiye' },
   { value: 'panik', label: 'Panik / acele' },
 ]
@@ -38,6 +39,8 @@ export default function HoldingsPage() {
   const [form, setForm] = useState(EMPTY_FORM)
   const [showForm, setShowForm] = useState(false)
   const [error, setError] = useState(null)
+  // "Empty portfolio" and "still fetching" must never look the same
+  const [loaded, setLoaded] = useState(false)
 
   const refresh = useCallback(async () => {
     setAuthToken(await getToken())
@@ -49,6 +52,7 @@ export default function HoldingsPage() {
     setSummary(s.data)
     setHealth(hs.data)
     setProfile(p.data)
+    setLoaded(true)
   }, [getToken])
 
   useEffect(() => {
@@ -127,7 +131,7 @@ export default function HoldingsPage() {
         {summary?.cash_erosion && (
           <div className="card" style={{ borderColor: 'var(--red)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-              <span style={{ fontSize: 18 }}>💧</span>
+              <Icon name="droplet" size={18} color="var(--red)" />
               <strong style={{ fontSize: 14 }}>Param eriyor mu?</strong>
             </div>
             <p style={{ fontSize: 13, lineHeight: 1.6 }}>
@@ -142,9 +146,13 @@ export default function HoldingsPage() {
         {health && (
           <div className="card">
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
-              <span style={{ fontSize: 22 }}>🔦</span>
+              <Icon name="bulb" size={22} glow />
               <strong>Fener Skoru: {health.overall}/100</strong>
             </div>
+            <p style={{ fontSize: 11.5, color: 'var(--text-dim)', lineHeight: 1.5, marginBottom: 8 }}>
+              Fener, portföyünün sağlığını tek bakışta gösterir: varlıkların ne kadar
+              çeşitli ve gerektiğinde ne kadar kolay nakde çevrilebilir olduğuna bakar.
+            </p>
             {health.notes.map((n, i) => (
               <p key={i} style={{ fontSize: 13, lineHeight: 1.6, opacity: 0.85 }}>{n}</p>
             ))}
@@ -165,7 +173,7 @@ export default function HoldingsPage() {
               },
             })}
           >
-            🔄 Kalan {money(summary.remaining_budget)} ile portföyümü güncelle
+            ↻ Kalan {money(summary.remaining_budget)} ile portföyümü güncelle
           </button>
         )}
 
@@ -189,7 +197,7 @@ export default function HoldingsPage() {
                         </span>
                       )}
                       <span style={{ marginLeft: 6, fontSize: 10, opacity: 0.6 }}>
-                        {h.value_source === 'live' ? '📡 canlı' : h.value_source === 'index' ? '📊 endeks tahmini' : '✍️ manuel'}
+                        {h.value_source === 'live' ? '● canlı' : h.value_source === 'index' ? 'endeks tahmini' : 'manuel'}
                       </span>
                     </>
                   )}
@@ -203,7 +211,15 @@ export default function HoldingsPage() {
               <button className="btn btn-ghost" onClick={() => remove(h.id)} aria-label="Sil" style={{ padding: '4px 10px' }}>✕</button>
             </div>
           ))}
-          {holdings.length === 0 && (
+          {!loaded && holdings.length === 0 && (
+            <div className="card" style={{ textAlign: 'center', padding: '36px 24px' }}>
+              <span className="spinner" style={{ width: 22, height: 22, display: 'inline-block' }} />
+              <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 10 }}>
+                Varlıkların yükleniyor…
+              </p>
+            </div>
+          )}
+          {loaded && holdings.length === 0 && (
             <div className="card" style={{
               textAlign: 'center', padding: '36px 24px',
               position: 'relative', overflow: 'hidden',
@@ -257,7 +273,7 @@ export default function HoldingsPage() {
                   üstüne kasko + MTV + bakım gelir. Lumos asla araç almayı yatırım olarak önermez.
                 </p>
                 <p style={{ color: 'var(--firefly)', fontWeight: 600 }}>
-                  💡 Bunu eklemek istiyorsan güncel piyasa değerini "Güncel tahmini değer"e yaz.
+                  <Icon name="bulb" size={13} /> Bunu eklemek istiyorsan güncel piyasa değerini "Güncel tahmini değer"e yaz.
                 </p>
               </div>
             )}

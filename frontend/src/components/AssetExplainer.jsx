@@ -91,9 +91,11 @@ function getAssetInfo(allocation) {
   return DEFAULT_INFO[category] || DEFAULT_INFO.stocks
 }
 
-export default function AssetExplainer({ allocation, onClose }) {
+export default function AssetExplainer({ allocation, onClose, color }) {
   const [activeTab, setActiveTab] = useState('what')
   const info = getAssetInfo(allocation)
+  // The pie slice's colour wins — the card must match what was clicked
+  const accent = color || info.color
 
   const tabs = [
     { key: 'what', label: 'Bu Nedir?', icon: '📖' },
@@ -103,8 +105,8 @@ export default function AssetExplainer({ allocation, onClose }) {
 
   return (
     <div className="card" style={{
-      border: `1px solid ${info.color}22`,
-      background: `linear-gradient(135deg, var(--bg-card) 0%, ${info.color}08 100%)`,
+      border: `1px solid ${accent}22`,
+      background: `linear-gradient(135deg, var(--bg-card) 0%, ${accent}08 100%)`,
       animation: 'fade-in 0.3s ease',
       position: 'relative',
     }}>
@@ -125,7 +127,7 @@ export default function AssetExplainer({ allocation, onClose }) {
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
         <span style={{
           fontSize: 28,
-          filter: `drop-shadow(0 0 8px ${info.color}40)`,
+          filter: `drop-shadow(0 0 8px ${accent}40)`,
         }}>{info.icon}</span>
         <div>
           <h3 style={{ fontSize: 15, fontWeight: 700 }}>
@@ -136,7 +138,7 @@ export default function AssetExplainer({ allocation, onClose }) {
             <span>·</span>
             <span>{info.type}</span>
             <span>·</span>
-            <span style={{ color: info.color, fontWeight: 600 }}>
+            <span style={{ color: accent, fontWeight: 600 }}>
               %{(allocation.weight * 100).toFixed(0)}
             </span>
           </div>
@@ -156,7 +158,7 @@ export default function AssetExplainer({ allocation, onClose }) {
             style={{
               flex: 1, padding: '8px 4px',
               background: activeTab === tab.key ? 'var(--bg-card-2)' : 'transparent',
-              border: activeTab === tab.key ? `1px solid ${info.color}33` : '1px solid transparent',
+              border: activeTab === tab.key ? `1px solid ${accent}33` : '1px solid transparent',
               borderRadius: 'var(--radius-xs)',
               color: activeTab === tab.key ? 'var(--text)' : 'var(--text-dim)',
               fontSize: 12, fontWeight: activeTab === tab.key ? 600 : 400,

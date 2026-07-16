@@ -2,9 +2,27 @@ import { useState, useCallback } from 'react'
 import { useAuth } from '@clerk/clerk-react'
 import api, { setAuthToken } from '../utils/api'
 
+// The recommendation is deterministic for a given (risk, budget) — cache it
+// per user so revisiting the portfolio page renders instantly instead of
+// showing a "hazırlanıyor" screen; a background refresh keeps it current.
+export function readCachedPortfolio(userId) {
+  try {
+    const raw = localStorage.getItem(`lumos-portfolio-${userId}`)
+    return raw ? JSON.parse(raw) : null
+  } catch {
+    return null
+  }
+}
+
+function cachePortfolio(userId, data) {
+  try {
+    localStorage.setItem(`lumos-portfolio-${userId}`, JSON.stringify(data))
+  } catch { /* storage full/blocked — cache is best-effort */ }
+}
+
 export default function usePortfolio() {
-  const { getToken } = useAuth()
-  const [portfolio, setPortfolio] = useState(null)
+  const { getToken, userId } = useAuth()
+  const [portfolio, setPortfolio] = useState(() => readCachedPortfolio(userId))
   const [profile, setProfile] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState(null)
@@ -31,7 +49,11 @@ export default function usePortfolio() {
   }, [getToken])
 
   async function recommend(riskScore, budget) {
-    setIsLoading(true)
+    // Instant render from cache; the fresh copy replaces it silently below.
+    const cached = readCachedPortfolio(userId)
+    const hasCache = cached && cached.risk_score === riskScore && cached.budget === budget
+    if (hasCache) setPortfolio(cached)
+    setIsLoading(!hasCache)
     setError(null)
     try {
       await ensureAuth()
@@ -39,10 +61,17 @@ export default function usePortfolio() {
         risk_score: riskScore,
         budget: budget,
       })
-      setPortfolio(res.data)
+      // Identical refresh must not re-render the page (it restarts the pie
+      // animation and re-mounts every card — visible jank on phones).
+      if (!hasCache || JSON.stringify(res.data) !== JSON.stringify(cached)) {
+        setPortfolio(res.data)
+        cachePortfolio(userId, res.data)
+      }
       return res.data
     } catch (err) {
-      setError(err.response?.data?.detail || 'Öneri alınamadı')
+      // With a cached portfolio on screen, a transient refresh failure is
+      // not worth an error banner.
+      if (!hasCache) setError(err.response?.data?.detail || 'Öneri alınamadı')
     } finally {
       setIsLoading(false)
     }

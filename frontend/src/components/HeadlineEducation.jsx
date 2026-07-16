@@ -39,6 +39,7 @@ function getSeenHeadlines() {
 }
 
 import { useState } from 'react'
+import Icon from './Icon'
 
 function markHeadlineSeen(id) {
   const seen = getSeenHeadlines()
@@ -102,7 +103,7 @@ export default function HeadlineEducation() {
         color: 'var(--red)', textTransform: 'uppercase', letterSpacing: '0.08em',
         marginBottom: 10,
       }}>
-        🗞️ Manşet Oku, Paniklemeden Anla
+        <Icon name="news" size={12} color="var(--red)" /> Manşet Oku, Paniklemeden Anla
       </span>
 
       <p style={{ fontSize: 18, fontWeight: 800, marginBottom: 10 }}>

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import Icon from './Icon'
 
 /**
  * Daily tip — one concept per session, a 15-second read.
@@ -92,7 +93,7 @@ export default function DailyTip() {
           fontSize: 11, fontWeight: 700, color: 'var(--firefly)',
           textTransform: 'uppercase', letterSpacing: '0.08em',
         }}>
-          💡 Bugün Öğrendin
+          <Icon name="bulb" size={13} /> Bugün Öğrendin
         </span>
         <span style={{
           fontSize: 10, color: 'var(--text-dim)', marginLeft: 'auto',
