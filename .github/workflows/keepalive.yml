@@ -14,4 +14,4 @@ jobs:
     steps:
       - name: Ping /health
         run: |
-          curl -sf --max-time 80 https://lumos-backend-u6il.onrender.com/health
+          curl -sf --max-time 80 https://lumos-api-yowm.onrender.com/health
