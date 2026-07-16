@@ -364,6 +364,7 @@ def _dispatch(
     messages: list[dict], system: str, max_tokens: int,
     tier: Optional[str] = None,
     providers: Optional[set] = None,
+    model_filter=None,
 ) -> str:
     tier_name, tier_cfg = _resolve_tier(tier)
     steps = _provider_chain(tier_cfg)
@@ -374,6 +375,17 @@ def _dispatch(
         filtered = [st for st in steps if st["provider"] in providers]
         if filtered:
             steps = filtered
+    if model_filter:
+        # Within an allowed provider, only quality-approved models may serve
+        # (e.g. OpenRouter hosts both Gemini and Llama — the quiz may use the
+        # former but never the latter). Steps left without models are dropped.
+        narrowed = []
+        for st in steps:
+            models = [m for m in (st.get("model_chain") or []) if model_filter(m)]
+            if models:
+                narrowed.append({**st, "model_chain": models})
+        if narrowed:
+            steps = narrowed
 
     started = time.monotonic()
     last_unavailable: Optional[Exception] = None
@@ -468,11 +480,20 @@ def chat(
     # [PROFILE_COMPLETE] marker.
     max_tokens = get_tier(tier)["max_tokens"] if tier else 4096
     # The scripted 9-question quiz must follow its Turkish script exactly —
-    # weak free-tier fallback models paraphrase questions and corrupt Turkish,
-    # so profiling is pinned to the strong providers. The free-form advisor
-    # keeps the full failover chain (a slightly weaker answer beats an error).
-    providers = {"gemini", "anthropic"} if mode == "profiling" else None
-    return _dispatch(messages, system, max_tokens=max_tokens, tier=tier, providers=providers)
+    # weak free-tier fallback models paraphrase questions and corrupt Turkish.
+    # Profiling therefore only accepts Gemini/Claude-class models, wherever
+    # they are hosted: Google direct, Anthropic direct, or OpenRouter's
+    # Gemini (a survival path when direct Gemini keys are unusable). The
+    # free-form advisor keeps the full failover chain.
+    if mode == "profiling":
+        providers = {"gemini", "anthropic", "openrouter"}
+        model_filter = lambda m: ("gemini" in m.lower() or "claude" in m.lower())  # noqa: E731
+    else:
+        providers = model_filter = None
+    return _dispatch(
+        messages, system, max_tokens=max_tokens, tier=tier,
+        providers=providers, model_filter=model_filter,
+    )
 
 
 def extract_profile(messages: list[dict]) -> dict:

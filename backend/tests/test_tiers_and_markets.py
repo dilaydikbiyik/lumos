@@ -294,3 +294,53 @@ def test_profiling_mode_never_reaches_weak_providers():
                 tier="free", providers={"gemini", "anthropic"},
             )
     assert called == ["gemini"]  # groq/openrouter never consulted
+
+
+def test_profiling_survives_via_openrouter_gemini_only():
+    """When direct Gemini keys are dead, the quiz may fall to OpenRouter —
+    but only its Gemini model, never the Llama/DeepSeek entries."""
+    from backend.services import ai_service
+
+    captured = {}
+
+    def gemini_down(messages, system, max_tokens, model_chain=None):
+        raise ai_service._ProviderUnavailable("keys unusable")
+
+    def openrouter(messages, system, max_tokens, model_chain=None):
+        captured["models"] = model_chain
+        return "Yaşınızı paylaşır mısınız?"
+
+    with patch.dict(ai_service._ADAPTERS, {
+        "gemini": gemini_down, "groq": openrouter, "openrouter": openrouter,
+    }):
+        reply = ai_service._dispatch(
+            [{"role": "user", "content": "merhaba"}], "sys", 100,
+            tier="free",
+            providers={"gemini", "anthropic", "openrouter"},
+            model_filter=lambda m: "gemini" in m.lower() or "claude" in m.lower(),
+        )
+    assert reply == "Yaşınızı paylaşır mısınız?"
+    assert captured["models"] == ["google/gemini-2.0-flash-exp:free"]
+
+
+def test_chat_profiling_mode_allows_openrouter_gemini():
+    """chat(mode='profiling') must wire the provider+model filters through."""
+    from unittest.mock import patch as _patch
+
+    from backend.services import ai_service
+
+    captured = {}
+
+    def fake_dispatch(messages, system, max_tokens, tier=None, providers=None, model_filter=None):
+        captured["providers"] = providers
+        captured["model_filter"] = model_filter
+        return "ok"
+
+    with _patch.object(ai_service, "_dispatch", fake_dispatch):
+        ai_service.chat([{"role": "user", "content": "selam"}], mode="profiling")
+
+    assert captured["providers"] == {"gemini", "anthropic", "openrouter"}
+    f = captured["model_filter"]
+    assert f("google/gemini-2.0-flash-exp:free") and f("claude-haiku-4-5")
+    assert not f("meta-llama/llama-3.3-70b-instruct:free")
+    assert not f("deepseek/deepseek-chat-v3-0324:free")
