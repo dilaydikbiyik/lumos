@@ -32,6 +32,11 @@ class UserRead(BaseModel):
     plan: str = "free"
     market: str = "TR"
     primary_fear: Optional[str]
+    monthly_income: Optional[float] = None
+
+
+class MonthlyIncomeUpdate(BaseModel):
+    monthly_income: float
 
 
 class InvestmentPathUpdate(BaseModel):
@@ -60,6 +65,17 @@ async def update_investment_path(
 ):
     """PATCH /users/me/investment-path — set the user's chosen journey (Flow 0)."""
     return await user_repository.set_investment_path(db, user_id, body.investment_path)
+
+
+@router.patch("/me/income", response_model=UserRead)
+async def update_monthly_income(
+    body: MonthlyIncomeUpdate,
+    user_id: str = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """PATCH /users/me/income — save the user's monthly net income once so
+    affordability checks never have to re-ask for it."""
+    return await user_repository.set_monthly_income(db, user_id, body.monthly_income)
 
 
 @router.patch("/me/fear-check-in")

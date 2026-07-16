@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from 'react'
 import { UserButton, useAuth } from '@clerk/clerk-react'
+import { parseTL } from '../utils/number'
 import api, { extractErrorMessage, setAuthToken } from '../utils/api'
 import LumosLogo from '../components/LumosLogo'
 import IsikTut from '../components/IsikTut'
@@ -33,7 +34,7 @@ function ProvinceScenario({ province, amount }) {
     try {
       const [b] = await Promise.all([
         api.post('/planning/projection/province', {
-          region_code: province.code, amount: Number(amount) || 1000000, years: 5,
+          region_code: province.code, amount: parseTL(amount) || 1000000, years: 5,
         }),
         fetchLinks(),
       ])
@@ -141,10 +142,26 @@ function ProvinceCard({ province, amount }) {
 }
 
 function RentVsBuy() {
-  const [form, setForm] = useState({ down_payment: '', monthly_rent: '', home_price: '', years: 10 })
+  const [form, setForm] = useState({ down_payment: '', monthly_rent: '', home_price: '', income: '', years: 10 })
   const [result, setResult] = useState(null)
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(false)
+  // Income lives on the user profile: prefilled when known, asked at most once
+  const [savedIncome, setSavedIncome] = useState(null)
+
+  useEffect(() => {
+    let cancelled = false
+    api.get('/users/me')
+      .then(res => {
+        if (cancelled) return
+        if (res.data?.monthly_income > 0) {
+          setSavedIncome(res.data.monthly_income)
+          setForm(f => ({ ...f, income: String(res.data.monthly_income) }))
+        }
+      })
+      .catch(() => {})
+    return () => { cancelled = true }
+  }, [])
 
   async function run(e) {
     e.preventDefault()
@@ -152,12 +169,17 @@ function RentVsBuy() {
     setLoading(true)
     try {
       const res = await api.post('/planning/rent-vs-buy', {
-        down_payment: Number(form.down_payment),
-        monthly_rent: Number(form.monthly_rent),
+        down_payment: parseTL(form.down_payment),
+        monthly_rent: parseTL(form.monthly_rent),
         years: Number(form.years),
-        ...(form.home_price ? { home_price: Number(form.home_price) } : {}),
+        ...(form.home_price ? { home_price: parseTL(form.home_price) } : {}),
       })
       setResult(res.data)
+      const income = parseTL(form.income)
+      if (income > 0 && income !== savedIncome) {
+        api.patch('/users/me/income', { monthly_income: income })
+          .then(() => setSavedIncome(income)).catch(() => {})
+      }
     } catch (err) {
       setError(extractErrorMessage(err, 'Hesaplanamadı'))
     } finally {
@@ -169,18 +191,22 @@ function RentVsBuy() {
 
   return (
     <div className="card">
-      <h3 style={{ marginBottom: 4 }}>🏠 Kirada mı otur, ev mi al?</h3>
+      <h3 style={{ marginBottom: 4 }}>Kirada mı otur, ev mi al?</h3>
       <p style={{ fontSize: 13, opacity: 0.8, marginBottom: 12 }}>
         Aynı evi iki senaryoda karşılaştırırız: peşinat + kredi ile satın almak, ya da
         kirada kalıp farkı yatırmak. Ev almak her zaman kazanç değildir.
       </p>
       <form onSubmit={run} style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-        <input className="input" type="number" placeholder="Peşinat / birikimin (TL)" required min="1"
+        <input className="input" type="text" inputMode="numeric" placeholder="Peşinat / birikimin (TL)" required
                value={form.down_payment} onChange={e => setForm({ ...form, down_payment: e.target.value })} />
-        <input className="input" type="number" placeholder="Şu anki aylık kiran (TL)" required min="1"
+        <input className="input" type="text" inputMode="numeric" placeholder="Şu anki aylık kiran (TL)" required
                value={form.monthly_rent} onChange={e => setForm({ ...form, monthly_rent: e.target.value })} />
-        <input className="input" type="number" placeholder="Evin fiyatı (opsiyonel — boşsa kiradan tahmin edilir)" min="1"
+        <input className="input" type="text" inputMode="numeric" placeholder="Evin fiyatı (opsiyonel — boşsa kiradan tahmin edilir)"
                value={form.home_price} onChange={e => setForm({ ...form, home_price: e.target.value })} />
+        {savedIncome == null && (
+          <input className="input" type="text" inputMode="numeric" placeholder="Aylık net gelirin (opsiyonel — taksit gücünü kontrol eder)"
+                 value={form.income} onChange={e => setForm({ ...form, income: e.target.value })} />
+        )}
         <select className="input" value={form.years} onChange={e => setForm({ ...form, years: e.target.value })}>
           {[5, 10, 20].map(y => <option key={y} value={y}>{y} yıllık projeksiyon</option>)}
         </select>
@@ -197,6 +223,25 @@ function RentVsBuy() {
             {result.home_price_estimated && ' (kiradan tahmin edildi)'} · aylık kredi taksiti
             ≈ <strong>{fmt(result.monthly_mortgage)} TL</strong>
           </div>
+
+          {/* Affordability reality check — a comparison is meaningless if the
+              installment doesn't fit the user's income */}
+          {parseTL(form.income) > 0 && result.monthly_mortgage > 0 && (() => {
+            const ratio = result.monthly_mortgage / parseTL(form.income)
+            const pct = Math.round(ratio * 100)
+            return (
+              <div style={{
+                fontSize: 12.5, lineHeight: 1.6, padding: '10px 12px', marginBottom: 10,
+                borderRadius: 'var(--radius-xs)', border: '1px solid var(--border)',
+                background: 'var(--bg-input)',
+                color: ratio > 0.45 ? 'var(--red)' : 'var(--text-muted)',
+              }}>
+                {ratio > 0.45
+                  ? `Taksit, gelirinin %${pct}'i — bankalar genelde gelirin ~%45'inin üzerindeki taksitlere kredi vermez. Bu ev bu peşinatla şu an gerçekçi olmayabilir; daha yüksek peşinat ya da daha uygun bir ev düşünebilirsin.`
+                  : `Taksit, gelirinin %${pct}'i — genel kabul gören güvenli sınır ~%45'in altında, bu plan gelirine uygun görünüyor.`}
+              </div>
+            )
+          })()}
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
             <div style={{

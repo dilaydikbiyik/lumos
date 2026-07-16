@@ -31,6 +31,9 @@ class User(Base):
     # Consistency = trust.
     age: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
     income_stability: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    # Asked once (e.g. in the rent-vs-buy affordability check), reused by any
+    # tool that needs an income reality-check — never re-asked
+    monthly_income: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
 
     # Billing-ready plan tier: free / plus / pro (ai_tiers.py) — a payment
     # webhook or admin flips this; models & quotas follow automatically

@@ -50,6 +50,13 @@ async def set_investment_path(db: AsyncSession, clerk_user_id: str, path: str) -
     return user
 
 
+async def set_monthly_income(db: AsyncSession, clerk_user_id: str, income: float) -> User:
+    user = await get_or_create(db, clerk_user_id)
+    user.monthly_income = income
+    await db.flush()
+    return user
+
+
 async def set_primary_fear(db: AsyncSession, clerk_user_id: str, fear: str) -> User:
     user = await get_or_create(db, clerk_user_id)
     user.primary_fear = fear

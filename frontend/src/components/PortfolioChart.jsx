@@ -9,6 +9,9 @@ import { useState } from 'react'
 export default function PortfolioChart({ allocations = [], onSliceClick }) {
   const [active, setActive] = useState(null)
 
+  const selectedIndex = allocations.findIndex(a => a.ticker === active)
+  const selectedAllocation = selectedIndex >= 0 ? allocations[selectedIndex] : null
+
   const data = allocations.map(a => ({
     name: a.name,
     ticker: a.ticker,
@@ -22,7 +25,6 @@ export default function PortfolioChart({ allocations = [], onSliceClick }) {
     onSliceClick?.(ticker === active ? null : ticker)
   }
 
-  const selectedAllocation = allocations.find(a => a.ticker === active)
 
   return (
     <div className="card">
@@ -77,10 +79,11 @@ export default function PortfolioChart({ allocations = [], onSliceClick }) {
         ))}
       </div>
 
-      {/* Asset detail card */}
+      {/* Quick glance card — appears right under the chart, in the slice colour */}
       {selectedAllocation && (
-        <AssetCard allocation={selectedAllocation} onClose={() => setActive(null)} />
+        <AssetCard allocation={selectedAllocation} index={selectedIndex} onClose={() => setActive(null)} />
       )}
+
     </div>
   )
 }

@@ -372,3 +372,13 @@ def test_neon_style_url_is_normalized_for_asyncpg():
     # already-correct asyncpg URLs stay stable
     ok = "postgresql+asyncpg://u:p@h/db?ssl=require"
     assert normalize_db_url(ok) == ok
+
+
+def test_monthly_income_saved_once_and_returned(client):
+    res = client.patch("/users/me/income", json={"monthly_income": 85000})
+    assert res.status_code == 200
+    assert res.json()["monthly_income"] == 85000
+
+    me = client.get("/users/me")
+    assert me.status_code == 200
+    assert me.json()["monthly_income"] == 85000

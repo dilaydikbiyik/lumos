@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useAuth } from '@clerk/clerk-react'
+import api from '../utils/api'
 import LumosLogo from '../components/LumosLogo'
 import { SignInButton, SignedIn, SignedOut, UserButton } from '@clerk/clerk-react'
 import DisclaimerModal from '../components/DisclaimerModal'
@@ -40,6 +42,26 @@ const FEATURES = [
 
 export default function OnboardingPage() {
   const navigate = useNavigate()
+  const { userId } = useAuth()
+
+  // A returning user with a finished risk profile must not walk the
+  // 3-step intro (path → fear check-in → quiz) again: straight to the
+  // dashboard. Cache answers instantly; the server confirms in the rare
+  // cache-miss case.
+  async function continueFromHero() {
+    if (userId && localStorage.getItem(`lumos-profile-${userId}`)) {
+      navigate('/dashboard')
+      return
+    }
+    try {
+      const res = await api.get('/profile')
+      if (res.data?.risk_score != null) {
+        navigate('/dashboard')
+        return
+      }
+    } catch { /* can't tell — fall through to the intro */ }
+    navigate('/path')
+  }
   // Accepted once per device — re-prompting on every visit numbs the warning
   const [showDisclaimer, setShowDisclaimer] = useState(
     () => localStorage.getItem('lumos-disclaimer-ok') !== '1',
@@ -124,7 +146,7 @@ export default function OnboardingPage() {
             <button
               className="btn btn-primary"
               style={{ maxWidth: 320, width: '100%', margin: '0 auto', fontSize: 16, display: 'flex' }}
-              onClick={() => navigate('/path')}
+              onClick={continueFromHero}
             >
               Devam Et →
             </button>
