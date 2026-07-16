@@ -1,13 +1,16 @@
 databases: []  # DB lives on Neon (see DATABASE_URL)
 
 services:
+  # US region: Google's free Gemini tier rejects requests from EU datacenter
+  # IPs (403), which forced every quiz reply onto slow congested fallbacks.
+  # Region can't be changed in place on Render, hence the new service name.
   - type: web
-    name: lumos-backend
+    name: lumos-api
     runtime: docker
     dockerfilePath: ./Dockerfile
     dockerContext: .
     plan: free
-    region: frankfurt
+    region: oregon
     branch: main
     healthCheckPath: /health
     envVars:
