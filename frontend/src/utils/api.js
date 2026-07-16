@@ -4,7 +4,10 @@ const api = axios.create({
   baseURL: import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000',
   // Bound infinite hangs (Render cold-start + slow AI) — a timed-out request
   // becomes a retryable "no response" for idempotent calls below.
-  timeout: 60000,
+  // Generous: a free-tier backend waking from spin-down can take 50-90s on
+  // the very first request — timing out at 60s turns a slow success into
+  // an error the user sees.
+  timeout: 120000,
 })
 
 /**
