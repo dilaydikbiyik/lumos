@@ -486,8 +486,10 @@ def chat(
     # Gemini (a survival path when direct Gemini keys are unusable). The
     # free-form advisor keeps the full failover chain.
     if mode == "profiling":
-        providers = {"gemini", "anthropic", "openrouter"}
-        model_filter = lambda m: ("gemini" in m.lower() or "claude" in m.lower())  # noqa: E731
+        providers = {"gemini", "anthropic", "groq", "openrouter"}
+        model_filter = lambda m: any(  # noqa: E731
+            fam in m.lower() for fam in ("gemini", "gemma", "claude", "gpt-oss")
+        )
     else:
         providers = model_filter = None
     return _dispatch(

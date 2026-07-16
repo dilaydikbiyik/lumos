@@ -39,7 +39,7 @@ async def health_check():
 
     return {
         "status": overall,
-        "version": "0.2.0",
+        "version": "1.0.0",
         "db": db_status,
         "ai": ai_status,
     }

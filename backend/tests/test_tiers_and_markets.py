@@ -296,9 +296,9 @@ def test_profiling_mode_never_reaches_weak_providers():
     assert called == ["gemini"]  # groq/openrouter never consulted
 
 
-def test_profiling_survives_via_openrouter_gemini_only():
+def test_profiling_survives_via_openrouter_google_models_only():
     """When direct Gemini keys are dead, the quiz may fall to OpenRouter —
-    but only its Gemini model, never the Llama/DeepSeek entries."""
+    but only its Google-family models, never the Llama/DeepSeek entries."""
     from backend.services import ai_service
 
     captured = {}
@@ -317,10 +317,12 @@ def test_profiling_survives_via_openrouter_gemini_only():
             [{"role": "user", "content": "merhaba"}], "sys", 100,
             tier="free",
             providers={"gemini", "anthropic", "openrouter"},
-            model_filter=lambda m: "gemini" in m.lower() or "claude" in m.lower(),
+            model_filter=lambda m: any(f in m.lower() for f in ("gemini", "gemma", "claude")),
         )
     assert reply == "Yaşınızı paylaşır mısınız?"
-    assert captured["models"] == ["google/gemini-2.0-flash-exp:free"]
+    assert captured["models"] == [
+        "google/gemma-4-31b-it:free", "google/gemma-4-26b-a4b-it:free",
+    ]
 
 
 def test_chat_profiling_mode_allows_openrouter_gemini():
@@ -339,8 +341,10 @@ def test_chat_profiling_mode_allows_openrouter_gemini():
     with _patch.object(ai_service, "_dispatch", fake_dispatch):
         ai_service.chat([{"role": "user", "content": "selam"}], mode="profiling")
 
-    assert captured["providers"] == {"gemini", "anthropic", "openrouter"}
+    assert captured["providers"] == {"gemini", "anthropic", "groq", "openrouter"}
     f = captured["model_filter"]
     assert f("google/gemini-2.0-flash-exp:free") and f("claude-haiku-4-5")
+    assert f("google/gemma-4-31b-it:free") and f("openai/gpt-oss-120b")
     assert not f("meta-llama/llama-3.3-70b-instruct:free")
     assert not f("deepseek/deepseek-chat-v3-0324:free")
+    assert not f("llama-3.3-70b-versatile")

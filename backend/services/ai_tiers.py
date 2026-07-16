@@ -26,12 +26,16 @@ AI_TIERS: dict[str, dict] = {
                 "gemini-2.5-flash", "gemini-2.5-flash-lite", "gemini-2.0-flash", "gemini-2.0-flash-lite",
             ]},
             {"provider": "groq", "model_chain": [
+                # gpt-oss-120b: strong open model, quiz-eligible, very fast on Groq
+                "openai/gpt-oss-120b",
                 "llama-3.3-70b-versatile", "llama-3.1-8b-instant",
             ]},
             {"provider": "openrouter", "model_chain": [
                 "meta-llama/llama-3.3-70b-instruct:free",
                 "deepseek/deepseek-chat-v3-0324:free",
-                "google/gemini-2.0-flash-exp:free",
+                # Google-quality models — also eligible for the scripted quiz
+                "google/gemma-4-31b-it:free",
+                "google/gemma-4-26b-a4b-it:free",
             ]},
         ],
         "daily_quota": 50,
