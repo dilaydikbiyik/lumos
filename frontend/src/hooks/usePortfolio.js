@@ -15,17 +15,17 @@ export default function usePortfolio() {
   }
 
   // useCallback — needed as a useEffect dependency in DashboardPage.
-  // Returns the profile data so callers can use it directly without
-  // waiting for the async state update (avoids race conditions).
+  // Return contract: profile object = saved profile exists; null = server
+  // DEFINITIVELY says there is none; undefined = transient error (network,
+  // cold start) — callers must not treat an error as "no profile".
   const loadProfile = useCallback(async () => {
     try {
       await ensureAuth()
       const res = await api.get('/profile')
       setProfile(res.data)
-      return res.data
+      return res.data ?? null
     } catch {
-      setProfile(null)
-      return null
+      return undefined
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [getToken])

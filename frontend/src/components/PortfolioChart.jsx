@@ -79,7 +79,8 @@ export default function PortfolioChart({ allocations = [], onSliceClick }) {
           >
             <span style={{ width: 10, height: 10, borderRadius: '50%', background: CATEGORY_COLORS[d.category] || COLORS[i % COLORS.length], flexShrink: 0 }} />
             <span style={{ fontSize: 13, flex: 1 }}>{d.name}</span>
-            <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>{d.value}%</span>
+            {/* Percentage in the exact slice colour — the legend and pie read as one */}
+            <span style={{ fontSize: 13, fontWeight: 700, color: CATEGORY_COLORS[d.category] || COLORS[i % COLORS.length] }}>{d.value}%</span>
           </div>
         ))}
       </div>

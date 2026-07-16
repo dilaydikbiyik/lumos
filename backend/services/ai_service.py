@@ -317,6 +317,37 @@ def _resolve_tier(tier_name: Optional[str]) -> tuple[str, dict]:
     return tier_name, get_tier(tier_name)
 
 
+# Scripts that must never appear in a Turkish/English reply. Weak free-tier
+# models (quantized Llama variants etc.) occasionally corrupt Turkish output
+# with CJK/Cyrillic/Devanagari tokens ("rahat的话", "мдд") — a prompt rule
+# cannot stop tokenizer-level corruption, so we detect and reject the reply,
+# letting the dispatcher fall through to the next provider.
+_FOREIGN_SCRIPT_RANGES = (
+    (0x0400, 0x04FF),  # Cyrillic
+    (0x0590, 0x05FF),  # Hebrew
+    (0x0600, 0x06FF),  # Arabic
+    (0x0900, 0x097F),  # Devanagari
+    (0x0E00, 0x0E7F),  # Thai
+    (0x3040, 0x30FF),  # Hiragana + Katakana
+    (0x4E00, 0x9FFF),  # CJK
+    (0xAC00, 0xD7AF),  # Hangul
+)
+
+
+def _looks_corrupted(text: str) -> bool:
+    """True when the reply contains foreign-script characters (>=2)."""
+    hits = 0
+    for ch in text:
+        cp = ord(ch)
+        for lo, hi in _FOREIGN_SCRIPT_RANGES:
+            if lo <= cp <= hi:
+                hits += 1
+                if hits >= 2:
+                    return True
+                break
+    return False
+
+
 def _provider_chain(tier_cfg: dict) -> list[dict]:
     """
     Normalise a tier into an ordered list of {provider, model_chain} steps.
@@ -332,9 +363,17 @@ def _provider_chain(tier_cfg: dict) -> list[dict]:
 def _dispatch(
     messages: list[dict], system: str, max_tokens: int,
     tier: Optional[str] = None,
+    providers: Optional[set] = None,
 ) -> str:
     tier_name, tier_cfg = _resolve_tier(tier)
     steps = _provider_chain(tier_cfg)
+    if providers:
+        # Quality-critical flows (the scripted risk quiz) restrict which
+        # providers may serve them; fall back to the full chain only if the
+        # filter would leave nothing.
+        filtered = [st for st in steps if st["provider"] in providers]
+        if filtered:
+            steps = filtered
 
     started = time.monotonic()
     last_unavailable: Optional[Exception] = None
@@ -359,6 +398,16 @@ def _dispatch(
             logger.warning(
                 "ai_call tier=%s provider=%s status=error error=%s — trying next provider",
                 tier_name, provider, type(exc).__name__,
+            )
+            continue
+
+        if _looks_corrupted(reply):
+            # Token-corrupted output (foreign scripts in a Turkish reply) —
+            # treat like an unavailable provider and try the next one.
+            last_unavailable = _ProviderUnavailable(f"{provider}: corrupted-script reply")
+            logger.warning(
+                "ai_call tier=%s provider=%s status=corrupted_reply chars=%d — trying next provider",
+                tier_name, provider, len(reply),
             )
             continue
 
@@ -418,7 +467,12 @@ def chat(
     # pool, and the final profile summary must not be truncated before the
     # [PROFILE_COMPLETE] marker.
     max_tokens = get_tier(tier)["max_tokens"] if tier else 4096
-    return _dispatch(messages, system, max_tokens=max_tokens, tier=tier)
+    # The scripted 9-question quiz must follow its Turkish script exactly —
+    # weak free-tier fallback models paraphrase questions and corrupt Turkish,
+    # so profiling is pinned to the strong providers. The free-form advisor
+    # keeps the full failover chain (a slightly weaker answer beats an error).
+    providers = {"gemini", "anthropic"} if mode == "profiling" else None
+    return _dispatch(messages, system, max_tokens=max_tokens, tier=tier, providers=providers)
 
 
 def extract_profile(messages: list[dict]) -> dict:

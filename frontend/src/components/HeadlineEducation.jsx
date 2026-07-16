@@ -40,26 +40,53 @@ function getSeenHeadlines() {
 
 import { useState } from 'react'
 
-export default function HeadlineEducation() {
+function markHeadlineSeen(id) {
   const seen = getSeenHeadlines()
-  const unseen = SCENARIOS.filter(s => !seen.includes(s.id))
-  const [scenario] = useState(() => unseen[0] || null)
-  const [dismissed, setDismissed] = useState(false)
+  if (!seen.includes(id)) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify([...seen, id]))
+  }
+}
 
+export default function HeadlineEducation() {
+  // Tap the card to mark the current headline learned and move to the next —
+  // a mini-carousel over the 4 scenarios.
+  const [idx, setIdx] = useState(() => {
+    const seen = getSeenHeadlines()
+    const firstUnseen = SCENARIOS.findIndex(s => !seen.includes(s.id))
+    return firstUnseen === -1 ? 0 : firstUnseen
+  })
+  const [dismissed, setDismissed] = useState(false)
+  const [, forceRender] = useState(0)
+
+  const scenario = SCENARIOS[idx]
   if (!scenario || dismissed) return null
 
-  function dismiss() {
-    const next = [...getSeenHeadlines(), scenario.id]
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(next))
+  const seen = getSeenHeadlines()
+
+  function advance() {
+    markHeadlineSeen(scenario.id)
+    setIdx((idx + 1) % SCENARIOS.length)
+    forceRender(n => n + 1)
+  }
+
+  function dismiss(e) {
+    e.stopPropagation()
+    markHeadlineSeen(scenario.id)
     setDismissed(true)
   }
 
   return (
-    <div className="card" style={{
-      background: 'linear-gradient(135deg, var(--bg-card) 0%, rgba(248,113,113,0.03) 100%)',
-      border: '1px solid rgba(248,113,113,0.15)',
-      position: 'relative',
-    }}>
+    <div
+      className="card"
+      onClick={advance}
+      role="button"
+      aria-label="Sonraki manşet"
+      style={{
+        background: 'linear-gradient(135deg, var(--bg-card) 0%, rgba(248,113,113,0.03) 100%)',
+        border: '1px solid rgba(248,113,113,0.15)',
+        position: 'relative', cursor: 'pointer',
+      }}
+    >
       <button
         onClick={dismiss}
         style={{
@@ -106,7 +133,7 @@ export default function HeadlineEducation() {
         }} />
       </div>
       <p style={{ fontSize: 10, color: 'var(--text-dim)', marginTop: 4 }}>
-        {seen.length}/{SCENARIOS.length} manşet gerçeği öğrenildi
+        {seen.length}/{SCENARIOS.length} manşet gerçeği öğrenildi · karta dokun → sıradaki
       </p>
     </div>
   )

@@ -4,7 +4,7 @@
 ![Python](https://img.shields.io/badge/python-3.12-blue)
 ![FastAPI](https://img.shields.io/badge/FastAPI-async-009688)
 ![React](https://img.shields.io/badge/react-19-61DAFB)
-![Tests](https://img.shields.io/badge/backend%20tests-185%20passed-3DD68C)
+![Tests](https://img.shields.io/badge/tests-203%20backend%20%2B%2010%20frontend-3DD68C)
 ![Cost](https://img.shields.io/badge/running%20cost-%240%2Fmonth-F5A524)
 
 > An AI-powered investment guide built for people who have never invested — and are scared to start.
@@ -113,6 +113,16 @@ surface, zero custody risk — and a lower trust barrier for scared beginners.
   drift detection: *"at your current pace you'll be 21 months late"*
 - **Virtual portfolio**: a fake 100.000 TL on the recommended allocation with **real market data** —
   feel the swings before risking anything
+
+### 💬 Always-on advisor chat
+- A floating assistant on every page for whatever is on the user's mind — "what is an ETF?",
+  "why is gold in my portfolio?", "what does my risk score mean?"
+- Answers are personal: the backend injects the user's real profile (risk score, budget, path,
+  stated fear) as context
+- Guard-railed for honesty: no buy/sell calls, no market predictions, and it never invents
+  numbers — engine outputs are the only source of figures. Output is script-checked: a reply
+  containing foreign-script corruption (a failure mode of small fallback models) is rejected
+  and re-served by the next provider
 
 ### 🤖 What-If assistant (tool-use, not hallucination)
 - "What changes if I add 10.000 TL?" / "What if I were more aggressive?" — the LLM only *extracts
@@ -241,7 +251,8 @@ disclaimer — Lumos gives no tax or legal advice in any market.
 ## Testing
 
 ```bash
-python -m pytest backend/tests/ -q     # 185 tests, ~1s, zero network
+python -m pytest backend/tests/ -q     # 203 tests, ~1s, zero network
+cd frontend && npm test                # 10 vitest tests (retry safety, currency truth)
 ```
 
 - External boundaries (AI providers, yfinance, EVDS, RSS) are fully mocked; business logic runs real
@@ -293,6 +304,12 @@ react-i18next localization · OpenAI/Mistral adapters once billing lands · Capa
 stores (push notifications power the behavioral coach in real time)
 
 See [todo.md](todo.md) for the full 9-phase build log — kept honest since day one.
+
+## License
+
+**All rights reserved** — this repository is public for portfolio review only.
+The code, the Lumos brand, and the product concept may not be copied, reused,
+or deployed without written permission. See [LICENSE](LICENSE).
 
 ---
 

@@ -247,3 +247,50 @@ def test_advisor_endpoint_uses_advisor_mode_with_context(client):
         assert "6.2/10" in captured["context"]  # real profile injected
     finally:
         chat_router.ai_chat = original
+
+
+# ── Reply-quality guards ─────────────────────────────────────────────────────
+
+def test_corrupted_script_reply_is_rejected_and_next_provider_serves():
+    """A reply with CJK/Cyrillic corruption must be discarded, not shown."""
+    from backend.services import ai_service
+
+    def corrupted(messages, system, max_tokens, model_chain=None):
+        return "Eğer rahat的话, yaşınızı paylaşır mısınız?"
+
+    def clean(messages, system, max_tokens, model_chain=None):
+        return "Yaşınızı paylaşır mısınız?"
+
+    with patch.dict(ai_service._ADAPTERS, {
+        "gemini": corrupted, "groq": clean, "openrouter": clean,
+    }):
+        reply = ai_service._dispatch([{"role": "user", "content": "5 sene"}], "sys", 100, tier="free")
+    assert reply == "Yaşınızı paylaşır mısınız?"
+
+
+def test_profiling_mode_never_reaches_weak_providers():
+    """The scripted quiz is pinned to gemini/anthropic — llama fallbacks are
+    for the free-form advisor only."""
+    from backend.services import ai_service
+
+    called = []
+
+    def track(name, reply="tamam"):
+        def _adapter(messages, system, max_tokens, model_chain=None):
+            called.append(name)
+            if name == "gemini":
+                raise ai_service._ProviderUnavailable("spent")
+            return reply
+        return _adapter
+
+    with patch.dict(ai_service._ADAPTERS, {
+        "gemini": track("gemini"), "groq": track("groq"), "openrouter": track("openrouter"),
+    }):
+        import pytest as _pytest
+        from fastapi import HTTPException
+        with _pytest.raises(HTTPException):
+            ai_service._dispatch(
+                [{"role": "user", "content": "merhaba"}], "sys", 100,
+                tier="free", providers={"gemini", "anthropic"},
+            )
+    assert called == ["gemini"]  # groq/openrouter never consulted

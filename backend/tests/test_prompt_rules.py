@@ -29,8 +29,12 @@ def test_ethical_boundaries_present():
     assert "Do not predict market movements" in SYSTEM
 
 
-def test_disclaimer_required():
-    assert "yatırım tavsiyesi niteliği taşımaz" in SYSTEM
+def test_no_per_message_disclaimer():
+    # Policy (2026-07-14): the app shows a persistent educational notice in
+    # the UI; the model must NOT append boilerplate to every reply.
+    assert "Do NOT append any legal/educational disclaimer" in SYSTEM
+    # The legal framing for the model itself stays at the top of the prompt.
+    assert "LEGAL DISCLAIMER" in SYSTEM
 
 
 def test_extract_prompt_demands_pure_json():

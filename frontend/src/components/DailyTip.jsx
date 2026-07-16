@@ -39,25 +39,43 @@ function markSeen(tipId) {
 }
 
 export default function DailyTip() {
-  const seen = getSeenTips()
-  const unseen = TIPS.filter(t => !seen.includes(t.id))
-  const [tip] = useState(() => unseen[0] || null)
+  // Start at the first unseen tip; tapping the card (or "Sonraki") marks it
+  // learned and advances — the card is a mini-carousel, not a one-shot.
+  const [idx, setIdx] = useState(() => {
+    const seen = getSeenTips()
+    const firstUnseen = TIPS.findIndex(t => !seen.includes(t.id))
+    return firstUnseen === -1 ? 0 : firstUnseen
+  })
   const [dismissed, setDismissed] = useState(false)
+  const [, forceRender] = useState(0)
 
+  const tip = TIPS[idx]
   if (!tip || dismissed) return null
 
   const progress = getSeenTips().length
   const total = TIPS.length
 
+  function advance() {
+    markSeen(tip.id)
+    setIdx((idx + 1) % TIPS.length)
+    forceRender(n => n + 1) // progress counter reads localStorage
+  }
+
   return (
-    <div className="card" style={{
-      background: 'linear-gradient(135deg, var(--bg-card) 0%, rgba(245,165,36,0.04) 100%)',
-      border: '1px solid var(--firefly-dim)',
-      position: 'relative', overflow: 'hidden',
-    }}>
+    <div
+      className="card"
+      onClick={advance}
+      role="button"
+      aria-label="Sonraki ipucu"
+      style={{
+        background: 'linear-gradient(135deg, var(--bg-card) 0%, rgba(245,165,36,0.04) 100%)',
+        border: '1px solid var(--firefly-dim)',
+        position: 'relative', overflow: 'hidden', cursor: 'pointer',
+      }}
+    >
       {/* Kapat */}
       <button
-        onClick={() => { markSeen(tip.id); setDismissed(true) }}
+        onClick={(e) => { e.stopPropagation(); markSeen(tip.id); setDismissed(true) }}
         style={{
           position: 'absolute', top: 10, right: 12,
           background: 'none', border: 'none', color: 'var(--text-dim)',
@@ -106,6 +124,9 @@ export default function DailyTip() {
           borderRadius: 2, transition: 'width 0.4s ease',
         }} />
       </div>
+      <p style={{ fontSize: 10, color: 'var(--text-dim)', marginTop: 6 }}>
+        Karta dokun → sıradaki kavram
+      </p>
     </div>
   )
 }

@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { UserButton } from '@clerk/clerk-react'
+import { UserButton, useAuth } from '@clerk/clerk-react'
 import LumosLogo from '../components/LumosLogo'
 import ChatWindow from '../components/ChatWindow'
 import RiskGauge from '../components/RiskGauge'
@@ -20,25 +20,43 @@ function getRiskMeta(score) {
   return RISK_META.high
 }
 
+function readCachedProfile(key) {
+  if (!key) return null
+  try {
+    return JSON.parse(localStorage.getItem(key) || 'null')
+  } catch {
+    return null
+  }
+}
+
 export default function ProfilePage() {
   const navigate = useNavigate()
+  const { userId } = useAuth()
   const { saveProfile, loadProfile } = usePortfolio()
   const { money } = useMarket()
-  const [displayProfile, setDisplayProfile] = useState(null)   // what we show
-  const [profileLoading, setProfileLoading] = useState(true)   // true until first fetch completes
-  const [retaking, setRetaking] = useState(false)               // user chose to redo
 
-  // On mount: fetch stored profile. Do NOT call setState synchronously in the
-  // effect body — profileLoading starts as true so the spinner shows immediately.
+  // NOTHING here blocks on the network: a returning user sees their cached
+  // result instantly, a new user sees the quiz instantly (its intro is a
+  // local constant). The server copy refreshes in the background.
+  const cacheKey = userId ? `lumos-profile-${userId}` : null
+  const [displayProfile, setDisplayProfile] = useState(() => readCachedProfile(cacheKey))
+  const [retaking, setRetaking] = useState(false)   // user chose to redo
+  const quizStartedRef = useRef(false)              // guards against late swaps
+
   useEffect(() => {
     let cancelled = false
     loadProfile().then(result => {
-      if (!cancelled) {
-        setDisplayProfile(result || null)
-        setProfileLoading(false)
+      if (cancelled) return
+      if (result?.risk_score != null) {
+        // Fresh server copy — adopt it unless the user is mid-quiz
+        if (!quizStartedRef.current) setDisplayProfile(result)
+        if (cacheKey) localStorage.setItem(cacheKey, JSON.stringify(result))
+      } else if (result === null) {
+        // Server DEFINITIVELY has no profile — drop any stale cache
+        if (cacheKey) localStorage.removeItem(cacheKey)
+        if (!quizStartedRef.current) setDisplayProfile(null)
       }
-    }).catch(() => {
-      if (!cancelled) setProfileLoading(false)
+      // undefined = transient error (cold start etc.) — keep what we have
     })
     return () => { cancelled = true }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -48,24 +66,10 @@ export default function ProfilePage() {
     const result = await saveProfile(answers)
     if (result) {
       setRetaking(false)
+      quizStartedRef.current = false
       setDisplayProfile(result)
+      if (cacheKey) localStorage.setItem(cacheKey, JSON.stringify(result))
     }
-  }
-
-  // While fetching, show a subtle loading indicator — don't start the quiz yet
-  if (profileLoading) {
-    return (
-      <div className="page">
-        <header className="navbar">
-          <LumosLogo />
-          <UserButton afterSignOutUrl="/" />
-        </header>
-        <div className="page-content" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1 }}>
-          <img src="/favicon.svg" alt="" width={36} height={36} className="firefly-mark" style={{ marginBottom: 12 }} />
-          <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>Profil yükleniyor…</p>
-        </div>
-      </div>
-    )
   }
 
   // Show result if we have a saved profile AND the user hasn't asked to redo
@@ -96,6 +100,7 @@ export default function ProfilePage() {
             </div>
             <ChatWindow
               onProfileComplete={handleProfileComplete}
+              onFirstMessage={() => { quizStartedRef.current = true }}
             />
           </>
         ) : (

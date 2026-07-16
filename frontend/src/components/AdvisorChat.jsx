@@ -116,6 +116,9 @@ function AdvisorPanel({ onClose }) {
             value={input} onChange={e => setInput(e.target.value)} enterKeyHint="send" />
           <button className="btn btn-primary" type="submit" disabled={loading} aria-label="Gönder">→</button>
         </form>
+        <p style={{ fontSize: 10, color: 'var(--text-dim)', textAlign: 'center', padding: '0 12px 10px' }}>
+          Yalnızca eğitim amaçlıdır — yatırım tavsiyesi değildir.
+        </p>
       </div>
     </div>
   )

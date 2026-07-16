@@ -82,6 +82,9 @@ export default function ChatWindow({ onProfileComplete, onFirstMessage }) {
           {isLoading ? <span className="spinner" style={{ width: 18, height: 18 }} /> : '→'}
         </button>
       </form>
+      <p style={{ fontSize: 10, color: 'var(--text-dim)', textAlign: 'center', marginTop: 8 }}>
+        Yalnızca eğitim amaçlıdır — yatırım tavsiyesi değildir.
+      </p>
     </div>
   )
 }
