@@ -19,15 +19,27 @@ export default function RecommendPage() {
   const { state: profileState } = useLocation()
   const navigate = useNavigate()
   const { money } = useMarket()
-  const { portfolio, isLoading, error, recommend } = usePortfolio()
+  const { portfolio, isLoading, error, recommend, loadProfile } = usePortfolio()
   const [selectedTicker, setSelectedTicker] = useState(null)
 
   useEffect(() => {
     if (profileState?.risk_score && profileState?.answers?.budget) {
       recommend(profileState.risk_score, profileState.answers.budget)
-    } else {
-      navigate('/profile')
+      return
     }
+    // Opened directly (bottom nav, deep link, refresh): no router state —
+    // fall back to the saved server profile before bouncing to the quiz.
+    let cancelled = false
+    ;(async () => {
+      const saved = await loadProfile()
+      if (cancelled) return
+      if (saved?.risk_score != null && saved?.answers?.budget) {
+        recommend(saved.risk_score, saved.answers.budget)
+      } else {
+        navigate('/profile')
+      }
+    })()
+    return () => { cancelled = true }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profileState?.risk_score, profileState?.answers?.budget])
 

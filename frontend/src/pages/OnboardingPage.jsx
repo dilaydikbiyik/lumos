@@ -39,7 +39,14 @@ const FEATURES = [
 
 export default function OnboardingPage() {
   const navigate = useNavigate()
-  const [showDisclaimer, setShowDisclaimer] = useState(true)
+  // Accepted once per device — re-prompting on every visit numbs the warning
+  const [showDisclaimer, setShowDisclaimer] = useState(
+    () => localStorage.getItem('lumos-disclaimer-ok') !== '1',
+  )
+  const acceptDisclaimer = () => {
+    localStorage.setItem('lumos-disclaimer-ok', '1')
+    setShowDisclaimer(false)
+  }
 
   return (
     <div className="page">
@@ -170,7 +177,7 @@ export default function OnboardingPage() {
         </div>
       </div>
 
-      {showDisclaimer && <DisclaimerModal onAccept={() => setShowDisclaimer(false)} />}
+      {showDisclaimer && <DisclaimerModal onAccept={acceptDisclaimer} />}
     </div>
   )
 }

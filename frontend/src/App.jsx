@@ -56,6 +56,19 @@ function AuthPending() {
   )
 }
 
+/** Panic + advisor floating buttons. Hidden on /profile: the quiz screen is
+    itself a chat, and on small screens the FABs sat on top of its input. */
+function FloatingHelpers() {
+  const { pathname } = useLocation()
+  if (pathname === '/profile') return null
+  return (
+    <>
+      <SignedIn><PanicButton /></SignedIn>
+      <AdvisorChat />
+    </>
+  )
+}
+
 function ProtectedRoute({ children }) {
   return (
     <>
@@ -97,11 +110,9 @@ export default function App() {
         {/* Responsive nav: bottom bar on mobile, left sidebar on desktop (CSS decides) */}
         <AppNav />
 
-        {/* Panic Button — crisis-moment support (signed-in only) */}
-        <SignedIn><PanicButton /></SignedIn>
-
-        {/* Advisor chat — always-available education Q&A (signed-in only) */}
-        <AdvisorChat />
+        {/* Floating helpers — hidden on the quiz page, where the user is
+            already chatting with Lumos and the FABs cover the input row */}
+        <FloatingHelpers />
 
         </MarketProvider>
       </BrowserRouter>
