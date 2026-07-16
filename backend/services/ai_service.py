@@ -335,16 +335,17 @@ _FOREIGN_SCRIPT_RANGES = (
 
 
 def _looks_corrupted(text: str) -> bool:
-    """True when the reply contains foreign-script characters (>=2)."""
-    hits = 0
+    """True when the reply contains ANY foreign-script character.
+
+    These scripts are never legitimate in this product's Turkish/English
+    output — even a single token-corrupted character (e.g. '而' inside a
+    portfolio explanation) destroys user trust, so one hit is enough.
+    """
     for ch in text:
         cp = ord(ch)
         for lo, hi in _FOREIGN_SCRIPT_RANGES:
             if lo <= cp <= hi:
-                hits += 1
-                if hits >= 2:
-                    return True
-                break
+                return True
     return False
 
 
