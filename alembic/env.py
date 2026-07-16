@@ -19,14 +19,14 @@ if config.config_file_name is not None:
 # Project metadata for autogenerate — importing the models registers the
 # tables on Base.metadata
 from backend.config import settings  # noqa: E402
-from backend.db.database import Base  # noqa: E402
+from backend.db.database import Base, normalize_db_url  # noqa: E402
 import backend.models.user  # noqa: F401, E402
 import backend.models.holding  # noqa: F401, E402
 
 target_metadata = Base.metadata
 
 # Use the app's DATABASE_URL (async sqlite/postgres) unless overridden
-config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)
+config.set_main_option("sqlalchemy.url", normalize_db_url(settings.DATABASE_URL))
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:

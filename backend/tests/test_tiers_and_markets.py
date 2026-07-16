@@ -348,3 +348,27 @@ def test_chat_profiling_mode_allows_openrouter_gemini():
     assert not f("meta-llama/llama-3.3-70b-instruct:free")
     assert not f("deepseek/deepseek-chat-v3-0324:free")
     assert not f("llama-3.3-70b-versatile")
+
+
+# ── DB URL normalization (paste-verbatim provider strings) ───────────────────
+
+def test_neon_style_url_is_normalized_for_asyncpg():
+    from backend.db.database import normalize_db_url
+
+    neon = ("postgresql://user:pw@ep-x-pooler.c-4.eu-central-1.aws.neon.tech/neondb"
+            "?sslmode=require&channel_binding=require")
+    out = normalize_db_url(neon)
+    assert out.startswith("postgresql+asyncpg://")
+    assert "channel_binding" not in out
+    assert "ssl=require" in out and "sslmode=" not in out
+
+    # param-order variant: channel_binding first must still yield a valid query
+    variant = "postgres://u:p@h/db?channel_binding=require&sslmode=require"
+    out2 = normalize_db_url(variant)
+    assert out2 == "postgresql+asyncpg://u:p@h/db?ssl=require"
+
+    # sqlite/dev URLs pass through untouched
+    assert normalize_db_url("sqlite+aiosqlite:///./lumos.db") == "sqlite+aiosqlite:///./lumos.db"
+    # already-correct asyncpg URLs stay stable
+    ok = "postgresql+asyncpg://u:p@h/db?ssl=require"
+    assert normalize_db_url(ok) == ok
