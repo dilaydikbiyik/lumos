@@ -4,14 +4,29 @@
  * Outputs: demo/screens/*.png (iPhone 3x + one desktop) and demo/video/*.webm
  */
 import { chromium, devices } from 'playwright'
-import { readFileSync, mkdirSync } from 'fs'
+import { mkdirSync } from 'fs'
 
 const APP = 'https://lumos-sooty.vercel.app'
 const PORTAL = 'https://peaceful-drake-17.accounts.dev'
-const ticket = readFileSync('/tmp/lumos_demo_ticket.txt', 'utf8').trim()
+const CLERK = 'https://api.clerk.com/v1'
+const SECRET = process.env.CLERK_SECRET_KEY
+const DEMO_USER = process.env.DEMO_USER_ID
+if (!SECRET || !DEMO_USER) throw new Error('CLERK_SECRET_KEY and DEMO_USER_ID env required')
 
 mkdirSync('demo/screens', { recursive: true })
 mkdirSync('demo/video', { recursive: true })
+
+// Sign-in tokens are single-use — mint a fresh one per browser context.
+async function freshTicket() {
+  const res = await fetch(`${CLERK}/sign_in_tokens`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${SECRET}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ user_id: DEMO_USER, expires_in_seconds: 600 }),
+  })
+  const j = await res.json()
+  if (!j.token) throw new Error('ticket mint failed: ' + JSON.stringify(j).slice(0, 200))
+  return j.token
+}
 
 const iphone = {
   viewport: { width: 390, height: 844 },
@@ -22,13 +37,17 @@ const iphone = {
 }
 
 async function signIn(page) {
+  const ticket = await freshTicket()
   await page.goto(`${PORTAL}/sign-in?__clerk_ticket=${ticket}`)
-  await page.waitForTimeout(5000)
+  await page.waitForTimeout(6000)
   const cookies = await page.context().cookies(PORTAL)
   const db = cookies.find(c => c.name === '__clerk_db_jwt')
   if (!db) throw new Error('clerk dev-browser cookie missing — ticket expired?')
   await page.goto(`${APP}/?__clerk_db_jwt=${db.value}`)
-  await page.waitForTimeout(4000)
+  await page.waitForTimeout(5000)
+  // Confirm the session actually restored before shooting anything
+  const ok = await page.evaluate(() => !!(window.Clerk && window.Clerk.user))
+  if (!ok) throw new Error('sign-in did not restore a Clerk session')
   await page.evaluate(() => localStorage.setItem('lumos-disclaimer-ok', '1'))
   await page.goto(`${APP}/`)
   await page.waitForTimeout(2500)
