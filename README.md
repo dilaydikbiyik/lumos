@@ -6,7 +6,7 @@
 ![React](https://img.shields.io/badge/react-19-61DAFB)
 ![Tests](https://img.shields.io/badge/tests-203%20backend%20%2B%2010%20frontend-3DD68C)
 ![Cost](https://img.shields.io/badge/running%20cost-%240%2Fmonth-F5A524)
-
+🔗 **[Live demo →](https://lumos-sooty.vercel.app)**
 > An AI-powered investment guide built for people who have never invested — and are scared to start.
 > *"Investing looks like a dark forest. Lumos is the light in your hand."*
 
@@ -323,7 +323,7 @@ Or with Docker: `docker compose up --build` (runs migrations, serves on :8000).
 
 ## Roadmap
 
-**Near-term:** deployment (Render + Vercel configs ready, cloud Postgres) · screenshots &
+**Live:** [lumos-sooty.vercel.app](https://lumos-sooty.vercel.app) · **Near-term:** screenshots &
 demo video · Stripe/Iyzico webhook onto the existing plan-tier switch · Sentry · uptime ping
 
 **Growth:** wire US/DE data adapters (FRED, Destatis) onto the Market Pack skeletons ·
