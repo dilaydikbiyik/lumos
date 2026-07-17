@@ -23,6 +23,33 @@ shows you the honest downside before the upside, and treats your fear as **data 
 
 ---
 
+## Screenshots
+
+<p align="center">
+  <img src="demo/video/lumos-demo.gif" width="300" alt="Lumos demo — mobile tour" />
+</p>
+
+| Onboarding | Risk profile | Portfolio |
+|---|---|---|
+| ![Karşılama](demo/screens/01-karsilama.png) | ![Risk profili](demo/screens/02-risk-profili.png) | ![Portföy](demo/screens/03-portfoy.png) |
+
+| Holdings + live chart | Dashboard | AI advisor |
+|---|---|---|
+| ![Varlıklarım](demo/screens/05-varliklarim.png) | ![Panel](demo/screens/06-panel.png) | ![Danışman](demo/screens/08-danisman.png) |
+
+<details>
+<summary>More: asset card, real-estate explorer, desktop layout</summary>
+
+| Asset card | Real-estate explorer | Desktop |
+|---|---|---|
+| ![Varlık kartı](demo/screens/04-varlik-karti.png) | ![Emlak Keşfet](demo/screens/07-emlak-kesfet.png) | ![Desktop](demo/screens/09-desktop-panel.png) |
+
+</details>
+
+> Full demo video: [demo/video/lumos-demo.mp4](demo/video/lumos-demo.mp4)
+
+---
+
 ## Why Lumos exists
 
 Millions of people want to invest but never start. The blocker isn't access — commission-free
