@@ -71,13 +71,19 @@ const browser = await chromium.launch()
   await shoot(page, '/', '01-karsilama')
   await shoot(page, '/profile', '02-risk-profili', { settle: 6000 })
   await shoot(page, '/recommend', '03-portfoy', { settle: 12000 })
-  // slice detail card — tap the first legend row
+  // Real-estate projection: İstanbul 5-year scenario band
   try {
-    await page.locator('text=S&P 500 ETF').first().click()
+    await page.goto(`${APP}/explore`)
+    await page.waitForSelector('input[placeholder*="ara"]', { timeout: 20000 })
+    await page.locator('input[placeholder*="ara"]').fill('İstanbul')
+    await page.waitForTimeout(1800)
+    await page.locator('.card', { hasText: 'İstanbul' }).first().click({ force: true })
     await page.waitForTimeout(1200)
-    await page.screenshot({ path: 'demo/screens/04-varlik-karti.png' })
-    console.log('✓ 04-varlik-karti')
-  } catch { console.log('… varlık kartı atlandı') }
+    await page.locator('button', { hasText: 'olurdu' }).click({ force: true })
+    await page.waitForTimeout(8000)
+    await page.screenshot({ path: 'demo/screens/04-emlak-istanbul.png' })
+    console.log('✓ 04-emlak-istanbul')
+  } catch (e) { console.log('… İstanbul projeksiyonu atlandı:', e.message) }
   await shoot(page, '/holdings', '05-varliklarim', { settle: 9000 })
   await shoot(page, '/dashboard', '06-panel', { settle: 7000 })
   await shoot(page, '/explore', '07-emlak-kesfet', { settle: 7000 })

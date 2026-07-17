@@ -31,17 +31,24 @@ const EMOTIONS = [
 
 export default function HoldingsPage() {
   const navigate = useNavigate()
-  const { getToken } = useAuth()
+  const { getToken, userId } = useAuth()
   const { money } = useMarket()
-  const [holdings, setHoldings] = useState([])
-  const [summary, setSummary] = useState(null)
-  const [health, setHealth] = useState(null)
-  const [profile, setProfile] = useState(null)
+  const cacheKey = userId ? `lumos-holdings-${userId}` : null
+  // Hydrate instantly from the last snapshot so returning users never see a
+  // blank/jank frame; the network refresh below replaces it in the background.
+  const cached = (() => {
+    try { return cacheKey ? JSON.parse(localStorage.getItem(cacheKey)) : null }
+    catch { return null }
+  })()
+  const [holdings, setHoldings] = useState(cached?.holdings ?? [])
+  const [summary, setSummary] = useState(cached?.summary ?? null)
+  const [health, setHealth] = useState(cached?.health ?? null)
+  const [profile, setProfile] = useState(cached?.profile ?? null)
   const [form, setForm] = useState(EMPTY_FORM)
   const [showForm, setShowForm] = useState(false)
   const [error, setError] = useState(null)
   // "Empty portfolio" and "still fetching" must never look the same
-  const [loaded, setLoaded] = useState(false)
+  const [loaded, setLoaded] = useState(!!cached)
 
   const refresh = useCallback(async () => {
     setAuthToken(await getToken())
@@ -54,7 +61,14 @@ export default function HoldingsPage() {
     setHealth(hs.data)
     setProfile(p.data)
     setLoaded(true)
-  }, [getToken])
+    if (cacheKey) {
+      try {
+        localStorage.setItem(cacheKey, JSON.stringify({
+          holdings: h.data, summary: s.data, health: hs.data, profile: p.data,
+        }))
+      } catch { /* storage full — best-effort cache */ }
+    }
+  }, [getToken, cacheKey])
 
   useEffect(() => {
     let cancelled = false

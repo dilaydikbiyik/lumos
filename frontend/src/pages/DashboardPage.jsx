@@ -148,7 +148,7 @@ export default function DashboardPage() {
                     : '—'
                   }
                 </div>
-                {holdingsSummary.cash_erosion && (
+                {holdingsSummary.cash_erosion && holdingsSummary.remaining_budget > 0 && (
                   <div style={{ fontSize: 11, color: 'var(--red)', marginTop: 3 }}>
                     ↓ {money(holdingsSummary.cash_erosion.erosion_amount)}/ay eriyor
                   </div>

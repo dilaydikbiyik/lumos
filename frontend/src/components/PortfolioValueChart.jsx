@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
+import { useAuth } from '@clerk/clerk-react'
 import api from '../utils/api'
 import useMarket from '../hooks/useMarket'
 
@@ -13,18 +14,26 @@ const RANGES = [
     follow actual closes; cash/manual assets are carried flat (no fake wiggle). */
 export default function PortfolioValueChart({ holdingsCount }) {
   const { money } = useMarket()
+  const { userId } = useAuth()
   const [days, setDays] = useState(30)
-  const [data, setData] = useState(null)
+  const ck = userId ? `lumos-history-${userId}-${days}` : null
+  const [data, setData] = useState(() => {
+    try { return ck ? JSON.parse(localStorage.getItem(ck)) : null } catch { return null }
+  })
   const [error, setError] = useState(null)
 
   useEffect(() => {
     if (!holdingsCount) return
     let cancelled = false
     api.get('/holdings/history', { params: { days } })
-      .then(res => { if (!cancelled) { setData(res.data); setError(null) } })
+      .then(res => {
+        if (cancelled) return
+        setData(res.data); setError(null)
+        try { if (ck) localStorage.setItem(ck, JSON.stringify(res.data)) } catch { /* ignore */ }
+      })
       .catch(() => { if (!cancelled) setError('Değer geçmişi şu an yüklenemedi.') })
     return () => { cancelled = true }
-  }, [days, holdingsCount])
+  }, [days, holdingsCount, ck])
 
   if (!holdingsCount) return null
 
