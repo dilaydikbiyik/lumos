@@ -30,9 +30,8 @@ def explain_portfolio(portfolio: PortfolioRecommendResponse, user_profile: dict)
         "3. One honest sentence about what could go wrong (e.g. temporary drops) and why "
         "the mix is designed to soften it — calm, not alarming.\n"
         "Respond in TURKISH — the app's UI language is Turkish; even though this "
-        "prompt is English, the reader is a Turkish beginner.\n\n"
-        "⚠️ Always end with: 'Bu içerik yalnızca eğitim amaçlıdır ve yatırım tavsiyesi "
-        "niteliği taşımaz. Lütfen lisanslı bir finansal danışmana başvurun.'"
+        "prompt is English, the reader is a Turkish beginner. Do NOT append a "
+        "legal disclaimer; the app already shows one right below this text."
     )
     return generate_text(prompt, cache=True)
 

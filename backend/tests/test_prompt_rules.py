@@ -46,3 +46,24 @@ def test_extract_prompt_demands_pure_json():
 def test_extract_prompt_captures_monthly_contribution():
     # Quiz Q1 asks one-time vs monthly — the answer must not be lost
     assert "monthly_contribution" in EXTRACT
+
+
+def test_oneshot_generation_never_inherits_the_quiz_script():
+    """generate_text without an explicit system must use the neutral one-shot
+    system — falling back to the quiz script made the portfolio explainer
+    ask 'Soru 2' instead of explaining."""
+    from unittest.mock import patch
+
+    from backend.services import ai_service
+
+    captured = {}
+
+    def fake_dispatch(messages, system, max_tokens, **kw):
+        captured["system"] = system
+        return "Açıklama."
+
+    with patch.object(ai_service, "_dispatch", fake_dispatch):
+        ai_service.generate_text("explain this portfolio")
+
+    assert captured["system"] == ai_service._ONESHOT_SYSTEM
+    assert "[PROFILE_COMPLETE]" not in captured["system"]

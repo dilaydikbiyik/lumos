@@ -19,6 +19,18 @@ logger = logging.getLogger("lumos.ai")
 _SYSTEM_PROMPT = (Path(__file__).parent.parent / "prompts" / "system_prompt.txt").read_text()
 _ADVISOR_PROMPT = (Path(__file__).parent.parent / "prompts" / "advisor_prompt.txt").read_text()
 
+# One-shot generations (portfolio explainer etc.) must NEVER inherit the
+# interactive quiz script — a fallback to _SYSTEM_PROMPT once made the
+# "Neden Bu Portföy?" card ask quiz question 2 instead of explaining.
+_ONESHOT_SYSTEM = (
+    "You are Lumos's financial-education writer for absolute beginners in "
+    "Türkiye. Follow the user prompt exactly and return ONLY the requested "
+    "text, in Turkish unless told otherwise. Plain everyday language; explain "
+    "any finance term inline the first time it appears. Never ask the reader "
+    "questions, never run a quiz, never give buy/sell advice or predictions, "
+    "and never append legal disclaimers (the app shows a persistent notice)."
+)
+
 # Short content hash — lets logs tie a response to the exact prompt version
 PROMPT_VERSION = hashlib.sha1(_SYSTEM_PROMPT.encode()).hexdigest()[:8]
 
@@ -580,7 +592,7 @@ def generate_text(prompt: str, system: Optional[str] = None, cache: bool = False
 
     reply = _dispatch(
         [{"role": "user", "content": prompt}],
-        system or _SYSTEM_PROMPT,
+        system or _ONESHOT_SYSTEM,
         max_tokens=512,
     )
     if cache_key:
