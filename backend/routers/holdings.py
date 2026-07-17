@@ -1,4 +1,5 @@
 import asyncio
+from datetime import date
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -87,6 +88,24 @@ async def delete_holding(
     await holding_repository.delete(db, holding)
 
 
+@router.get("/history")
+@limiter.limit("20/minute")
+async def value_history(
+    request: Request,
+    days: int = 30,
+    user_id: str = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Daily value series of the user's holdings — live tickers follow real
+    closes, everything else is carried flat at its best-known value."""
+    from backend.services.portfolio_history import portfolio_value_history
+
+    days = max(7, min(days, 365))
+    user = await user_repository.get_or_create(db, user_id)
+    holdings = await holding_repository.list_for_user(db, user.id)
+    return await asyncio.to_thread(portfolio_value_history, holdings, days)
+
+
 @router.get("/health")
 @limiter.limit("20/minute")
 async def health_score(
@@ -136,7 +155,16 @@ async def portfolio_summary(
     cash_erosion = None
     if idle_cash > 0:
         erosion = inflation_service.monthly_cash_erosion(idle_cash)
-        cash_erosion = CashErosion(**erosion)
+        cash_erosion = CashErosion(**erosion, idle_cash=round(idle_cash, 2))
+
+    # Monthly-plan tracking: what entered the portfolio this calendar month
+    today = date.today()
+    invested_this_month = sum(
+        h.purchase_amount for h in holdings
+        if (h.purchase_date or (h.created_at.date() if h.created_at else None))
+        and (h.purchase_date or h.created_at.date()).year == today.year
+        and (h.purchase_date or h.created_at.date()).month == today.month
+    )
 
     return PortfolioSummary(
         total_budget=user.budget,
@@ -146,4 +174,6 @@ async def portfolio_summary(
         holdings_count=len(holdings),
         by_type=by_type,
         cash_erosion=cash_erosion,
+        monthly_contribution=user.monthly_contribution,
+        invested_this_month=round(invested_this_month, 2),
     )

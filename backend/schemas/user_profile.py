@@ -5,6 +5,10 @@ from typing import Literal, Optional
 class RiskProfileAnswers(BaseModel):
     """Structured answers collected during the risk-profiling conversation."""
     budget: float = Field(..., gt=0, description="Available investment budget in TRY")
+    monthly_contribution: Optional[float] = Field(
+        None, ge=0,
+        description="TRY the user plans to add every month (null = one-time investment)"
+    )
     time_horizon: Literal["short", "medium", "long"] = Field(
         ..., description="short (<2yr) / medium (2-10yr) / long (>10yr)"
     )

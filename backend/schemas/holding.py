@@ -62,6 +62,9 @@ class CashErosion(BaseModel):
     """'Param eriyor mu?' — real monthly purchasing-power loss on idle cash."""
     monthly_inflation_pct: float
     erosion_amount: float
+    # What the erosion was computed ON (cash holdings + uninvested budget) —
+    # the UI must name this amount, not a different field
+    idle_cash: float = 0.0
 
 
 class PortfolioSummary(BaseModel):
@@ -73,3 +76,7 @@ class PortfolioSummary(BaseModel):
     holdings_count: int
     by_type: dict[str, float]  # asset_type -> current value
     cash_erosion: Optional[CashErosion] = None
+    # Monthly-plan tracking (quiz Q1: "her ay düzenli"): the planned amount
+    # and what was actually recorded this calendar month
+    monthly_contribution: Optional[float] = None
+    invested_this_month: float = 0.0

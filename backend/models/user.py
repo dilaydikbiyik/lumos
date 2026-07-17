@@ -34,6 +34,9 @@ class User(Base):
     # Asked once (e.g. in the rent-vs-buy affordability check), reused by any
     # tool that needs an income reality-check — never re-asked
     monthly_income: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
+    # Quiz Q1 captures whether the budget is one-time or monthly — the
+    # monthly plan amount lives here (null = one-time investor)
+    monthly_contribution: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
 
     # Billing-ready plan tier: free / plus / pro (ai_tiers.py) — a payment
     # webhook or admin flips this; models & quotas follow automatically

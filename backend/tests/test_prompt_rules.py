@@ -41,3 +41,8 @@ def test_extract_prompt_demands_pure_json():
     assert "RAW JSON ONLY" in EXTRACT
     for field in ("budget", "time_horizon", "loss_tolerance", "goal", "experience"):
         assert field in EXTRACT
+
+
+def test_extract_prompt_captures_monthly_contribution():
+    # Quiz Q1 asks one-time vs monthly — the answer must not be lost
+    assert "monthly_contribution" in EXTRACT

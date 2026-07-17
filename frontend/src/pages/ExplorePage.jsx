@@ -362,7 +362,7 @@ export default function ExplorePage() {
   const { pack } = useMarket()
   const [provinces, setProvinces] = useState(null)
   const [horizon, setHorizon] = useState(3)
-  const [scenarioAmount, setScenarioAmount] = useState('1000000')
+  const [scenarioAmount, setScenarioAmount] = useState('1.000.000')
   const [search, setSearch] = useState('')
   // Loading is derived: no data yet, or data belongs to a different horizon
   const loading = !provinces || provinces._horizon !== horizon
@@ -460,8 +460,8 @@ export default function ExplorePage() {
 
           <input
             className="input"
-            type="number"
-            min="1"
+            type="text"
+            inputMode="numeric"
             placeholder="Senaryo tutarı (TL)"
             value={scenarioAmount}
             onChange={e => setScenarioAmount(e.target.value)}

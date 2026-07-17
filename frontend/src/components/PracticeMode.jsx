@@ -66,6 +66,10 @@ export default function PracticeMode({ allocations }) {
             Bu dalgalanmayı hissettin mi? Gerçek parayla da böyle olacak — fark, şimdi hiçbir şey
             kaybetmiyor olman.
           </p>
+          <p style={{ fontSize: 11.5, color: 'var(--text-dim)', marginTop: 6, lineHeight: 1.5 }}>
+            Bu rakam tek bir haftanın gerçek piyasa hareketi — bir getiri sözü değil.
+            Eksi kapanan haftalar da olur; mesele o haftalarda satmamayı öğrenmek.
+          </p>
         </>
       )}
       {error && <p style={{ color: 'var(--red)', fontSize: 13, marginTop: 10 }}>{error}</p>}

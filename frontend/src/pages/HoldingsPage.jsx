@@ -3,6 +3,7 @@ import Icon from '../components/Icon'
 import { useNavigate } from 'react-router-dom'
 import LumosLogo from '../components/LumosLogo'
 import CurrencyExposure from '../components/CurrencyExposure'
+import PortfolioValueChart from '../components/PortfolioValueChart'
 import { UserButton, useAuth } from '@clerk/clerk-react'
 import api, { extractErrorMessage, setAuthToken } from '../utils/api'
 import useMarket from '../hooks/useMarket'
@@ -135,7 +136,8 @@ export default function HoldingsPage() {
               <strong style={{ fontSize: 14 }}>Param eriyor mu?</strong>
             </div>
             <p style={{ fontSize: 13, lineHeight: 1.6 }}>
-              Yatırılmamış {money(summary.remaining_budget || 0)}'nin bu ay enflasyon nedeniyle
+              Kasada bekleyen {money(summary.cash_erosion.idle_cash ?? (summary.remaining_budget || 0))}'nin
+              (nakit varlıkların + yatırılmamış bütçen) bu ay enflasyon nedeniyle
               gerçek değeri ~{money(summary.cash_erosion.erosion_amount)} azaldı
               (aylık enflasyon %{summary.cash_erosion.monthly_inflation_pct}).
             </p>
@@ -158,6 +160,10 @@ export default function HoldingsPage() {
             ))}
           </div>
         )}
+
+        {/* Daily value of the real portfolio — the "what happened since I
+            bought it" chart */}
+        <PortfolioValueChart holdingsCount={holdings.length} />
 
         {/* Currency exposure — TL vs FX */}
         <CurrencyExposure holdings={holdings} />

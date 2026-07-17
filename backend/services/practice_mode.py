@@ -30,6 +30,16 @@ def practice_snapshot(weights: dict[str, float], virtual_budget: float = DEFAULT
     for ticker, weight in weights.items():
         series = history.get(ticker)
         if series is None or series.empty:
+            # Unpriced slice (e.g. cash): it exists and sits FLAT. Excluding
+            # it would shrink the base and overstate the weekly move.
+            allocation_value = virtual_budget * weight
+            total_value += allocation_value
+            total_week_ago_value += allocation_value
+            per_asset[ticker] = {
+                "weekly_change_pct": 0.0,
+                "current_value": round(allocation_value, 2),
+                "flat": True,
+            }
             continue
 
         latest = float(series.iloc[-1])
@@ -48,7 +58,7 @@ def practice_snapshot(weights: dict[str, float], virtual_budget: float = DEFAULT
             "current_value": round(current_value, 2),
         }
 
-    if not per_asset:
+    if not per_asset or all(a.get("flat") for a in per_asset.values()):
         raise MarketDataError("No price data available for practice portfolio")
 
     weekly_change = total_value - total_week_ago_value

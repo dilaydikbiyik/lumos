@@ -27,6 +27,7 @@ async def save_profile(
         db, user_id,
         risk_score=profile.risk_score,
         budget=answers.budget,
+        monthly_contribution=answers.monthly_contribution,
         time_horizon=answers.time_horizon,
         loss_tolerance=answers.loss_tolerance,
         goal=answers.goal,

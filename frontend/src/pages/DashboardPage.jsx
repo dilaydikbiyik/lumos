@@ -48,6 +48,11 @@ function ProgressiveDetails({ holdingsSummary, portfolio }) {
   )
 }
 
+const TYPE_TR = {
+  stock: 'Hisse', fund: 'Fon', etf: 'ETF', real_estate: 'Konut', land: 'Arsa',
+  vehicle: 'Araç', gold: 'Altın', crypto: 'Kripto', cash: 'Nakit', other: 'Diğer',
+}
+
 export default function DashboardPage() {
   const navigate = useNavigate()
   const { getToken } = useAuth()
@@ -151,6 +156,25 @@ export default function DashboardPage() {
               </div>
             </div>
 
+            {/* Monthly plan tracker — quiz Q1 said "her ay düzenli" */}
+            {holdingsSummary.monthly_contribution > 0 && (
+              <div style={{
+                marginTop: 14, padding: '10px 12px', borderRadius: 'var(--radius-xs)',
+                background: 'var(--bg-input)', border: '1px solid var(--border)',
+                fontSize: 12.5, lineHeight: 1.6,
+              }}>
+                {(() => {
+                  const plan = holdingsSummary.monthly_contribution
+                  const done = holdingsSummary.invested_this_month || 0
+                  const left = Math.max(plan - done, 0)
+                  return done >= plan
+                    ? <>Aylık planın <strong>{money(plan)}</strong> — bu ay <strong>{money(done)}</strong> ekledin, plan tamam ✓</>
+                    : <>Aylık planın <strong>{money(plan)}</strong> — bu ay <strong>{money(done)}</strong> eklendi,
+                        kalan <strong>{money(left)}</strong>. Eklediğinde Varlıklarım'a işlemeyi unutma.</>
+                })()}
+              </div>
+            )}
+
             {/* Per-type allocation mini bar */}
             {holdingsSummary.by_type && Object.keys(holdingsSummary.by_type).length > 0 && (
               <div style={{ marginTop: 16 }}>
@@ -158,7 +182,7 @@ export default function DashboardPage() {
                   {Object.entries(holdingsSummary.by_type).map(([type, val], i) => {
                     const colors = ['#F5A524', '#7A4A93', '#1FB2A6', '#E8663F', '#9C5A34']
                     const pct = holdingsSummary.total_current_value > 0
-                      ? (val.current_value / holdingsSummary.total_current_value) * 100
+                      ? (Number(val) / holdingsSummary.total_current_value) * 100
                       : 0
                     return (
                       <div key={type} style={{
@@ -173,12 +197,12 @@ export default function DashboardPage() {
                   {Object.entries(holdingsSummary.by_type).map(([type, val], i) => {
                     const colors = ['#F5A524', '#7A4A93', '#1FB2A6', '#E8663F', '#9C5A34']
                     const pct = holdingsSummary.total_current_value > 0
-                      ? Math.round((val.current_value / holdingsSummary.total_current_value) * 100)
+                      ? Math.round((Number(val) / holdingsSummary.total_current_value) * 100)
                       : 0
                     return (
                       <span key={type} style={{ fontSize: 11, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 4 }}>
                         <span style={{ width: 7, height: 7, borderRadius: '50%', background: colors[i % colors.length], display: 'inline-block' }} />
-                        {type} %{pct}
+                        {TYPE_TR[type] || type} %{pct}
                       </span>
                     )
                   })}

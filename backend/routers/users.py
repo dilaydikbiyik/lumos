@@ -33,6 +33,7 @@ class UserRead(BaseModel):
     market: str = "TR"
     primary_fear: Optional[str]
     monthly_income: Optional[float] = None
+    monthly_contribution: Optional[float] = None
 
 
 class MonthlyIncomeUpdate(BaseModel):
