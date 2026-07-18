@@ -101,7 +101,7 @@ export default function FutureScenarios({ allocations, budget }) {
           <BandRow label="Tipik dönem" tone="mid"  data={result.typical}     amount={budget} />
           <BandRow label="İyi dönem"   tone="good" data={result.optimistic}  amount={budget} />
           <p style={{ fontSize: 12, opacity: 0.6, marginTop: 8, lineHeight: 1.5 }}>
-            ⚠️ {result.honesty_note}
+            {result.honesty_note}
           </p>
         </>
       )}

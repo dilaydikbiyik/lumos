@@ -248,8 +248,11 @@ def build_portfolio(risk_score: float, budget: float) -> PortfolioRecommendRespo
                 "defensive_target_pct": round(defensive_target * 100, 1),
                 "growth_target_pct": round(growth_target * 100, 1),
                 "formula": (
-                    "savunma_payı = clamp(60 − 5.5·risk, 0, 60)% — nakit+tahvil; "
-                    "kalan büyüme kovası ağırlık ∝ (1-α)·(1/oynaklık) + α·oynaklık, α=skor/10"
+                    "Güvenli pay = 60 − (5,5 × risk skoru), en az %0 en fazla %60 "
+                    "(nakit + tahvil). Kalan pay büyüme varlıklarına dağıtılır: "
+                    "her varlığın ağırlığı = (1 − α) × (1 / oynaklık) + α × oynaklık. "
+                    "α risk skorunun onda biridir; yani α büyüdükçe oynak varlıklar "
+                    "daha fazla, küçüldükçe sakin varlıklar daha fazla pay alır."
                 ),
                 "position_cap": cap,
                 "max_position_pct": MAX_POSITION_PCT,

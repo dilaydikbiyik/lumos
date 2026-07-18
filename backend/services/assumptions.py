@@ -14,6 +14,11 @@ use INFLATION_FALLBACK_PCT. These remain PLANNING assumptions, not forecasts;
 the real spreads are the only hand-set inputs and they live here, in one spot.
 """
 
+import logging
+
+logger = logging.getLogger("lumos.assumptions")
+
+
 # Fallback inflation used only when no CPI data can be read at all.
 INFLATION_FALLBACK_PCT = 40.0
 
@@ -36,8 +41,12 @@ def annual_inflation_pct() -> float:
         v = inflation_service.trailing_annual_inflation_pct()
         if v and v > 0:
             return round(v, 1)
-    except Exception:  # data layer down → don't break the calculator
-        pass
+    except Exception as exc:  # data layer down → don't break the calculator
+        # A silent fallback makes a static number look like a live one; say so.
+        logger.warning(
+            "live inflation unavailable (%s) — using static fallback %.1f%%",
+            type(exc).__name__, INFLATION_FALLBACK_PCT,
+        )
     return INFLATION_FALLBACK_PCT
 
 

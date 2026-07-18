@@ -67,9 +67,27 @@ async function signIn(page) {
   throw new Error('sign-in did not restore a Clerk session after retries')
 }
 
-async function shoot(page, path, name, { settle = 3500, fullPage = false } = {}) {
+/** Poll until a piece of real content appears — pages that wait on the API
+    (and an AI explanation) rendered blank when we shot them on a timer. */
+async function waitForText(page, needle, maxSeconds = 60) {
+  for (let i = 0; i < maxSeconds; i++) {
+    let t = ''
+    try { t = await page.evaluate(() => document.body.innerText) } catch { /* navigating */ }
+    if (t.includes(needle)) return true
+    await page.waitForTimeout(1000)
+  }
+  return false
+}
+
+async function shoot(page, path, name, { settle = 3500, fullPage = false, expect = null } = {}) {
   await page.goto(`${APP}${path}`)
+  if (expect) {
+    const ok = await waitForText(page, expect)
+    if (!ok) console.log('  … içerik gelmedi:', name)
+  }
   await page.waitForTimeout(settle)
+  await page.evaluate(() => window.scrollTo(0, 0))
+  await page.waitForTimeout(800)
   await page.screenshot({ path: `demo/screens/${name}.png`, fullPage })
   console.log('✓', name)
 }
@@ -84,27 +102,24 @@ const browser = await chromium.launch()
 
   await shoot(page, '/', '01-karsilama')
   await shoot(page, '/profile', '02-risk-profili', { settle: 6000 })
-  await shoot(page, '/recommend', '03-portfoy', { settle: 12000 })
-  // Real-estate projection: İstanbul 5-year scenario band
+  await shoot(page, '/recommend', '03-portfoy', { settle: 6000, expect: 'Dağılımın' })
+  // Real-estate decision tool: the rent-vs-buy scenario with real numbers
   try {
     await page.goto(`${APP}/explore`)
-    await page.waitForSelector('input[aria-label="İl ara"]', { timeout: 20000 })
-    await page.locator('input[aria-label="İl ara"]').fill('İstanbul')
+    await waitForText(page, 'Kirada mı otur')
+    await page.locator('input[placeholder*="Peşinat"]').fill('2.000.000')
+    await page.locator('input[placeholder*="kiran"]').fill('35.000')
+    await page.locator('input[placeholder*="Evin fiyatı"]').fill('6.000.000')
+    await page.getByRole('button', { name: 'Karşılaştır' }).click()
+    await waitForText(page, 'Ev alırsan')
     await page.waitForTimeout(2500)
-    const card = page.locator('.card', { hasText: 'İstanbul' }).first()
-    await card.scrollIntoViewIfNeeded()
-    await card.click({ force: true })
-    await page.waitForTimeout(1500)
-    const projBtn = page.locator('button', { hasText: 'olurdu' }).first()
-    await projBtn.waitFor({ timeout: 8000 })
-    await projBtn.click({ force: true })
-    await page.waitForTimeout(9000)
-    await card.scrollIntoViewIfNeeded()
-    await page.screenshot({ path: 'demo/screens/04-emlak-istanbul.png' })
-    console.log('✓ 04-emlak-istanbul')
-  } catch (e) { console.log('… İstanbul projeksiyonu atlandı:', e.message) }
-  await shoot(page, '/holdings', '05-varliklarim', { settle: 9000 })
-  await shoot(page, '/dashboard', '06-panel', { settle: 7000 })
+    await page.locator('text=Kirada mı otur').scrollIntoViewIfNeeded()
+    await page.waitForTimeout(800)
+    await page.screenshot({ path: 'demo/screens/04-kira-vs-ev.png' })
+    console.log('✓ 04-kira-vs-ev')
+  } catch (e) { console.log('… kira-vs-ev atlandı:', e.message.slice(0, 80)) }
+  await shoot(page, '/holdings', '05-varliklarim', { settle: 7000, expect: 'Varlıklarım' })
+  await shoot(page, '/dashboard', '06-panel', { settle: 6000, expect: 'Kontrol Paneli' })
   await shoot(page, '/explore', '07-emlak-kesfet', { settle: 7000 })
 
   // advisor chat with a real AI answer
@@ -127,8 +142,8 @@ const browser = await chromium.launch()
   const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 2 })
   const page = await ctx.newPage()
   await signIn(page)
-  await shoot(page, '/dashboard', '09-desktop-panel', { settle: 7000 })
-  await shoot(page, '/recommend', '10-desktop-portfoy', { settle: 12000 })
+  await shoot(page, '/dashboard', '09-desktop-panel', { settle: 6000, expect: 'Kontrol Paneli' })
+  await shoot(page, '/recommend', '10-desktop-portfoy', { settle: 6000, expect: 'Dağılımın' })
   await ctx.close()
 }
 

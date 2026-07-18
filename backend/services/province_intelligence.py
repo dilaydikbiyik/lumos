@@ -54,7 +54,8 @@ def rank_provinces(horizon_years: int = 3) -> dict:
         base_month = months[max(len(months) - 1 - quarters, 0)]
         try:
             real_change = inflation_service.real_return_pct(change, base_month, latest_month)
-        except Exception:
+        except Exception as exc:
+            logger.warning("real-return conversion failed for %s (%s)", suffix, type(exc).__name__)
             real_change = None
 
         rows.append({

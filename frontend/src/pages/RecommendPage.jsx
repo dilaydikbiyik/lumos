@@ -17,12 +17,44 @@ import BeginnerGuide from '../components/BeginnerGuide'
 import usePortfolio from '../hooks/usePortfolio'
 import useMarket from '../hooks/useMarket'
 
+
+/** One stage of the portfolio journey. Collapsed by default so the page opens
+    as "here is your portfolio and why", not as a wall of thirteen cards. */
+function Layer({ title, hint, open, onToggle, children }) {
+  return (
+    <section style={{ display: 'flex', flexDirection: 'column', gap: open ? 16 : 0 }}>
+      <button
+        onClick={onToggle}
+        aria-expanded={open}
+        style={{
+          width: '100%', textAlign: 'left', cursor: 'pointer',
+          background: open ? 'var(--bg-card-2)' : 'var(--bg-card)',
+          border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)',
+          padding: '14px 16px', color: 'var(--text)',
+          display: 'flex', alignItems: 'center', gap: 12,
+        }}
+      >
+        <div style={{ flex: 1 }}>
+          <div style={{ fontSize: 'var(--t-lead)', fontWeight: 700, marginBottom: 2 }}>{title}</div>
+          <div style={{ fontSize: 'var(--t-micro)', color: 'var(--text-muted)', lineHeight: 1.5 }}>{hint}</div>
+        </div>
+        <span style={{
+          color: 'var(--firefly)', fontSize: 18, flexShrink: 0,
+          transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s ease',
+        }}>⌄</span>
+      </button>
+      {open && children}
+    </section>
+  )
+}
+
 export default function RecommendPage() {
   const { state: profileState } = useLocation()
   const navigate = useNavigate()
   const { money } = useMarket()
   const { portfolio, isLoading, error, recommend, loadProfile } = usePortfolio()
   const [selectedTicker, setSelectedTicker] = useState(null)
+  const [layer, setLayer] = useState(null)   // 'test' | 'apply' | null
 
   useEffect(() => {
     if (profileState?.risk_score && profileState?.answers?.budget) {
@@ -37,7 +69,10 @@ export default function RecommendPage() {
       if (cancelled) return
       if (saved?.risk_score != null && saved?.answers?.budget) {
         recommend(saved.risk_score, saved.answers.budget)
-      } else {
+      } else if (saved === null && !portfolio) {
+        // The server DEFINITIVELY has no profile and nothing is cached —
+        // only then send the user to the quiz. A transient error (undefined)
+        // must never throw someone with a cached portfolio back to step one.
         navigate('/profile')
       }
     })()
@@ -85,13 +120,9 @@ export default function RecommendPage() {
           </div>
         </div>
 
-        {/* Allocation chart — clicking a slice opens AssetExplainer */}
+        {/* ── Layer 1: PORTFÖYÜN — what you got and why (always visible) ── */}
         <PortfolioChart allocations={portfolio.allocations} onSliceClick={setSelectedTicker} />
 
-        {/* Why this allocation? — deterministic formula + dropped assets */}
-        <AllocationRationale portfolio={portfolio} />
-
-        {/* Asset explainer — what/why/risk for the selected asset */}
         {selectedAlloc && (
           <AssetExplainer
             allocation={selectedAlloc}
@@ -100,45 +131,57 @@ export default function RecommendPage() {
           />
         )}
 
-        {/* Practice portfolio — try it without risking real money */}
-        <PracticeMode allocations={portfolio.allocations} />
+        <AllocationRationale portfolio={portfolio} />
 
-        {/* Time Machine — honest historical simulation */}
-        <TimeMachine allocations={portfolio.allocations} budget={portfolio.budget} />
-
-        {/* Future Scenarios — not a forecast: historical window distribution */}
-        <FutureScenarios allocations={portfolio.allocations} budget={portfolio.budget} />
-
-        {/* What if? — tool-use: the AI calls the real engine, never invents math */}
-        <WhatIfAssistant riskScore={portfolio.risk_score} budget={portfolio.budget} />
-
-        {/* REIT card */}
-        {portfolio.includes_reits && <ReitCard explanation={portfolio.metadata?.reit_explanation} />}
-
-        {/* Portfolio explanation */}
         {portfolio.plain_explanation && (
           <div className="card">
             <h3 style={{ marginBottom: 10, display: 'flex', alignItems: 'center', gap: 8 }}>
               <Icon name="bulb" size={18} />
               Neden Bu Portföy?
             </h3>
-            <p style={{ fontSize: 14, whiteSpace: 'pre-line', lineHeight: 1.7 }}>{portfolio.plain_explanation}</p>
+            <p style={{ fontSize: 'var(--t-small)', whiteSpace: 'pre-line', lineHeight: 1.7 }}>
+              {portfolio.plain_explanation}
+            </p>
           </div>
         )}
 
-        {/* Legal disclaimer */}
+        {portfolio.includes_reits && <ReitCard explanation={portfolio.metadata?.reit_explanation} />}
+
+        {/* ── Layer 2: SINA — test it against reality before risking money ── */}
+        <Layer
+          title="Bu portföyü sına"
+          hint="Gerçek geçmiş verilerle dene: kötü günlerde ne olurdu, sen ne hissederdin?"
+          open={layer === 'test'}
+          onToggle={() => setLayer(layer === 'test' ? null : 'test')}
+        >
+          <PracticeMode allocations={portfolio.allocations} />
+          <TimeMachine allocations={portfolio.allocations} budget={portfolio.budget} />
+          <FutureScenarios allocations={portfolio.allocations} budget={portfolio.budget} />
+          <WhatIfAssistant riskScore={portfolio.risk_score} budget={portfolio.budget} />
+        </Layer>
+
+        {/* "How do I actually buy this?" — reference material, fine to fold away */}
+        <Layer
+          title="Nasıl alırım?"
+          hint="Aracı kurum hesabı açmaktan ilk emri vermeye kadar adım adım rehber."
+          open={layer === 'howto'}
+          onToggle={() => setLayer(layer === 'howto' ? null : 'howto')}
+        >
+          <BeginnerGuide />
+        </Layer>
+
+        {/* The execution bridge is the page's primary action once someone has
+            bought — it must never sit behind a collapsed section. */}
+        <BoughtItBridge allocations={portfolio.allocations} budget={portfolio.budget} />
+
         <div className="disclaimer">
           <Icon name="warning" size={13} /> Bu bilgiler yalnızca eğitim amaçlıdır. Geçmiş performans, gelecek sonuçların garantisi değildir. Yatırım kararlarınız için lisanslı bir finansal danışmana başvurun.
         </div>
 
-        {/* "Take the first step" guide — broker walkthrough */}
-        <BeginnerGuide />
-
-        {/* "I bought it" bridge — the last link of the no-execution model */}
-        <BoughtItBridge allocations={portfolio.allocations} budget={portfolio.budget} />
-
+        {/* Nothing is saved here — the portfolio is recomputed from the profile
+            on demand. Calling it "Kaydet" implied an action that never happened. */}
         <button className="btn btn-ghost btn-full" onClick={() => navigate('/dashboard')}>
-          Kaydet ve Panele Git →
+          Panele dön →
         </button>
       </div>
     </div>

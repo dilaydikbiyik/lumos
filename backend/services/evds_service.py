@@ -12,6 +12,8 @@ keeps us far under any rate limit while staying fresh enough.
 import logging
 from typing import Optional
 
+from concurrent.futures import ThreadPoolExecutor, as_completed
+
 import httpx
 
 from backend.config import settings
@@ -171,16 +173,18 @@ def fetch_quarterly_series_batch(codes: list[str], start: str, end: str) -> dict
     Returns {code: {"YYYY-MM": value}} (quarter→month).
     """
     cache_key = f"evds_batch_q:{hashlib_key(codes)}:{start}:{end}"
+    lkg_key = f"lkg:{cache_key}"          # last-known-good: never expires
     cached = cache_service.get(cache_key)
     if cached is not None:
         return cached
 
-    out: dict[str, dict[str, float]] = {c: {} for c in codes}
     CHUNK = 15
-    for i in range(0, len(codes), CHUNK):
-        chunk = codes[i:i + CHUNK]
+    chunks = [codes[i:i + CHUNK] for i in range(0, len(codes), CHUNK)]
+
+    def _fetch(chunk: list[str]) -> dict[str, dict[str, float]]:
+        part: dict[str, dict[str, float]] = {c: {} for c in chunk}
         url = f"{BASE_URL}/series={'-'.join(chunk)}&startDate={start}&endDate={end}&type=json"
-        resp = httpx.get(url, headers={"key": settings.TCMB_EVDS_API_KEY}, timeout=20)
+        resp = httpx.get(url, headers={"key": settings.TCMB_EVDS_API_KEY}, timeout=25)
         resp.raise_for_status()
         for item in resp.json().get("items", []):
             tarih = item.get("Tarih", "")
@@ -190,10 +194,36 @@ def fetch_quarterly_series_batch(codes: list[str], start: str, end: str) -> dict
             for code in chunk:
                 raw = item.get(code.replace(".", "_"))
                 if raw is not None:
-                    out[code][month] = float(raw)
+                    part[code][month] = float(raw)
+        return part
+
+    # Chunks are independent, and each round trip to TCMB costs ~13s from a US
+    # datacenter — sequentially that is over a minute for 81 provinces, which
+    # is why this endpoint used to time out. Fetch them at once instead, and
+    # let a slow/failing chunk cost only its own data, not the whole answer.
+    out: dict[str, dict[str, float]] = {c: {} for c in codes}
+    failures = 0
+    with ThreadPoolExecutor(max_workers=min(6, len(chunks))) as pool:
+        futures = {pool.submit(_fetch, c): c for c in chunks}
+        for fut in as_completed(futures):
+            try:
+                out.update(fut.result())
+            except Exception as exc:
+                failures += 1
+                logger.warning("EVDS chunk failed (%s) — continuing with the rest", exc)
 
     if any(out.values()):
         cache_service.set(cache_key, out, ttl=_CACHE_TTL)
+        if not failures:                   # only a complete answer becomes the fallback
+            cache_service.set(lkg_key, out, ttl=None)
+        return out
+
+    # Nothing came back — serve the last complete answer rather than an empty
+    # screen. Housing indices move quarterly; yesterday's copy is still true.
+    fallback = cache_service.get(lkg_key)
+    if fallback is not None:
+        logger.warning("EVDS unreachable — serving last-known-good province data")
+        return fallback
     return out
 
 

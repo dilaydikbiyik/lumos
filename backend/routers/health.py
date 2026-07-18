@@ -1,8 +1,11 @@
+import logging
 from fastapi import APIRouter
 from pydantic import BaseModel
 from backend.db.database import engine as async_engine
 from backend.config import settings
 from sqlalchemy import text
+
+logger = logging.getLogger("lumos.health")
 
 router = APIRouter()
 
@@ -24,7 +27,10 @@ async def health_check():
     try:
         async with async_engine.connect() as conn:
             await conn.execute(text("SELECT 1"))
-    except Exception:
+    except Exception as exc:
+        # Never swallow this: /health is what uptime monitoring reads, so the
+        # reason the database is unreachable has to reach the logs.
+        logger.error("health_check db unreachable: %s: %s", type(exc).__name__, exc)
         db_status = "error"
 
     # AI provider configuration check (config only, not an access test)

@@ -1,4 +1,5 @@
 import { useEffect, useCallback } from 'react'
+import FireflyMark from '../components/FireflyMark'
 import Icon from '../components/Icon'
 import { useNavigate } from 'react-router-dom'
 import { UserButton, useAuth } from '@clerk/clerk-react'
@@ -127,8 +128,8 @@ export default function DashboardPage() {
             </p>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
               <div>
-                <div style={{ fontSize: 11, color: 'var(--text-dim)', marginBottom: 4 }}>Toplam Değer</div>
-                <div style={{ fontSize: 24, fontWeight: 800, color: 'var(--firefly)' }}>
+                <div className="num-label">Toplam Değer</div>
+                <div className="num-hero" style={{ color: 'var(--firefly)' }}>
                   {fmt(holdingsSummary.total_current_value)} <span style={{ fontSize: 13, fontWeight: 500 }}>{unit}</span>
                 </div>
                 {holdingsSummary.total_purchase_amount > 0 && (
@@ -138,9 +139,8 @@ export default function DashboardPage() {
                 )}
               </div>
               <div>
-                <div style={{ fontSize: 11, color: 'var(--text-dim)', marginBottom: 4 }}>Kalan Bütçe</div>
-                <div style={{
-                  fontSize: 24, fontWeight: 800,
+                <div className="num-label">Kalan Bütçe</div>
+                <div className="num-hero" style={{
                   color: holdingsSummary.remaining_budget > 0 ? 'var(--green)' : 'var(--text-muted)',
                 }}>
                   {holdingsSummary.remaining_budget != null
@@ -241,7 +241,7 @@ export default function DashboardPage() {
               animation: 'pulse 3s ease-in-out infinite',
             }} />
             <div style={{ position: 'relative', zIndex: 1 }}>
-              <img src="/favicon.svg" alt="" width={48} height={48} style={{ display: 'block', margin: '0 auto 12px', filter: 'drop-shadow(0 0 12px rgba(245,165,36,0.4))' }} />
+              <FireflyMark size={48} style={{ display: 'block', margin: '0 auto 12px', filter: 'drop-shadow(0 0 12px rgba(245,165,36,0.4))' }} />
               <p style={{ fontSize: 15, fontWeight: 600, marginBottom: 6 }}>Yolculuğun burada başlıyor</p>
               <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 20 }}>
                 Seni tanıyalım, korkularını dinleyelim ve sana özel bir portföy oluşturalım.
@@ -277,7 +277,7 @@ export default function DashboardPage() {
               <PortfolioChart allocations={portfolio.allocations} />
             ) : (
               <div className="card" style={{ textAlign: 'center', padding: '32px 24px' }}>
-                <img src="/favicon.svg" alt="" width={40} height={40} style={{ display: 'block', margin: '0 auto 10px', filter: 'drop-shadow(0 0 8px rgba(245,165,36,0.3))' }} />
+                <FireflyMark size={40} style={{ display: 'block', margin: '0 auto 10px', filter: 'drop-shadow(0 0 8px rgba(245,165,36,0.3))' }} />
                 <p style={{ fontSize: 14, marginBottom: 6 }}>Profilin hazır, sıra portföyde!</p>
                 <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 18 }}>Senin risk profiline uygun bir portföy oluşturalım.</p>
                 <button className="btn btn-primary" onClick={handleRerun}>

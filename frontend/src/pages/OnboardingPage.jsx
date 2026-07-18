@@ -24,19 +24,19 @@ const FIREFLY_CONFIG = [
 
 const FEATURES = [
   {
-    icon: 'target',
-    title: 'Seni Tanıyalım',
-    desc: '9 soru, yapay zeka destekli risk profili — jargon yok, baskı yok.',
-  },
-  {
-    icon: 'chart',
-    title: 'Akıllı Portföy',
-    desc: 'Risk profiline göre hazırlanan kişisel yatırım planı — her kuruşun nereye gittiğini bilirsin.',
+    icon: 'trendUp',
+    title: 'Enflasyon Sonrası Gerçek Getiri',
+    desc: '"%300 kazandım" demek, enflasyon %320\'yse kaybettin demektir. Lumos her rakamı TCMB verisiyle enflasyondan arındırıp gösterir.',
   },
   {
     icon: 'home',
-    title: 'Emlak + Borsa',
-    desc: 'Küçük bütçeyle bile gayrimenkul getirisine ortak ol — iki dünya, tek çatı.',
+    title: 'Emlak ve Borsa Yan Yana',
+    desc: '81 ilin m² fiyatı ve gerçek değerlenmesi, hisse portföyünle aynı ekranda. Kirada mı otur, ev mi al — hesabı burada.',
+  },
+  {
+    icon: 'lifebuoy',
+    title: 'Panik Anında Yanında',
+    desc: 'En pahalı hata, düşüşte satmaktır. Piyasa çakıldığında tek dokunuşla veriye dayalı, sakin bir ses.',
   },
 ]
 
@@ -126,10 +126,24 @@ export default function OnboardingPage() {
             <span className="gradient-text">elindeki ışık.</span>
           </h1>
 
-          <p style={{ fontSize: 15, maxWidth: 340, margin: '0 auto 32px', lineHeight: 1.7 }}>
-            Yapay zeka destekli rehberle yatırım öğren, korkmadan başla,
-            kendi kararını kendin ver.
+          <p style={{ fontSize: 'var(--t-body)', maxWidth: 360, margin: '0 auto 20px', lineHeight: 1.7 }}>
+            Yatırımı korkmadan öğren: her rakam enflasyondan arındırılmış,
+            her öneri adım adım açıklanmış, kararın her zaman sende.
           </p>
+
+          {/* Trust strip — the concrete, checkable claims behind the promise */}
+          <div style={{
+            display: 'flex', flexWrap: 'wrap', gap: '6px 10px', justifyContent: 'center',
+            maxWidth: 380, margin: '0 auto 32px',
+          }}>
+            {['TCMB resmî verisi', '81 il emlak endeksi', 'Gerçek piyasa fiyatları', 'Formülü görünür'].map(t => (
+              <span key={t} style={{
+                fontSize: 'var(--t-micro)', color: 'var(--text-muted)',
+                border: '1px solid var(--border)', borderRadius: 999,
+                padding: '4px 10px', background: 'var(--bg-card)',
+              }}>{t}</span>
+            ))}
+          </div>
 
           <SignedOut>
             <SignInButton mode="modal">
@@ -171,8 +185,8 @@ export default function OnboardingPage() {
               <div style={{ marginBottom: 10 }}>
                 <Icon name={f.icon} size={28} glow />
               </div>
-              <h3 style={{ fontSize: 13, marginBottom: 6, color: 'var(--text)' }}>{f.title}</h3>
-              <p style={{ fontSize: 12, lineHeight: 1.55 }}>{f.desc}</p>
+              <h3 style={{ fontSize: 'var(--t-body)', marginBottom: 6, color: 'var(--text)' }}>{f.title}</h3>
+              <p style={{ fontSize: 'var(--t-small)', lineHeight: 1.6 }}>{f.desc}</p>
             </div>
           ))}
         </div>

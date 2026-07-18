@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useAuth } from '@clerk/clerk-react'
 import api, { extractErrorMessage } from '../utils/api'
 import useMarket from '../hooks/useMarket'
+import { readJSON, userKey } from '../utils/storage'
 
 // portfolio category -> holding asset type
 const CATEGORY_TO_TYPE = {
@@ -17,27 +19,41 @@ const NO_TICKER_TYPES = new Set(['cash'])
 export default function BoughtItBridge({ allocations, budget }) {
   const navigate = useNavigate()
   const { money } = useMarket()
+  const { userId } = useAuth()
   const [saving, setSaving] = useState(false)
+  const [addingMore, setAddingMore] = useState(false)
   const [error, setError] = useState(null)
-  const [alreadyRecorded, setAlreadyRecorded] = useState(false)
 
-  // If this portfolio's assets are already in holdings, the CTA must not
-  // reappear and invite a duplicate transfer.
+  const isRecorded = holdings =>
+    Array.isArray(holdings) && allocations.some(a => {
+      const owned = new Set(holdings.map(h => h.ticker || h.name).filter(Boolean))
+      return owned.has(a.ticker) || owned.has(a.name)
+    })
+
+  // Start from the holdings snapshot the app already has, so a portfolio that
+  // is clearly recorded never flashes the "Aldım" button first. null = we
+  // genuinely don't know yet, and offering the button in that state could
+  // invite a duplicate transfer — so we show neither until we do.
+  const [alreadyRecorded, setAlreadyRecorded] = useState(() => {
+    const cached = readJSON(userKey('holdings', userId))
+    return cached ? isRecorded(cached.holdings) : null
+  })
+
   useEffect(() => {
     let cancelled = false
     ;(async () => {
       try {
         const res = await api.get('/holdings')
-        if (cancelled) return
-        const owned = new Set(
-          res.data.map(h => h.ticker || h.name).filter(Boolean),
-        )
-        const hit = allocations.some(a => owned.has(a.ticker) || owned.has(a.name))
-        setAlreadyRecorded(hit)
-      } catch { /* can't tell — keep the button */ }
+        if (!cancelled) setAlreadyRecorded(isRecorded(res.data))
+      } catch {
+        // Network is down: fall back to "not recorded" so the user is never
+        // stuck with no way forward — the backend still de-duplicates.
+        if (!cancelled) setAlreadyRecorded(prev => (prev === null ? false : prev))
+      }
     })()
     return () => { cancelled = true }
-  }, [allocations])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [allocations, userId])
 
   async function transfer() {
     setSaving(true)
@@ -64,15 +80,33 @@ export default function BoughtItBridge({ allocations, budget }) {
     }
   }
 
-  if (alreadyRecorded) {
+  if (alreadyRecorded === null) {
+    return (
+      <div className="card" style={{ opacity: 0.6 }}>
+        <p style={{ fontSize: 'var(--t-small)' }}>Varlıklarım kontrol ediliyor…</p>
+      </div>
+    )
+  }
+
+  if (alreadyRecorded && !addingMore) {
     return (
       <div className="card">
-        <h3 style={{ marginBottom: 4 }}>Bu portföy Varlıklarım'da ✓</h3>
-        <p style={{ fontSize: 13, opacity: 0.8, marginBottom: 12 }}>
-          Alımını daha önce işledin — güncel değerini Varlıklarım'dan takip edebilirsin.
+        <h3 style={{ marginBottom: 4 }}>Bu portföy Varlıklarım&apos;da ✓</h3>
+        <p style={{ fontSize: 'var(--t-small)', opacity: 0.8, marginBottom: 12 }}>
+          Bu varlıkları daha önce işledin — güncel değerlerini Varlıklarım&apos;dan takip
+          edebilirsin.
         </p>
         <button className="btn btn-ghost btn-full" onClick={() => navigate('/holdings')}>
-          Varlıklarım'a git →
+          Varlıklarım&apos;a git →
+        </button>
+        {/* Regular investors buy the same mix again every month; "already
+            recorded" must inform, never block. */}
+        <button
+          className="btn btn-ghost btn-full"
+          style={{ marginTop: 8, fontSize: 'var(--t-micro)', color: 'var(--text-dim)' }}
+          onClick={() => setAddingMore(true)}
+        >
+          Yeni bir alım daha işlemek istiyorum
         </button>
       </div>
     )
@@ -80,7 +114,9 @@ export default function BoughtItBridge({ allocations, budget }) {
 
   return (
     <div className="card">
-      <h3 style={{ marginBottom: 4 }}>Bu portföyü aldın mı?</h3>
+      <h3 style={{ marginBottom: 4 }}>
+        {addingMore ? 'Yeni alımını işle' : 'Bu portföyü aldın mı?'}
+      </h3>
       <p style={{ fontSize: 13, opacity: 0.8, marginBottom: 12 }}>
         Alımını kendi aracı kurumunda yaptıysan, portföyü tek tıkla
         Varlıklarım'a işleyelim — kalan bütçen otomatik güncellenir.

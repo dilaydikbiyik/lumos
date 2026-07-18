@@ -1,12 +1,15 @@
 import { useEffect, useState, useCallback } from 'react'
+import FireflyMark from '../components/FireflyMark'
 import Icon from '../components/Icon'
 import { useNavigate } from 'react-router-dom'
 import LumosLogo from '../components/LumosLogo'
 import CurrencyExposure from '../components/CurrencyExposure'
 import PortfolioValueChart from '../components/PortfolioValueChart'
+import DriftCard from '../components/DriftCard'
 import { UserButton, useAuth } from '@clerk/clerk-react'
 import api, { extractErrorMessage, setAuthToken } from '../utils/api'
 import useMarket from '../hooks/useMarket'
+import { readJSON, writeJSON, userKey } from '../utils/storage'
 
 const TYPE_LABELS = {
   stock: 'Hisse', fund: 'Fon', etf: 'ETF',
@@ -33,13 +36,10 @@ export default function HoldingsPage() {
   const navigate = useNavigate()
   const { getToken, userId } = useAuth()
   const { money } = useMarket()
-  const cacheKey = userId ? `lumos-holdings-${userId}` : null
+  const cacheKey = userKey('holdings', userId)
   // Hydrate instantly from the last snapshot so returning users never see a
   // blank/jank frame; the network refresh below replaces it in the background.
-  const cached = (() => {
-    try { return cacheKey ? JSON.parse(localStorage.getItem(cacheKey)) : null }
-    catch { return null }
-  })()
+  const cached = readJSON(cacheKey)
   const [holdings, setHoldings] = useState(cached?.holdings ?? [])
   const [summary, setSummary] = useState(cached?.summary ?? null)
   const [health, setHealth] = useState(cached?.health ?? null)
@@ -61,13 +61,9 @@ export default function HoldingsPage() {
     setHealth(hs.data)
     setProfile(p.data)
     setLoaded(true)
-    if (cacheKey) {
-      try {
-        localStorage.setItem(cacheKey, JSON.stringify({
-          holdings: h.data, summary: s.data, health: hs.data, profile: p.data,
-        }))
-      } catch { /* storage full — best-effort cache */ }
-    }
+    writeJSON(cacheKey, {
+      holdings: h.data, summary: s.data, health: hs.data, profile: p.data,
+    })
   }, [getToken, cacheKey])
 
   useEffect(() => {
@@ -130,12 +126,12 @@ export default function HoldingsPage() {
         {summary && (
           <div className="card" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
             <div>
-              <div style={{ fontSize: 12, opacity: 0.7 }}>Toplam Değer</div>
-              <div style={{ fontSize: 22, fontWeight: 700 }}>{money(summary.total_current_value)}</div>
+              <div className="num-label">Toplam Değer</div>
+              <div className="num-lead">{money(summary.total_current_value)}</div>
             </div>
             <div>
-              <div style={{ fontSize: 12, opacity: 0.7 }}>Kalan Bütçe</div>
-              <div style={{ fontSize: 22, fontWeight: 700, color: 'var(--green, #4ade80)' }}>
+              <div className="num-label">Kalan Bütçe</div>
+              <div className="num-lead" style={{ color: 'var(--green, #4ade80)' }}>
                 {summary.remaining_budget != null ? money(summary.remaining_budget) : '—'}
               </div>
             </div>
@@ -149,12 +145,24 @@ export default function HoldingsPage() {
               <Icon name="droplet" size={18} color="var(--red)" />
               <strong style={{ fontSize: 14 }}>Param eriyor mu?</strong>
             </div>
-            <p style={{ fontSize: 13, lineHeight: 1.6 }}>
-              Kasada bekleyen {money(summary.cash_erosion.idle_cash ?? (summary.remaining_budget || 0))}'nin
-              (nakit varlıkların + yatırılmamış bütçen) bu ay enflasyon nedeniyle
-              gerçek değeri ~{money(summary.cash_erosion.erosion_amount)} azaldı
+            <p style={{ fontSize: 'var(--t-small)', lineHeight: 1.6 }}>
+              Kasada bekleyen <strong>{money(summary.cash_erosion.idle_cash ?? 0)}</strong>&apos;nin
+              bu ay enflasyon nedeniyle gerçek değeri
+              ~<strong>{money(summary.cash_erosion.erosion_amount)}</strong> azaldı
               (aylık enflasyon %{summary.cash_erosion.monthly_inflation_pct}).
             </p>
+            {/* Where that number comes from — a figure the user never typed
+                needs its own arithmetic shown, or it reads as invented. */}
+            <div style={{
+              marginTop: 8, paddingTop: 8, borderTop: '1px solid var(--border)',
+              fontSize: 'var(--t-micro)', color: 'var(--text-muted)', lineHeight: 1.7,
+            }}>
+              <div>Nakit varlıkların (Varlıklarım&apos;a eklediğin nakit): <strong>{money(summary.cash_erosion.cash_holdings ?? 0)}</strong></div>
+              <div>Yatırılmamış bütçen (bildirdiğin bütçe − yatırdığın): <strong>{money(summary.cash_erosion.uninvested_budget ?? 0)}</strong></div>
+              <div style={{ marginTop: 2 }}>
+                Toplam × aylık TÜFE (%{summary.cash_erosion.monthly_inflation_pct}) = {money(summary.cash_erosion.erosion_amount)}
+              </div>
+            </div>
           </div>
         )}
 
@@ -178,6 +186,9 @@ export default function HoldingsPage() {
         {/* Daily value of the real portfolio — the "what happened since I
             bought it" chart */}
         <PortfolioValueChart holdingsCount={holdings.length} />
+
+        {/* Post-purchase advice: has the mix drifted from the target? */}
+        <DriftCard holdingsCount={holdings.length} />
 
         {/* Currency exposure — TL vs FX */}
         <CurrencyExposure holdings={holdings} />
@@ -217,7 +228,13 @@ export default function HoldingsPage() {
                         </span>
                       )}
                       <span style={{ marginLeft: 6, fontSize: 10, opacity: 0.6 }}>
-                        {h.value_source === 'live' ? '● canlı' : h.value_source === 'index' ? 'endeks tahmini' : 'manuel'}
+                        {h.value_source === 'live'
+                          ? (h.purchase_date === new Date().toISOString().slice(0, 10)
+                              // A 0% move on the day of purchase is correct, not a
+                              // broken feed — say which it is instead of leaving doubt.
+                              ? '● canlı · bugün alındı'
+                              : '● canlı')
+                          : h.value_source === 'index' ? 'endeks tahmini' : 'manuel'}
                       </span>
                     </>
                   )}
@@ -253,10 +270,7 @@ export default function HoldingsPage() {
                 animation: 'pulse 3s ease-in-out infinite',
               }} />
               <div style={{ position: 'relative', zIndex: 1 }}>
-                <img src="/favicon.svg" alt="" width={46} height={46} style={{
-                  display: 'block', margin: '0 auto 10px',
-                  filter: 'drop-shadow(0 0 12px rgba(245,165,36,0.35))',
-                }} />
+                <FireflyMark size={46} />
                 <p style={{ fontSize: 14, fontWeight: 600, marginBottom: 4 }}>
                   Henüz varlığın yok
                 </p>

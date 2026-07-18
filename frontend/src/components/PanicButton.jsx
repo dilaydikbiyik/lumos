@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import useScrollDirection from '../hooks/useScrollDirection'
 import Icon from './Icon'
 import { useAuth } from '@clerk/clerk-react'
 import api, { setAuthToken } from '../utils/api'
@@ -14,6 +15,7 @@ import api, { setAuthToken } from '../utils/api'
  */
 export default function PanicButton() {
   const { getToken } = useAuth()
+  const tucked = useScrollDirection()
   const [open, setOpen] = useState(false)
   const [stage, setStage] = useState('pause')     // pause | coach | done
   const [coach, setCoach] = useState(null)
@@ -66,7 +68,7 @@ export default function PanicButton() {
       <button
         onClick={press}
         aria-label="Panik anı desteği"
-        className="fab fab-panic"
+        className={`fab fab-panic ${tucked ? "fab-tucked" : ""}`}
         style={{
           background: 'var(--bg-card)', border: '1px solid var(--firefly-dim)',
           boxShadow: '0 4px 18px rgba(245,165,36,0.18)',

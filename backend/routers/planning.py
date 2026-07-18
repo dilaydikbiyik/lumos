@@ -75,7 +75,7 @@ async def region_intelligence(
     from backend.services.region_intelligence import rank_regions
 
     horizon_years = min(max(horizon_years, 1), 3)
-    return rank_regions(horizon_years)
+    return await asyncio.to_thread(rank_regions, horizon_years)
 
 
 @router.post("/listing-links")
@@ -156,7 +156,7 @@ async def province_intelligence(
     """
     from backend.services.province_intelligence import rank_provinces
 
-    return rank_provinces(horizon_years)
+    return await asyncio.to_thread(rank_provinces, horizon_years)
 
 
 @router.post("/projection/province")

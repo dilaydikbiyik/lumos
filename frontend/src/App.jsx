@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
+import FireflyMark from './components/FireflyMark'
 import { useEffect } from 'react'
 import { ClerkLoading, SignedIn, SignedOut, RedirectToSignIn, useAuth } from '@clerk/clerk-react'
 import AppNav from './components/AppNav'
@@ -48,7 +49,7 @@ function AuthBridge() {
 function AuthPending() {
   return (
     <div className="page" style={{ alignItems: 'center', justifyContent: 'center', minHeight: '100dvh' }}>
-      <img src="/favicon.svg" alt="" width={40} height={40} className="firefly-mark" />
+      <FireflyMark size={40} />
       <p style={{ marginTop: 14, fontSize: 13, color: 'var(--text-muted)' }}>
         Giriş sayfasına yönlendiriliyorsun…
       </p>

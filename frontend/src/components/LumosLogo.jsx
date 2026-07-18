@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom'
+import FireflyMark from './FireflyMark'
 
 /**
  * Lumos brand logo — firefly animation + glowing wordmark.
@@ -30,14 +31,10 @@ export default function LumosLogo({ size = 22, hero = false }) {
           A small marginTop nudges the icon down to the cap-height centre of "L"
           (the wordmark div is taller than one line because it holds firefly
           particles with absolute positioning above the text). */}
-      <img
-        src="/favicon.svg"
-        alt=""
-        width={size * 1.4}
-        height={size * 1.4}
+      <FireflyMark
+        size={size * 1.4}
         style={{
           filter: 'drop-shadow(0 0 5px rgba(245,165,36,0.55))',
-          flexShrink: 0,
           marginTop: '0.55em',
         }}
       />

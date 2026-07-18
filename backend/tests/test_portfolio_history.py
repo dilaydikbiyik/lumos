@@ -99,3 +99,104 @@ def test_practice_snapshot_counts_unpriced_slices_as_flat_base():
     assert abs(out["weekly_change_pct"] - spy_pct / 2) < 0.6
     assert out["per_asset"]["CASH"]["weekly_change_pct"] == 0.0
     assert out["biggest_mover"]["ticker"] == "SPY"
+
+
+# ── Portfolio drift (post-purchase advice) ───────────────────────────────────
+
+def test_drift_stays_quiet_when_the_mix_is_close_to_target():
+    from backend.services.drift import compute_drift
+
+    holdings = [_holding(id=1, asset_type="etf", purchase_amount=6000),
+                _holding(id=2, asset_type="cash", purchase_amount=4000)]
+    values = {1: 6000.0, 2: 4000.0}                       # 60 / 40
+    target = [SimpleNamespace(category="stocks", weight=0.62),
+              SimpleNamespace(category="cash", weight=0.38)]
+
+    out = compute_drift(holdings, values, target)
+    assert out["verdict"] == "balanced"
+    assert out["max_drift_pct"] < 5
+    # never nudges someone to trade over noise
+    assert "gerekmiyor" in out["message"]
+
+
+def test_drift_flags_a_winner_that_grew_into_an_outsized_bet():
+    from backend.services.drift import compute_drift
+
+    holdings = [_holding(id=1, asset_type="etf", purchase_amount=5000),
+                _holding(id=2, asset_type="cash", purchase_amount=5000)]
+    values = {1: 9000.0, 2: 3000.0}                       # 75 / 25 after a rally
+    target = [SimpleNamespace(category="stocks", weight=0.50),
+              SimpleNamespace(category="cash", weight=0.50)]
+
+    out = compute_drift(holdings, values, target)
+    assert out["verdict"] == "serious"
+    assert out["max_drift_pct"] >= 10
+    # the cheap remedy (steer new money) is preferred over selling
+    assert "yeni katkılarını" in out["message"]
+    assert "Lumos senin adına işlem yapmaz" in out["honesty_note"]
+
+
+def test_drift_reports_unavailable_without_holdings():
+    from backend.services.drift import compute_drift
+
+    out = compute_drift([], {}, [SimpleNamespace(category="stocks", weight=1.0)])
+    assert out["available"] is False
+
+
+def test_drift_files_a_reit_etf_as_real_estate_not_stocks():
+    """VNQ is recorded as an 'etf' holding; mapping by type alone would report
+    'you own no real estate' while the user holds exactly that."""
+    from backend.services.drift import compute_drift
+
+    holdings = [_holding(id=1, asset_type="etf", ticker="VNQ", purchase_amount=5000),
+                _holding(id=2, asset_type="etf", ticker="SPY", purchase_amount=5000)]
+    values = {1: 5000.0, 2: 5000.0}
+    target = [SimpleNamespace(category="reit", weight=0.5, ticker="VNQ"),
+              SimpleNamespace(category="stocks", weight=0.5, ticker="SPY")]
+
+    out = compute_drift(holdings, values, target)
+    reit = next(r for r in out["rows"] if r["category"] == "reit")
+    assert reit["actual_pct"] == 50.0      # not 0
+    assert out["verdict"] == "balanced"
+
+
+# ── EVDS batching (the province list used to time out) ───────────────────────
+
+def test_evds_batches_are_fetched_in_parallel_and_survive_one_failure():
+    """81 provinces = 6 chunks. Sequentially, at ~13s per round trip from a US
+    datacenter, that exceeded every timeout. Chunks now run at once, and a
+    failing chunk costs only its own series."""
+    import time
+    from unittest.mock import patch
+
+    from backend.services import evds_service
+
+    calls = []
+
+    class _Resp:
+        def __init__(self, code): self.code = code
+        def raise_for_status(self): pass
+        def json(self):
+            return {"items": [{"Tarih": "2026-Q1", self.code.replace(".", "_"): "100"}]}
+
+    def slow_get(url, **kw):
+        calls.append(url)
+        time.sleep(0.3)                      # simulate a slow round trip
+        if "FAILME" in url:
+            raise RuntimeError("chunk down")
+        code = url.split("series=")[1].split("&")[0].split("-")[0]
+        return _Resp(code)
+
+    codes = [f"CODE{i}" for i in range(30)] + ["FAILME"]
+    with patch("backend.services.evds_service.httpx.get", slow_get), \
+         patch("backend.services.evds_service.cache_service.get", return_value=None), \
+         patch("backend.services.evds_service.cache_service.set"), \
+         patch("backend.services.evds_service.settings") as st:
+        st.TCMB_EVDS_API_KEY = "x"
+        started = time.time()
+        out = evds_service.fetch_quarterly_series_batch(codes, "01-01-2010", "01-01-2026")
+        elapsed = time.time() - started
+
+    assert len(calls) == 3                   # 31 codes / 15 per chunk
+    assert elapsed < 0.8                     # parallel, not 3 × 0.3s
+    assert any(v for v in out.values())      # the healthy chunks still answered

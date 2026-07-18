@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
+import FireflyMark from './FireflyMark'
+import useScrollDirection from '../hooks/useScrollDirection'
 import Icon from './Icon'
 import { SignedIn, useAuth } from '@clerk/clerk-react'
 import MessageBubble from './MessageBubble'
@@ -73,7 +75,7 @@ function AdvisorPanel({ onClose }) {
           display: 'flex', alignItems: 'center', gap: 8, padding: '14px 16px',
           borderBottom: '1px solid var(--border)',
         }}>
-          <img src="/favicon.svg" alt="" width={22} height={22} style={{ filter: 'drop-shadow(0 0 5px rgba(245,165,36,0.5))' }} />
+          <FireflyMark size={22} />
           <div style={{ flex: 1 }}>
             <div style={{ fontWeight: 700, fontSize: 15 }}>Lumos Danışman</div>
             <div style={{ fontSize: 11, color: 'var(--text-dim)' }}>Sorularını yanıtlar — tavsiye değil, eğitim</div>
@@ -127,13 +129,14 @@ function AdvisorPanel({ onClose }) {
 
 export default function AdvisorChat() {
   const [open, setOpen] = useState(false)
+  const tucked = useScrollDirection()
   return (
     <SignedIn>
       {!open && (
         <button
           onClick={() => setOpen(true)}
           aria-label="Danışmana sor"
-          className="fab fab-advisor"
+          className={`fab fab-advisor ${tucked ? "fab-tucked" : ""}`}
           style={{
             border: 'none',
             background: 'var(--firefly, #F5A524)', color: '#1a1205', fontSize: 24,

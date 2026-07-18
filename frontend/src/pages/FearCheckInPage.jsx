@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import FireflyMark from '../components/FireflyMark'
 import LumosLogo from '../components/LumosLogo'
 import { useNavigate } from 'react-router-dom'
 import { UserButton } from '@clerk/clerk-react'
@@ -85,7 +86,7 @@ export default function FearCheckInPage() {
               boxShadow: '0 0 32px rgba(245,165,36,0.2)',
               animation: 'light-pulse 2s ease-in-out infinite',
             }}>
-              <img src="/favicon.svg" alt="" width={40} height={40} style={{ filter: 'drop-shadow(0 0 10px rgba(245,165,36,0.5))' }} />
+              <FireflyMark size={40} style={{ filter: 'drop-shadow(0 0 10px rgba(245,165,36,0.5))' }} />
             </div>
           </div>
 

@@ -3,6 +3,7 @@ import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'rec
 import { useAuth } from '@clerk/clerk-react'
 import api from '../utils/api'
 import useMarket from '../hooks/useMarket'
+import { readJSON, writeJSON, userKey } from '../utils/storage'
 
 const RANGES = [
   { days: 30, label: '1 Ay' },
@@ -16,10 +17,8 @@ export default function PortfolioValueChart({ holdingsCount }) {
   const { money } = useMarket()
   const { userId } = useAuth()
   const [days, setDays] = useState(30)
-  const ck = userId ? `lumos-history-${userId}-${days}` : null
-  const [data, setData] = useState(() => {
-    try { return ck ? JSON.parse(localStorage.getItem(ck)) : null } catch { return null }
-  })
+  const ck = userKey(`history-${days}`, userId)
+  const [data, setData] = useState(() => readJSON(ck))
   const [error, setError] = useState(null)
 
   useEffect(() => {
@@ -29,7 +28,7 @@ export default function PortfolioValueChart({ holdingsCount }) {
       .then(res => {
         if (cancelled) return
         setData(res.data); setError(null)
-        try { if (ck) localStorage.setItem(ck, JSON.stringify(res.data)) } catch { /* ignore */ }
+        writeJSON(ck, res.data)
       })
       .catch(() => { if (!cancelled) setError('Değer geçmişi şu an yüklenemedi.') })
     return () => { cancelled = true }
@@ -64,10 +63,10 @@ export default function PortfolioValueChart({ holdingsCount }) {
       {data && data.series.length >= 2 && (
         <>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 8 }}>
-            <span style={{ fontSize: 20, fontWeight: 700 }}>
+            <span className="num-lead">
               {money(data.series[data.series.length - 1].value)}
             </span>
-            <span style={{ fontSize: 13, fontWeight: 700, color }}>
+            <span className="num" style={{ fontSize: 'var(--t-small)', fontWeight: 700, color }}>
               {up ? '▲' : '▼'} {money(Math.abs(data.change_amount))} (%{Math.abs(data.change_pct)})
             </span>
           </div>

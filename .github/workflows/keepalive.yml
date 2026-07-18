@@ -1,6 +1,12 @@
-# Keeps the Render free instance awake so users never hit the 30-50s
-# cold start ("Seçim kaydedilemedi" class of errors). A single always-on
-# free service fits within Render's 750 instance-hours/month.
+# Keeps the Render free instance awake so users never hit the 30-50s cold
+# start ("Seçim kaydedilemedi" class of errors). A single always-on free
+# service fits within Render's 750 instance-hours/month.
+#
+# A single ping is not evidence of an outage: during a redeploy the service
+# is intentionally down for a minute, and a free instance waking from sleep
+# can exceed any one timeout. So we retry with backoff and only report a
+# failure when the backend stays unreachable across all attempts — otherwise
+# every deploy would email a false alarm.
 name: Keep backend awake
 
 on:
@@ -12,6 +18,16 @@ jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
-      - name: Ping /health
+      - name: Ping /health (retry through cold starts and redeploys)
         run: |
-          curl -sf --max-time 80 https://lumos-api-yowm.onrender.com/health
+          URL="https://lumos-api-yowm.onrender.com/health"
+          for attempt in 1 2 3 4; do
+            if body=$(curl -sf --max-time 90 "$URL"); then
+              echo "attempt $attempt: awake — $body"
+              exit 0
+            fi
+            echo "attempt $attempt: no answer yet (waking or redeploying), retrying…"
+            sleep 30
+          done
+          echo "::error::Backend did not answer /health across 4 attempts (~6 min)."
+          exit 1

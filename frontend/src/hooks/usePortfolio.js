@@ -1,23 +1,17 @@
 import { useState, useCallback } from 'react'
 import { useAuth } from '@clerk/clerk-react'
 import api, { setAuthToken } from '../utils/api'
+import { readJSON, writeJSON, userKey } from '../utils/storage'
 
 // The recommendation is deterministic for a given (risk, budget) — cache it
 // per user so revisiting the portfolio page renders instantly instead of
 // showing a "hazırlanıyor" screen; a background refresh keeps it current.
 export function readCachedPortfolio(userId) {
-  try {
-    const raw = localStorage.getItem(`lumos-portfolio-${userId}`)
-    return raw ? JSON.parse(raw) : null
-  } catch {
-    return null
-  }
+  return readJSON(userKey('portfolio', userId))
 }
 
 function cachePortfolio(userId, data) {
-  try {
-    localStorage.setItem(`lumos-portfolio-${userId}`, JSON.stringify(data))
-  } catch { /* storage full/blocked — cache is best-effort */ }
+  writeJSON(userKey('portfolio', userId), data)
 }
 
 export default function usePortfolio() {

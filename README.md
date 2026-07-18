@@ -115,18 +115,29 @@ surface, zero custody risk — and a lower trust barrier for scared beginners.
 - **Province intelligence**: concrete TL/m² prices for all **81 provinces** (central-bank unit-price
   series, quarterly since 2010) ranked by *real* appreciation over 1/3/5 years — plus the coarser
   19-region NUTS2 index; every scenario band deflates each window by its own period inflation
-- **Rent vs. buy** decision tool — two scenarios side by side, including the honest note that
-  homeownership has non-financial value too
+- **Rent vs. buy** decision tool — the same home under two strategies with an equal monthly
+  housing budget, including an affordability check (the installment/income ratio is flagged past
+  the ~45% banks lend against) and the honest note that homeownership has non-financial value too
 - **Listing bridge**: filter-ready links out to listing portals (market-aware: Sahibinden/Emlakjet
   in TR, Zillow/Realtor in US, ImmoScout24/Immowelt in DE) — no scraping, no listing data stored
 
 ### 💰 Personal wealth tracker
 - Every asset in one picture: stocks, funds, ETFs, gold, crypto, cash — **and land, apartments,
   vehicles** (cars are tracked with honest depreciation framing, never recommended)
+- **Daily value chart** of what you actually own: ticker holdings follow real market closes,
+  cash/manual assets are carried flat (no invented movement), and each holding enters the series
+  on its own purchase date
 - Remaining-budget math and an *"is my money melting?"* idle-cash erosion card (live monthly CPI)
+  that itemises its own arithmetic — cash holdings + uninvested budget × monthly CPI
+- **Drift advice** — the guidance a beginner needs *after* buying: prices move at different speeds,
+  so the winner quietly grows into an outsized bet. Target weights are recomputed from the risk
+  score and compared with reality; below a meaningful threshold it explicitly says *do nothing*,
+  and the suggested remedy is steering new contributions rather than selling
+- **Monthly-plan tracking** for people who invest regularly: planned vs. recorded this month
 - **Fener (lantern) score**: 0–100 portfolio health from diversification + liquidity, with
   plain-language notes explaining *why* and *how to improve*
-- One-tap **"I bought it" bridge** transfers a recommendation into holdings after an external purchase
+- One-tap **"I bought it" bridge** transfers a recommendation into holdings after an external
+  purchase — and stops offering itself once the portfolio is already recorded
 
 ### 🧠 Behavioral coaching
 - **Panic Button 🫨** — a real button for scary market days: guided breathing → a calming message
@@ -195,37 +206,56 @@ surface, zero custody risk — and a lower trust barrier for scared beginners.
 
 ---
 
-## The AI layer: quota-resilient, billing-ready
+## The AI layer: three free providers, one honest chain
 
-The hardest constraint of a $0 project is AI quota. Lumos turns that constraint into architecture:
+The hardest constraint of a $0 project is AI quota. Lumos turns that constraint into
+architecture — and everything below runs today on **free tiers only**. No paid model has ever
+served a request in production.
 
-**1. Model fallback chains.** Every Gemini model has its *own* free-tier quota. When the primary
-model returns 429 (quota) or 5xx (overload), the adapter falls through the chain — the user gets
-an answer from a slightly lighter model instead of an error. Free capacity is effectively tripled:
+**1. Cross-provider fallback.** Three independent free tiers rarely run dry at the same moment,
+so a spent quota is never a dead end. Each step is itself a model chain, because every model
+carries its own free allowance:
 
 ```
-free  →  gemini-2.5-flash  →  gemini-2.5-flash-lite  →  gemini-2.0-flash
+gemini      gemini-2.5-flash → 2.5-flash-lite → 2.0-flash → 2.0-flash-lite
+   ↓ (quota spent / region-blocked / key rejected)
+groq        openai/gpt-oss-120b → llama-3.3-70b → llama-3.1-8b
+   ↓
+openrouter  llama-3.3-70b:free → deepseek-chat-v3:free → gemma-4-31b:free → gemma-4-26b:free
 ```
 
-The chain is crossed with a **multi-key matrix** (up to 4 keys × 4 models = 16 independent quota
-pools, model-major order): when one key's quota fills, the user sacrifices a key — not quality.
+Gemini is crossed with a **multi-key matrix** (up to 4 keys × 4 models = 16 independent quota
+pools): when one key's allowance fills, the user loses a key — not an answer. A provider that
+returns 429/5xx, is missing a key, or is blocked by region simply hands off to the next one.
+This is not theory: Google blocks its free Gemini tier from EU datacenter IPs, which is why the
+backend runs in Oregon — and why the chain exists at all.
 
-**2. Plan tiers (payments-ready, payments-excluded).** Providers, model chains, and daily quotas
-all hang off a single tier table. A future Stripe/Iyzico webhook flips one field
-(`user.plan = "plus"`) and everything follows — models, quotas, fallbacks. No other code changes:
+**2. A quality gate, not just a quota gate.** The scripted 9-question risk quiz has to follow its
+Turkish script exactly, and lighter models paraphrase questions or corrupt Turkish. So profiling
+accepts only Gemini/Gemma/Claude-class models (`gemini`, `gemma`, `claude`, `gpt-oss`) wherever
+they are hosted, while Llama and DeepSeek stay available to the free-form advisor, where a
+slightly weaker answer beats an error. Replies containing foreign-script characters (a real
+failure mode: *"rahat的话"*) are rejected and re-served by the next provider.
 
-| Plan | Provider & chain | Daily quota | Price (planned) |
+**3. Payments-ready, payments-excluded.** Providers, model chains and daily quotas all hang off a
+single tier table, so introducing paid plans later is a configuration change rather than a
+refactor: a Stripe/Iyzico webhook would flip `user.plan` and models, quotas and fallbacks follow.
+The paid rows are **defined but never enabled** — no billing exists, so no user has been served by
+them:
+
+| Plan | Status | Provider & chain | Daily quota |
 |---|---|---|---|
-| **free** — "Ateş Böceği" (Firefly) | Gemini flash chain (3 models) | 50 msg/day | $0 forever |
-| **plus** — "Fener" (Lantern) | Gemini 2.5 Pro → flash chain | 500 msg/day | ~$4.99/mo |
-| **pro** — "Şafak" (Dawn) | Claude Sonnet → Haiku | 2000 msg/day | ~$14.99/mo |
+| **free** — "Ateş Böceği" (Firefly) | **live** | Gemini → Groq → OpenRouter (11 models) | 50 msg/day |
+| **plus** — "Fener" (Lantern) | planned | Gemini 2.5 Pro → flash chain | 500 msg/day |
+| **pro** — "Şafak" (Dawn) | planned | Claude Sonnet → Haiku | 2000 msg/day |
 
-The provider adapter interface is symmetrical: Anthropic's chain handles credit-exhaustion and
-rate limits exactly like Gemini's handles quota — so premium models inherit the same resilience.
+The Anthropic adapter is written and symmetrical with the others (it handles credit exhaustion
+the way Gemini's handles quota), but Claude has no free tier — so it sits unused behind the
+`pro` row, waiting for the day billing is turned on.
 
-**3. AI never does math.** Risk scores, allocations, backtests, projections, what-if comparisons —
-all computed by deterministic engines. The LLM extracts intent (strict JSON with a 3-strategy
-parser) and phrases results. This is a product-safety decision, enforced by tests.
+**4. AI never does math.** Risk scores, allocations, backtests, projections, drift, what-if
+comparisons — all computed by deterministic engines. The LLM extracts intent (strict JSON with a
+3-strategy parser) and phrases results. This is a product-safety decision, enforced by tests.
 
 ---
 
@@ -261,7 +291,9 @@ disclaimer — Lumos gives no tax or legal advice in any market.
 | **TCMB EVDS** (Turkish central bank) | Live CPI, 19-region housing price indices | Daily cache; in-repo static CPI fallback; honest `available: false` when down |
 | **yfinance** | Prices, volatility, backtests, projections | Fresh 24h + stale 7d + last-known-good cache tiers; baseline volatilities as final resort |
 | **RSS** (AA, Bloomberg HT) | Calm news digest | Per-feed fail-open; digest hides when empty |
-| **Google Gemini** (free tier) | Advisor chat, extraction, phrasing | 3-model fallback chain + per-plan quotas |
+| **Google Gemini** (free tier) | Advisor chat, extraction, phrasing | 4-model chain × up to 4 keys, then hands off to Groq |
+| **Groq** (free tier) | Fallback when Gemini is spent or region-blocked | gpt-oss-120b → Llama chain; quiz-eligible models only |
+| **OpenRouter** (`:free` models) | Last-resort fallback | Llama / DeepSeek / Gemma chain; corrupted replies rejected |
 
 ---
 
@@ -325,14 +357,17 @@ Or with Docker: `docker compose up --build` (runs migrations, serves on :8000).
 
 ## Roadmap
 
-**Live:** [lumos-sooty.vercel.app](https://lumos-sooty.vercel.app) · **Near-term:** screenshots &
-demo video · Stripe/Iyzico webhook onto the existing plan-tier switch · Sentry · uptime ping
+**Live:** [lumos-sooty.vercel.app](https://lumos-sooty.vercel.app) · **Near-term:** Stripe/Iyzico
+webhook onto the existing plan-tier switch (the paid rows above become real) · Sentry · uptime ping
 
 **Growth:** wire US/DE data adapters (FRED, Destatis) onto the Market Pack skeletons ·
 react-i18next localization · OpenAI/Mistral adapters once billing lands · Capacitor wrap for
 stores (push notifications power the behavioral coach in real time)
 
 See [todo.md](todo.md) for the full 9-phase build log — kept honest since day one.
+Before real traffic: [docs/production-readiness.md](docs/production-readiness.md)
+(Clerk production instance, always-on backend, persistent cache).
+Brand assets and trademark notes: [brand/](brand/).
 
 ## License
 

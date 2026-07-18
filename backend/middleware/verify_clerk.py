@@ -1,3 +1,4 @@
+import logging
 import time
 
 import httpx
@@ -7,6 +8,8 @@ from jose import jwt, JWTError
 from typing import Optional
 
 from backend.config import settings
+
+logger = logging.getLogger("lumos.verify_clerk")
 
 _security = HTTPBearer(auto_error=False)
 
@@ -57,9 +60,11 @@ async def get_current_user(request: Request) -> str:
     try:
         try:
             payload = _decode(token, await _get_jwks())
-        except JWTError:
+        except JWTError as exc:
             # The signing key may have rotated since we cached the JWKS —
-            # refresh once before rejecting the token.
+            # refresh once before rejecting the token. Log the reason only:
+            # the token itself must never reach a log stream.
+            logger.info("jwt verification failed (%s) — retrying with fresh JWKS", type(exc).__name__)
             payload = _decode(token, await _get_jwks(force=True))
         user_id: str = payload.get("sub")
         if not user_id:

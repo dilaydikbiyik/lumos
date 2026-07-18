@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import FireflyMark from '../components/FireflyMark'
 import Icon from '../components/Icon'
 import { useNavigate } from 'react-router-dom'
 import { UserButton, useAuth } from '@clerk/clerk-react'
@@ -7,6 +8,7 @@ import ChatWindow from '../components/ChatWindow'
 import RiskGauge from '../components/RiskGauge'
 import usePortfolio from '../hooks/usePortfolio'
 import useMarket from '../hooks/useMarket'
+import { readJSON, writeJSON, removeKey, userKey } from '../utils/storage'
 
 // Risk score → user-friendly label and colour
 const RISK_META = {
@@ -21,14 +23,7 @@ function getRiskMeta(score) {
   return RISK_META.high
 }
 
-function readCachedProfile(key) {
-  if (!key) return null
-  try {
-    return JSON.parse(localStorage.getItem(key) || 'null')
-  } catch {
-    return null
-  }
-}
+
 
 export default function ProfilePage() {
   const navigate = useNavigate()
@@ -39,8 +34,8 @@ export default function ProfilePage() {
   // NOTHING here blocks on the network: a returning user sees their cached
   // result instantly, a new user sees the quiz instantly (its intro is a
   // local constant). The server copy refreshes in the background.
-  const cacheKey = userId ? `lumos-profile-${userId}` : null
-  const [displayProfile, setDisplayProfile] = useState(() => readCachedProfile(cacheKey))
+  const cacheKey = userKey('profile', userId)
+  const [displayProfile, setDisplayProfile] = useState(() => readJSON(cacheKey))
   const [retaking, setRetaking] = useState(false)   // user chose to redo
   const quizStartedRef = useRef(false)              // guards against late swaps
 
@@ -53,10 +48,10 @@ export default function ProfilePage() {
         // when it actually differs (identical swaps re-render the gauge).
         const changed = JSON.stringify(result) !== JSON.stringify(displayProfile)
         if (!quizStartedRef.current && changed) setDisplayProfile(result)
-        if (cacheKey) localStorage.setItem(cacheKey, JSON.stringify(result))
+        writeJSON(cacheKey, result)
       } else if (result === null) {
         // Server DEFINITIVELY has no profile — drop any stale cache
-        if (cacheKey) localStorage.removeItem(cacheKey)
+        removeKey(cacheKey)
         if (!quizStartedRef.current) setDisplayProfile(null)
       }
       // undefined = transient error (cold start etc.) — keep what we have
@@ -71,7 +66,7 @@ export default function ProfilePage() {
       setRetaking(false)
       quizStartedRef.current = false
       setDisplayProfile(result)
-      if (cacheKey) localStorage.setItem(cacheKey, JSON.stringify(result))
+      writeJSON(cacheKey, result)
     }
   }
 
@@ -111,7 +106,7 @@ export default function ProfilePage() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             {/* Header */}
             <div style={{ textAlign: 'center', padding: '12px 0' }}>
-              <img src="/favicon.svg" alt="" width={44} height={44} style={{ display: 'block', margin: '0 auto 10px', filter: 'drop-shadow(0 0 12px rgba(245,165,36,0.4))' }} />
+              <FireflyMark size={44} style={{ display: 'block', margin: '0 auto 10px', filter: 'drop-shadow(0 0 12px rgba(245,165,36,0.4))' }} />
               <h2>Risk Profilin Hazır</h2>
               <p style={{ fontSize: 13, marginTop: 6 }}>
                 Cevapların analiz edildi — sana özel portföy hesaplanıyor.
@@ -161,7 +156,7 @@ export default function ProfilePage() {
             {/* Score breakdown */}
             {displayProfile.factors?.length > 0 && (
               <div className="card">
-                <h3 style={{ marginBottom: 4, fontSize: 15 }}>🧮 Bu skor nereden geldi?</h3>
+                <h3 style={{ marginBottom: 4, fontSize: 15 }}>Bu skor nereden geldi?</h3>
                 <p style={{ fontSize: 12, opacity: 0.7, marginBottom: 12 }}>
                   Kara kutu yok — her puanın kaynağı ve gerekçesi:
                 </p>

@@ -106,6 +106,34 @@ async def value_history(
     return await asyncio.to_thread(portfolio_value_history, holdings, days)
 
 
+@router.get("/drift")
+@limiter.limit("20/minute")
+async def portfolio_drift(
+    request: Request,
+    user_id: str = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Has the portfolio drifted away from what the risk profile called for?
+    The target is recomputed from the saved risk score, so nothing is stored."""
+    from backend.services.drift import compute_drift
+    from backend.services.portfolio_engine import build_portfolio
+
+    user = await user_repository.get_or_create(db, user_id)
+    if user.risk_score is None:
+        return {"available": False, "reason": "Önce risk profilini tamamla."}
+
+    holdings = await holding_repository.list_for_user(db, user.id)
+    if not holdings:
+        return {"available": False, "reason": "Henüz takip ettiğin bir varlık yok."}
+
+    enrichment = await asyncio.to_thread(enrich_holdings, holdings)
+    values = {h.id: current_value(h, enrichment) for h in holdings}
+    target = await asyncio.to_thread(
+        build_portfolio, user.risk_score, user.budget or sum(values.values()),
+    )
+    return compute_drift(holdings, values, target.allocations)
+
+
 @router.get("/health")
 @limiter.limit("20/minute")
 async def health_score(
@@ -155,7 +183,12 @@ async def portfolio_summary(
     cash_erosion = None
     if idle_cash > 0:
         erosion = inflation_service.monthly_cash_erosion(idle_cash)
-        cash_erosion = CashErosion(**erosion, idle_cash=round(idle_cash, 2))
+        cash_erosion = CashErosion(
+            **erosion,
+            idle_cash=round(idle_cash, 2),
+            cash_holdings=round(by_type.get("cash", 0.0), 2),
+            uninvested_budget=round(remaining or 0.0, 2),
+        )
 
     # Monthly-plan tracking: what entered the portfolio this calendar month
     today = date.today()

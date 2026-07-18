@@ -67,3 +67,11 @@ def test_oneshot_generation_never_inherits_the_quiz_script():
 
     assert captured["system"] == ai_service._ONESHOT_SYSTEM
     assert "[PROFILE_COMPLETE]" not in captured["system"]
+
+
+def test_reit_prompt_does_not_demand_its_own_disclaimer():
+    """The card sits above the app's persistent notice — a second, bilingual
+    disclaimer inside the text is boilerplate."""
+    reit = (PROMPTS / "reit_explain_prompt.txt").read_text()
+    assert "Do NOT append one" in reit
+    assert "For educational purposes only" not in reit

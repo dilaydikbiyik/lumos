@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import MessageBubble from './MessageBubble'
 import useChat from '../hooks/useChat'
 
-const INTRO = "Merhaba! Ben Lumos.\n\nSana 9 kısa soru soracağım ve kişisel risk profilini oluşturacağım. Hazır mısın?\n\n**1️⃣ Başlayalım: Yatırıma ayırabileceğin bütçen nedir?** (Örn: 50.000 TL)"
+const INTRO = "Merhaba! Ben Lumos.\n\nSana 9 kısa soru soracağım ve kişisel risk profilini oluşturacağım. Hazır mısın?\n\n**1. soru — Yatırıma ayırabileceğin bütçen nedir?** (Örn: 50.000 TL)"
 
 export default function ChatWindow({ onProfileComplete, onFirstMessage }) {
   const { messages, isLoading, error, sendMessage } = useChat(onProfileComplete)
@@ -41,7 +41,7 @@ export default function ChatWindow({ onProfileComplete, onFirstMessage }) {
         /* smooth momentum scroll on iOS */
         WebkitOverflowScrolling: 'touch',
       }}>
-        <div className="bubble-assistant" style={{ whiteSpace: 'pre-line' }}>{INTRO}</div>
+        <MessageBubble role="assistant" content={INTRO} />
 
         {messages.map((msg, i) => (
           <MessageBubble key={i} role={msg.role} content={msg.content} />

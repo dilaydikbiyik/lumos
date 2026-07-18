@@ -11,7 +11,7 @@ export default function DisclaimerModal({ onAccept }) {
       zIndex: 1000, padding: 16,
     }}>
       <div className="card" style={{ maxWidth: 480, width: '100%' }}>
-        <div style={{ fontSize: 36, marginBottom: 16, textAlign: 'center' }}>⚠️</div>
+        <div style={{ fontSize: 36, marginBottom: 16, textAlign: 'center' }}></div>
         <h2 style={{ marginBottom: 12, textAlign: 'center' }}>Önemli Uyarı</h2>
 
         <p style={{ fontSize: 14, marginBottom: 16, lineHeight: 1.7 }}>

@@ -10,6 +10,7 @@ Honest by construction:
   • a holding only enters the series on its purchase date (money that wasn't
     in the market can't have moved).
 """
+import logging
 from datetime import date, timedelta
 
 import pandas as pd
@@ -21,6 +22,8 @@ from backend.services.holdings_valuation import (
     current_value,
 )
 from backend.services.market_data import fetch_price_history
+
+logger = logging.getLogger("lumos.portfolio_history")
 
 
 def portfolio_value_history(holdings, days: int = 30) -> dict:
@@ -38,7 +41,8 @@ def portfolio_value_history(holdings, days: int = 30) -> dict:
     if live:
         try:
             history = fetch_price_history(sorted({h.ticker for h in live}), period="3mo")
-        except Exception:
+        except Exception as exc:
+            logger.warning("price history unavailable (%s) — carrying holdings flat", type(exc).__name__)
             history = {}
 
     # Trading-day index from whatever price data we have

@@ -40,6 +40,15 @@
   --bg-predawn:   #121528;
   --bg-dawn:      #181B32;
 
+  /* ── Type scale: one clear step between levels, so the eye can rank
+       what it sees instead of swimming in 11-14px soup ── */
+  --t-micro:  11px;   /* legal, timestamps */
+  --t-small:  13px;   /* secondary copy */
+  --t-body:   15px;   /* primary reading size */
+  --t-lead:   17px;   /* card titles */
+  --t-title:  22px;   /* section headings */
+  --t-hero:   32px;   /* the number that matters on a screen */
+
   /* ── Mobile-first sizing ── */
   --radius:       18px;
   --radius-sm:    12px;
@@ -419,19 +428,25 @@ select.input { cursor: pointer; }
 .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
 
 /* ── Floating action buttons (advisor + panic) ───────────────────────────────
-   Anchored on the LEFT so they never collide with a page's own bottom-right
-   send button (e.g. the risk-quiz chat input). On mobile they sit above the
-   bottom nav; on desktop they clear the left sidebar. */
+   Anchored on the RIGHT: text starts at the left edge, so buttons parked
+   there sat on top of every paragraph. The one screen with its own
+   bottom-right control (the risk-quiz input) hides these entirely. */
 .fab {
-  position: fixed; left: 14px; z-index: 40;
-  width: 52px; height: 52px; border-radius: 50%;
+  position: fixed; right: 14px; z-index: 40;
+  width: 46px; height: 46px; border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
   cursor: pointer; font-size: 22px;
+  opacity: 0.92;
+  transition: transform 0.28s cubic-bezier(.4,0,.2,1), opacity 0.28s ease;
 }
+.fab:hover { opacity: 1; }
+/* While the user scrolls down (reading), the buttons step aside instead of
+   covering the text; they slide back on scroll-up or when scrolling stops. */
+.fab-tucked { transform: translateX(72px); opacity: 0; pointer-events: none; }
 .fab-panic   { bottom: calc(84px + env(safe-area-inset-bottom)); }
 .fab-advisor { bottom: calc(148px + env(safe-area-inset-bottom)); }
 @media (min-width: 768px) {
-  .fab         { left: calc(var(--sidebar-w) + 16px); }
+  .fab         { right: 24px; }
   .fab-panic   { bottom: 20px; }
   .fab-advisor { bottom: 84px; }
 }
@@ -738,4 +753,37 @@ body.illumination-3::after { opacity: 1; }
   background-size: 200% 100%;
   animation: shimmer 1.8s ease-in-out infinite;
   border-radius: var(--radius-xs);
+}
+
+
+/* ── Numeric display ─────────────────────────────────────────────────────────
+   Money and percentages carry the meaning in this product, so they get their
+   own treatment: tabular figures (digits line up across rows), tighter
+   tracking, and a size that outranks the label above them. */
+.num {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+  letter-spacing: -0.02em;
+}
+.num-hero {
+  font-size: var(--t-hero);
+  font-weight: 800;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
+}
+.num-lead {
+  font-size: var(--t-title);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+/* The label that sits above a number — quiet, uppercase, never competing */
+.num-label {
+  font-size: var(--t-micro);
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  font-weight: 600;
+  margin-bottom: 4px;
 }

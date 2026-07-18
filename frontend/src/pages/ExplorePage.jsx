@@ -52,20 +52,25 @@ function ProvinceScenario({ province, amount }) {
         <button className="btn btn-ghost" style={{ width: '100%' }} onClick={run} disabled={loading}>
           {loading
             ? <span className="spinner" style={{ width: 16, height: 16 }} />
-            : `${fmt(Number(amount) || 1000000)} TL ${province.province}'de 5 yılda ne olurdu?`}
+            : `${fmt(parseTL(amount) || 1000000)} TL ile ${province.province}'de konut alsaydım?`}
         </button>
       )}
       {error && <p style={{ color: 'var(--red)', fontSize: 12 }}>{error}</p>}
       {band && !band.available && <p style={{ fontSize: 12, opacity: 0.75 }}>{band.reason}</p>}
       {band?.available && (
         <div style={{ fontSize: 13, lineHeight: 1.7 }}>
-          <div>Kötü dönem: <strong style={{ color: 'var(--red)' }}>{fmt(band.pessimistic.value)} TL</strong>
+          <p style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.6, marginBottom: 8 }}>
+            TCMB&apos;nin {province.province} konut fiyat endeksine göre, geçmişteki
+            <strong> tüm 5 yıllık dönemler</strong> tek tek hesaplandı. Bugün bu parayla
+            konut alsaydın, o dönemlerin sonunda elindeki değer şu aralıkta olurdu:
+          </p>
+          <div>En kötü dönemlerden biri (%10&apos;luk dilim): <strong style={{ color: 'var(--red)' }}>{fmt(band.pessimistic.value)} TL</strong>
             {band.real_band && <span style={{ fontSize: 11, opacity: 0.7 }}> · reel {band.real_band.pessimistic_pct > 0 ? '+' : ''}{band.real_band.pessimistic_pct}%</span>}
           </div>
-          <div>Tipik dönem: <strong style={{ color: 'var(--firefly, #F5A524)' }}>{fmt(band.typical.value)} TL</strong>
+          <div>Tipik dönem (ortanca): <strong style={{ color: 'var(--firefly, #F5A524)' }}>{fmt(band.typical.value)} TL</strong>
             {band.real_band && <span style={{ fontSize: 11, opacity: 0.7 }}> · reel {band.real_band.typical_pct > 0 ? '+' : ''}{band.real_band.typical_pct}%</span>}
           </div>
-          <div>İyi dönem: <strong style={{ color: 'var(--green, #3DD68C)' }}>{fmt(band.optimistic.value)} TL</strong>
+          <div>En iyi dönemlerden biri (%90&apos;lık dilim): <strong style={{ color: 'var(--green, #3DD68C)' }}>{fmt(band.optimistic.value)} TL</strong>
             {band.real_band && <span style={{ fontSize: 11, opacity: 0.7 }}> · reel {band.real_band.optimistic_pct > 0 ? '+' : ''}{band.real_band.optimistic_pct}%</span>}
           </div>
           {links && (
@@ -103,7 +108,7 @@ function ProvinceScenario({ province, amount }) {
               </div>
             </div>
           )}
-          <p style={{ fontSize: 11, opacity: 0.6, marginTop: 6 }}>⚠️ {band.honesty_note}</p>
+          <p style={{ fontSize: 11, opacity: 0.6, marginTop: 6 }}>{band.honesty_note}</p>
         </div>
       )}
     </div>
@@ -267,7 +272,7 @@ function RentVsBuy() {
               background: !buyWins ? 'var(--firefly-dim)' : 'transparent',
             }}>
               <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 6 }}>
-                📊 Kirada kalırsan {!buyWins && '✓'}
+                Kirada kalırsan {!buyWins && '✓'}
               </div>
               <div style={{ fontSize: 12, opacity: 0.75 }}>{result.years} yıl sonra net servetin</div>
               <div style={{ fontSize: 17, fontWeight: 700 }}>{fmt(result.rent.net_worth)} TL</div>
@@ -491,7 +496,7 @@ export default function ExplorePage() {
                 </p>
               )}
               <p style={{ fontSize: 12, opacity: 0.6, marginTop: 10, lineHeight: 1.5 }}>
-                ⚠️ {provinces.honesty_note} (Veri: {provinces.data_through})
+                {provinces.honesty_note} (Veri: {provinces.data_through})
               </p>
             </>
           )}

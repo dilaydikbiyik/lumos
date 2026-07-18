@@ -62,9 +62,11 @@ class CashErosion(BaseModel):
     """'Param eriyor mu?' — real monthly purchasing-power loss on idle cash."""
     monthly_inflation_pct: float
     erosion_amount: float
-    # What the erosion was computed ON (cash holdings + uninvested budget) —
-    # the UI must name this amount, not a different field
+    # What the erosion was computed ON, itemised — "how is this number made?"
+    # is the first question a user asks about a figure they didn't enter
     idle_cash: float = 0.0
+    cash_holdings: float = 0.0       # cash-type assets recorded in Varlıklarım
+    uninvested_budget: float = 0.0   # declared budget not yet put to work
 
 
 class PortfolioSummary(BaseModel):
