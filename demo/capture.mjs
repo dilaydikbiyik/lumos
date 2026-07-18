@@ -36,21 +36,35 @@ const iphone = {
   userAgent: devices['iPhone 13'].userAgent,
 }
 
+async function isSignedIn(page) {
+  try { return await page.evaluate(() => !!(window.Clerk && window.Clerk.user)) }
+  catch { return false }
+}
+
 async function signIn(page) {
-  const ticket = await freshTicket()
-  await page.goto(`${PORTAL}/sign-in?__clerk_ticket=${ticket}`)
-  await page.waitForTimeout(6000)
-  const cookies = await page.context().cookies(PORTAL)
-  const db = cookies.find(c => c.name === '__clerk_db_jwt')
-  if (!db) throw new Error('clerk dev-browser cookie missing — ticket expired?')
-  await page.goto(`${APP}/?__clerk_db_jwt=${db.value}`)
-  await page.waitForTimeout(5000)
-  // Confirm the session actually restored before shooting anything
-  const ok = await page.evaluate(() => !!(window.Clerk && window.Clerk.user))
-  if (!ok) throw new Error('sign-in did not restore a Clerk session')
-  await page.evaluate(() => localStorage.setItem('lumos-disclaimer-ok', '1'))
-  await page.goto(`${APP}/`)
-  await page.waitForTimeout(2500)
+  // Clerk's dev instance rate-limits back-to-back sign-ins, so a context can
+  // land signed-out — retry the whole ticket→cookie→app dance a few times.
+  for (let attempt = 1; attempt <= 4; attempt++) {
+    const ticket = await freshTicket()
+    await page.goto(`${PORTAL}/sign-in?__clerk_ticket=${ticket}`)
+    await page.waitForTimeout(6000)
+    const db = (await page.context().cookies(PORTAL)).find(c => c.name === '__clerk_db_jwt')
+    if (db) {
+      await page.goto(`${APP}/?__clerk_db_jwt=${db.value}`)
+      for (let i = 0; i < 12; i++) {
+        if (await isSignedIn(page)) {
+          await page.evaluate(() => localStorage.setItem('lumos-disclaimer-ok', '1'))
+          await page.goto(`${APP}/`)
+          await page.waitForTimeout(2500)
+          return
+        }
+        await page.waitForTimeout(1500)
+      }
+    }
+    console.log(`  … sign-in denemesi ${attempt} başarısız, tekrar`)
+    await page.waitForTimeout(8000)  // let the rate-limit window pass
+  }
+  throw new Error('sign-in did not restore a Clerk session after retries')
 }
 
 async function shoot(page, path, name, { settle = 3500, fullPage = false } = {}) {
@@ -74,13 +88,18 @@ const browser = await chromium.launch()
   // Real-estate projection: İstanbul 5-year scenario band
   try {
     await page.goto(`${APP}/explore`)
-    await page.waitForSelector('input[placeholder*="ara"]', { timeout: 20000 })
-    await page.locator('input[placeholder*="ara"]').fill('İstanbul')
-    await page.waitForTimeout(1800)
-    await page.locator('.card', { hasText: 'İstanbul' }).first().click({ force: true })
-    await page.waitForTimeout(1200)
-    await page.locator('button', { hasText: 'olurdu' }).click({ force: true })
-    await page.waitForTimeout(8000)
+    await page.waitForSelector('input[aria-label="İl ara"]', { timeout: 20000 })
+    await page.locator('input[aria-label="İl ara"]').fill('İstanbul')
+    await page.waitForTimeout(2500)
+    const card = page.locator('.card', { hasText: 'İstanbul' }).first()
+    await card.scrollIntoViewIfNeeded()
+    await card.click({ force: true })
+    await page.waitForTimeout(1500)
+    const projBtn = page.locator('button', { hasText: 'olurdu' }).first()
+    await projBtn.waitFor({ timeout: 8000 })
+    await projBtn.click({ force: true })
+    await page.waitForTimeout(9000)
+    await card.scrollIntoViewIfNeeded()
     await page.screenshot({ path: 'demo/screens/04-emlak-istanbul.png' })
     console.log('✓ 04-emlak-istanbul')
   } catch (e) { console.log('… İstanbul projeksiyonu atlandı:', e.message) }

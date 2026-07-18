@@ -38,11 +38,11 @@ shows you the honest downside before the upside, and treats your fear as **data 
 | ![Varlıklarım](demo/screens/05-varliklarim.png) | ![Panel](demo/screens/06-panel.png) | ![Danışman](demo/screens/08-danisman.png) |
 
 <details>
-<summary>More: asset card, real-estate explorer, desktop layout</summary>
+<summary>More: rent-vs-buy, real-estate explorer, desktop layout</summary>
 
-| Asset card | Real-estate explorer | Desktop |
+| Rent vs. buy | Real-estate explorer | Desktop |
 |---|---|---|
-| ![Varlık kartı](demo/screens/04-varlik-karti.png) | ![Emlak Keşfet](demo/screens/07-emlak-kesfet.png) | ![Desktop](demo/screens/09-desktop-panel.png) |
+| ![Kirada mı otur, ev mi al](demo/screens/04-kira-vs-ev.png) | ![Emlak Keşfet](demo/screens/07-emlak-kesfet.png) | ![Desktop](demo/screens/09-desktop-panel.png) |
 
 </details>
 
