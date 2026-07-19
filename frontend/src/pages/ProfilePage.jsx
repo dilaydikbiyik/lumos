@@ -6,6 +6,7 @@ import { UserButton, useAuth } from '@clerk/clerk-react'
 import LumosLogo from '../components/LumosLogo'
 import ChatWindow from '../components/ChatWindow'
 import RiskGauge from '../components/RiskGauge'
+import DebtFirstCard from '../components/DebtFirstCard'
 import usePortfolio from '../hooks/usePortfolio'
 import useMarket from '../hooks/useMarket'
 import { readJSON, writeJSON, removeKey, userKey } from '../utils/storage'
@@ -60,14 +61,16 @@ export default function ProfilePage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  // Returns false when the save failed, so the chat can tell the user rather
+  // than silently leaving them on a finished quiz with nowhere to go.
   async function handleProfileComplete(answers) {
     const result = await saveProfile(answers)
-    if (result) {
-      setRetaking(false)
-      quizStartedRef.current = false
-      setDisplayProfile(result)
-      writeJSON(cacheKey, result)
-    }
+    if (!result) return false
+    setRetaking(false)
+    quizStartedRef.current = false
+    setDisplayProfile(result)
+    writeJSON(cacheKey, result)
+    return true
   }
 
   // Show result if we have a saved profile AND the user hasn't asked to redo
@@ -114,6 +117,10 @@ export default function ProfilePage() {
             </div>
 
             <RiskGauge score={displayProfile.risk_score} label={displayProfile.label} />
+
+            {/* Before the portfolio, not after it: if repayment beats investing,
+                the user should read that first, not as a footnote. */}
+            <DebtFirstCard check={displayProfile.debt_check} />
 
             {/* Summary card */}
             <div className="card" style={{

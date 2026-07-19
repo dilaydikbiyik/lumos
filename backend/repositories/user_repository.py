@@ -29,7 +29,7 @@ async def save_risk_profile(
     db: AsyncSession, clerk_user_id: str, *, risk_score: float,
     budget: float, time_horizon: str, loss_tolerance: str, goal: str, experience: str,
     age: int | None = None, income_stability: str | None = None,
-    monthly_contribution: float | None = None,
+    monthly_contribution: float | None = None, high_interest_debt: float | None = None,
 ) -> User:
     user = await get_or_create(db, clerk_user_id)
     user.risk_score = risk_score
@@ -41,6 +41,7 @@ async def save_risk_profile(
     user.experience = experience
     user.age = age
     user.income_stability = income_stability
+    user.high_interest_debt = high_interest_debt
     await db.flush()
     return user
 

@@ -988,3 +988,77 @@ Rate limit eklendi: `list_holdings:30/min`, `health:20/min`, `summary:20/min`.
 - [ ] `GROQ_API_KEY` + `OPENROUTER_API_KEY` Render env'e ekle
 - [ ] Kendi Clerk kullanıcı ID'ni `ADMIN_CLERK_IDS`'e ekle (Render env paneli)
 - [ ] JS bundle code-split (isteğe bağlı, 253 kB gzip kabul edilebilir)
+
+---
+
+## First user testing round — 19 Jul 2026
+
+First real feedback after the LinkedIn launch. Most testers were on mobile.
+
+### Bugs fixed
+
+- [x] **Dead end after finishing the quiz.** `extract-profile` is an LLM call;
+      when it failed the user was told to "try again" with no message left to
+      send. A failed profile save was swallowed silently too. The finished
+      transcript is now kept so extraction can be retried on its own.
+- [x] **Chat reset on navigation.** Messages lived only in memory and were
+      discarded on a tab switch. Now persisted as a draft in localStorage.
+- [x] **Reveal raced the reader** — the page swapped to the risk profile
+      before the closing message could be read. It now waits for an explicit
+      "I've read it, show my profile".
+- [x] **Google sign-in broken for LinkedIn visitors.** LinkedIn opens links in
+      its own webview and Google rejects OAuth there (`disallowed_useragent`).
+      Detect the webview and tell the user to open in a real browser.
+- [x] **Loan cost was invisible.** The backend computed it but nothing reached
+      the screen. Added total interest and its ratio to principal; rate and
+      term are now user-supplied instead of assumed.
+- [x] **"Educational tool only" undersold the product.** Legal substance kept,
+      order reversed: what Lumos does first, its limits second.
+
+### Open — product decisions
+
+- [x] **In-app feedback button.** Bottom sheet on every signed-in page, plain
+      categories ("Anlamadım" / "Bir şey bozuk"), captures the current route.
+      Readable at `GET /feedback` (admin only).
+- [x] **Debt check.** Q8 now asks for credit-card / consumer-loan balance
+      (mortgages excluded — secured and far cheaper). `debt_check.py` compares
+      one year of avoided interest against one year of expected return on the
+      same amount; the card shows both numbers side by side and appears above
+      the portfolio, not below it. Silent under 5.000 TRY.
+- [ ] **Legal review — specific instrument recommendations.** Users want the
+      app to say "buy this one". The line between a general allocation and a
+      specific instrument recommendation is the SPK investment-advice
+      boundary. **Not to be implemented without a lawyer's opinion.**
+- [x] **Friction on the way to real money.** The step-by-step guide already
+      existed but contradicted the product: it told users to search "SPY" at a
+      Turkish broker, and claimed US shares trade via BIST (they do not). Now
+      states plainly that foreign-listed ETFs need a broker offering overseas
+      markets, and what to ask before opening an account. Named brokers
+      removed — we take no commission and a list would go stale.
+
+- [x] **Property costs are in the comparison.** Title deed fee, agency
+      commission (+ VAT) and annual upkeep were missing, which silently
+      favoured buying; the footnote even admitted they were excluded. The
+      renter now keeps the money the buyer spends at closing. In the default
+      scenario this is enough to flip the verdict. A checkbox lets the user
+      say the figure they typed is all their cash, and the fees come out of
+      it — the surprise that derails first-time buyers.
+
+      Rates reviewed against current Turkish practice: title deed fee 4%
+      (legally split 2/2, buyer commonly absorbs all — stated as a market
+      assumption, not a rule), agency commission capped at 2% per side with
+      VAT invoiced on top (kept as two constants so VAT can move on its own),
+      upkeep 1%/yr (a modelling convention; real range is roughly 0.5% for
+      new buildings to 2%+ for old ones).
+
+      Sale taxes stay out on purpose. Capital-gains rules depend on
+      acquisition date and have changed, so the app claims no exemption and
+      says only that the projection assumes you keep living there.
+
+### Principles worth keeping
+
+- The majority of users arrive on mobile — evaluate mobile first.
+- The audience is beginners; resist added complexity. Keeping charts and
+  gauges sparse is a deliberate choice and the easiest thing to lose later.
+- The provider chain (Gemini→Groq→OpenRouter) is reasonable for now, but the
+  models behave differently and that risks inconsistency; revisit long term.

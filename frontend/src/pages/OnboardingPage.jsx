@@ -6,6 +6,7 @@ import LumosLogo from '../components/LumosLogo'
 import { SignInButton, SignedIn, SignedOut, UserButton } from '@clerk/clerk-react'
 import DisclaimerModal from '../components/DisclaimerModal'
 import Icon from '../components/Icon'
+import { isInAppBrowser } from '../utils/inAppBrowser'
 
 // 10 fireflies — drift toward the title
 // Each with its own start position, duration and motion vector
@@ -146,6 +147,18 @@ export default function OnboardingPage() {
           </div>
 
           <SignedOut>
+            {isInAppBrowser() && (
+              <div style={{
+                maxWidth: 320, margin: '0 auto 12px', padding: '10px 14px',
+                borderRadius: 'var(--radius-xs)', border: '1px solid var(--border)',
+                background: 'var(--bg-input)', fontSize: 12.5, lineHeight: 1.6,
+                color: 'var(--text-muted)', textAlign: 'left',
+              }}>
+                Bu sayfayı uygulama içi tarayıcıda açtın. Google ile giriş burada
+                çalışmıyor — sağ üstteki menüden <strong>&quot;Tarayıcıda aç&quot;</strong>{' '}
+                dersen sorunsuz giriş yapabilirsin.
+              </div>
+            )}
             <SignInButton mode="modal">
               <button
                 className="btn btn-primary"

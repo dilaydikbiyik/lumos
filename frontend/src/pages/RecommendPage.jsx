@@ -126,7 +126,7 @@ export default function RecommendPage() {
         {selectedAlloc && (
           <AssetExplainer
             allocation={selectedAlloc}
-            color={sliceColor(selectedAlloc, portfolio.allocations.findIndex(a => a.ticker === selectedTicker))}
+            color={sliceColor(selectedAlloc, portfolio.allocations.findIndex(a => a.ticker === selectedTicker), portfolio.allocations)}
             onClose={() => setSelectedTicker(null)}
           />
         )}

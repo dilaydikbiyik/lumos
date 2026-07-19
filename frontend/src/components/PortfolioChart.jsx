@@ -1,5 +1,5 @@
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts'
-import { COLORS, CATEGORY_COLORS } from '../utils/palette'
+import { allocationColors } from '../utils/palette'
 import AssetCard from './AssetCard'
 import { useState } from 'react'
 
@@ -18,6 +18,10 @@ export default function PortfolioChart({ allocations = [], onSliceClick }) {
     value: parseFloat((a.weight * 100).toFixed(1)),
     category: a.category,
   }))
+
+  // Computed once for the whole list so the pie, the legend dot and the
+  // percentage of a given asset are always the same colour.
+  const colors = allocationColors(allocations)
 
   function handleClick(entry) {
     const ticker = entry.ticker
@@ -44,7 +48,7 @@ export default function PortfolioChart({ allocations = [], onSliceClick }) {
             {data.map((entry, i) => (
               <Cell
                 key={entry.ticker}
-                fill={CATEGORY_COLORS[entry.category] || COLORS[i % COLORS.length]}
+                fill={colors[i]}
                 opacity={active && active !== entry.ticker ? 0.4 : 1}
                 stroke={active === entry.ticker ? '#fff' : 'transparent'}
                 strokeWidth={2}
@@ -71,17 +75,18 @@ export default function PortfolioChart({ allocations = [], onSliceClick }) {
             }}
             onClick={() => handleClick(d)}
           >
-            <span style={{ width: 10, height: 10, borderRadius: '50%', background: CATEGORY_COLORS[d.category] || COLORS[i % COLORS.length], flexShrink: 0 }} />
+            <span style={{ width: 10, height: 10, borderRadius: '50%', background: colors[i], flexShrink: 0 }} />
             <span style={{ fontSize: 13, flex: 1 }}>{d.name}</span>
             {/* Percentage in the exact slice colour — the legend and pie read as one */}
-            <span style={{ fontSize: 13, fontWeight: 700, color: CATEGORY_COLORS[d.category] || COLORS[i % COLORS.length] }}>{d.value}%</span>
+            <span style={{ fontSize: 13, fontWeight: 700, color: colors[i] }}>{d.value}%</span>
           </div>
         ))}
       </div>
 
       {/* Quick glance card — appears right under the chart, in the slice colour */}
       {selectedAllocation && (
-        <AssetCard allocation={selectedAllocation} index={selectedIndex} onClose={() => setActive(null)} />
+        <AssetCard allocation={selectedAllocation} index={selectedIndex}
+                   color={colors[selectedIndex]} onClose={() => setActive(null)} />
       )}
 
     </div>

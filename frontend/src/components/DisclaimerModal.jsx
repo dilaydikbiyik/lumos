@@ -12,11 +12,18 @@ export default function DisclaimerModal({ onAccept }) {
     }}>
       <div className="card" style={{ maxWidth: 480, width: '100%' }}>
         <div style={{ fontSize: 36, marginBottom: 16, textAlign: 'center' }}></div>
-        <h2 style={{ marginBottom: 12, textAlign: 'center' }}>Önemli Uyarı</h2>
+        <h2 style={{ marginBottom: 12, textAlign: 'center' }}>Lumos ne yapar, ne yapmaz</h2>
 
+        {/* Same legal boundary as before, stated in the other order: what the
+            app does first, then its limits. Leading with "yalnızca" made the
+            product sound like a lesser version of something else. */}
         <p style={{ fontSize: 14, marginBottom: 16, lineHeight: 1.7 }}>
-          <strong style={{ color: 'var(--text)' }}>Lumos yalnızca bir eğitim aracıdır.</strong><br />
-          Yatırım tavsiyesi, finansal planlama veya düzenlemeye tabi finansal hizmet <em>vermez</em>.
+          <strong style={{ color: 'var(--text)' }}>Yapar:</strong> risk profilini çıkarır, sana uygun
+          bir portföy dağılımı hesaplar, her rakamı canlı piyasa ve TCMB verisiyle enflasyondan
+          arındırıp gösterir, kararlarının arkasındaki formülü açıklar.<br /><br />
+          <strong style={{ color: 'var(--text)' }}>Yapmaz:</strong> senin adına alım satım yapmaz,
+          paranı tutmaz. Yatırım tavsiyesi, finansal planlama veya düzenlemeye tabi bir finansal
+          hizmet <em>vermez</em>.
         </p>
 
         <div className="disclaimer" style={{ marginBottom: 20 }}>

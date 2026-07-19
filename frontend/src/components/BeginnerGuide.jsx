@@ -11,8 +11,10 @@ const STEPS = [
     id: 1,
     emoji: '🏦',
     title: 'Aracı Kurum Nedir?',
-    body: 'Hisse senedi ve fon alıp satman için bir aracı kuruma ihtiyacın var. Banka hesabına benzer ama yatırım için. Türkiye\'de lisanslı kurumları SPK listesinden kontrol edebilirsin.',
-    tip: '💡 Türk yatırımcılar için popüler seçenekler: İş Yatırım, Yapı Kredi Yatırım, Denizbank Yatırım.',
+    body: 'Hisse senedi ve fon alıp satman için bir aracı kuruma ihtiyacın var. Banka hesabına benzer ama yatırım için. Türkiye\'de faaliyet gösteren kurumların SPK lisansı olmak zorundadır.',
+    // Deliberately no broker names: we take no commission and endorse nobody,
+    // and a list would go stale. The regulator's own list is the honest source.
+    tip: '💡 Kurumun lisanslı olduğunu SPK\'nın resmî listesinden kendin doğrula (spk.gov.tr). Biz belirli bir kurum önermiyoruz — hiçbirinden komisyon almıyoruz.',
   },
   {
     id: 2,
@@ -32,8 +34,11 @@ const STEPS = [
     id: 4,
     emoji: '🛒',
     title: 'İlk Emir Nasıl Verilir?',
-    body: '1. Uygulamada "Emir Ver" veya "Al" bölümüne git.\n2. Almak istediğin varlığı ara (örn: "SPY" veya "XU100").\n3. Miktar gir (kaç lot / TL).\n4. "Piyasa Emri" seç — anlık fiyattan alınır.\n5. Onayla.',
-    tip: '💡 Piyasa saatleri: BIST 10:00–18:00 TSİ. ABD hisseleri için Borsa İstanbul üzerinden kaldıraçsız erişim mümkün.',
+    body: '1. Uygulamada "Emir Ver" veya "Al" bölümüne git.\n2. Almak istediğin varlığı ara.\n3. Miktar gir (kaç lot / TL).\n4. "Piyasa Emri" seç — anlık fiyattan alınır.\n5. Onayla.',
+    // The portfolio can include US-listed ETFs (SPY, QQQ...), which a standard
+    // Turkish equity account does not necessarily reach. Saying "just search
+    // the ticker" would send a beginner into a wall on their first attempt.
+    tip: '💡 Önemli: Portföyünde yurtdışı borsalarda işlem gören ETF\'ler varsa (SPY, QQQ gibi), bunlar BIST\'te işlem görmez. Bunun için aracı kurumunun yurtdışı piyasa hizmeti vermesi gerekir; genellikle ayrı bir başvuru ve döviz dönüşümü gerektirir. Hesap açmadan önce "yurtdışı ETF alabiliyor muyum, komisyonu ne?" diye sor.',
   },
   {
     id: 5,

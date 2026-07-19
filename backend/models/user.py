@@ -37,6 +37,9 @@ class User(Base):
     # Quiz Q1 captures whether the budget is one-time or monthly — the
     # monthly plan amount lives here (null = one-time investor)
     monthly_contribution: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
+    # Credit-card / consumer-loan balance (mortgages excluded). Persisted so the
+    # "clear this first" check survives a page reload — null = never asked.
+    high_interest_debt: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
 
     # Billing-ready plan tier: free / plus / pro (ai_tiers.py) — a payment
     # webhook or admin flips this; models & quotas follow automatically

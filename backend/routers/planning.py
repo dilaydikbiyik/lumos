@@ -32,6 +32,9 @@ async def rent_vs_buy(
     """Rent or buy? — two honest side-by-side projections of the SAME home."""
     return compare_rent_vs_buy(
         body.down_payment, body.monthly_rent, body.years, home_price=body.home_price,
+        mortgage_annual_rate_pct=body.mortgage_annual_rate_pct,
+        mortgage_term_years=body.mortgage_term_years,
+        down_payment_includes_costs=body.down_payment_includes_costs,
     )
 
 

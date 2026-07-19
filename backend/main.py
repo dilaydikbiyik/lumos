@@ -23,7 +23,7 @@ if settings.SENTRY_DSN:
     )
 from backend.middleware.error_handler import register_error_handlers
 from backend.middleware.request_id import RequestIDMiddleware
-from backend.routers import admin, backtest, chat, coach, health, holdings, news, planning, practice, profile, recommend, users
+from backend.routers import admin, backtest, chat, coach, feedback, health, holdings, news, planning, practice, profile, recommend, users
 
 
 @asynccontextmanager
@@ -110,3 +110,4 @@ app.include_router(coach.router,    prefix="/coach",     tags=["Coach"])
 app.include_router(planning.router, prefix="/planning",  tags=["Planning"])
 app.include_router(practice.router,  prefix="/practice",  tags=["Practice"])
 app.include_router(admin.router,    prefix="/admin",     tags=["Admin"])
+app.include_router(feedback.router, prefix="/feedback",  tags=["Feedback"])

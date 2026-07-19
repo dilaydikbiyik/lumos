@@ -29,6 +29,14 @@ class RiskProfileAnswers(BaseModel):
         None,
         description="Income stability — irregular income lowers risk capacity"
     )
+    high_interest_debt: Optional[float] = Field(
+        None, ge=0,
+        description=(
+            "Outstanding credit-card / consumer-loan debt in TRY (null = unknown, "
+            "0 = none). Carrying it makes investing a losing trade, so it is "
+            "surfaced before any allocation."
+        )
+    )
 
 
 class RiskFactor(BaseModel):
@@ -46,3 +54,6 @@ class RiskProfileResponse(BaseModel):
     summary: str = Field(..., description="Brief explanation of the score")
     factors: list[RiskFactor] = Field(default_factory=list, description="Skorun şeffaf dökümü")
     answers: RiskProfileAnswers
+    # Present only when the user carries material high-interest debt: the
+    # arithmetic showing repayment beats investing. None = nothing to say.
+    debt_check: Optional[dict] = None

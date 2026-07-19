@@ -27,11 +27,15 @@ TR = MarketPack(
         "(ör. banka aracı kurumları veya dijital aracılar). Hesap açılışı "
         "çoğunlukla uzaktan kimlik doğrulama ile aynı gün tamamlanır."
     ),
+    # Deliberately no specific holding periods or rates: tax rules change, and a
+    # stale number here would read as a promise. Point at the boundary instead.
     tax_note=(
-        "Genel bilgi: BIST hisse alım-satım kazançları için stopaj oranı uzun "
-        "süredir %0'dır; mevduat faizi ve fon türlerine göre stopaj değişir; "
-        "temettüler stopaja tabidir. Gayrimenkulde tapu harcı ve 5 yıl içinde "
-        "satışta değer artış kazancı vergisi gündeme gelir."
+        "Vergilendirme, varlık türüne ve edinim tarihine göre değişir; kurallar "
+        "zaman içinde güncellenir. Gayrimenkulde tapu harcı alım anında doğar, "
+        "satış hâlinde ise değer artış kazancı vergisi gündeme gelebilir. "
+        "Hesaplamalarımız evde oturmaya/varlığı elde tutmaya devam ettiğin "
+        "varsayımına dayanır ve satış vergilerini içermez. Kendi durumun için "
+        "güncel mevzuata veya bir mali müşavire başvur."
     ),
     fear_options={
         "param_eriyor": "Enflasyon param eritiyor",

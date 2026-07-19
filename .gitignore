@@ -50,3 +50,6 @@ logs/
 # Coverage
 .coverage
 htmlcov/
+
+# Playwright raw recording — the committed mp4/gif are generated from it
+demo/video/*.webm

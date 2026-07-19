@@ -4,7 +4,7 @@
 ![Python](https://img.shields.io/badge/python-3.12-blue)
 ![FastAPI](https://img.shields.io/badge/FastAPI-async-009688)
 ![React](https://img.shields.io/badge/react-19-61DAFB)
-![Tests](https://img.shields.io/badge/tests-203%20backend%20%2B%2010%20frontend-3DD68C)
+![Tests](https://img.shields.io/badge/tests-245%20backend%20%2B%2014%20frontend-3DD68C)
 ![Cost](https://img.shields.io/badge/running%20cost-%240%2Fmonth-F5A524)
 🔗 **[Live demo →](https://lumos-sooty.vercel.app)**
 > An AI-powered investment guide built for people who have never invested — and are scared to start.
@@ -40,6 +40,13 @@ shows you the honest downside before the upside, and treats your fear as **data 
 | Rent vs. buy | Province price explorer | Desktop layout |
 |---|---|---|
 | ![Kirada mı otur, ev mi al](demo/screens/04-kira-vs-ev.png) | ![Emlak Keşfet](demo/screens/07-emlak-kesfet.png) | ![Desktop](demo/screens/09-desktop-panel.png) |
+
+**The screen no investing app wants to show you** — carrying card debt, the app
+says clear it first and does the arithmetic, before it will show you a portfolio:
+
+<p align="center">
+  <img src="demo/screens/11-borc-once.png" width="300" alt="Borcu önce kapat" />
+</p>
 
 <details>
 <summary>More: desktop portfolio view</summary>
@@ -118,6 +125,11 @@ surface, zero custody risk — and a lower trust barrier for scared beginners.
 - **Rent vs. buy** decision tool — the same home under two strategies with an equal monthly
   housing budget, including an affordability check (the installment/income ratio is flagged past
   the ~45% banks lend against) and the honest note that homeownership has non-financial value too
+- **What buying actually costs**: title deed fee, agency commission with VAT and annual upkeep are
+  in the comparison rather than a footnote saying they were excluded — enough to flip the verdict
+  in the default scenario. A checkbox says "this is all my cash" and takes the fees out of the down
+  payment, which is the surprise that derails first-time buyers. Loan cost is shown in full: total
+  interest against principal, with the user's own rate and term
 - **Listing bridge**: filter-ready links out to listing portals (market-aware: Sahibinden/Emlakjet
   in TR, Zillow/Realtor in US, ImmoScout24/Immowelt in DE) — no scraping, no listing data stored
 
@@ -147,6 +159,12 @@ surface, zero custody risk — and a lower trust barrier for scared beginners.
   behavior mirror that compares stated vs. actual behavior
 - **Calm news digest**: at most 3 headlines a day, AI-rewritten in non-alarmist language with a
   "does this affect you?" note — plus micro-lessons on decoding scary headlines
+- **Debt before investing**: card interest compounds far above any portfolio expectation, so a user
+  carrying it is told to clear it first — one year of avoided interest against one year of expected
+  return on the same amount, both shown, repayment labelled certain and returns labelled expected.
+  Above the portfolio, not below it. Every app with something to sell has a reason not to say this
+- **Feedback from inside the app**: beginners close the tab rather than report problems, so saying
+  "I didn't understand this screen" costs one tap and captures the route automatically
 
 ### 🎯 Goal-based planning & 🐣 practice mode
 - "800.000 TL for a down payment in 3 years" → required monthly contribution (annuity math) with
@@ -312,8 +330,8 @@ disclaimer — Lumos gives no tax or legal advice in any market.
 ## Testing
 
 ```bash
-python -m pytest backend/tests/ -q     # 203 tests, ~1s, zero network
-cd frontend && npm test                # 10 vitest tests (retry safety, currency truth)
+python -m pytest backend/tests/ -q     # 245 tests, ~3s, zero network
+cd frontend && npm test                # 14 vitest tests (retry safety, currency truth)
 ```
 
 - External boundaries (AI providers, yfinance, EVDS, RSS) are fully mocked; business logic runs real

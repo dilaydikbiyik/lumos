@@ -1,12 +1,21 @@
 /**
  * Professional app-flow captures for README / LinkedIn.
- * Usage: node demo/capture.mjs   (expects a Clerk sign-in token in /tmp/lumos_demo_ticket.txt)
- * Outputs: demo/screens/*.png (iPhone 3x + one desktop) and demo/video/*.webm
+ * Usage: CLERK_SECRET_KEY=... DEMO_USER_ID=... node demo/capture.mjs
+ * Outputs: demo/screens/*.png (iPhone 3x + one desktop),
+ *          demo/video/lumos-demo.{mp4,gif} (converted from the raw recording)
  */
-import { chromium, devices } from 'playwright'
-import { mkdirSync } from 'fs'
+import { mkdirSync, readdirSync, unlinkSync } from 'fs'
+import { execFileSync } from 'child_process'
+import { createRequire } from 'module'
+
+// Both tools are devDependencies of the frontend package; resolve from there so
+// this script needs no node_modules of its own at the repo root.
+const req = createRequire(new URL('../frontend/package.json', import.meta.url))
+const { chromium, devices } = req('playwright')
+const ffmpeg = req('ffmpeg-static')
 
 const APP = 'https://lumos-sooty.vercel.app'
+const API = 'https://lumos-api-yowm.onrender.com'
 const PORTAL = 'https://peaceful-drake-17.accounts.dev'
 const CLERK = 'https://api.clerk.com/v1'
 const SECRET = process.env.CLERK_SECRET_KEY
@@ -110,14 +119,49 @@ const browser = await chromium.launch()
     await page.locator('input[placeholder*="Peşinat"]').fill('2.000.000')
     await page.locator('input[placeholder*="kiran"]').fill('35.000')
     await page.locator('input[placeholder*="Evin fiyatı"]').fill('6.000.000')
+    // "All my cash" — the fees come out of it, which is the number first-time
+    // buyers forget. Worth showing, since it changes the answer.
+    await page.locator('text=elimdeki tüm nakit').click()
     await page.getByRole('button', { name: 'Karşılaştır' }).click()
     await waitForText(page, 'Ev alırsan')
     await page.waitForTimeout(2500)
-    await page.locator('text=Kirada mı otur').scrollIntoViewIfNeeded()
-    await page.waitForTimeout(800)
+    // Frame the RESULT, not the form: the loan-cost card and the verdict are
+    // the point, and they now sit below where the old shot was cropped.
+    await page.locator('text=Kredinin maliyeti').scrollIntoViewIfNeeded()
+    await page.waitForTimeout(1000)
     await page.screenshot({ path: 'demo/screens/04-kira-vs-ev.png' })
     console.log('✓ 04-kira-vs-ev')
   } catch (e) { console.log('… kira-vs-ev atlandı:', e.message.slice(0, 80)) }
+  // "Clear your debt first" — only renders for a profile that reports debt, so
+  // set it on the demo account, shoot, and put it back. Restored in a finally
+  // block: leaving the demo user in a debt state would poison every later run.
+  try {
+    const setDebt = amount => page.evaluate(async ([api, debt]) => {
+      const token = await window.Clerk.session.getToken()
+      const headers = { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
+      const current = await (await fetch(`${api}/profile`, { headers })).json()
+      await fetch(`${api}/profile`, {
+        method: 'POST', headers,
+        body: JSON.stringify({ ...current.answers, high_interest_debt: debt }),
+      })
+    }, [API, amount])
+
+    try {
+      await setDebt(45000)
+      await page.goto(`${APP}/profile`)
+      await waitForText(page, 'Önce şunu konuşalım')
+      await page.waitForTimeout(4000)
+      // Don't shoot from the top: the conclusion — repayment wins by X — is the
+      // last line of the card and was hiding behind the bottom nav.
+      await page.evaluate(() => window.scrollBy(0, 430))
+      await page.waitForTimeout(1000)
+      await page.screenshot({ path: 'demo/screens/11-borc-once.png' })
+      console.log('✓ 11-borc-once')
+    } finally {
+      await setDebt(null)
+    }
+  } catch (e) { console.log('… borç kartı atlandı:', e.message.slice(0, 80)) }
+
   await shoot(page, '/holdings', '05-varliklarim', { settle: 7000, expect: 'Varlıklarım' })
   await shoot(page, '/dashboard', '06-panel', { settle: 6000, expect: 'Kontrol Paneli' })
   await shoot(page, '/explore', '07-emlak-kesfet', { settle: 7000 })
@@ -175,4 +219,34 @@ const browser = await chromium.launch()
 }
 
 await browser.close()
+
+// ── webm → mp4 + gif ─────────────────────────────────────────────────────────
+// Playwright only emits webm, which neither LinkedIn nor GitHub renders inline.
+// Bundled ffmpeg binary, so regenerating assets needs no system install.
+{
+  const raw = readdirSync('demo/video').filter(f => f.endsWith('.webm')).pop()
+  if (!raw) {
+    console.log('… webm bulunamadı, dönüştürme atlandı')
+  } else {
+    const src = `demo/video/${raw}`
+    const run = args => execFileSync(ffmpeg, ['-y', '-v', 'error', ...args], { stdio: 'inherit' })
+
+    run(['-i', src, '-movflags', '+faststart', '-pix_fmt', 'yuv420p',
+         '-vf', 'scale=780:-2:flags=lanczos', '-c:v', 'libx264',
+         '-preset', 'slow', '-crf', '23', '-an', 'demo/video/lumos-demo.mp4'])
+    console.log('✓ lumos-demo.mp4')
+
+    // Two-pass palette keeps gradients from banding. 1.35x because nobody
+    // watches a minute-long gif, and it halves the file.
+    const gifChain = 'setpts=PTS/1.35,fps=9,scale=300:-1:flags=lanczos'
+    run(['-i', src, '-vf', `${gifChain},palettegen=max_colors=96`, 'demo/video/palette.png'])
+    run(['-i', src, '-i', 'demo/video/palette.png',
+         '-lavfi', `${gifChain}[x];[x][1:v]paletteuse=dither=bayer:bayer_scale=4`,
+         'demo/video/lumos-demo.gif'])
+    unlinkSync('demo/video/palette.png')
+    unlinkSync(src)   // raw recording is an intermediate, not an asset
+    console.log('✓ lumos-demo.gif')
+  }
+}
+
 console.log('BİTTİ')

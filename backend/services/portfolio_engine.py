@@ -69,6 +69,37 @@ def _load_universe() -> list[dict]:
         return json.load(f)
 
 
+def _pick_diversified(ranked: list[str], universe: list[dict], slots: int) -> list[str]:
+    """
+    Take the top `slots` assets, but never two from one category while another
+    category is still unrepresented.
+
+    Ranking alone produced portfolios whose entire growth sleeve sat in two
+    REIT ETFs tracking the same index — four slices on the chart, one real
+    exposure underneath. Order within a category is untouched, so the choice
+    stays deterministic and explainable; only redundant picks are deferred.
+    """
+    category_of = {a["ticker"]: a["category"] for a in universe}
+    kept: list[str] = []
+    used: set[str] = set()
+
+    for ticker in ranked:                       # first pass: one per category
+        if len(kept) >= slots:
+            break
+        category = category_of.get(ticker)
+        if category not in used:
+            kept.append(ticker)
+            used.add(category)
+
+    for ticker in ranked:                       # then fill, best-ranked first
+        if len(kept) >= slots:
+            break
+        if ticker not in kept:
+            kept.append(ticker)
+
+    return kept
+
+
 def _position_cap(budget: float) -> int:
     for limit, cap in _BUDGET_POSITION_CAPS:
         if budget < limit:
@@ -165,14 +196,32 @@ def build_portfolio(risk_score: float, budget: float) -> PortfolioRecommendRespo
     total_raw = sum(raw.values())
     growth_w = {t: v / total_raw for t, v in raw.items()}
 
-    kept = sorted(growth_w, key=growth_w.get, reverse=True)[:growth_slots]
+    ranked = sorted(growth_w, key=growth_w.get, reverse=True)
+    kept = _pick_diversified(ranked, growth_universe, growth_slots)
+
+    category_of = {a["ticker"]: a["category"] for a in growth_universe}
+    kept_categories = {category_of[t] for t in kept}
     dropped: list[dict] = []
     for t in growth_w:
         if t not in kept:
+            # Two funds tracking the same market are one exposure wearing two
+            # names. Say which, so a dropped-but-higher-ranked asset doesn't
+            # look arbitrary.
+            if category_of[t] in kept_categories:
+                reason = (
+                    f"Aynı kategoriden ({category_of[t]}) bir varlık zaten seçildi — "
+                    "aynı şeyi izleyen iki fonu birlikte tutmak çeşitlendirme "
+                    "görüntüsü verir ama riski azaltmaz"
+                )
+            else:
+                reason = (
+                    f"{budget:,.0f} TL bütçe için azami {cap} pozisyon hedeflendi — "
+                    "küçük bütçeyi çok parçaya bölmek pratik değil"
+                )
             dropped.append({
                 "ticker": t,
                 "weight_pct": round(growth_w[t] * 100, 1),
-                "reason": f"{budget:,.0f} TL bütçe için azami {cap} pozisyon hedeflendi — küçük bütçeyi çok parçaya bölmek pratik değil",
+                "reason": reason,
             })
     growth_w = {t: growth_w[t] for t in kept}
     gsum = sum(growth_w.values()) or 1.0

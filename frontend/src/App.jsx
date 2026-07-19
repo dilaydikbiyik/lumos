@@ -3,6 +3,7 @@ import FireflyMark from './components/FireflyMark'
 import { useEffect } from 'react'
 import { ClerkLoading, SignedIn, SignedOut, RedirectToSignIn, useAuth } from '@clerk/clerk-react'
 import AppNav from './components/AppNav'
+import FeedbackButton from './components/FeedbackButton'
 import PanicButton from './components/PanicButton'
 import AdvisorChat from './components/AdvisorChat'
 import { MarketProvider } from './contexts/MarketContext'
@@ -109,6 +110,13 @@ export default function App() {
         <Illumination />
 
         {/* Responsive nav: bottom bar on mobile, left sidebar on desktop (CSS decides) */}
+        {/* Sits at the end of the document flow, so it appears under whatever
+            page the user is on — no third floating button competing with the
+            panic and advisor FABs. */}
+        <SignedIn>
+          <div style={{ padding: '4px 16px 96px' }}><FeedbackButton /></div>
+        </SignedIn>
+
         <AppNav />
 
         {/* Floating helpers — hidden on the quiz page, where the user is

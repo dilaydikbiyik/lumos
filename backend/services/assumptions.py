@@ -33,6 +33,31 @@ RENT_REAL_SPREAD_PCT = 0.0
 MORTGAGE_RATE_PCT = 39.0
 MORTGAGE_TERM_YEARS = 10
 
+# ── Property transaction and ownership costs ────────────────────────────────
+# Buying a home costs materially more than its price, and leaving these out
+# flatters the "buy" side of every comparison. They are statutory or
+# convention-driven rather than market-derived, so they are set here and shown
+# to the user as assumptions.
+#
+# These are RATES SET BY REGULATION OR CUSTOM AND THEY CHANGE. Verify against
+# the current tariff before treating any output as decision-grade.
+#
+# Title deed fee (tapu harcı): 4% of the declared value in total, split by law
+# 2% buyer / 2% seller. Who actually pays is a matter of agreement between the
+# parties, and in second-hand sales the buyer commonly absorbs all 4% — so the
+# conservative default charges the buyer the full amount. This is an ASSUMPTION
+# about market practice, not a legal requirement.
+TITLE_DEED_FEE_PCT = 4.0
+# Agency commission: the regulation caps it at 2% from each side, and the agent
+# invoices VAT on top of that. Kept as two numbers because the VAT rate is set
+# centrally and moves independently of the commission cap.
+AGENCY_COMMISSION_PCT = 2.0
+VAT_PCT = 20.0
+# Recurring ownership costs as a share of home value per year: building dues,
+# compulsory earthquake insurance (DASK) and upkeep. Renters pay dues too in
+# many buildings, so only the ownership-specific part belongs here.
+ANNUAL_UPKEEP_PCT = 1.0
+
 
 def annual_inflation_pct() -> float:
     """Live trailing-12-month CPI inflation; fallback if unavailable."""
@@ -88,3 +113,8 @@ def real_value(nominal_amount: float, years: float,
     if inflation_pct is None:
         inflation_pct = annual_inflation_pct()
     return nominal_amount / (1 + inflation_pct / 100) ** years
+
+
+def agency_commission_with_vat_pct() -> float:
+    """Agency commission as actually invoiced — the cap plus VAT on top."""
+    return round(AGENCY_COMMISSION_PCT * (1 + VAT_PCT / 100), 2)

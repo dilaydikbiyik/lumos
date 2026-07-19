@@ -157,3 +157,51 @@ def test_risk_factors_expose_weights_and_answers():
     assert "%30" in loss.factor            # weight is visible
     assert loss.answer == "Düşüşte satarım"  # answer in readable form
     assert loss.explanation               # has a why-explanation
+
+
+# ── Growth sleeve must not stack duplicates of one exposure ─────────────────
+
+def test_picker_prefers_a_new_category_over_a_higher_ranked_duplicate():
+    """Two REIT ETFs tracking the same index are one exposure, not two."""
+    from backend.services.portfolio_engine import _pick_diversified
+
+    universe = [
+        {"ticker": "VNQ", "category": "reit"},
+        {"ticker": "SCHH", "category": "reit"},
+        {"ticker": "GLD", "category": "gold"},
+        {"ticker": "SPY", "category": "stocks"},
+    ]
+    ranked = ["VNQ", "SCHH", "GLD", "SPY"]      # both REITs rank top
+
+    assert _pick_diversified(ranked, universe, 2) == ["VNQ", "GLD"]
+    assert _pick_diversified(ranked, universe, 3) == ["VNQ", "GLD", "SPY"]
+
+
+def test_picker_falls_back_to_duplicates_once_categories_run_out():
+    from backend.services.portfolio_engine import _pick_diversified
+
+    universe = [
+        {"ticker": "VNQ", "category": "reit"},
+        {"ticker": "SCHH", "category": "reit"},
+        {"ticker": "GLD", "category": "gold"},
+    ]
+    picked = _pick_diversified(["VNQ", "SCHH", "GLD"], universe, 3)
+    assert set(picked) == {"VNQ", "SCHH", "GLD"}
+
+
+def test_picker_keeps_rank_order_within_a_category():
+    from backend.services.portfolio_engine import _pick_diversified
+
+    universe = [
+        {"ticker": "SCHH", "category": "reit"},
+        {"ticker": "VNQ", "category": "reit"},
+    ]
+    assert _pick_diversified(["SCHH", "VNQ"], universe, 1) == ["SCHH"]
+
+
+def test_picker_never_exceeds_the_slot_count():
+    from backend.services.portfolio_engine import _pick_diversified
+
+    universe = [{"ticker": t, "category": c} for t, c in
+                [("A", "stocks"), ("B", "gold"), ("C", "reit"), ("D", "bond")]]
+    assert len(_pick_diversified(["A", "B", "C", "D"], universe, 2)) == 2

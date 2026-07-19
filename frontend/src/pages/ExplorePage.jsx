@@ -147,7 +147,7 @@ function ProvinceCard({ province, amount }) {
 }
 
 function RentVsBuy() {
-  const [form, setForm] = useState({ down_payment: '', monthly_rent: '', home_price: '', income: '', years: 10 })
+  const [form, setForm] = useState({ down_payment: '', monthly_rent: '', home_price: '', income: '', years: 10, rate: '', term: '', cash_includes_costs: false })
   const [result, setResult] = useState(null)
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(false)
@@ -178,6 +178,9 @@ function RentVsBuy() {
         monthly_rent: parseTL(form.monthly_rent),
         years: Number(form.years),
         ...(form.home_price ? { home_price: parseTL(form.home_price) } : {}),
+        ...(form.rate ? { mortgage_annual_rate_pct: Number(String(form.rate).replace(',', '.')) } : {}),
+        ...(form.term ? { mortgage_term_years: Number(form.term) } : {}),
+        down_payment_includes_costs: form.cash_includes_costs,
       })
       setResult(res.data)
       const income = parseTL(form.income)
@@ -202,8 +205,22 @@ function RentVsBuy() {
         kirada kalıp farkı yatırmak. Ev almak her zaman kazanç değildir.
       </p>
       <form onSubmit={run} style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-        <input className="input" type="text" inputMode="numeric" placeholder="Peşinat / birikimin (TL)" required
+        <input className="input" type="text" inputMode="numeric"
+               placeholder={form.cash_includes_costs ? 'Cebindeki toplam nakit (TL)' : 'Peşinat / birikimin (TL)'}
+               required
                value={form.down_payment} onChange={e => setForm({ ...form, down_payment: e.target.value })} />
+        {/* Buyers think in "money I have", not "down payment net of fees".
+            Closing costs are what blows up that budget, so let them say which
+            number they typed and do the subtraction for them. */}
+        <label style={{
+          display: 'flex', gap: 8, alignItems: 'flex-start', cursor: 'pointer',
+          fontSize: 12.5, color: 'var(--text-muted)', lineHeight: 1.5,
+        }}>
+          <input type="checkbox" checked={form.cash_includes_costs}
+                 onChange={e => setForm({ ...form, cash_includes_costs: e.target.checked })}
+                 style={{ marginTop: 2, accentColor: 'var(--accent)', width: 15, height: 15, flexShrink: 0 }} />
+          Bu rakam elimdeki tüm nakit — tapu ve komisyonu buradan düş
+        </label>
         <input className="input" type="text" inputMode="numeric" placeholder="Şu anki aylık kiran (TL)" required
                value={form.monthly_rent} onChange={e => setForm({ ...form, monthly_rent: e.target.value })} />
         <input className="input" type="text" inputMode="numeric" placeholder="Evin fiyatı (opsiyonel — boşsa kiradan tahmin edilir)"
@@ -215,6 +232,23 @@ function RentVsBuy() {
         <select className="input" value={form.years} onChange={e => setForm({ ...form, years: e.target.value })}>
           {[5, 10, 20].map(y => <option key={y} value={y}>{y} yıllık projeksiyon</option>)}
         </select>
+        {/* Bank offers vary a lot; boş bırakılırsa piyasa ortalaması kullanılır. */}
+        <details>
+          <summary style={{ fontSize: 12.5, color: 'var(--text-dim)', cursor: 'pointer' }}>
+            Kredi koşullarını kendim gireyim
+          </summary>
+          <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+            <input className="input" type="text" inputMode="decimal" style={{ flex: 1 }}
+                   placeholder="Faiz (%/yıl)"
+                   value={form.rate} onChange={e => setForm({ ...form, rate: e.target.value })} />
+            <input className="input" type="text" inputMode="numeric" style={{ flex: 1 }}
+                   placeholder="Vade (yıl)"
+                   value={form.term} onChange={e => setForm({ ...form, term: e.target.value })} />
+          </div>
+          <p style={{ fontSize: 11, color: 'var(--text-dim)', marginTop: 6, lineHeight: 1.5 }}>
+            Bankandan aldığın gerçek teklifi gir. Boş bırakırsan piyasa ortalaması kullanılır.
+          </p>
+        </details>
         <button className="btn btn-primary" type="submit" disabled={loading}>
           {loading ? 'Hesaplanıyor…' : 'Karşılaştır'}
         </button>
@@ -227,6 +261,16 @@ function RentVsBuy() {
             Karşılaştırılan ev: <strong>{fmt(result.home_price)} TL</strong>
             {result.home_price_estimated && ' (kiradan tahmin edildi)'} · aylık kredi taksiti
             ≈ <strong>{fmt(result.monthly_mortgage)} TL</strong>
+            {/* The number people forget to budget for. */}
+            {form.cash_includes_costs && result.buy.purchase_costs > 0 && (
+              <><br />
+              <span style={{ color: 'var(--text-muted)' }}>
+                {fmt(result.buy.cash_available)} TL nakdinin{' '}
+                <strong>{fmt(result.buy.purchase_costs)} TL</strong>&apos;si tapu ve komisyona
+                gidiyor; eve peşinat olarak{' '}
+                <strong>{fmt(result.buy.down_payment_applied)} TL</strong> kalıyor.
+              </span></>
+            )}
           </div>
 
           {/* Affordability reality check — a comparison is meaningless if the
@@ -248,6 +292,29 @@ function RentVsBuy() {
             )
           })()}
 
+          {/* What the loan itself costs. Beginners compare installments and
+              miss that the interest can exceed the amount borrowed. */}
+          {result.loan?.principal > 0 && (
+            <div style={{
+              fontSize: 12.5, lineHeight: 1.7, padding: '10px 12px', marginBottom: 10,
+              borderRadius: 'var(--radius-xs)', border: '1px solid var(--border)',
+              background: 'var(--bg-input)',
+            }}>
+              <strong>Kredinin maliyeti</strong> ({result.assumptions.mortgage_annual_rate_pct}%/yıl,{' '}
+              {result.assumptions.mortgage_term_years} yıl vade)<br />
+              Çekilen kredi <strong>{fmt(result.loan.principal)} TL</strong> · vade sonunda toplam
+              ödenen <strong>{fmt(result.loan.total_over_full_term)} TL</strong><br />
+              Bunun <strong>{fmt(result.loan.interest_over_full_term)} TL</strong>&apos;si faiz — yani
+              anaparanın <strong>{Math.round(result.loan.interest_over_full_term / result.loan.principal * 100)}%</strong>&apos;i kadar.
+              {result.loan.interest_over_full_term > result.loan.principal && (
+                <> Faiz, çektiğin krediden fazla: evi iki kez ödüyorsun.</>
+              )}
+              <div style={{ fontSize: 11, opacity: 0.65, marginTop: 4 }}>
+                Sabit faizli hesaptır; enflasyon yüksek seyrederse taksitin reel yükü zamanla hafifler.
+              </div>
+            </div>
+          )}
+
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
             <div style={{
               padding: 12, borderRadius: 10,
@@ -264,6 +331,10 @@ function RentVsBuy() {
               </div>
               <div style={{ fontSize: 12, opacity: 0.7, marginTop: 6, lineHeight: 1.5 }}>
                 Ev değeri {fmt(result.buy.home_value)} − kalan kredi {fmt(result.buy.remaining_loan)}
+                {result.buy.purchase_costs > 0 && (
+                  <><br />Alım masrafı {fmt(result.buy.purchase_costs)} · aidat/bakım{' '}
+                  {fmt(result.buy.total_upkeep_paid)}</>
+                )}
               </div>
             </div>
             <div style={{
@@ -301,9 +372,18 @@ function RentVsBuy() {
             portföy +%{result.assumptions.portfolio_annual_growth_pct}/yıl,
             kredi %{result.assumptions.mortgage_annual_rate_pct}/yıl ({result.assumptions.mortgage_term_years} yıl vade),
             enflasyon %{result.assumptions.annual_inflation_pct}/yıl.
-            Büyük TL rakamları çoğunlukla enflasyondan şişer; “bugünkü alım gücü” satırı gerçek
-            değeri gösterir. Vergi, aidat, tapu ve bakım masrafları ile ev sahibi olmanın parasal
-            olmayan değeri bu hesaba dahil değildir — o kararın duygusal tarafı da meşrudur.
+            Alım masrafları dahildir: tapu harcı %{result.assumptions.title_deed_fee_pct} +
+            emlakçı komisyonu %{result.assumptions.agency_commission_pct} + KDV
+            (%{result.assumptions.vat_pct}) = %{result.assumptions.agency_commission_with_vat_pct};
+            ayrıca aidat, DASK ve bakım için yılda ev değerinin
+            %{result.assumptions.annual_upkeep_pct}&apos;i.
+            Tapu harcının tamamının alıcıya yazılması yaygın piyasa uygulamasına dayanan bir
+            varsayımdır; kanunen yarısı satıcıya aittir ve taraflar farklı anlaşabilir. Bu
+            oranlar mevzuat ve teamülle belirlenir, zamanla değişir. Büyük TL rakamları
+            çoğunlukla enflasyondan şişer; “bugünkü alım gücü” satırı gerçek değeri gösterir.
+            Hesap, evde oturmaya devam ettiğin varsayımına dayanır; bu nedenle satış hâlinde
+            doğabilecek vergiler ile ev sahibi olmanın parasal olmayan değeri dahil değildir —
+            o kararın duygusal tarafı da meşrudur.
           </p>
         </div>
       )}

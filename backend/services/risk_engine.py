@@ -22,6 +22,7 @@ Budget is NOT included in the formula (it affects portfolio size, not risk toler
 """
 
 from backend.schemas.user_profile import RiskFactor, RiskProfileAnswers, RiskProfileResponse
+from backend.services import debt_check
 
 _TIME_HORIZON_SCORES = {"short": 2, "medium": 5, "long": 9}
 _LOSS_TOLERANCE_SCORES = {"low": 2, "medium": 5, "high": 9}
@@ -171,4 +172,5 @@ def compute_risk_score(answers: RiskProfileAnswers) -> RiskProfileResponse:
         summary=summary,
         factors=factors,
         answers=answers,
+        debt_check=debt_check.check(answers.high_interest_debt, answers.budget),
     )

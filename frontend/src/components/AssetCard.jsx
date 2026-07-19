@@ -1,4 +1,4 @@
-import { CATEGORY_COLORS, COLORS } from '../utils/palette'
+import { sliceColor } from '../utils/palette'
 
 const CATEGORY_LABELS = {
   stocks: 'Hisse Senetleri', reit: 'Gayrimenkul (REIT)', fund: 'Yatırım Fonu',
@@ -7,9 +7,10 @@ const CATEGORY_LABELS = {
 
 /** Quick glance card right under the pie — accented with the EXACT colour of
     the clicked slice, so the chart and the card read as one. */
-export default function AssetCard({ allocation, index = 0, onClose }) {
+export default function AssetCard({ allocation, index = 0, color = null, onClose }) {
   if (!allocation) return null
-  const accent = CATEGORY_COLORS[allocation.category] || COLORS[index % COLORS.length]
+  // The caller knows the sibling shading; fall back only when it doesn't.
+  const accent = color || sliceColor(allocation, index)
   return (
     <div style={{
       marginTop: 16, padding: '16px', borderRadius: 10,

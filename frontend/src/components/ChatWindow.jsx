@@ -5,8 +5,10 @@ import useChat from '../hooks/useChat'
 const INTRO = "Merhaba! Ben Lumos.\n\nSana 9 kısa soru soracağım ve kişisel risk profilini oluşturacağım. Hazır mısın?\n\n**1. soru — Yatırıma ayırabileceğin bütçen nedir?** (Örn: 50.000 TL)"
 
 export default function ChatWindow({ onProfileComplete, onFirstMessage }) {
-  const { messages, isLoading, error, sendMessage } = useChat(onProfileComplete)
+  const { messages, isLoading, error, sendMessage, pendingProfile, confirmProfile,
+          retryExtract, quizFinished } = useChat(onProfileComplete)
   const [input, setInput] = useState('')
+  const [revealing, setRevealing] = useState(false)
   const bottomRef = useRef(null)
   const inputRef = useRef(null)
   const startedRef = useRef(false)
@@ -57,7 +59,37 @@ export default function ChatWindow({ onProfileComplete, onFirstMessage }) {
         <div ref={bottomRef} />
       </div>
 
-      {/* Input bar */}
+      {/* Once the quiz is done the input bar gives way to an explicit hand-off:
+          the user decides when they've finished reading the closing message. */}
+      {pendingProfile ? (
+        <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid var(--border)' }}>
+          <button
+            className="btn btn-primary btn-full"
+            disabled={revealing}
+            onClick={async () => { setRevealing(true); await confirmProfile() }}
+          >
+            {revealing
+              ? <span className="spinner" style={{ width: 18, height: 18 }} />
+              : 'Okudum, risk profilimi göster →'}
+          </button>
+          <p style={{ fontSize: 'var(--t-micro)', color: 'var(--text-dim)', textAlign: 'center', marginTop: 8 }}>
+            Acelen yok — yukarıyı istediğin kadar okuyabilirsin.
+          </p>
+        </div>
+      ) : quizFinished ? (
+        /* Quiz done but the profile didn't come back — never a dead end:
+           the answers are still held, so retrying costs the user nothing. */
+        <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid var(--border)' }}>
+          <button className="btn btn-primary btn-full" disabled={isLoading} onClick={retryExtract}>
+            {isLoading
+              ? <span className="spinner" style={{ width: 18, height: 18 }} />
+              : 'Tekrar dene'}
+          </button>
+          <p style={{ fontSize: 'var(--t-micro)', color: 'var(--text-dim)', textAlign: 'center', marginTop: 8 }}>
+            Cevapların kayıtlı — baştan başlaman gerekmiyor.
+          </p>
+        </div>
+      ) : (
       <form
         onSubmit={handleSend}
         style={{ display: 'flex', gap: 8, marginTop: 12, paddingTop: 12, borderTop: '1px solid var(--border)' }}
@@ -82,6 +114,7 @@ export default function ChatWindow({ onProfileComplete, onFirstMessage }) {
           {isLoading ? <span className="spinner" style={{ width: 18, height: 18 }} /> : '→'}
         </button>
       </form>
+      )}
       <p style={{ fontSize: 10, color: 'var(--text-dim)', textAlign: 'center', marginTop: 8 }}>
         Yalnızca eğitim amaçlıdır — yatırım tavsiyesi değildir.
       </p>

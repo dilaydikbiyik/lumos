@@ -34,6 +34,7 @@ async def save_profile(
         experience=answers.experience,
         age=answers.age,
         income_stability=answers.income_stability,
+        high_interest_debt=answers.high_interest_debt,
     )
     return profile
 
@@ -58,5 +59,6 @@ async def get_profile(
         experience=user.experience,
         age=user.age,
         income_stability=user.income_stability,
+        high_interest_debt=user.high_interest_debt,
     )
     return compute_risk_score(answers)

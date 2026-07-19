@@ -106,3 +106,97 @@ def test_listing_links_endpoint(client):
     })
     assert res.status_code == 200
     assert len(res.json()["links"]) == 2
+
+
+# ── Purchase and ownership costs ────────────────────────────────────────────
+
+def test_purchase_costs_are_charged_on_the_price():
+    from backend.services import assumptions
+    from backend.services.rent_vs_buy import compare_rent_vs_buy
+
+    r = compare_rent_vs_buy(2_000_000, 30_000, 10, home_price=5_000_000)
+    expected = 5_000_000 * (
+        assumptions.TITLE_DEED_FEE_PCT + assumptions.agency_commission_with_vat_pct()
+    ) / 100
+    assert r["buy"]["purchase_costs"] == expected
+
+
+def test_upkeep_accumulates_over_the_horizon():
+    from backend.services.rent_vs_buy import compare_rent_vs_buy
+
+    short = compare_rent_vs_buy(2_000_000, 30_000, 5, home_price=5_000_000)
+    long = compare_rent_vs_buy(2_000_000, 30_000, 10, home_price=5_000_000)
+    assert long["buy"]["total_upkeep_paid"] > short["buy"]["total_upkeep_paid"] > 0
+
+
+def test_costs_make_buying_less_attractive():
+    """The whole point: ignoring these silently favours buying."""
+    from backend.services import assumptions
+    from backend.services.rent_vs_buy import compare_rent_vs_buy
+
+    with_costs = compare_rent_vs_buy(2_000_000, 30_000, 10, home_price=5_000_000)
+
+    deed, agency, upkeep = (
+        assumptions.TITLE_DEED_FEE_PCT,
+        assumptions.AGENCY_COMMISSION_PCT,
+        assumptions.ANNUAL_UPKEEP_PCT,
+    )
+    assumptions.TITLE_DEED_FEE_PCT = 0.0
+    assumptions.AGENCY_COMMISSION_PCT = 0.0
+    assumptions.ANNUAL_UPKEEP_PCT = 0.0
+    try:
+        without = compare_rent_vs_buy(2_000_000, 30_000, 10, home_price=5_000_000)
+    finally:
+        assumptions.TITLE_DEED_FEE_PCT = deed
+        assumptions.AGENCY_COMMISSION_PCT = agency
+        assumptions.ANNUAL_UPKEEP_PCT = upkeep
+
+    buy_edge_with = with_costs["buy"]["net_worth"] - with_costs["rent"]["net_worth"]
+    buy_edge_without = without["buy"]["net_worth"] - without["rent"]["net_worth"]
+    assert buy_edge_with < buy_edge_without
+
+
+def test_renter_keeps_the_money_the_buyer_spent_on_costs():
+    """The costs the buyer pays at closing stay invested on the renting side."""
+    from backend.services.rent_vs_buy import compare_rent_vs_buy
+
+    r = compare_rent_vs_buy(2_000_000, 30_000, 1, home_price=5_000_000)
+    assert r["rent"]["portfolio_value"] > 2_000_000 + r["buy"]["purchase_costs"] * 0.9
+
+
+def test_agency_commission_carries_vat():
+    """The cap is 2%; the agent invoices VAT on top of it."""
+    from backend.services import assumptions
+
+    assert assumptions.agency_commission_with_vat_pct() > assumptions.AGENCY_COMMISSION_PCT
+    assert assumptions.agency_commission_with_vat_pct() == round(
+        assumptions.AGENCY_COMMISSION_PCT * (1 + assumptions.VAT_PCT / 100), 2
+    )
+
+
+def test_cash_flag_takes_costs_out_of_the_down_payment():
+    """"This is all my money" must not silently gain the fees on top."""
+    from backend.services.rent_vs_buy import compare_rent_vs_buy
+
+    on_top = compare_rent_vs_buy(2_000_000, 30_000, 10, home_price=5_000_000)
+    inclusive = compare_rent_vs_buy(
+        2_000_000, 30_000, 10, home_price=5_000_000, down_payment_includes_costs=True,
+    )
+
+    assert on_top["buy"]["down_payment_applied"] == 2_000_000
+    assert inclusive["buy"]["down_payment_applied"] == (
+        2_000_000 - inclusive["buy"]["purchase_costs"]
+    )
+    # Both report the cash the user actually said they had
+    assert inclusive["buy"]["cash_available"] == 2_000_000
+    # Less money reaching the property means a bigger loan
+    assert inclusive["buy"]["remaining_loan"] >= on_top["buy"]["remaining_loan"]
+
+
+def test_cash_flag_never_makes_the_down_payment_negative():
+    from backend.services.rent_vs_buy import compare_rent_vs_buy
+
+    r = compare_rent_vs_buy(
+        10_000, 30_000, 10, home_price=5_000_000, down_payment_includes_costs=True,
+    )
+    assert r["buy"]["down_payment_applied"] == 0

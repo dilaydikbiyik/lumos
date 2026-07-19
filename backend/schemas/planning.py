@@ -10,6 +10,13 @@ class RentVsBuyRequest(BaseModel):
     # Optional: the real property price. If omitted it's estimated from the rent
     # so buy and rent describe the SAME home (consistency).
     home_price: Optional[float] = Field(None, gt=0, description="Property price (optional; estimated from rent if absent)")
+    # Loan terms differ hugely per bank and per campaign, so let the user use
+    # the offer they actually have. Both default to the planning assumptions.
+    mortgage_annual_rate_pct: Optional[float] = Field(None, gt=0, le=200, description="Mortgage interest rate, %/year")
+    mortgage_term_years: Optional[int] = Field(None, ge=1, le=30, description="Mortgage term in years")
+    # True = down_payment is all the cash the user has, so closing costs come
+    # out of it rather than being found on top.
+    down_payment_includes_costs: bool = False
 
 
 class GoalPlanRequest(BaseModel):
