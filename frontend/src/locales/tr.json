@@ -1,0 +1,61 @@
+{
+  "nav": {
+    "explore": "Keşfet",
+    "profile": "Profil",
+    "portfolio": "Portföy",
+    "holdings": "Varlıklar",
+    "dashboard": "Panel"
+  },
+  "common": {
+    "start": "Başlayalım",
+    "continue": "Devam Et →",
+    "compare": "Karşılaştır",
+    "calculating": "Hesaplanıyor…",
+    "send": "Gönder",
+    "cancel": "Vazgeç",
+    "tryAgain": "Tekrar dene",
+    "back": "← Geri"
+  },
+  "onboarding": {
+    "tagline": "Yatırım karanlık bir orman gibi görünür.",
+    "heroPrefix": "Lumos,",
+    "heroHighlight": "elindeki ışık.",
+    "heroBody": "Yatırımı korkmadan öğren: her rakam enflasyondan arındırılmış, her öneri adım adım açıklanmış, kararın her zaman sende.",
+    "trust": {
+      "centralBank": "TCMB resmî verisi",
+      "housing": "81 il emlak endeksi",
+      "livePrices": "Gerçek piyasa fiyatları",
+      "formula": "Formülü görünür"
+    },
+    "inAppBrowser": "Bu sayfayı uygulama içi tarayıcıda açtın. Google ile giriş burada çalışmıyor — sağ üstteki menüden <1>\"Tarayıcıda aç\"</1> dersen sorunsuz giriş yapabilirsin.",
+    "features": {
+      "realReturn": {
+        "title": "Enflasyon Sonrası Gerçek Getiri",
+        "desc": "\"%300 kazandım\" demek, enflasyon %320'yse kaybettin demektir. Lumos her rakamı resmî veriyle enflasyondan arındırıp gösterir."
+      },
+      "realEstate": {
+        "title": "Emlak ve Borsa Yan Yana",
+        "desc": "81 ilin m² fiyatı ve gerçek değerlenmesi, hisse portföyünle aynı ekranda. Kirada mı otur, ev mi al — hesabı burada."
+      },
+      "panic": {
+        "title": "Panik Anında Yanında",
+        "desc": "En pahalı hata, düşüşte satmaktır. Piyasa çakıldığında tek dokunuşla veriye dayalı, sakin bir ses."
+      }
+    },
+    "expectation": "Lumos sana yol gösterir; alım-satımı kendi aracı kurumunda yaparsın, sonra burada takip ederiz. Hiçbir zaman senin adına işlem yapmayız.",
+    "disclaimerLine": "<0>Yalnızca eğitim amaçlıdır.</0> Yatırım tavsiyesi değildir. Lisanslı bir finansal danışmana başvurun."
+  },
+  "disclaimerModal": {
+    "title": "Lumos ne yapar, ne yapmaz",
+    "does": "Yapar:",
+    "doesBody": "risk profilini çıkarır, sana uygun bir portföy dağılımı hesaplar, her rakamı canlı piyasa ve resmî enflasyon verisiyle arındırıp gösterir, kararlarının arkasındaki formülü açıklar.",
+    "doesnt": "Yapmaz:",
+    "doesntBody": "senin adına alım satım yapmaz, paranı tutmaz. Yatırım tavsiyesi, finansal planlama veya düzenlemeye tabi bir finansal hizmet vermez.",
+    "detail": "Bu uygulamanın ürettiği portföy önerileri, halka açık piyasa verilerine ve yapay zeka analizine dayanır. Hiçbir yatırım kararının tek dayanağı olmamalıdır. Yatırım yapmadan önce mutlaka lisanslı bir finansal danışmana başvurun.",
+    "checkbox": "Bu uygulamanın yalnızca eğitim amaçlı olduğunu ve yatırım tavsiyesi niteliği taşımadığını anlıyorum.",
+    "accept": "Anladım, devam et"
+  },
+  "language": {
+    "label": "Dil"
+  }
+}

@@ -232,9 +232,10 @@ def test_advisor_endpoint_uses_advisor_mode_with_context(client):
 
     captured = {}
 
-    def fake_chat(messages, tier=None, mode="profiling", context=""):
+    def fake_chat(messages, tier=None, mode="profiling", context="", language="tr"):
         captured["mode"] = mode
         captured["context"] = context
+        captured["language"] = language
         return "ETF, hazır bir sepettir."
 
     original = chat_router.ai_chat
@@ -245,6 +246,7 @@ def test_advisor_endpoint_uses_advisor_mode_with_context(client):
         assert res.json()["reply"] == "ETF, hazır bir sepettir."
         assert captured["mode"] == "advisor"
         assert "6.2/10" in captured["context"]  # real profile injected
+        assert captured["language"] == "tr"      # no header -> reference locale
     finally:
         chat_router.ai_chat = original
 
@@ -382,3 +384,56 @@ def test_monthly_income_saved_once_and_returned(client):
     me = client.get("/users/me")
     assert me.status_code == 200
     assert me.json()["monthly_income"] == 85000
+
+
+def test_language_header_selects_the_english_prompt_variant(client):
+    """X-Lumos-Lang: en must reach chat() as language="en"; junk falls back to tr."""
+    import asyncio
+
+    from backend.main import app
+    from backend.middleware.verify_clerk import get_current_user
+    from backend.repositories import user_repository
+    from backend.routers import chat as chat_router
+    from backend.tests.conftest import _TestSession
+
+    app.dependency_overrides[get_current_user] = lambda: "user_lang_1"
+
+    async def seed():
+        async with _TestSession() as db:
+            await user_repository.get_or_create(db, "user_lang_1")
+            await db.commit()
+
+    asyncio.run(seed())
+
+    captured = {}
+
+    def fake_chat(messages, tier=None, mode="profiling", context="", language="tr"):
+        captured["language"] = language
+        return "ok [PROFILE_COMPLETE]"
+
+    original = chat_router.ai_chat
+    chat_router.ai_chat = fake_chat
+    try:
+        body = {"messages": [{"role": "user", "content": "hello"}]}
+        assert client.post("/chat", json=body, headers={"X-Lumos-Lang": "en"}).status_code == 200
+        assert captured["language"] == "en"
+        assert client.post("/chat", json=body, headers={"X-Lumos-Lang": "xx"}).status_code == 200
+        assert captured["language"] == "tr"
+    finally:
+        chat_router.ai_chat = original
+
+
+def test_prompt_variants_cover_the_same_contract():
+    """The EN quiz must keep the marker protocol and carry no Turkish script."""
+    import re
+
+    from backend.services.ai_service import _SYSTEM_PROMPTS, _ADVISOR_PROMPTS
+
+    for variants in (_SYSTEM_PROMPTS, _ADVISOR_PROMPTS):
+        assert set(variants) >= {"tr", "en"}
+
+    en = _SYSTEM_PROMPTS["en"]
+    assert "[PROFILE_COMPLETE]" in en                  # completion protocol intact
+    assert "Q9" in en                                  # all nine questions present
+    assert not re.search(r"[şğıŞĞİ]", en)              # no Turkish leaked into EN
+    assert "EXCLUSIVELY in English" in en

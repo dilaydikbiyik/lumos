@@ -4,9 +4,17 @@
     {
       "name": "lumos-frontend",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev"],
+      "runtimeArgs": [
+        "run",
+        "dev"
+      ],
       "port": 5173,
-      "cwd": "frontend"
+      "cwd": "frontend",
+      "autoPort": true
+    },
+    {
+      "name": "sensesign",
+      "url": "http://localhost:5173"
     }
   ]
 }

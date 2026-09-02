@@ -32,6 +32,13 @@ api.interceptors.request.use(async (config) => {
       // if the token can't be fetched, send the request anyway — backend answers 401
     }
   }
+  // The backend also speaks to the user (quiz, advisor, engine explanations) —
+  // it needs to know which language this device is set to. Imported lazily to
+  // keep api.js free of a hard i18n dependency for tests.
+  try {
+    const { default: i18n } = await import('../i18n')
+    config.headers['X-Lumos-Lang'] = i18n.language || 'tr'
+  } catch { /* i18n not initialised (tests) — backend defaults to tr */ }
   return config
 })
 

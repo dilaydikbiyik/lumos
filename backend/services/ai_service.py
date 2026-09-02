@@ -16,8 +16,22 @@ from fastapi import HTTPException
 from backend.config import settings
 logger = logging.getLogger("lumos.ai")
 
-_SYSTEM_PROMPT = (Path(__file__).parent.parent / "prompts" / "system_prompt.txt").read_text()
-_ADVISOR_PROMPT = (Path(__file__).parent.parent / "prompts" / "advisor_prompt.txt").read_text()
+_PROMPTS_DIR = Path(__file__).parent.parent / "prompts"
+
+
+def _load_prompt_variants(stem: str) -> dict[str, str]:
+    """{lang: prompt} — "tr" is the bare file, other languages are stem.<lang>.txt."""
+    variants = {"tr": (_PROMPTS_DIR / f"{stem}.txt").read_text()}
+    for f in _PROMPTS_DIR.glob(f"{stem}.*.txt"):
+        variants[f.suffixes[0].lstrip(".")] = f.read_text()
+    return variants
+
+
+_SYSTEM_PROMPTS = _load_prompt_variants("system_prompt")
+_ADVISOR_PROMPTS = _load_prompt_variants("advisor_prompt")
+# Legacy aliases — one-shot helpers and tests reference the Turkish originals
+_SYSTEM_PROMPT = _SYSTEM_PROMPTS["tr"]
+_ADVISOR_PROMPT = _ADVISOR_PROMPTS["tr"]
 
 # One-shot generations (portfolio explainer etc.) must NEVER inherit the
 # interactive quiz script — a fallback to _SYSTEM_PROMPT once made the
@@ -465,6 +479,7 @@ def chat(
     tier: Optional[str] = None,
     mode: str = "profiling",
     context: str = "",
+    language: str = "tr",
 ) -> str:
     """
     Send a conversation history to the AI provider resolved from the
@@ -477,6 +492,8 @@ def chat(
               free-form education assistant reachable from anywhere.
         context: optional "USER CONTEXT" block appended in advisor mode so
                  answers reference the user's real profile/holdings.
+        language: UI language of the requesting device ("tr"/"en") — selects
+                 the prompt variant so quiz questions arrive in that language.
 
     Returns:
         The assistant's text reply.
@@ -485,7 +502,8 @@ def chat(
     from backend.services.ai_tiers import get_tier
     from backend.services.chat_context import build_market_context
 
-    base = _ADVISOR_PROMPT if mode == "advisor" else _SYSTEM_PROMPT
+    variants = _ADVISOR_PROMPTS if mode == "advisor" else _SYSTEM_PROMPTS
+    base = variants.get(language) or variants["tr"]
     system = base + (context or "") + build_market_context()
 
     # Generous budget: gemini-2.5-flash spends "thinking" tokens from the same

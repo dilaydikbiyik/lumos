@@ -1,0 +1,61 @@
+{
+  "nav": {
+    "explore": "Explore",
+    "profile": "Profile",
+    "portfolio": "Portfolio",
+    "holdings": "Assets",
+    "dashboard": "Dashboard"
+  },
+  "common": {
+    "start": "Get started",
+    "continue": "Continue →",
+    "compare": "Compare",
+    "calculating": "Calculating…",
+    "send": "Send",
+    "cancel": "Cancel",
+    "tryAgain": "Try again",
+    "back": "← Back"
+  },
+  "onboarding": {
+    "tagline": "Investing looks like a dark forest.",
+    "heroPrefix": "Lumos,",
+    "heroHighlight": "the light in your hand.",
+    "heroBody": "Learn investing without the fear: every number inflation-adjusted, every suggestion explained step by step, every decision still yours.",
+    "trust": {
+      "centralBank": "Official central-bank data",
+      "housing": "Housing index, 81 provinces",
+      "livePrices": "Real market prices",
+      "formula": "The formula is visible"
+    },
+    "inAppBrowser": "You opened this page in an in-app browser. Google sign-in doesn't work here — choose <1>\"Open in browser\"</1> from the top-right menu and it will work fine.",
+    "features": {
+      "realReturn": {
+        "title": "Real Returns, After Inflation",
+        "desc": "\"I gained 300%\" means you lost if inflation was 320%. Lumos deflates every figure with official data before showing it."
+      },
+      "realEstate": {
+        "title": "Real Estate and Stocks, Side by Side",
+        "desc": "Price per m² and real appreciation for 81 provinces, next to your stock portfolio. Rent or buy — the math lives here."
+      },
+      "panic": {
+        "title": "There When You Panic",
+        "desc": "The most expensive mistake is selling in a crash. When markets drop, one tap brings a calm, data-grounded voice."
+      }
+    },
+    "expectation": "Lumos guides you; you trade at your own broker, then we track it here together. We never trade on your behalf.",
+    "disclaimerLine": "<0>Educational purposes only.</0> Not investment advice. Consult a licensed financial advisor."
+  },
+  "disclaimerModal": {
+    "title": "What Lumos does — and doesn't",
+    "does": "Does:",
+    "doesBody": "builds your risk profile, computes a portfolio allocation that fits it, deflates every number with live market and official inflation data, and explains the formula behind each decision.",
+    "doesnt": "Doesn't:",
+    "doesntBody": "trade on your behalf or hold your money. It provides no investment advice, financial planning, or any regulated financial service.",
+    "detail": "The portfolio suggestions this app produces are based on public market data and AI analysis. They should never be the sole basis of any investment decision. Always consult a licensed financial advisor before investing.",
+    "checkbox": "I understand this app is educational only and does not constitute investment advice.",
+    "accept": "Got it, continue"
+  },
+  "language": {
+    "label": "Language"
+  }
+}

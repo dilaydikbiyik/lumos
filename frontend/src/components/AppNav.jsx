@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { SignedIn, useAuth } from '@clerk/clerk-react'
+import { useTranslation } from 'react-i18next'
 import api, { setAuthToken } from '../utils/api'
 import LumosLogo from './LumosLogo'
 import MarketSwitcher from './MarketSwitcher'
@@ -36,12 +37,14 @@ const icons = {
   ),
 }
 
+// Labels are i18n KEYS — resolved at render time so a language switch
+// re-labels the nav without a reload.
 const NAV_ITEMS = [
-  { path: '/explore',   icon: 'explore',   label: 'Keşfet'    },
-  { path: '/profile',   icon: 'chat',      label: 'Profil'    },
-  { path: '/recommend', icon: 'portfolio', label: 'Portföy'   },
-  { path: '/holdings',  icon: 'holdings',  label: 'Varlıklar' },
-  { path: '/dashboard', icon: 'dashboard', label: 'Panel'     },
+  { path: '/explore',   icon: 'explore',   label: 'nav.explore'   },
+  { path: '/profile',   icon: 'chat',      label: 'nav.profile'   },
+  { path: '/recommend', icon: 'portfolio', label: 'nav.portfolio' },
+  { path: '/holdings',  icon: 'holdings',  label: 'nav.holdings'  },
+  { path: '/dashboard', icon: 'dashboard', label: 'nav.dashboard' },
 ]
 
 /**
@@ -74,6 +77,8 @@ function NavSurfaces() {
   }, [isSignedIn, getToken, pathname])
 
   // While the sidebar is visible, page content shifts right (CSS: body.has-sidebar)
+  const { t } = useTranslation()
+
   useEffect(() => {
     document.body.classList.add('has-sidebar')
     return () => document.body.classList.remove('has-sidebar')
@@ -100,10 +105,10 @@ function NavSurfaces() {
                 key={item.path}
                 className={`sidebar-item${active ? ' active' : ''}`}
                 onClick={() => navigate(item.path)}
-                aria-label={item.label}
+                aria-label={t(item.label)}
               >
                 {icons[item.icon](active)}
-                <span>{item.label}</span>
+                <span>{t(item.label)}</span>
               </button>
             )
           })}
@@ -124,10 +129,10 @@ function NavSurfaces() {
               key={item.path}
               className={`bottom-nav-item${active ? ' active' : ''}`}
               onClick={() => navigate(item.path)}
-              aria-label={item.label}
+              aria-label={t(item.label)}
             >
               {icons[item.icon](active)}
-              <span>{item.label}</span>
+              <span>{t(item.label)}</span>
             </button>
           )
         })}

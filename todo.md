@@ -1062,3 +1062,65 @@ First real feedback after the LinkedIn launch. Most testers were on mobile.
   gauges sparse is a deliberate choice and the easiest thing to lose later.
 - The provider chain (Gemini→Groq→OpenRouter) is reasonable for now, but the
   models behave differently and that risks inconsistency; revisit long term.
+
+---
+
+## Store release program — started 2 Sep 2026
+
+Goal: professionalize, ship US + DE market packs, English UI, then App Store +
+Play Store. One month of production data at kickoff: 18 users, 10 completed
+profiles, 17 holdings, 0 in-app feedback submissions.
+
+**Gatekeeper (user-owned, in parallel): legal review.** The SPK question is
+still open; store release ends the "portfolio project" defense, and US/DE add
+SEC/BaFin surface. Book the lawyer before Phase 4; the answer may change scope
+(e.g. dropping specific tickers).
+
+### Phase 1 — i18n foundation (EN UI)
+
+- [x] react-i18next + `locales/tr.json` / `en.json`; language is a DEVICE
+      preference, independent of market (expat in Istanbul: EN UI + TR data).
+      Browser-language default on first visit; `?lang=` override for testing.
+- [x] `X-Lumos-Lang` header on every API call; backend `get_language()`
+      dependency (unknown → tr, old clients unaffected; CORS already `*`).
+- [x] Prompt variants: `system_prompt.en.txt` (full 9-question quiz in
+      English, same marker protocol and guardrails) + `advisor_prompt.en.txt`;
+      `ai_service.chat(language=...)` selects, contract enforced by tests.
+- [x] Pattern conversions: AppNav, OnboardingPage, DisclaimerModal.
+- [ ] Convert the remaining ~38 frontend files to `t()` keys (page by page:
+      Profile → Recommend → Holdings → Dashboard → Explore → components).
+- [ ] Backend engine strings (risk factors, drift labels, summaries — 21
+      files) keyed by request language.
+- [ ] Language switcher in the UI — only AFTER coverage is complete; a
+      switcher that flips 10% of the copy reads as broken.
+- [ ] Number/date formatting per locale everywhere (`useMarket` fmt vs i18n).
+
+### Phase 2 — US + DE market packs (real data)
+
+- [ ] US: FRED adapters — CPI (CPIAUCSL) + Case-Shiller (CSUSHPINSA).
+      **User: register a free FRED API key.**
+- [ ] DE: Destatis/ECB CPI + a housing series; German UI (`de.json`) — EN in
+      Germany is a half-measure.
+- [ ] **PRIIPs realism**: EU retail cannot buy US-domiciled ETFs (no KID).
+      The DE asset universe must be UCITS funds; repeat none of the
+      "search SPY at a Turkish broker" mistake.
+- [ ] Per-market asset universes + broker/tax notes reviewed for realism.
+- [ ] Trust chips and market-specific copy from the pack, not hardcoded.
+
+### Phase 3 — professionalize for production
+
+- [ ] Persistent cache: diskcache → small Neon table (Render disk is
+      ephemeral; every deploy wipes last-known-good).
+- [ ] Code-split the bundle (i18n + Recharts are natural seams).
+- [ ] Sentry: set SENTRY_DSN in Render/Vercel (code already wired).
+- [ ] Privacy policy + terms pages (both stores require them).
+- [ ] **User:** domain → Clerk production instance (+ own Google OAuth) →
+      Render paid tier (see docs/production-readiness.md).
+
+### Phase 4 — the stores
+
+- [ ] Capacitor packaging (iOS + Android), icons/splash from brand/.
+- [ ] Store listings: screenshots per device size, descriptions TR/EN/DE.
+- [ ] **User:** Apple Developer ($99/yr) + Play Console ($25 one-time).
+- [ ] Review-readiness: demo account for reviewers, no dev-mode Clerk,
+      finance-category compliance answers ready.

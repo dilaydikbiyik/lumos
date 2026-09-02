@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from backend.config import settings
 from backend.db.database import get_db
 from backend.limiter import limiter
+from backend.middleware.language import get_language
 from backend.middleware.verify_clerk import get_current_user
 from backend.repositories import user_repository
 from backend.schemas.user_profile import RiskProfileAnswers
@@ -63,7 +64,9 @@ async def chat_endpoint(
     messages = [m.model_dump() for m in body.messages]
     # ai_chat uses blocking I/O (httpx sync + google-genai SDK) — run in a
     # thread pool so the async event loop stays free for other requests.
-    reply = await asyncio.to_thread(ai_chat, messages, user.plan)
+    reply = await asyncio.to_thread(
+        ai_chat, messages, user.plan, "profiling", "", get_language(request)
+    )
     return {"reply": reply}
 
 
@@ -116,7 +119,7 @@ async def advisor_endpoint(
     context = _advisor_context(user)
     # ai_chat is synchronous (blocking I/O) — run off the event loop
     reply = await asyncio.to_thread(
-        ai_chat, messages, user.plan, "advisor", context
+        ai_chat, messages, user.plan, "advisor", context, get_language(request)
     )
     return {"reply": reply}
 

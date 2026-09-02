@@ -7,6 +7,7 @@ import { SignInButton, SignedIn, SignedOut, UserButton } from '@clerk/clerk-reac
 import DisclaimerModal from '../components/DisclaimerModal'
 import Icon from '../components/Icon'
 import { isInAppBrowser } from '../utils/inAppBrowser'
+import { Trans, useTranslation } from 'react-i18next'
 
 // 10 fireflies — drift toward the title
 // Each with its own start position, duration and motion vector
@@ -24,24 +25,13 @@ const FIREFLY_CONFIG = [
 ]
 
 const FEATURES = [
-  {
-    icon: 'trendUp',
-    title: 'Enflasyon Sonrası Gerçek Getiri',
-    desc: '"%300 kazandım" demek, enflasyon %320\'yse kaybettin demektir. Lumos her rakamı TCMB verisiyle enflasyondan arındırıp gösterir.',
-  },
-  {
-    icon: 'home',
-    title: 'Emlak ve Borsa Yan Yana',
-    desc: '81 ilin m² fiyatı ve gerçek değerlenmesi, hisse portföyünle aynı ekranda. Kirada mı otur, ev mi al — hesabı burada.',
-  },
-  {
-    icon: 'lifebuoy',
-    title: 'Panik Anında Yanında',
-    desc: 'En pahalı hata, düşüşte satmaktır. Piyasa çakıldığında tek dokunuşla veriye dayalı, sakin bir ses.',
-  },
+  { icon: 'trendUp',  key: 'realReturn' },
+  { icon: 'home',     key: 'realEstate' },
+  { icon: 'lifebuoy', key: 'panic' },
 ]
 
 export default function OnboardingPage() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const { userId } = useAuth()
 
@@ -119,17 +109,16 @@ export default function OnboardingPage() {
             fontWeight: 600,
             marginBottom: 16,
           }}>
-            Yatırım karanlık bir orman gibi görünür.
+            {t('onboarding.tagline')}
           </p>
 
           <h1 style={{ marginBottom: 16 }}>
-            Lumos,{' '}
-            <span className="gradient-text">elindeki ışık.</span>
+            {t('onboarding.heroPrefix')}{' '}
+            <span className="gradient-text">{t('onboarding.heroHighlight')}</span>
           </h1>
 
           <p style={{ fontSize: 'var(--t-body)', maxWidth: 360, margin: '0 auto 20px', lineHeight: 1.7 }}>
-            Yatırımı korkmadan öğren: her rakam enflasyondan arındırılmış,
-            her öneri adım adım açıklanmış, kararın her zaman sende.
+            {t('onboarding.heroBody')}
           </p>
 
           {/* Trust strip — the concrete, checkable claims behind the promise */}
@@ -137,12 +126,12 @@ export default function OnboardingPage() {
             display: 'flex', flexWrap: 'wrap', gap: '6px 10px', justifyContent: 'center',
             maxWidth: 380, margin: '0 auto 32px',
           }}>
-            {['TCMB resmî verisi', '81 il emlak endeksi', 'Gerçek piyasa fiyatları', 'Formülü görünür'].map(t => (
-              <span key={t} style={{
+            {['centralBank', 'housing', 'livePrices', 'formula'].map(k => (
+              <span key={k} style={{
                 fontSize: 'var(--t-micro)', color: 'var(--text-muted)',
                 border: '1px solid var(--border)', borderRadius: 999,
                 padding: '4px 10px', background: 'var(--bg-card)',
-              }}>{t}</span>
+              }}>{t('onboarding.trust.' + k)}</span>
             ))}
           </div>
 
@@ -154,9 +143,7 @@ export default function OnboardingPage() {
                 background: 'var(--bg-input)', fontSize: 12.5, lineHeight: 1.6,
                 color: 'var(--text-muted)', textAlign: 'left',
               }}>
-                Bu sayfayı uygulama içi tarayıcıda açtın. Google ile giriş burada
-                çalışmıyor — sağ üstteki menüden <strong>&quot;Tarayıcıda aç&quot;</strong>{' '}
-                dersen sorunsuz giriş yapabilirsin.
+                <Trans i18nKey="onboarding.inAppBrowser" components={[null, <strong key="s" />]} />
               </div>
             )}
             <SignInButton mode="modal">
@@ -164,7 +151,7 @@ export default function OnboardingPage() {
                 className="btn btn-primary"
                 style={{ maxWidth: 320, width: '100%', margin: '0 auto', fontSize: 16, display: 'flex' }}
               >
-                Başlayalım
+                {t('common.start')}
               </button>
             </SignInButton>
           </SignedOut>
@@ -175,7 +162,7 @@ export default function OnboardingPage() {
               style={{ maxWidth: 320, width: '100%', margin: '0 auto', fontSize: 16, display: 'flex' }}
               onClick={continueFromHero}
             >
-              Devam Et →
+              {t('common.continue')}
             </button>
           </SignedIn>
         </div>
@@ -187,7 +174,7 @@ export default function OnboardingPage() {
         <div className="grid-3" style={{ marginBottom: 28 }}>
           {FEATURES.map((f, idx) => (
             <div
-              key={f.title}
+              key={f.key}
               className="card-glass"
               style={{
                 textAlign: 'center',
@@ -198,8 +185,8 @@ export default function OnboardingPage() {
               <div style={{ marginBottom: 10 }}>
                 <Icon name={f.icon} size={28} glow />
               </div>
-              <h3 style={{ fontSize: 'var(--t-body)', marginBottom: 6, color: 'var(--text)' }}>{f.title}</h3>
-              <p style={{ fontSize: 'var(--t-small)', lineHeight: 1.6 }}>{f.desc}</p>
+              <h3 style={{ fontSize: 'var(--t-body)', marginBottom: 6, color: 'var(--text)' }}>{t(`onboarding.features.${f.key}.title`)}</h3>
+              <p style={{ fontSize: 'var(--t-small)', lineHeight: 1.6 }}>{t(`onboarding.features.${f.key}.desc`)}</p>
             </div>
           ))}
         </div>
@@ -212,14 +199,13 @@ export default function OnboardingPage() {
           background: 'var(--bg-card)',
           border: '1px solid var(--border)',
         }}>
-          <Icon name="bulb" size={14} /> Lumos sana yol gösterir; alım-satımı kendi aracı kurumunda yaparsın,
-          sonra burada takip ederiz. Hiçbir zaman senin adına işlem yapmayız.
+          <Icon name="bulb" size={14} /> {t('onboarding.expectation')}
         </p>
 
         {/* Disclaimer */}
         <div className="disclaimer" style={{ textAlign: 'center' }}>
-          <Icon name="warning" size={14} /> <strong>Yalnızca eğitim amaçlıdır.</strong> Yatırım tavsiyesi değildir.
-          Lisanslı bir finansal danışmana başvurun.
+          <Icon name="warning" size={14} />{' '}
+          <Trans i18nKey="onboarding.disclaimerLine" components={[<strong key="s" />]} />
         </div>
       </div>
 
