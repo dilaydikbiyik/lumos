@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import GLOSSARY from '../data/glossary'
+import { useTranslation } from 'react-i18next'
 
 /**
  * "Işık Tut" (hold a light) — firefly-themed jargon tooltip.
@@ -8,10 +8,13 @@ import GLOSSARY from '../data/glossary'
  * Tap/click opens a plain-language explanation bubble.
  */
 export default function IsikTut({ term, children }) {
+  const { t, i18n } = useTranslation()
   const [open, setOpen] = useState(false)
-  const explanation = GLOSSARY[term.toLowerCase()]
-
-  if (!explanation) return children || term
+  // Terms act as stable identifiers across languages; the copy lives in the
+  // locale files so the tooltip follows the UI language.
+  const key = 'glossary.' + term.toLowerCase()
+  if (!i18n.exists(key)) return children || term
+  const explanation = t(key)
 
   return (
     <span style={{ position: 'relative', display: 'inline-block' }}>
@@ -68,7 +71,7 @@ export default function IsikTut({ term, children }) {
               color: 'var(--firefly)', textTransform: 'uppercase',
               letterSpacing: '0.05em',
             }}>
-              💡 Işık Tut
+              {t('isikTut.label')}
             </span>
 
             {explanation}

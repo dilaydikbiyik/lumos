@@ -14,7 +14,10 @@
     "send": "Send",
     "cancel": "Cancel",
     "tryAgain": "Try again",
-    "back": "← Back"
+    "back": "← Back",
+    "eduFooter": "Educational purposes only — not investment advice.",
+    "close": "Close",
+    "value": "Value"
   },
   "onboarding": {
     "tagline": "Investing looks like a dark forest.",
@@ -57,5 +60,485 @@
   },
   "language": {
     "label": "Language"
+  },
+  "quiz": {
+    "intro": "Hi! I'm Lumos.\n\nI'll ask you 9 short questions and build your personal risk profile. Ready?\n\n**Question 1 — How much can you set aside for investing?** (e.g. 50,000)",
+    "reveal": "I've read it — show my risk profile →",
+    "noRush": "No rush — read the above for as long as you like.",
+    "answersKept": "Your answers are saved — no need to start over.",
+    "inputPlaceholder": "Type your answer…"
+  },
+  "profile": {
+    "bands": {
+      "low": "Conservative",
+      "medium": "Balanced",
+      "high": "Aggressive"
+    },
+    "step": "Step 3 / 3",
+    "title": "Let's Get to Know You",
+    "subtitle": "9 short questions — the AI builds your profile and personalises your portfolio around it.",
+    "readyTitle": "Your Risk Profile Is Ready",
+    "readySubtitle": "Your answers are analysed — your personal portfolio is being computed.",
+    "profileWord": "Profile",
+    "budgetNote": "Your budget is <0>{{budget}}</0>. At this risk level, a sharp downturn could temporarily take your portfolio down about <1>{{pct}}%</1> to <2>{{worst}}</2>. That's a normal range for this profile — no loss is locked in unless you sell.",
+    "whyTitle": "Where did this score come from?",
+    "whySubtitle": "No black box — the source and reasoning behind every point:",
+    "total": "Total ≈ <0>{{score}}/10</0> (sum of contributions, clamped to the 1-10 range)",
+    "seePortfolio": "See My Portfolio",
+    "retake": "← Redo the Risk Analysis"
+  },
+  "debt": {
+    "title": "Let's talk about this first",
+    "body": "You're carrying <0>{{debt}}</0> of credit-card / consumer-loan debt. It grows at roughly <1>{{debtPct}}%</1> a year. A portfolio matching your risk profile has a long-run expectation of about <2>{{portPct}}%</2> a year — and that's an expectation, not a guarantee.",
+    "ifRepay": "If you clear the debt with {{amount}}",
+    "repayCaption": "interest you won't pay in one year — certain",
+    "ifInvest": "If you invest the same money",
+    "investCaption": "expected return in one year — not guaranteed",
+    "verdict": "Paying off the debt is <0>{{advantage}}</0> better for this year — with zero risk taken.",
+    "covers": "Your budget covers the debt; you can start investing with the remaining <0>{{leftover}}</0> with peace of mind.",
+    "notCovered": "Clear the debt first, then come back. Your portfolio will be waiting.",
+    "assumption": "The calculation assumes a card rate of {{monthly}}%/month ({{annual}}% compounded annually). This is a planning assumption, not the current official rate — the central bank revises it periodically. Check the rate on your own statement; the number shifts, the direction doesn't. You can still explore the portfolio below — it's here when you're ready."
+  },
+  "recommend": {
+    "preparing": "Preparing your portfolio…",
+    "title": "Your Portfolio Is Ready",
+    "riskBadge": "Risk {{score}}/10",
+    "budgetBadge": "{{amount}} budget",
+    "reitBadge": "REITs included ✓",
+    "whyTitle": "Why This Portfolio?",
+    "testLayerTitle": "Stress-test this portfolio",
+    "testLayerHint": "Try it against real history: what would the bad days have looked like, and how would you have felt?",
+    "howtoLayerTitle": "How do I buy it?",
+    "howtoLayerHint": "A step-by-step guide, from opening a brokerage account to placing the first order.",
+    "disclaimer": "This information is educational only. Past performance does not guarantee future results. Consult a licensed financial advisor for your investment decisions.",
+    "backToDashboard": "Back to dashboard →"
+  },
+  "rationale": {
+    "title": "Why this split?",
+    "subtitle": "These weights come from a deterministic formula, not from the AI — every step is right here:",
+    "intro": "Your risk score is <0>{{score}}/10</0>. The split is produced in two steps:",
+    "step1": "<0>How much should stay on the safe side?</0><1/>As the risk score rises, the share of cash and bonds falls. For yours, the safe side came to <2>{{pct}}%</2> — this part cushions the shock in sharp downturns.",
+    "step2": "<0>How was the remaining {{pct}}% shared out?</0><1/>Growth-side assets are weighted by their volatility (how much the price swings). At low risk scores the calm assets dominate; at high scores, the lively ones.",
+    "lowBand": "Your score is on the low side, so the weight leans toward calm assets.",
+    "highBand": "Your score is on the high side, so the weight leans toward lively assets.",
+    "midBand": "You're in the middle, so the two are blended evenly.",
+    "showFormula": "Show the actual formula",
+    "alphaNote": "α = {{alpha}} (your risk score ÷ 10)",
+    "droppedTitle": "Why {{count}} positions? These were deliberately dropped:",
+    "wouldBe": "(would have been {{pct}}%)",
+    "footer": "Your budget {{budget}} · split across at most {{cap}} assets · anything below {{minPct}}% was dropped (tiny positions are hard to track and contribute next to nothing)"
+  },
+  "categories": {
+    "stocks": "Stocks",
+    "reit": "Real Estate (REIT)",
+    "fund": "Mutual Fund",
+    "gold": "Precious Metals",
+    "bond": "Bonds / Fixed Income",
+    "cash": "Cash / Money Market"
+  },
+  "bridge": {
+    "checking": "Checking your assets…",
+    "recordedTitle": "This portfolio is in My Assets ✓",
+    "recordedBody": "You've recorded these assets before — track their current values from My Assets.",
+    "goHoldings": "Go to My Assets →",
+    "addAnother": "I want to record another purchase",
+    "newPurchaseTitle": "Record your new purchase",
+    "boughtTitle": "Did you buy this portfolio?",
+    "body": "If you made the purchase at your own broker, record the portfolio into My Assets with one tap — your remaining budget updates automatically.",
+    "recordCta": "I bought it — record the {{amount}} split",
+    "transferError": "The transfer couldn't be completed — you can add them one by one from the My Assets page.",
+    "shareLabel": "Share of portfolio",
+    "chartTitle": "Your Allocation"
+  },
+  "reit": {
+    "title": "Real Estate Investing: REIT ETFs",
+    "body": "When your budget can't stretch to buying property outright, <0>REIT ETFs</0> let you invest in the real-estate market. They trade like stocks and hold dozens of commercial buildings and homes — you share in property returns without buying property."
+  },
+  "explainer": {
+    "tabs": {
+      "what": "What Is It?",
+      "why": "Why It's Here",
+      "risk": "The Risk"
+    },
+    "byTicker": {
+      "XU100_IS": {
+        "type": "Stock Index",
+        "what": "BIST 100 — an index of Türkiye's 100 largest listed companies, including giants like Turkish Airlines, Aselsan and BİM.",
+        "why": "As the Turkish economy grows, so does the value of these companies. The simplest way to invest in the local market.",
+        "risk": "Drops of 20-30% can happen in the short term. Over the long run (5+ years) the Turkish market has historically beaten inflation."
+      },
+      "SPY": {
+        "type": "US Equity ETF",
+        "what": "The S&P 500 — a basket of the 500 largest US companies. Apple, Google, Amazon and Tesla are all inside.",
+        "why": "Dollar-based returns from one of the most consistently growing markets in history.",
+        "risk": "It has been positive over the great majority of 10+ year windows — with exceptions: the 2000-2009 \"lost decade\" ended down. A long horizon usually suffices; it never guarantees."
+      },
+      "QQQ": {
+        "type": "Technology ETF",
+        "what": "The Nasdaq 100 — a basket of the world's technology giants: Apple, Microsoft, NVIDIA, Meta and more.",
+        "why": "Tech has been the fastest-growing sector over the long run. Dollar-based, with high growth potential.",
+        "risk": "Tech stocks swing harder. Down 33% in 2022, up 55% in 2023 — it takes a strong stomach."
+      },
+      "GLD": {
+        "type": "Gold ETF",
+        "what": "Physical gold in stock-market form. Instead of buying gold by the gram, you own a share of the dollar gold price.",
+        "why": "Gold acts as a \"safe haven\" in crises. When stocks fall, gold often rises — it keeps your portfolio balanced.",
+        "risk": "Gold doesn't grow as fast as stocks over the long run. But its power to preserve money is very high."
+      },
+      "VNQ": {
+        "type": "Real Estate ETF (REIT)",
+        "what": "Vanguard REIT ETF — a property basket investing in US commercial buildings, malls and housing.",
+        "why": "Even when a flat is out of budget, you can earn real-estate income with small amounts. Pays regular dividends, like rent.",
+        "risk": "Rising interest rates can weigh on property prices. And it isn't \"touchable\" the way physical property is."
+      },
+      "SCHH": {
+        "type": "US Housing REIT ETF",
+        "what": "Schwab US REIT ETF — a housing-weighted American real-estate basket.",
+        "why": "Similar to VNQ but more housing-weighted. Property-market exposure with stock-like convenience.",
+        "risk": "REIT ETFs swing like stocks. But there's no buying-and-selling-property hassle, and you can cash out instantly."
+      }
+    },
+    "byCategory": {
+      "stocks": {
+        "type": "Stock / Equity ETF",
+        "what": "An ownership share of a company or a basket of companies. As the business grows, so does your share.",
+        "why": "The asset class with the highest long-run returns — growth potential well above inflation.",
+        "risk": "Sharp short-term drops happen. Recovery has historically come most of the time, but it can take years."
+      },
+      "gold": {
+        "type": "Gold",
+        "what": "A precious metal that has held value for millennia. Known as \"crisis insurance\".",
+        "why": "When stocks fall, gold often rises. It helps your portfolio keep its balance.",
+        "risk": "It won't earn like stocks over the long run, but it stops your money from melting away."
+      },
+      "fund": {
+        "type": "Mutual Fund",
+        "what": "A pooled investment managed by professionals on your behalf, bought and sold through fund platforms.",
+        "why": "No need to pick individual stocks — experts manage the mix for you.",
+        "risk": "Management fees are deducted, and performance depends on the manager's decisions."
+      }
+    }
+  },
+  "timeMachine": {
+    "title": "Time Machine",
+    "subtitle": "What if you had built this portfolio in the past? We show not just the gain but the worst moment too — <0>seeing the bottom</0> is the real test of courage.",
+    "error": "The simulation couldn't run right now — try again shortly.",
+    "years": "{{n}} yr",
+    "wouldBe": "{{amount}} would have become…",
+    "afterInflation": "After inflation (<0>real</0>)",
+    "worstMoment": "At its worst moment",
+    "roughRide": "At one point {{lost}} of your money would have looked \"gone\". If you hadn't sold that day, today you'd be {{outcome}} — are you ready for that?",
+    "inProfit": "in profit",
+    "recovering": "on the road to recovery",
+    "calmRide": "This portfolio had a relatively calm ride in the past — but the past guarantees nothing about the future."
+  },
+  "scenarios": {
+    "title": "Future Scenarios",
+    "subtitle": "\"What happens to my money in {{years}} years?\" — <0>not a forecast</0>: the range of every {{years}}-year window lived through the asset's own history.",
+    "error": "Scenarios couldn't be computed right now",
+    "wholePortfolio": "🧺 Whole Portfolio",
+    "inWholePortfolio": "in your whole portfolio",
+    "show": "Show",
+    "resultIntro": "If <0>{{amount}}</0> had stayed {{target}} for {{years}} years (based on {{windows}} windows across {{history}} years of history):",
+    "bad": "Bad stretch",
+    "typical": "Typical stretch",
+    "good": "Good stretch"
+  },
+  "whatIf": {
+    "title": "What would happen?",
+    "subtitle": "Ask \"what if\" questions about your portfolio — the answer comes from a real calculation, not a guess.",
+    "placeholder": "e.g. what if I added 20,000 more?",
+    "ask": "Ask",
+    "error": "Couldn't answer right now",
+    "sug1": "What changes if I add 10,000 more?",
+    "sug2": "What would my portfolio look like if I were more cautious?",
+    "sug3": "What if I went more aggressive?",
+    "notUnderstood": "I couldn't read that as a budget or risk change — try something like \"what if I added X\" or \"what if I were more aggressive/cautious\"."
+  },
+  "practice": {
+    "title": "Try It With Play Money First",
+    "subtitle": "Build this portfolio with a virtual 100,000 TL before risking real money — watch how it moves on real market data.",
+    "start": "Set Up the Virtual Portfolio",
+    "error": "The virtual portfolio couldn't start right now",
+    "virtualNow": "Virtual 100,000 TL is now",
+    "thisWeek": "This week",
+    "mover": "This week's biggest mover was <0>{{ticker}}</0> ({{pct}}%). Did you feel that swing? Real money will feel exactly like this — the difference is you're losing nothing right now.",
+    "honesty": "This figure is one week of real market movement — not a promise of returns. Some weeks close in the red; the skill is learning not to sell during them."
+  },
+  "guide": {
+    "title": "First Investment Guide",
+    "subtitle": "Broker → Deposit → First order — a step-by-step guide for Türkiye",
+    "prev": "← Previous",
+    "next": "Next →",
+    "steps": {
+      "1": {
+        "title": "What Is a Broker?",
+        "body": "To buy and sell stocks and funds you need a brokerage account. It's like a bank account, but for investing. In Türkiye every operating broker must hold an SPK (Capital Markets Board) licence.",
+        "tip": "💡 Verify the licence yourself on the regulator's official list (spk.gov.tr). We recommend no particular broker — we take commission from none of them."
+      },
+      "2": {
+        "title": "How Do I Open an Account?",
+        "body": "1. Go to your chosen broker's website.\n2. Tap \"Open Account\".\n3. Enter your national ID number, email and phone.\n4. Verify your identity by video call or at a branch.\n5. The account activates within 1–3 business days.",
+        "tip": "💡 Most brokers support fully remote opening through their mobile app — no branch visit required."
+      },
+      "3": {
+        "title": "How Do I Deposit Money?",
+        "body": "Send money from your own bank account to the brokerage account by wire transfer. It usually shows up the same day or within 1 business day.",
+        "tip": "💡 Start small — 500–1,000 TL is plenty for a first try. You don't have to deposit everything at once."
+      },
+      "4": {
+        "title": "How Do I Place the First Order?",
+        "body": "1. Go to the \"Place Order\" or \"Buy\" section in the app.\n2. Search for the asset you want.\n3. Enter the amount (lots / currency).\n4. Choose \"Market Order\" — it fills at the current price.\n5. Confirm.",
+        "tip": "💡 Important: if your portfolio includes ETFs listed on foreign exchanges (like SPY or QQQ), they don't trade on BIST. Your broker must offer overseas-market access, which usually needs a separate application and currency conversion. Before opening an account, ask: \"can I buy foreign ETFs, and what's the commission?\""
+      },
+      "5": {
+        "title": "Tracking and Patience",
+        "body": "After buying, don't build a habit of checking prices daily — it feeds anxiety. Once a week is enough. Lumos will let you know about big moves anyway.",
+        "tip": "💡 Golden rule: treat the money as if you won't see it for 5 years. Don't use funds you'll need short-term."
+      }
+    }
+  },
+  "advisor": {
+    "greeting": "Lumos Advisor.\n\nAsk anything on your mind about investing or this app, in your own words — you're not limited to the canned questions. I explain concepts, walk you through the reasoning behind a portfolio decision, and put news in context.\n\nOne boundary: I won't say \"buy\" or \"sell\" for any specific stock or fund, and I won't predict where the market is going — nobody can honestly know those. Beyond that, nothing is off limits.",
+    "title": "Lumos Advisor",
+    "subtitle": "Answers your questions — education, not advice",
+    "typing": "typing…",
+    "suggestionsLabel": "Example starters — or type your own question below:",
+    "placeholder": "Ask anything…",
+    "error": "I couldn't answer just now — try again shortly.",
+    "openLabel": "Ask the advisor",
+    "sug1": "What's an ETF? Explain with an example",
+    "sug2": "What does my risk score mean?",
+    "sug3": "Why does inflation melt my money?",
+    "sug4": "Why is gold in my portfolio?",
+    "sug5": "What should I do if the market drops?",
+    "sug6": "Should I hold dollars or gold?"
+  },
+  "panic": {
+    "openLabel": "Panic support",
+    "fallbackMessage": "You don't have to decide anything in a hurry. A drop only becomes a loss when you sell.",
+    "fallbackFact": "Closing this screen and doing nothing is also a valid decision.",
+    "fallbackClosing": "The decision is yours. There's no rush — the numbers aren't going anywhere.",
+    "pauseTitle": "Pause before you decide",
+    "pauseBody": "Selling in a hurry during a drop is the most common and most expensive mistake investors make. In a few seconds I'll show you your actual numbers.",
+    "showNow": "Show the numbers now →",
+    "yourSituation": "Your situation",
+    "stickToPlan": "I'm sticking to my plan",
+    "stillWorried": "I'm still worried"
+  },
+  "isikTut": {
+    "label": "💡 Shine a Light"
+  },
+  "glossary": {
+    "volatilite": "How much the price swings up and down. High volatility = big waves; both risk and opportunity grow.",
+    "çeşitlendirme": "Not putting all your eggs in one basket. Spread across different assets, one bad day can't take everything.",
+    "etf": "A ready-made investment basket. One purchase makes you part-owner of dozens of stocks — no picking one by one.",
+    "fon": "A pooled investment professionals manage on your behalf, bought and sold through fund platforms.",
+    "reit": "A share of a real-estate company. A way to become a property investor with small amounts, without buying a flat.",
+    "temettü": "Your share of a company's profit. Think of it like rent — it pays you for as long as you hold the stock.",
+    "risk skoru": "Your 1-10 profile score. It shows how much turbulence you can stand; your portfolio is built around it.",
+    "likidite": "How fast you can turn an asset into cash. Stocks take minutes; land can take months.",
+    "amortisman": "An asset's loss of value over time. Inevitable for cars — which is why a car is an expense, not an investment.",
+    "enflasyon": "Your money losing purchasing power. At 50% inflation, 100 under the mattress behaves like 67 a year later.",
+    "reel getiri": "Your true gain after inflation. You made 45% but inflation was 60%? You actually lost.",
+    "drawdown": "The biggest peak-to-trough fall. The answer to \"how deep in the red were you on your worst day?\""
+  },
+  "feedback": {
+    "open": "Say something about this",
+    "openLabel": "Send feedback",
+    "thanks": "Got it, thank you. I genuinely read these.",
+    "title": "What happened?",
+    "subtitle": "Write anything you didn't understand, found silly, or that's broken. Short is fine.",
+    "catConfusing": "I didn't get it",
+    "catBug": "Something's broken",
+    "catIdea": "I have an idea",
+    "catOther": "Other",
+    "placeholder": "e.g. I didn't understand how my risk score was computed",
+    "error": "Couldn't send — you can try again.",
+    "privacy": "The screen you're on is attached automatically. Nothing else is collected."
+  },
+  "holdings": {
+    "types": {
+      "stock": "Stock",
+      "fund": "Fund",
+      "etf": "ETF",
+      "real_estate": "Home",
+      "land": "Land",
+      "vehicle": "Vehicle",
+      "gold": "Gold",
+      "crypto": "Crypto",
+      "cash": "Cash",
+      "other": "Other"
+    },
+    "emotions": {
+      "prompt": "What drove this decision? (opt.)",
+      "plan": "Part of my plan",
+      "fomo": "Fear of missing out (FOMO)",
+      "tuyo": "A tip / someone's advice",
+      "panik": "Panic / haste"
+    },
+    "loadError": "Assets couldn't be loaded",
+    "addError": "The asset couldn't be added",
+    "title": "My Assets",
+    "subtitle": "Stocks + property + your car — your whole wealth in one picture",
+    "totalValue": "Total Value",
+    "erosionTitle": "Is my money melting?",
+    "erosionBody": "The <0>{{idle}}</0> sitting idle lost about ~<1>{{amount}}</1> of real value to inflation this month (monthly inflation {{pct}}%).",
+    "erosionCash": "Your cash holdings (cash added to My Assets): <0>{{amount}}</0>",
+    "erosionBudget": "Your uninvested budget (declared budget − invested): <0>{{amount}}</0>",
+    "erosionFormula": "Total × monthly CPI ({{pct}}%) = {{amount}}",
+    "healthTitle": "Lantern Score: {{score}}/100",
+    "healthBody": "The Lantern shows your portfolio's health at a glance: how diversified your assets are, and how easily they turn into cash when needed.",
+    "rebuildCta": "↻ Update my portfolio with the remaining {{amount}}",
+    "purchase": "Bought",
+    "current": "Now",
+    "live": "● live",
+    "liveBoughtToday": "● live · bought today",
+    "indexEstimate": "index estimate",
+    "manual": "manual",
+    "liveHint": "(add quantity or purchase date for live tracking)",
+    "deleteLabel": "Delete",
+    "loading": "Loading your assets…",
+    "emptyTitle": "No assets yet",
+    "emptyBody": "Let's catch the first light together — start by adding an asset.",
+    "namePlaceholder": "Name (e.g. plot in Gölbaşı, SPY ETF)",
+    "vehicleTitle": "🚗 Is your car wealth, or an expense?",
+    "vehicleBody": "A vehicle can be part of the wealth picture — but careful: it loses 10–20% of its value every year (depreciation), plus insurance, tax and maintenance. Lumos never suggests buying a car as an investment.",
+    "vehicleTip": "If you still want to add it, put its current market value into \"Current estimated value\".",
+    "tickerPlaceholder": "Symbol (e.g. SPY, THYAO.IS)",
+    "amountPlaceholder": "Purchase amount",
+    "currentPlaceholder": "Current estimated value (optional)",
+    "add": "Add",
+    "addCta": "+ Add Asset",
+    "remainingBudget": "Remaining Budget",
+    "lookupCta": "Find",
+    "lookupPrice": "Current price: {{price}} {{currency}}",
+    "lookupNotFound": "Couldn't verify that symbol right now — the price service may be temporarily unavailable. Try again, or just type the name and amount yourself. (Borsa İstanbul stocks need a \".IS\" suffix, like THYAO.IS.)",
+    "quantityPlaceholder": "How many did you buy? (opt. — enables live tracking)",
+    "computedNote": "Filled in as {{quantity}} × {{price}} = {{total}}. If you paid a different price, you can edit the amount."
+  },
+  "fx": {
+    "title": "Currency Split",
+    "subtitle": "Your TL vs FX-based assets",
+    "riskLabel": "Currency risk",
+    "high": "High",
+    "mid": "Medium",
+    "low": "Low",
+    "highMsg": "Most of your portfolio is TL-based. When the lira weakens, your whole portfolio feels it. Consider adding FX-based assets.",
+    "midMsg": "There's a reasonable balance between TL and FX. This split gives partial protection against currency swings.",
+    "lowMsg": "Your portfolio leans FX-based. You're naturally protected from lira depreciation.",
+    "tryLegend": "🇹🇷 TL — {{pct}}%",
+    "fxLegend": "🌍 FX — {{pct}}%"
+  },
+  "drift": {
+    "title": "Is your portfolio in balance?",
+    "balanced": "In balance",
+    "notable": "Slight drift",
+    "serious": "Notable drift",
+    "target": "target {{pct}}%",
+    "actual": "now {{pct}}%",
+    "categories": {
+      "stocks": "Stocks / ETF",
+      "reit": "Real estate",
+      "bond": "Bonds",
+      "fund": "Funds",
+      "gold": "Gold",
+      "cash": "Cash",
+      "other": "Other"
+    }
+  },
+  "chart": {
+    "title": "How's Your Portfolio Doing?",
+    "m1": "1 Mo",
+    "m3": "3 Mo",
+    "y1": "1 Yr",
+    "error": "Value history couldn't load right now.",
+    "liveNote": "{{count}} assets track real market closes",
+    "flatNote": "{{count}} assets (cash/manual) held flat at last known value",
+    "dipNote": "Down days are normal — the point is not selling on them.",
+    "pending": "The chart will appear here once your assets accumulate a few days of data."
+  },
+  "comparison": {
+    "balanced": "Your Portfolio Is Balanced",
+    "deviations": "Deviations From Target",
+    "subtitle": "Recommended vs actual split for your risk {{score}}/10 profile",
+    "actualLegend": "■ Actual split",
+    "targetLegend": "■ Target split"
+  },
+  "dailyTip": {
+    "label": "Learned Today",
+    "next": "Tap the card → next concept",
+    "nextLabel": "Next tip",
+    "tips": {
+      "etf": {
+        "title": "An ETF Is Really a Basket",
+        "body": "One purchase makes you part-owner of dozens of stocks. No picking them one by one — investing, pre-packaged."
+      },
+      "diversification": {
+        "title": "Don't Put All Your Eggs in One Basket",
+        "body": "Spread across different assets and one bad day can't take everything. That's called diversification."
+      },
+      "inflation": {
+        "title": "Inflation Melts Your Money",
+        "body": "At 50% inflation, 100 under the mattress behaves like 67 a year later. Not investing is a risk too."
+      },
+      "dividend": {
+        "title": "A Dividend Is Like Rent",
+        "body": "Your share of the company's profit. It pays you regularly for as long as you hold the stock — like renting out property."
+      },
+      "reel-return": {
+        "title": "Real Return Is the True Gain",
+        "body": "You made 45% but inflation was 60%? You actually lost. Always look at the inflation-adjusted return."
+      },
+      "liquidity": {
+        "title": "Liquidity Saves You",
+        "body": "Stocks turn to cash in minutes; land can take months. You might need money urgently — don't forget that."
+      },
+      "drawdown": {
+        "title": "Drops Are Normal",
+        "body": "Markets often fall 10-15%. That's not panic, it's the natural cycle. No loss is locked in unless you sell."
+      },
+      "gold": {
+        "title": "Gold Is Like Insurance",
+        "body": "In crises, gold usually rises while stocks fall. Think of it as your portfolio's \"protective shield\"."
+      },
+      "patience": {
+        "title": "Patience Is the Best Strategy",
+        "body": "The great majority of 10-year windows in S&P 500 history have been positive — though periods like 2000-2009 lost money. Time is your strongest tool, not a guarantee."
+      },
+      "reit": {
+        "title": "Be a Landlord Without Buying a House",
+        "body": "REIT ETFs let you earn real-estate income with small amounts. A way to be a property investor without buying property."
+      },
+      "fomo": {
+        "title": "FOMO Is Your Enemy",
+        "body": "\"Everyone's buying, so I will too\" is the most dangerous sentence in investing. Buy every rally and you'll usually catch the top."
+      },
+      "cost-avg": {
+        "title": "Regular Investing Lowers Risk",
+        "body": "Investing the same amount monthly means buying cheap some months and dear in others. The result: a below-average cost."
+      }
+    }
+  },
+  "goal": {
+    "title": "🎯 My Goal",
+    "subtitle": "Let's turn a goal like \"a house deposit in 3 years\" into a concrete monthly plan.",
+    "targetPlaceholder": "Target amount (e.g. 800000)",
+    "withinYears": "within {{n}} years",
+    "savingsPlaceholder": "Current savings (opt.)",
+    "monthlyPlaceholder": "How much do you save monthly right now? (opt.)",
+    "plan": "Plan it",
+    "error": "Couldn't calculate",
+    "alreadyOnTrack": "Your existing savings reach the goal on their own — no extra contribution needed.",
+    "needMonthly": "To reach the goal on time you need to save about <0>{{amount}}</0> a month.",
+    "realValueNote": "Assuming {{inflation}}% inflation, your {{target}} goal will be worth ≈ <0>{{real}}</0> in today's money by then. A fixed target loses purchasing power over time — you may want to revisit it.",
+    "atYourPace": "At your current pace ({{amount}}/mo):",
+    "onTrack": "✓ You're reaching the goal on time.",
+    "delayed": "At this pace your goal slips by about <0>{{months}} months</0>.",
+    "progress": "Progress: {{pct}}%",
+    "howTitle": "What is this calculation based on?",
+    "howBody": "It assumes the money you save doesn't sit idle but grows in a portfolio matching your risk profile, at an average {{growth}}% a year. That rate isn't invented: it's live inflation ({{inflation}}%) plus the real premium a diversified portfolio is assumed to earn over the long run. The horizon is converted to {{months}} months, and each contribution's growth over the remaining time is counted.",
+    "howFormula": "monthly = (target − grown value of current savings) × r / ((1+r)^months − 1),  r = monthly return",
+    "howCaveat": "This is a planning assumption, not a forecast: markets don't grow the same amount every year, and some years close down. If the rate turns out lower, the monthly figure won't be enough — reviewing the plan once a year is a good habit."
   }
 }

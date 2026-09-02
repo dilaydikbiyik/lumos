@@ -2,17 +2,19 @@ import { useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import api from '../utils/api'
 import Icon from '../components/Icon'
+import { useTranslation } from 'react-i18next'
 
 // Deliberately plain words: a beginner who is stuck won't self-classify as
 // "UX issue" or "feature request", but will recognise "anlamadım".
 const CATEGORIES = [
-  { id: 'confusing', label: 'Anlamadım' },
-  { id: 'bug',       label: 'Bir şey bozuk' },
-  { id: 'idea',      label: 'Önerim var' },
-  { id: 'other',     label: 'Başka' },
+  { id: 'confusing', label: 'feedback.catConfusing' },
+  { id: 'bug',       label: 'feedback.catBug' },
+  { id: 'idea',      label: 'feedback.catIdea' },
+  { id: 'other',     label: 'feedback.catOther' },
 ]
 
 export default function FeedbackButton() {
+  const { t } = useTranslation()
   const { pathname } = useLocation()
   const [open, setOpen] = useState(false)
   const [category, setCategory] = useState(null)
@@ -39,14 +41,14 @@ export default function FeedbackButton() {
     return (
       <button
         onClick={() => setOpen(true)}
-        aria-label="Geri bildirim gönder"
+        aria-label={t('feedback.openLabel')}
         className="btn btn-ghost"
         style={{
           fontSize: 'var(--t-micro)', color: 'var(--text-dim)',
           display: 'flex', alignItems: 'center', gap: 6, margin: '0 auto',
         }}
       >
-        <Icon name="chat" size={13} /> Buna dair bir şey söyle
+        <Icon name="chat" size={13} /> {t('feedback.open')}
       </button>
     )
   }
@@ -64,13 +66,13 @@ export default function FeedbackButton() {
       <div className="card" style={{ maxWidth: 460, width: '100%', marginBottom: 'env(safe-area-inset-bottom)' }}>
         {state === 'sent' ? (
           <p style={{ fontSize: 14, textAlign: 'center', padding: '18px 0', lineHeight: 1.6 }}>
-            Aldım, teşekkürler. Gerçekten okuyorum.
+            {t('feedback.thanks')}
           </p>
         ) : (
           <>
-            <h3 style={{ marginBottom: 4 }}>Ne oldu?</h3>
+            <h3 style={{ marginBottom: 4 }}>{t('feedback.title')}</h3>
             <p style={{ fontSize: 'var(--t-small)', opacity: 0.8, marginBottom: 12, lineHeight: 1.6 }}>
-              Anlamadığın, saçma bulduğun ya da bozuk olan her şeyi yaz. Kısa olabilir.
+              {t('feedback.subtitle')}
             </p>
 
             <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 10 }}>
@@ -85,7 +87,7 @@ export default function FeedbackButton() {
                     color: category === c.id ? 'var(--firefly)' : 'var(--text-dim)',
                   }}
                 >
-                  {c.label}
+                  {t(c.label)}
                 </button>
               ))}
             </div>
@@ -97,30 +99,30 @@ export default function FeedbackButton() {
               value={message}
               onChange={e => setMessage(e.target.value)}
               maxLength={2000}
-              placeholder="Örn: risk skorunun nasıl çıktığını anlamadım"
+              placeholder={t('feedback.placeholder')}
               style={{ resize: 'vertical', width: '100%', fontFamily: 'inherit' }}
             />
 
             {state === 'error' && (
               <p style={{ color: 'var(--red)', fontSize: 13, marginTop: 8 }}>
-                Gönderilemedi — tekrar deneyebilirsin.
+                {t('feedback.error')}
               </p>
             )}
 
             <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
               <button className="btn btn-ghost" style={{ flex: 1 }}
                       onClick={() => { setOpen(false); reset() }}>
-                Vazgeç
+                {t('common.cancel')}
               </button>
               <button className="btn btn-primary" style={{ flex: 2 }}
                       onClick={send} disabled={state === 'sending' || !message.trim()}>
                 {state === 'sending'
                   ? <span className="spinner" style={{ width: 18, height: 18 }} />
-                  : 'Gönder'}
+                  : t('common.send')}
               </button>
             </div>
             <p style={{ fontSize: 'var(--t-micro)', color: 'var(--text-dim)', marginTop: 10, lineHeight: 1.5 }}>
-              Hangi ekranda olduğun otomatik eklenir. Başka hiçbir şey toplanmaz.
+              {t('feedback.privacy')}
             </p>
           </>
         )}

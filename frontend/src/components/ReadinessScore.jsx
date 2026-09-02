@@ -27,7 +27,26 @@ export default function ReadinessScore() {
     return () => { cancelled = true }
   }, [isSignedIn, getToken])
 
-  if (!data) return null
+  // Rendering nothing while loading let the cards below slide up into this
+  // slot and then jump back down when the data landed — the dashboard looked
+  // broken for its first two seconds. A placeholder of the right height keeps
+  // the layout still.
+  if (!data) {
+    return (
+      <div className="card" aria-hidden="true" style={{ opacity: 0.35, minHeight: 96 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div style={{
+            width: 44, height: 44, borderRadius: '50%', flexShrink: 0,
+            background: 'var(--bg-input)',
+          }} />
+          <div style={{ flex: 1 }}>
+            <div style={{ height: 12, width: '45%', borderRadius: 4, background: 'var(--bg-input)' }} />
+            <div style={{ height: 10, width: '65%', borderRadius: 4, background: 'var(--bg-input)', marginTop: 8 }} />
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   const { score, milestones, ready_for_real_investing } = data
 

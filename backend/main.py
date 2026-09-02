@@ -54,7 +54,40 @@ async def lifespan(app: FastAPI):
                 except Exception as exc:
                     _log.warning("Admin bootstrap failed for %s: %s", clerk_id, exc)
                     await db.rollback()
+
+    # Warm the daily news digest in the background. Building it costs an RSS
+    # fetch plus an LLM call — around 15 seconds — and the cache is wiped by
+    # every deploy because Render's disk is ephemeral. Without this, the first
+    # visitor after each deploy pays that entire cost while staring at a
+    # dashboard that looks broken. Fire-and-forget: never blocks startup, and
+    # a failure just means the first reader warms it the old way.
+    # Production only: the warm exists to protect the first real visitor after
+    # a deploy. In tests and local dev there is no such visitor, and firing it
+    # everywhere spent a live LLM call on every app start — including inside
+    # CI, where it also broke a test that asserts the model is never called.
+    import asyncio as _asyncio
+    import logging as _logging
+
+    warm_task = None
+    if settings.APP_ENV == "production":
+        _warm_log = _logging.getLogger("lumos.startup")
+
+        async def _warm_news_digest():
+            from backend.services.news_service import get_daily_digest
+
+            for path in ("hybrid", "stocks", "real_estate"):
+                try:
+                    await _asyncio.to_thread(get_daily_digest, path)
+                    _warm_log.info("News digest warmed: %s", path)
+                except Exception as exc:
+                    _warm_log.warning("News digest warm failed (%s): %s", path, type(exc).__name__)
+
+        warm_task = _asyncio.create_task(_warm_news_digest())
+
     yield
+
+    if warm_task is not None:
+        warm_task.cancel()
 
 
 app = FastAPI(

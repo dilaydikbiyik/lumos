@@ -16,10 +16,34 @@ from backend.schemas.holding import (
     HoldingUpdate,
     PortfolioSummary,
 )
-from backend.services import inflation_service
+from backend.services import inflation_service, ticker_lookup
 from backend.services.holdings_valuation import current_value, enrich_holdings
 
 router = APIRouter()
+
+
+@router.get("/lookup")
+@limiter.limit("30/minute")
+async def lookup_ticker(
+    request: Request,
+    ticker: str,
+    user_id: str = Depends(get_current_user),
+):
+    """
+    Resolve a symbol to its real name, price and currency so the user does not
+    have to type them — and so a mistyped symbol is caught before it is saved.
+    """
+    if not ticker or len(ticker) > 20:
+        raise HTTPException(status_code=422, detail="Geçersiz sembol.")
+    # yfinance is blocking HTTP — keep the event loop free
+    result = await asyncio.to_thread(ticker_lookup.lookup, ticker)
+    if result is None:
+        # Deliberately not "this symbol does not exist": the upstream quote
+        # service rate-limits us intermittently, so a failure here is often a
+        # blip on a perfectly valid symbol. The client says so, and never
+        # blocks the user from adding the asset by hand.
+        raise HTTPException(status_code=404, detail="Sembol şu an doğrulanamadı.")
+    return result
 
 
 def _serialize(holding, enrichment: dict) -> HoldingRead:

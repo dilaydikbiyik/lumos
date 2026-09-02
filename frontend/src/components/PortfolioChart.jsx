@@ -1,27 +1,46 @@
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts'
 import { allocationColors } from '../utils/palette'
+import { useTranslation } from 'react-i18next'
 import AssetCard from './AssetCard'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 
 
 
 
 export default function PortfolioChart({ allocations = [], onSliceClick }) {
+  const { t } = useTranslation()
   const [active, setActive] = useState(null)
 
   const selectedIndex = allocations.findIndex(a => a.ticker === active)
   const selectedAllocation = selectedIndex >= 0 ? allocations[selectedIndex] : null
 
-  const data = allocations.map(a => ({
-    name: a.name,
-    ticker: a.ticker,
-    value: parseFloat((a.weight * 100).toFixed(1)),
-    category: a.category,
-  }))
+  // The page renders from cache first, then re-renders when the fresh copy
+  // arrives. A brand-new (though equal) array makes Recharts restart its
+  // animation, so the wheel visibly stuttered and drew itself twice. Keeping
+  // the reference stable across equal refreshes keeps the animation to one
+  // pass; genuinely different weights still produce a new array and animate.
+  const signature = allocations
+    .map(a => `${a.ticker}:${(a.weight * 100).toFixed(1)}`)
+    .join('|')
+
+  const data = useMemo(
+    () => allocations.map(a => ({
+      name: a.name,
+      ticker: a.ticker,
+      value: parseFloat((a.weight * 100).toFixed(1)),
+      category: a.category,
+    })),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [signature],
+  )
 
   // Computed once for the whole list so the pie, the legend dot and the
   // percentage of a given asset are always the same colour.
-  const colors = allocationColors(allocations)
+  const colors = useMemo(
+    () => allocationColors(allocations),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [signature],
+  )
 
   function handleClick(entry) {
     const ticker = entry.ticker
@@ -32,7 +51,7 @@ export default function PortfolioChart({ allocations = [], onSliceClick }) {
 
   return (
     <div className="card">
-      <h3 style={{ marginBottom: 16 }}>Dağılımın</h3>
+      <h3 style={{ marginBottom: 16 }}>{t('bridge.chartTitle')}</h3>
       <ResponsiveContainer width="100%" height={240}>
         <PieChart>
           <Pie

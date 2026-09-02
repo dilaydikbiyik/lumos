@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import Icon from '../components/Icon'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { UserButton } from '@clerk/clerk-react'
@@ -49,6 +50,7 @@ function Layer({ title, hint, open, onToggle, children }) {
 }
 
 export default function RecommendPage() {
+  const { t } = useTranslation()
   const { state: profileState } = useLocation()
   const navigate = useNavigate()
   const { money } = useMarket()
@@ -83,14 +85,14 @@ export default function RecommendPage() {
   if (isLoading) return (
     <div className="page" style={{ alignItems: 'center', justifyContent: 'center', gap: 16 }}>
       <div className="light-loader" style={{ width: 24, height: 24 }} />
-      <p style={{ fontSize: 14, color: 'var(--text-muted)' }}>Portföyün hazırlanıyor…</p>
+      <p style={{ fontSize: 14, color: 'var(--text-muted)' }}>{t('recommend.preparing')}</p>
     </div>
   )
 
   if (error) return (
     <div className="page" style={{ alignItems: 'center', justifyContent: 'center' }}>
       <p style={{ color: 'var(--red)' }}>{error}</p>
-      <button className="btn btn-ghost" style={{ marginTop: 16 }} onClick={() => navigate('/profile')}>← Tekrar Dene</button>
+      <button className="btn btn-ghost" style={{ marginTop: 16 }} onClick={() => navigate('/profile')}>{t('common.back')} {t('common.tryAgain')}</button>
     </div>
   )
 
@@ -109,14 +111,14 @@ export default function RecommendPage() {
         {/* Header */}
         <div>
           <h2 style={{ marginBottom: 6 }}>
-            <span className="gradient-text">Portföyün Hazır</span>
+            <span className="gradient-text">{t('recommend.title')}</span>
           </h2>
           <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-            <span className="badge badge-amber">Risk {portfolio.risk_score}/10</span>
+            <span className="badge badge-amber">{t('recommend.riskBadge', { score: portfolio.risk_score })}</span>
             <span className="badge" style={{ background: 'var(--bg-input)', color: 'var(--text-muted)', border: '1px solid var(--border)' }}>
-              {money(portfolio.budget ?? 0)} bütçe
+              {t('recommend.budgetBadge', { amount: money(portfolio.budget ?? 0) })}
             </span>
-            {portfolio.includes_reits && <span className="badge badge-green">REIT dahil ✓</span>}
+            {portfolio.includes_reits && <span className="badge badge-green">{t('recommend.reitBadge')}</span>}
           </div>
         </div>
 
@@ -137,7 +139,7 @@ export default function RecommendPage() {
           <div className="card">
             <h3 style={{ marginBottom: 10, display: 'flex', alignItems: 'center', gap: 8 }}>
               <Icon name="bulb" size={18} />
-              Neden Bu Portföy?
+              {t('recommend.whyTitle')}
             </h3>
             <p style={{ fontSize: 'var(--t-small)', whiteSpace: 'pre-line', lineHeight: 1.7 }}>
               {portfolio.plain_explanation}
@@ -149,8 +151,8 @@ export default function RecommendPage() {
 
         {/* ── Layer 2: SINA — test it against reality before risking money ── */}
         <Layer
-          title="Bu portföyü sına"
-          hint="Gerçek geçmiş verilerle dene: kötü günlerde ne olurdu, sen ne hissederdin?"
+          title={t('recommend.testLayerTitle')}
+          hint={t('recommend.testLayerHint')}
           open={layer === 'test'}
           onToggle={() => setLayer(layer === 'test' ? null : 'test')}
         >
@@ -162,8 +164,8 @@ export default function RecommendPage() {
 
         {/* "How do I actually buy this?" — reference material, fine to fold away */}
         <Layer
-          title="Nasıl alırım?"
-          hint="Aracı kurum hesabı açmaktan ilk emri vermeye kadar adım adım rehber."
+          title={t('recommend.howtoLayerTitle')}
+          hint={t('recommend.howtoLayerHint')}
           open={layer === 'howto'}
           onToggle={() => setLayer(layer === 'howto' ? null : 'howto')}
         >
@@ -175,13 +177,13 @@ export default function RecommendPage() {
         <BoughtItBridge allocations={portfolio.allocations} budget={portfolio.budget} />
 
         <div className="disclaimer">
-          <Icon name="warning" size={13} /> Bu bilgiler yalnızca eğitim amaçlıdır. Geçmiş performans, gelecek sonuçların garantisi değildir. Yatırım kararlarınız için lisanslı bir finansal danışmana başvurun.
+          <Icon name="warning" size={13} /> {t('recommend.disclaimer')}
         </div>
 
         {/* Nothing is saved here — the portfolio is recomputed from the profile
             on demand. Calling it "Kaydet" implied an action that never happened. */}
         <button className="btn btn-ghost btn-full" onClick={() => navigate('/dashboard')}>
-          Panele dön →
+          {t('recommend.backToDashboard')}
         </button>
       </div>
     </div>

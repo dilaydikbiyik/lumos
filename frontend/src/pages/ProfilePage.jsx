@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { Trans, useTranslation } from 'react-i18next'
 import FireflyMark from '../components/FireflyMark'
 import Icon from '../components/Icon'
 import { useNavigate } from 'react-router-dom'
@@ -13,9 +14,9 @@ import { readJSON, writeJSON, removeKey, userKey } from '../utils/storage'
 
 // Risk score → user-friendly label and colour
 const RISK_META = {
-  low:    { color: 'var(--green)',   label: 'Muhafazakâr'  },
-  medium: { color: 'var(--firefly)', label: 'Dengeli'      },
-  high:   { color: 'var(--accent)',  label: 'Atılgan'      },
+  low:    { color: 'var(--green)',   label: 'profile.bands.low'    },
+  medium: { color: 'var(--firefly)', label: 'profile.bands.medium' },
+  high:   { color: 'var(--accent)',  label: 'profile.bands.high'   },
 }
 
 function getRiskMeta(score) {
@@ -27,6 +28,7 @@ function getRiskMeta(score) {
 
 
 export default function ProfilePage() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const { userId } = useAuth()
   const { saveProfile, loadProfile } = usePortfolio()
@@ -92,11 +94,11 @@ export default function ProfilePage() {
                 fontSize: 12, letterSpacing: '0.12em', textTransform: 'uppercase',
                 color: 'var(--firefly)', fontWeight: 700, marginBottom: 8,
               }}>
-                Adım 3 / 3
+                {t('profile.step')}
               </p>
-              <h2>Seni Tanıyalım</h2>
+              <h2>{t('profile.title')}</h2>
               <p style={{ fontSize: 13, marginTop: 6 }}>
-                9 kısa soru — yapay zeka profilini çıkaracak, portföyünü buna göre kişiselleştirecek.
+                {t('profile.subtitle')}
               </p>
             </div>
             <ChatWindow
@@ -110,9 +112,9 @@ export default function ProfilePage() {
             {/* Header */}
             <div style={{ textAlign: 'center', padding: '12px 0' }}>
               <FireflyMark size={44} style={{ display: 'block', margin: '0 auto 10px', filter: 'drop-shadow(0 0 12px rgba(245,165,36,0.4))' }} />
-              <h2>Risk Profilin Hazır</h2>
+              <h2>{t('profile.readyTitle')}</h2>
               <p style={{ fontSize: 13, marginTop: 6 }}>
-                Cevapların analiz edildi — sana özel portföy hesaplanıyor.
+                {t('profile.readySubtitle')}
               </p>
             </div>
 
@@ -133,7 +135,7 @@ export default function ProfilePage() {
                   color: getRiskMeta(displayProfile.risk_score).color,
                   textTransform: 'uppercase',
                 }}>
-                  {getRiskMeta(displayProfile.risk_score).label} Profil
+                  {t(getRiskMeta(displayProfile.risk_score).label)} {t('profile.profileWord')}
                 </span>
                 <span className="badge badge-amber">{displayProfile.risk_score}/10</span>
               </div>
@@ -149,12 +151,12 @@ export default function ProfilePage() {
                     background: 'var(--firefly-dim)', borderRadius: 'var(--radius-xs)',
                     fontSize: 13, lineHeight: 1.6, color: 'var(--text)',
                   }}>
-                    <Icon name="bulb" size={14} /> Senin bütçen <strong>{money(displayProfile.answers.budget)}</strong>.
-                    Bu risk seviyesinde, sert bir düşüşte portföyün geçici olarak
-                    yaklaşık <strong>%{dropPct}</strong> gerileyip{' '}
-                    <strong>{money(worst)}</strong>&apos;ye inebilir.
-                    Bu, bu profil için normal bir dalgalanma aralığı — satmadığın sürece
-                    zarar kesinleşmez.
+                    <Icon name="bulb" size={14} />{' '}
+                    <Trans
+                      i18nKey="profile.budgetNote"
+                      values={{ budget: money(displayProfile.answers.budget), pct: dropPct, worst: money(worst) }}
+                      components={[<strong key="a" />, <strong key="b" />, <strong key="c" />]}
+                    />
                   </div>
                 )
               })()}
@@ -163,9 +165,9 @@ export default function ProfilePage() {
             {/* Score breakdown */}
             {displayProfile.factors?.length > 0 && (
               <div className="card">
-                <h3 style={{ marginBottom: 4, fontSize: 15 }}>Bu skor nereden geldi?</h3>
+                <h3 style={{ marginBottom: 4, fontSize: 15 }}>{t('profile.whyTitle')}</h3>
                 <p style={{ fontSize: 12, opacity: 0.7, marginBottom: 12 }}>
-                  Kara kutu yok — her puanın kaynağı ve gerekçesi:
+                  {t('profile.whySubtitle')}
                 </p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                   {displayProfile.factors.map((f, i) => (
@@ -186,7 +188,11 @@ export default function ProfilePage() {
                   ))}
                 </div>
                 <p style={{ fontSize: 12, opacity: 0.6, marginTop: 12, borderTop: '1px solid var(--border)', paddingTop: 8 }}>
-                  Toplam ≈ <strong>{displayProfile.risk_score}/10</strong> (katkıların toplamı, 1-10 aralığına sabitlenir)
+                  <Trans
+                    i18nKey="profile.total"
+                    values={{ score: displayProfile.risk_score }}
+                    components={[<strong key="a" />]}
+                  />
                 </p>
               </div>
             )}
@@ -195,13 +201,13 @@ export default function ProfilePage() {
               className="btn btn-primary btn-full"
               onClick={() => navigate('/recommend', { state: displayProfile })}
             >
-              Portföyümü Gör
+              {t('profile.seePortfolio')}
             </button>
             <button
               className="btn btn-ghost btn-full"
               onClick={() => setRetaking(true)}
             >
-              ← Risk Analizini Güncelle
+              {t('profile.retake')}
             </button>
           </div>
         )}

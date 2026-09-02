@@ -3,6 +3,7 @@ import useScrollDirection from '../hooks/useScrollDirection'
 import Icon from './Icon'
 import { useAuth } from '@clerk/clerk-react'
 import api, { setAuthToken } from '../utils/api'
+import { useTranslation } from 'react-i18next'
 
 /**
  * Panic Button — press it when a market drop makes you want to sell everything.
@@ -14,6 +15,7 @@ import api, { setAuthToken } from '../utils/api'
  * "the decision is yours" close. No dark patterns: we never block selling.
  */
 export default function PanicButton() {
+  const { t } = useTranslation()
   const { getToken } = useAuth()
   const tucked = useScrollDirection()
   const [open, setOpen] = useState(false)
@@ -46,8 +48,8 @@ export default function PanicButton() {
       setCoach(res.data)
     } catch {
       setCoach({
-        message: 'Acele bir karar vermek zorunda değilsin. Bir düşüş, ancak sattığında kesinleşir.',
-        facts: ['Bu ekranı kapatıp hiçbir şey yapmamak da geçerli bir karardır.'],
+        message: t('panic.fallbackMessage'),
+        facts: [t('panic.fallbackFact')],
       })
     }
   }
@@ -57,7 +59,7 @@ export default function PanicButton() {
       const res = await api.post('/coach/panic', { resolution: choice })
       setClosing(res.data.message)
     } catch {
-      setClosing('Karar senin. Acele etmene gerek yok — rakamlar yerinde duruyor.')
+      setClosing(t('panic.fallbackClosing'))
     }
     setStage('done')
   }
@@ -67,7 +69,7 @@ export default function PanicButton() {
       {/* Floating panic button — left side, above the bottom nav */}
       <button
         onClick={press}
-        aria-label="Panik anı desteği"
+        aria-label={t('panic.openLabel')}
         className={`fab fab-panic ${tucked ? "fab-tucked" : ""}`}
         style={{
           background: 'var(--bg-card)', border: '1px solid var(--firefly-dim)',
@@ -97,15 +99,14 @@ export default function PanicButton() {
                 {secondsLeft}
               </div>
               <p style={{ fontSize: 17, fontWeight: 600, marginTop: 18 }}>
-                Karar vermeden önce dur
+                {t('panic.pauseTitle')}
               </p>
               <p style={{ fontSize: 14, opacity: 0.75, marginTop: 8, maxWidth: 360, lineHeight: 1.6 }}>
-                Düşüşte acele satış, yatırımcıların en sık yaptığı ve en pahalıya mal olan hatadır.
-                Birkaç saniye sonra elindeki gerçek rakamları göstereceğim.
+                {t('panic.pauseBody')}
               </p>
               <button className="btn btn-ghost" style={{ marginTop: 24, fontSize: 13 }}
                       onClick={() => setStage('coach')}>
-                Rakamları şimdi göster →
+                {t('panic.showNow')}
               </button>
             </>
           )}
@@ -116,7 +117,7 @@ export default function PanicButton() {
                 fontSize: 12, fontWeight: 700, letterSpacing: '0.08em',
                 textTransform: 'uppercase', color: 'var(--firefly)', marginBottom: 14,
               }}>
-                Senin durumun
+                {t('panic.yourSituation')}
               </p>
               <p style={{ fontSize: 15, lineHeight: 1.7, marginBottom: 18 }}>{coach.message}</p>
               <div style={{ textAlign: 'left', display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 22 }}>
@@ -129,10 +130,10 @@ export default function PanicButton() {
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 <button className="btn btn-primary btn-full" onClick={() => resolve('held')}>
-                  Planıma sadık kalıyorum
+                  {t('panic.stickToPlan')}
                 </button>
                 <button className="btn btn-ghost btn-full" onClick={() => resolve('still_worried')}>
-                  Hâlâ endişeliyim
+                  {t('panic.stillWorried')}
                 </button>
               </div>
             </div>
@@ -142,7 +143,7 @@ export default function PanicButton() {
             <div style={{ maxWidth: 420 }}>
               <p style={{ fontSize: 15, lineHeight: 1.7, marginBottom: 22 }}>{closing}</p>
               <button className="btn btn-primary" onClick={() => setOpen(false)}>
-                Kapat
+                {t('common.close')}
               </button>
             </div>
           )}

@@ -5,27 +5,10 @@ import Icon from './Icon'
 import { SignedIn, useAuth } from '@clerk/clerk-react'
 import MessageBubble from './MessageBubble'
 import api, { extractErrorMessage, setAuthToken } from '../utils/api'
-
-const GREETING = {
-  role: 'assistant',
-  content:
-    'Lumos Danışman.\n\nYatırım ve bu uygulamayla ilgili aklına takılan her şeyi ' +
-    'kendi cümlelerinle yazabilirsin — hazır sorulardan seçmek zorunda değilsin. ' +
-    'Kavramları açıklarım, portföyündeki bir kararın nedenini anlatırım, bir haberi ' +
-    'yorumlarım.\n\nTek sınır: belirli bir hisse/fon için "al" ya da "sat" demem ve ' +
-    'piyasanın yönünü tahmin etmem — bunlar kimsenin dürüstçe bilemeyeceği şeyler. ' +
-    'Bunun dışında sorabileceğin şey sınırlı değil.',
-}
+import { useTranslation } from 'react-i18next'
 
 // Example prompts — shown only as starting points; the input is always free-form.
-const SUGGESTIONS = [
-  'ETF nedir, örnekle anlat',
-  'Risk skorum ne anlama geliyor?',
-  'Enflasyonda param neden eriyor?',
-  'Portföyümde neden altın var?',
-  'Piyasa düşerse ne yapmalıyım?',
-  'Dolar mı altın mı tutmalıyım?',
-]
+const SUGGESTION_KEYS = ['sug1', 'sug2', 'sug3', 'sug4', 'sug5', 'sug6']
 
 /**
  * Always-available education advisor. A floating button on every signed-in
@@ -33,8 +16,11 @@ const SUGGESTIONS = [
  * the risk quiz). The backend injects the user's real profile as context.
  */
 function AdvisorPanel({ onClose }) {
+  const { t } = useTranslation()
   const { getToken } = useAuth()
-  const [messages, setMessages] = useState([GREETING])
+  // The greeting is UI chrome, not conversation — flagged so it is never
+  // sent to the backend and re-renders in the newly selected language.
+  const [messages, setMessages] = useState([{ role: 'assistant', greeting: true }])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
@@ -56,11 +42,11 @@ function AdvisorPanel({ onClose }) {
     try {
       setAuthToken(await getToken())
       // Send only the real turns (drop the local greeting) to the backend
-      const history = next.filter(m => m !== GREETING)
+      const history = next.filter(m => !m.greeting)
       const res = await api.post('/chat/advisor', { messages: history })
       setMessages([...next, { role: 'assistant', content: res.data.reply }])
     } catch (err) {
-      setError(extractErrorMessage(err, 'Şu an cevap veremedim — birazdan tekrar dene.'))
+      setError(extractErrorMessage(err, t('advisor.error')))
     } finally {
       setLoading(false)
       setTimeout(() => inputRef.current?.focus(), 100)
@@ -77,10 +63,10 @@ function AdvisorPanel({ onClose }) {
         }}>
           <FireflyMark size={22} />
           <div style={{ flex: 1 }}>
-            <div style={{ fontWeight: 700, fontSize: 15 }}>Lumos Danışman</div>
-            <div style={{ fontSize: 11, color: 'var(--text-dim)' }}>Sorularını yanıtlar — tavsiye değil, eğitim</div>
+            <div style={{ fontWeight: 700, fontSize: 15 }}>{t('advisor.title')}</div>
+            <div style={{ fontSize: 11, color: 'var(--text-dim)' }}>{t('advisor.subtitle')}</div>
           </div>
-          <button onClick={onClose} aria-label="Kapat"
+          <button onClick={onClose} aria-label={t('common.close')}
             style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: 22, cursor: 'pointer' }}>
             ×
           </button>
@@ -88,22 +74,22 @@ function AdvisorPanel({ onClose }) {
 
         {/* Messages */}
         <div style={{ flex: 1, overflowY: 'auto', padding: 14, display: 'flex', flexDirection: 'column', gap: 10 }}>
-          {messages.map((m, i) => <MessageBubble key={i} role={m.role} content={m.content} />)}
+          {messages.map((m, i) => <MessageBubble key={i} role={m.role} content={m.greeting ? t('advisor.greeting') : m.content} />)}
           {loading && (
             <div className="bubble-assistant" style={{ opacity: 0.7 }}>
-              <span className="light-loader" style={{ width: 14, height: 14, display: 'inline-block' }} /> yazıyor…
+              <span className="light-loader" style={{ width: 14, height: 14, display: 'inline-block' }} /> {t('advisor.typing')}
             </div>
           )}
           {error && <p style={{ color: 'var(--red)', fontSize: 13 }}>{error}</p>}
           {messages.length === 1 && !loading && (
             <div style={{ marginTop: 4 }}>
               <div style={{ fontSize: 11, color: 'var(--text-dim)', marginBottom: 6 }}>
-                Örnek başlangıçlar — ya da aşağıya kendi sorunu yaz:
+                {t('advisor.suggestionsLabel')}
               </div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                {SUGGESTIONS.map(s => (
-                  <button key={s} className="btn btn-ghost" style={{ fontSize: 12 }} onClick={() => send(s)}>
-                    {s}
+                {SUGGESTION_KEYS.map(k => (
+                  <button key={k} className="btn btn-ghost" style={{ fontSize: 12 }} onClick={() => send(t('advisor.' + k))}>
+                    {t('advisor.' + k)}
                   </button>
                 ))}
               </div>
@@ -115,12 +101,12 @@ function AdvisorPanel({ onClose }) {
         {/* Input */}
         <form onSubmit={e => { e.preventDefault(); send() }}
           className="advisor-input-row">
-          <input ref={inputRef} className="input" style={{ flex: 1 }} placeholder="Bir şey sor…"
+          <input ref={inputRef} className="input" style={{ flex: 1 }} placeholder={t('advisor.placeholder')}
             value={input} onChange={e => setInput(e.target.value)} enterKeyHint="send" />
-          <button className="btn btn-primary" type="submit" disabled={loading} aria-label="Gönder">→</button>
+          <button className="btn btn-primary" type="submit" disabled={loading} aria-label={t('common.send')}>→</button>
         </form>
         <p style={{ fontSize: 10, color: 'var(--text-dim)', textAlign: 'center', padding: '0 12px 10px' }}>
-          Yalnızca eğitim amaçlıdır — yatırım tavsiyesi değildir.
+          {t('common.eduFooter')}
         </p>
       </div>
     </div>
@@ -128,6 +114,7 @@ function AdvisorPanel({ onClose }) {
 }
 
 export default function AdvisorChat() {
+  const { t } = useTranslation()
   const [open, setOpen] = useState(false)
   const tucked = useScrollDirection()
   return (
@@ -135,7 +122,7 @@ export default function AdvisorChat() {
       {!open && (
         <button
           onClick={() => setOpen(true)}
-          aria-label="Danışmana sor"
+          aria-label={t('advisor.openLabel')}
           className={`fab fab-advisor ${tucked ? "fab-tucked" : ""}`}
           style={{
             border: 'none',

@@ -2,16 +2,12 @@ import { useEffect, useState } from 'react'
 import api from '../utils/api'
 import { CATEGORY_COLORS, COLORS } from '../utils/palette'
 import Icon from './Icon'
-
-const CATEGORY_TR = {
-  stocks: 'Hisse / ETF', reit: 'Gayrimenkul', bond: 'Tahvil',
-  fund: 'Fon', gold: 'Altın', cash: 'Nakit', other: 'Diğer',
-}
+import { useTranslation } from 'react-i18next'
 
 const VERDICT = {
-  balanced: { color: 'var(--green)', label: 'Dengede' },
-  notable:  { color: 'var(--firefly)', label: 'Hafif sapma' },
-  serious:  { color: 'var(--red)', label: 'Belirgin sapma' },
+  balanced: { color: 'var(--green)', label: 'drift.balanced' },
+  notable:  { color: 'var(--firefly)', label: 'drift.notable' },
+  serious:  { color: 'var(--red)', label: 'drift.serious' },
 }
 
 /**
@@ -20,6 +16,7 @@ const VERDICT = {
  * and — importantly — usually says "do nothing yet".
  */
 export default function DriftCard({ holdingsCount }) {
+  const { t } = useTranslation()
   const [data, setData] = useState(null)
 
   useEffect(() => {
@@ -38,12 +35,12 @@ export default function DriftCard({ holdingsCount }) {
     <div className="card">
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
         <Icon name="target" size={18} color={v.color} />
-        <strong style={{ fontSize: 'var(--t-lead)' }}>Portföyün dengede mi?</strong>
+        <strong style={{ fontSize: 'var(--t-lead)' }}>{t('drift.title')}</strong>
         <span className="badge" style={{
           marginLeft: 'auto', background: 'transparent',
           border: `1px solid ${v.color}55`, color: v.color, fontSize: 'var(--t-micro)',
         }}>
-          {v.label}
+          {t(v.label)}
         </span>
       </div>
 
@@ -62,13 +59,13 @@ export default function DriftCard({ holdingsCount }) {
                 fontSize: 'var(--t-micro)', marginBottom: 3,
               }}>
                 <span style={{ color: 'var(--text-muted)', flex: 1 }}>
-                  {CATEGORY_TR[r.category] || r.category}
+                  {t('drift.categories.' + r.category, { defaultValue: r.category })}
                 </span>
                 <span className="num" style={{ color: 'var(--text-dim)' }}>
-                  hedef %{r.target_pct}
+                  {t('drift.target', { pct: r.target_pct })}
                 </span>
                 <span className="num" style={{ color, fontWeight: 700, minWidth: 46, textAlign: 'right' }}>
-                  şu an %{r.actual_pct}
+                  {t('drift.actual', { pct: r.actual_pct })}
                 </span>
               </div>
               {/* target as a faint track, actual as the filled bar */}

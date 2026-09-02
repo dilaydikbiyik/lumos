@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import Icon from './Icon'
 
 /**
@@ -7,18 +8,18 @@ import Icon from './Icon'
  */
 
 const TIPS = [
-  { id: 'etf', emoji: '🧺', title: 'ETF Aslında Bir Sepettir', body: 'Tek alımda onlarca hisseye birden ortak olursun. Tek tek seçme derdi yok — hazır paketlenmiş yatırım.' },
-  { id: 'diversification', emoji: '🥚', title: 'Yumurtaları Tek Sepete Koyma', body: 'Farklı varlıklara dağıtınca tek bir kötü gün her şeyini götürmez. Buna çeşitlendirme denir.' },
-  { id: 'inflation', emoji: '📉', title: 'Enflasyon Paranı Eritir', body: '%50 enflasyonda yastık altındaki 100 TL, bir yıl sonra 67 TL gibi davranır. Yatırım yapmamak da bir risk.' },
-  { id: 'dividend', emoji: '💰', title: 'Temettü = Kira Gibi', body: 'Şirketin kârından sana düşen pay. Hisseni tuttuğun sürece düzenli gelir getirir — mülk kiralamak gibi.' },
-  { id: 'reel-return', emoji: '📊', title: 'Reel Getiri Gerçek Kazanç', body: '%45 kazandın ama enflasyon %60 ise gerçekte kaybettin. Her zaman enflasyondan arındırılmış getiriye bak.' },
-  { id: 'liquidity', emoji: '💧', title: 'Likidite Hayat Kurtarır', body: 'Hisse dakikalar içinde nakde döner, arsa aylar sürebilir. Acil paraya ihtiyacın olabilir — bunu unutma.' },
-  { id: 'drawdown', emoji: '🎢', title: 'Düşüşler Normal', body: 'Piyasalar her yıl ortalama %10-15 düşüş yaşar. Bu panik değil, doğal döngü. Satmadığın sürece zarar etmedin.' },
-  { id: 'gold', emoji: '🥇', title: 'Altın Sigorta Gibi', body: 'Kriz dönemlerinde hisse düşerken altın genelde yükselir. Portföyünün "koruma kalkanı" olarak düşün.' },
-  { id: 'patience', emoji: '⏳', title: 'Sabır En İyi Strateji', body: 'S&P 500 tarihinde hiçbir 10 yıllık dönemde zarar ettirmemiştir. Zaman, en güçlü yatırım aracın.' },
-  { id: 'reit', emoji: '🏢', title: 'Ev Almadan Emlakçı Ol', body: 'REIT ETF\'leri ile küçük tutarlarla gayrimenkul geliri elde edebilirsin. Mülk almadan emlak yatırımcısı olmanın yolu.' },
-  { id: 'fomo', emoji: '🔥', title: 'FOMO Düşmanın', body: '"Herkes alıyor, ben de alayım" en tehlikeli yatırım cümlesidir. Her yükselişte alsan, genelde tepeyi yakalar düşersin.' },
-  { id: 'cost-avg', emoji: '📅', title: 'Düzenli Yatırım Kur Riskini Azaltır', body: 'Her ay aynı tutarı yatırmak, bazı ay ucuza bazı ay pahalıya almana sebep olur. Sonuç: ortalamanın altında maliyet.' },
+  { id: 'etf', emoji: '🧺' },
+  { id: 'diversification', emoji: '🥚' },
+  { id: 'inflation', emoji: '📉' },
+  { id: 'dividend', emoji: '💰' },
+  { id: 'reel-return', emoji: '📊' },
+  { id: 'liquidity', emoji: '💧' },
+  { id: 'drawdown', emoji: '🎢' },
+  { id: 'gold', emoji: '🥇' },
+  { id: 'patience', emoji: '⏳' },
+  { id: 'reit', emoji: '🏢' },
+  { id: 'fomo', emoji: '🔥' },
+  { id: 'cost-avg', emoji: '📅' },
 ]
 
 const STORAGE_KEY = 'lumos-learned-tips'
@@ -40,6 +41,7 @@ function markSeen(tipId) {
 }
 
 export default function DailyTip() {
+  const { t } = useTranslation()
   // Start at the first unseen tip; tapping the card (or "Sonraki") marks it
   // learned and advances — the card is a mini-carousel, not a one-shot.
   const [idx, setIdx] = useState(() => {
@@ -67,7 +69,7 @@ export default function DailyTip() {
       className="card"
       onClick={advance}
       role="button"
-      aria-label="Sonraki ipucu"
+      aria-label={t('dailyTip.nextLabel')}
       style={{
         background: 'linear-gradient(135deg, var(--bg-card) 0%, rgba(245,165,36,0.04) 100%)',
         border: '1px solid var(--firefly-dim)',
@@ -82,21 +84,26 @@ export default function DailyTip() {
           background: 'none', border: 'none', color: 'var(--text-dim)',
           cursor: 'pointer', fontSize: 16, padding: '2px 6px',
         }}
-        aria-label="Kapat"
+        aria-label={t('common.close')}
       >
         ✕
       </button>
 
-      {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+      {/* Header — right padding keeps the counter clear of the absolutely
+          positioned close button, which used to sit on top of it. */}
+      <div style={{
+        display: 'flex', alignItems: 'center', gap: 8,
+        marginBottom: 10, paddingRight: 28,
+      }}>
         <span style={{
           fontSize: 11, fontWeight: 700, color: 'var(--firefly)',
           textTransform: 'uppercase', letterSpacing: '0.08em',
         }}>
-          <Icon name="bulb" size={13} /> Bugün Öğrendin
+          <Icon name="bulb" size={13} /> {t('dailyTip.label')}
         </span>
         <span style={{
           fontSize: 10, color: 'var(--text-dim)', marginLeft: 'auto',
+          flexShrink: 0,
         }}>
           {progress}/{total}
         </span>
@@ -109,8 +116,8 @@ export default function DailyTip() {
           filter: 'drop-shadow(0 0 6px rgba(245,165,36,0.3))',
         }}>{tip.emoji}</span>
         <div>
-          <p style={{ fontSize: 14, fontWeight: 700, marginBottom: 4 }}>{tip.title}</p>
-          <p style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.65 }}>{tip.body}</p>
+          <p style={{ fontSize: 14, fontWeight: 700, marginBottom: 4 }}>{t(`dailyTip.tips.${tip.id}.title`)}</p>
+          <p style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.65 }}>{t(`dailyTip.tips.${tip.id}.body`)}</p>
         </div>
       </div>
 
@@ -126,7 +133,7 @@ export default function DailyTip() {
         }} />
       </div>
       <p style={{ fontSize: 10, color: 'var(--text-dim)', marginTop: 6 }}>
-        Karta dokun → sıradaki kavram
+        {t('dailyTip.next')}
       </p>
     </div>
   )

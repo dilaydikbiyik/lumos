@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import useMarket from '../hooks/useMarket'
 
 /**
@@ -31,6 +32,7 @@ function getCurrency(holding) {
 }
 
 export default function CurrencyExposure({ holdings }) {
+  const { t } = useTranslation()
   // Holding amounts are recorded in TL (TR-market component) — TRY is pinned
   const { money } = useMarket()
   if (!holdings || holdings.length === 0) return null
@@ -57,17 +59,11 @@ export default function CurrencyExposure({ holdings }) {
   // Currency-risk message
   let riskLevel, riskMessage, riskColor
   if (tryPct >= 80) {
-    riskLevel = 'Yüksek'
-    riskMessage = 'Portföyünün büyük çoğunluğu TL bazlı. TL değer kaybettiğinde tüm portföyün etkilenir. Döviz bazlı varlık eklemeyi düşünebilirsin.'
-    riskColor = 'var(--red)'
+    riskLevel = t('fx.high'); riskMessage = t('fx.highMsg'); riskColor = 'var(--red)'
   } else if (tryPct >= 50) {
-    riskLevel = 'Orta'
-    riskMessage = 'TL ve döviz arasında makul bir denge var. Bu dağılım kur dalgalanmalarına karşı kısmen koruma sağlar.'
-    riskColor = 'var(--firefly)'
+    riskLevel = t('fx.mid'); riskMessage = t('fx.midMsg'); riskColor = 'var(--firefly)'
   } else {
-    riskLevel = 'Düşük'
-    riskMessage = 'Portföyün ağırlıklı olarak döviz bazlı. TL\'nin değer kaybından doğal olarak korunuyorsun.'
-    riskColor = 'var(--green)'
+    riskLevel = t('fx.low'); riskMessage = t('fx.lowMsg'); riskColor = 'var(--green)'
   }
 
   return (
@@ -75,15 +71,15 @@ export default function CurrencyExposure({ holdings }) {
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
         <span style={{ fontSize: 18 }}>💱</span>
         <div style={{ flex: 1 }}>
-          <h3 style={{ fontSize: 14, fontWeight: 700 }}>Kur Dağılımı</h3>
-          <p style={{ fontSize: 11, color: 'var(--text-dim)', marginTop: 1 }}>TL vs Döviz bazlı varlıkların</p>
+          <h3 style={{ fontSize: 14, fontWeight: 700 }}>{t('fx.title')}</h3>
+          <p style={{ fontSize: 11, color: 'var(--text-dim)', marginTop: 1 }}>{t('fx.subtitle')}</p>
         </div>
         <span style={{
           fontSize: 11, fontWeight: 600, padding: '3px 10px',
           borderRadius: 20, color: riskColor,
           background: `${riskColor}18`,
         }}>
-          Kur riski: {riskLevel}
+          {t('fx.riskLabel')}: {riskLevel}
         </span>
       </div>
 
@@ -110,7 +106,7 @@ export default function CurrencyExposure({ holdings }) {
             background: 'var(--firefly)', display: 'inline-block',
           }} />
           <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>
-            🇹🇷 TL — %{tryPct} · {money(tryTotal, 'TRY')}
+            {t('fx.tryLegend', { pct: tryPct })} · {money(tryTotal, 'TRY')}
           </span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -119,7 +115,7 @@ export default function CurrencyExposure({ holdings }) {
             background: 'var(--accent-2)', display: 'inline-block',
           }} />
           <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>
-            🌍 Döviz — %{usdPct} · {money(usdTotal, 'TRY')}
+            {t('fx.fxLegend', { pct: usdPct })} · {money(usdTotal, 'TRY')}
           </span>
         </div>
       </div>

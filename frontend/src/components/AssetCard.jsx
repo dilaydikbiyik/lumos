@@ -1,13 +1,12 @@
 import { sliceColor } from '../utils/palette'
+import { useTranslation } from 'react-i18next'
 
-const CATEGORY_LABELS = {
-  stocks: 'Hisse Senetleri', reit: 'Gayrimenkul (REIT)', fund: 'Yatırım Fonu',
-  gold: 'Kıymetli Maden', bond: 'Tahvil / Sabit Getiri', cash: 'Nakit / Para Piyasası',
-}
+
 
 /** Quick glance card right under the pie — accented with the EXACT colour of
     the clicked slice, so the chart and the card read as one. */
 export default function AssetCard({ allocation, index = 0, color = null, onClose }) {
+  const { t } = useTranslation()
   if (!allocation) return null
   // The caller knows the sibling shading; fall back only when it doesn't.
   const accent = color || sliceColor(allocation, index)
@@ -23,13 +22,13 @@ export default function AssetCard({ allocation, index = 0, color = null, onClose
         style={{ position: 'absolute', top: 10, right: 10, background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: 16 }}
       >✕</button>
       <p style={{ fontSize: 11, color: accent, fontWeight: 600, marginBottom: 4 }}>
-        {CATEGORY_LABELS[allocation.category] || allocation.category}
+        {t('categories.' + allocation.category, { defaultValue: allocation.category })}
       </p>
       <h3 style={{ marginBottom: 2 }}>{allocation.name}</h3>
       <p style={{ fontSize: 12, marginBottom: 12 }}>{allocation.ticker}</p>
       <div style={{ display: 'flex', gap: 16 }}>
         <div>
-          <p style={{ fontSize: 11, color: 'var(--text-dim)' }}>Portföydeki payı</p>
+          <p style={{ fontSize: 11, color: 'var(--text-dim)' }}>{t('bridge.shareLabel')}</p>
           <p style={{ fontWeight: 700, fontSize: 22, color: accent }}>
             {(allocation.weight * 100).toFixed(1)}%
           </p>

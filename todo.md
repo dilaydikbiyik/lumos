@@ -1087,8 +1087,13 @@ SEC/BaFin surface. Book the lawyer before Phase 4; the answer may change scope
       English, same marker protocol and guardrails) + `advisor_prompt.en.txt`;
       `ai_service.chat(language=...)` selects, contract enforced by tests.
 - [x] Pattern conversions: AppNav, OnboardingPage, DisclaimerModal.
-- [ ] Convert the remaining ~38 frontend files to `t()` keys (page by page:
-      Profile → Recommend → Holdings → Dashboard → Explore → components).
+- [~] Convert the remaining frontend files to `t()` keys. Done: quiz flow,
+      Profile, Recommend + its cards (explainer, rationale, time machine,
+      scenarios, what-if, practice, beginner guide, bridge), Holdings + its
+      cards (drift, FX, value chart, comparison), and the global chrome
+      (advisor, panic button, glossary tooltip, feedback, daily tip, goal
+      planner). Remaining: ExplorePage (largest), Dashboard shell,
+      FearCheckIn, PathSelection, HeadlineEducation, MarketSwitcher.
 - [ ] Backend engine strings (risk factors, drift labels, summaries — 21
       files) keyed by request language.
 - [ ] Language switcher in the UI — only AFTER coverage is complete; a
@@ -1124,3 +1129,44 @@ SEC/BaFin surface. Book the lawyer before Phase 4; the answer may change scope
 - [ ] **User:** Apple Developer ($99/yr) + Play Console ($25 one-time).
 - [ ] Review-readiness: demo account for reviewers, no dev-mode Clerk,
       finance-category compliance answers ready.
+
+
+### Second testing round — 20 Jul 2026 (desktop)
+
+- [x] **Dashboard read as "stray metadata" for its first seconds.** It was: the
+      daily-tip card renders with no network of its own, so while the rest
+      loaded the whole page was one tip card with a close button and a "0/12"
+      counter — then the real content shoved it down. Readiness now holds its
+      space with a placeholder; the tip waits for primary content.
+- [x] **Dashboard genuinely slow.** Measured in production: `/news/digest`
+      took 16.9s (RSS + LLM, and Render's ephemeral disk wipes the cache every
+      deploy, handing the whole cost to the first visitor). Warmed in the
+      background at startup — now 0.9s. Production-only: firing it in tests
+      spent a live LLM call and broke a test asserting the model is never
+      called.
+- [x] **Portfolio wheel stuttered and drew twice.** The page renders from
+      cache then re-renders on the fresh copy; an equal-but-new array made
+      Recharts restart. Dataset memoised on the allocation itself.
+- [x] **Close button sat on the tip counter** — both pinned to the same corner.
+- [x] **Adding an asset meant typing everything.** `GET /holdings/lookup`
+      resolves a symbol to its real name, price and currency; entering a
+      quantity fills the amount. It also validates the symbol, which used to
+      fail silently — a typo was saved and then never tracked live.
+      Production hardening found along the way: `Ticker.info` answers nothing
+      from our datacenter (names fell back to the symbol — now a search
+      endpoint covers it), `fast_info` intermittently returns no price (falls
+      back to the download path valuation already uses), and a transient
+      upstream failure was being cached as "not found" for 15 minutes on
+      valid symbols (now 60s, and the message no longer claims the symbol is
+      wrong).
+- [x] **Goal planner never said what it assumed.** It answered "how much a
+      month?" with no stated growth rate, in an app whose promise is that the
+      formula is visible. It now returns the assumed rate and explains the
+      annuity behind it, including that the rate is a planning assumption.
+
+Also corrected two claims while moving copy to locale files: the S&P 500 has
+NOT been positive over every 10-year window (2000-2009 was not), and "markets
+fall 10-15% every year" became "often".
+
+Not reproduced: nothing was tested on a phone this round — the reporter was on
+desktop and said so.

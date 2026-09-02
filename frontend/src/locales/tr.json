@@ -14,7 +14,10 @@
     "send": "Gönder",
     "cancel": "Vazgeç",
     "tryAgain": "Tekrar dene",
-    "back": "← Geri"
+    "back": "← Geri",
+    "eduFooter": "Yalnızca eğitim amaçlıdır — yatırım tavsiyesi değildir.",
+    "close": "Kapat",
+    "value": "Değer"
   },
   "onboarding": {
     "tagline": "Yatırım karanlık bir orman gibi görünür.",
@@ -57,5 +60,485 @@
   },
   "language": {
     "label": "Dil"
+  },
+  "quiz": {
+    "intro": "Merhaba! Ben Lumos.\n\nSana 9 kısa soru soracağım ve kişisel risk profilini oluşturacağım. Hazır mısın?\n\n**1. soru — Yatırıma ayırabileceğin bütçen nedir?** (Örn: 50.000 TL)",
+    "reveal": "Okudum, risk profilimi göster →",
+    "noRush": "Acelen yok — yukarıyı istediğin kadar okuyabilirsin.",
+    "answersKept": "Cevapların kayıtlı — baştan başlaman gerekmiyor.",
+    "inputPlaceholder": "Cevabını yaz…"
+  },
+  "profile": {
+    "bands": {
+      "low": "Muhafazakâr",
+      "medium": "Dengeli",
+      "high": "Atılgan"
+    },
+    "step": "Adım 3 / 3",
+    "title": "Seni Tanıyalım",
+    "subtitle": "9 kısa soru — yapay zeka profilini çıkaracak, portföyünü buna göre kişiselleştirecek.",
+    "readyTitle": "Risk Profilin Hazır",
+    "readySubtitle": "Cevapların analiz edildi — sana özel portföy hesaplanıyor.",
+    "profileWord": "Profil",
+    "budgetNote": "Senin bütçen <0>{{budget}}</0>. Bu risk seviyesinde, sert bir düşüşte portföyün geçici olarak yaklaşık <1>%{{pct}}</1> gerileyip <2>{{worst}}</2>'ye inebilir. Bu, bu profil için normal bir dalgalanma aralığı — satmadığın sürece zarar kesinleşmez.",
+    "whyTitle": "Bu skor nereden geldi?",
+    "whySubtitle": "Kara kutu yok — her puanın kaynağı ve gerekçesi:",
+    "total": "Toplam ≈ <0>{{score}}/10</0> (katkıların toplamı, 1-10 aralığına sabitlenir)",
+    "seePortfolio": "Portföyümü Gör",
+    "retake": "← Risk Analizini Güncelle"
+  },
+  "debt": {
+    "title": "Önce şunu konuşalım",
+    "body": "<0>{{debt}}</0> kredi kartı / ihtiyaç kredisi borcun var. Bu borç yılda yaklaşık <1>%{{debtPct}}</1> faizle büyüyor. Senin risk profiline uygun bir portföyün uzun vadeli beklentisi ise yılda yaklaşık <2>%{{portPct}}</2> — ve bu bir beklenti, garanti değil.",
+    "ifRepay": "{{amount}} ile borcu kapatırsan",
+    "repayCaption": "bir yılda ödemediğin faiz — kesin",
+    "ifInvest": "Aynı parayı yatırırsan",
+    "investCaption": "bir yılda beklenen getiri — garanti değil",
+    "verdict": "Borcu kapatmak, bu yıl için <0>{{advantage}}</0> daha iyi — üstelik risk almadan.",
+    "covers": "Bütçen borcu kapatmaya yetiyor; kalan <0>{{leftover}}</0> ile yatırıma gönül rahatlığıyla başlayabilirsin.",
+    "notCovered": "Önce borcu bitir, sonra buraya dön. Portföyün seni bekliyor olacak.",
+    "assumption": "Hesapta kart faizi aylık %{{monthly}} varsayıldı (yıllık bileşik %{{annual}}). Bu bir planlama varsayımıdır, güncel resmî oran değil — merkez bankası dönemsel olarak günceller. Kendi ekstrendeki orana bak; rakam değişir, yön değişmez. Aşağıdaki portföyü yine de inceleyebilirsin — hazır olduğunda burada."
+  },
+  "recommend": {
+    "preparing": "Portföyün hazırlanıyor…",
+    "title": "Portföyün Hazır",
+    "riskBadge": "Risk {{score}}/10",
+    "budgetBadge": "{{amount}} bütçe",
+    "reitBadge": "REIT dahil ✓",
+    "whyTitle": "Neden Bu Portföy?",
+    "testLayerTitle": "Bu portföyü sına",
+    "testLayerHint": "Gerçek geçmiş verilerle dene: kötü günlerde ne olurdu, sen ne hissederdin?",
+    "howtoLayerTitle": "Nasıl alırım?",
+    "howtoLayerHint": "Aracı kurum hesabı açmaktan ilk emri vermeye kadar adım adım rehber.",
+    "disclaimer": "Bu bilgiler yalnızca eğitim amaçlıdır. Geçmiş performans, gelecek sonuçların garantisi değildir. Yatırım kararlarınız için lisanslı bir finansal danışmana başvurun.",
+    "backToDashboard": "Panele dön →"
+  },
+  "rationale": {
+    "title": "Neden bu dağılım?",
+    "subtitle": "Bu oranlar yapay zekanın değil, deterministik bir formülün çıktısı — her adımı burada:",
+    "intro": "Risk skorun <0>{{score}}/10</0>. Dağılım iki adımda çıkıyor:",
+    "step1": "<0>Ne kadarı güvenli tarafta dursun?</0><1/>Risk skoru yükseldikçe nakit ve tahvilin payı azalır. Seninkiyle güvenli taraf <2>%{{pct}}</2> oldu — bu kısım sert düşüşlerde portföyünün sarsıntısını yumuşatır.",
+    "step2": "<0>Kalan %{{pct}} nasıl paylaşıldı?</0><1/>Büyüme tarafındaki varlıklar oynaklıklarına (fiyatın ne kadar inip çıktığına) göre tartıldı. Düşük risk skorunda sakin varlıklar ağır basar, yüksek skorda hareketli olanlar.",
+    "lowBand": "Senin skorun düşük tarafta, ağırlık sakin varlıklarda.",
+    "highBand": "Senin skorun yüksek tarafta, ağırlık hareketli varlıklarda.",
+    "midBand": "Sen ortadasın, ikisi dengeli karıştırıldı.",
+    "showFormula": "Formülün kendisini göster",
+    "alphaNote": "α = {{alpha}} (risk skorun ÷ 10)",
+    "droppedTitle": "Neden {{count}} pozisyon? Şunlar bilinçli olarak elendi:",
+    "wouldBe": "(%{{pct}} olurdu)",
+    "footer": "Bütçen {{budget}} · en fazla {{cap}} varlığa bölündü · payı %{{minPct}}'in altında kalanlar elendi (çok küçük paylar takibi zorlaştırır, getiriye katkısı ise ihmal edilebilir)"
+  },
+  "categories": {
+    "stocks": "Hisse Senetleri",
+    "reit": "Gayrimenkul (REIT)",
+    "fund": "Yatırım Fonu",
+    "gold": "Kıymetli Maden",
+    "bond": "Tahvil / Sabit Getiri",
+    "cash": "Nakit / Para Piyasası"
+  },
+  "bridge": {
+    "checking": "Varlıklarım kontrol ediliyor…",
+    "recordedTitle": "Bu portföy Varlıklarım'da ✓",
+    "recordedBody": "Bu varlıkları daha önce işledin — güncel değerlerini Varlıklarım'dan takip edebilirsin.",
+    "goHoldings": "Varlıklarım'a git →",
+    "addAnother": "Yeni bir alım daha işlemek istiyorum",
+    "newPurchaseTitle": "Yeni alımını işle",
+    "boughtTitle": "Bu portföyü aldın mı?",
+    "body": "Alımını kendi aracı kurumunda yaptıysan, portföyü tek tıkla Varlıklarım'a işleyelim — kalan bütçen otomatik güncellenir.",
+    "recordCta": "Aldım — {{amount}}'lik dağılımı işle",
+    "transferError": "Aktarım tamamlanamadı — Varlıklarım sayfasından tek tek ekleyebilirsin.",
+    "shareLabel": "Portföydeki payı",
+    "chartTitle": "Dağılımın"
+  },
+  "reit": {
+    "title": "Gayrimenkul Yatırımı: REIT ETF",
+    "body": "Bütçen doğrudan emlak almaya yetmediğinde, <0>REIT ETF'leri</0> ile gayrimenkul piyasasına yatırım yapabilirsin. Bunlar hisse gibi alınıp satılan, içinde onlarca ticari bina ve konut barındıran sepetlerdir — mülk almadan emlak getirisine ortak olursun."
+  },
+  "explainer": {
+    "tabs": {
+      "what": "Bu Nedir?",
+      "why": "Neden Var?",
+      "risk": "Riski Ne?"
+    },
+    "byTicker": {
+      "XU100_IS": {
+        "type": "Hisse Endeksi",
+        "what": "BIST 100, Türkiye'nin en büyük 100 şirketinin hisselerinden oluşan bir endeks. THY, Aselsan, BİM gibi dev şirketler bu sepetin içinde.",
+        "why": "Türk ekonomisi büyüdükçe bu şirketlerin değeri de büyür. Kendi ülkende yatırım yapmanın en kolay yolu.",
+        "risk": "Kısa vadede %20-30 düşüşler olabilir. Ama uzun vadede (5+ yıl) Türkiye borsası tarihsel olarak enflasyonun üstünde getiri sağlamıştır."
+      },
+      "SPY": {
+        "type": "Amerikan Hisse ETF",
+        "what": "S&P 500 — dünyanın en büyük 500 Amerikan şirketinin sepeti. Apple, Google, Amazon, Tesla hepsi içinde.",
+        "why": "Dolar bazlı kazanç sağlar + ABD piyasası tarihsel olarak en istikrarlı büyüyen piyasalardan biri. TL eriyor derdine karşı bir kalkan.",
+        "risk": "Dolar düşerse TL değerin azalır. 10+ yıllık dönemlerin büyük çoğunluğunda kazandırmıştır; istisna da var — 2000-2009 arası \"kayıp on yıl\"da düşüşle kapandı. Uzun vade çoğu zaman yeter, garanti etmez."
+      },
+      "QQQ": {
+        "type": "Teknoloji ETF",
+        "what": "Nasdaq 100 — dünya teknoloji devlerinin sepeti. Apple, Microsoft, NVIDIA, Meta gibi şirketler.",
+        "why": "Teknoloji sektörü uzun vadede en hızlı büyüyen sektör. Dolar bazlı, yüksek büyüme potansiyeli.",
+        "risk": "Teknoloji hisseleri daha çok dalgalanır. 2022'de %33 düşüp 2023'te %55 çıktı — kalp dayanıklılığı gerektirir."
+      },
+      "GLD": {
+        "type": "Altın ETF",
+        "what": "Fiziksel altının borsa hissesi versiyonu. Gram altın almak yerine, dolar bazlı altın fiyatına ortak olursun.",
+        "why": "Altın, kriz dönemlerinde \"güvenli liman\" görevi görür. Hisse düşerken altın genelde yükselir — portföyünü dengeye getirir.",
+        "risk": "Altın uzun vadede hisse kadar hızlı büyümez. Ama paranı koruma gücü çok yüksektir."
+      },
+      "VNQ": {
+        "type": "Gayrimenkul ETF (REIT)",
+        "what": "Vanguard REIT ETF — ABD'deki ticari binalar, alışveriş merkezleri ve konutlara yatırım yapan bir emlak sepeti.",
+        "why": "Daire almaya bütçen yetmese bile, küçük tutarlarla gayrimenkul geliri elde edebilirsin. Kira gibi düzenli temettü öder.",
+        "risk": "Faiz oranları yükseldiğinde gayrimenkul fiyatları baskılanabilir. Fiziksel emlak gibi \"dokunulabilir\" değil."
+      },
+      "SCHH": {
+        "type": "ABD Konut REIT ETF",
+        "what": "Schwab US REIT ETF — konut ağırlıklı Amerikan gayrimenkul sepeti.",
+        "why": "VNQ'ya benzer ama daha konut ağırlıklı. Emlak piyasasına hisse kolaylığında ortak olursun.",
+        "risk": "REIT ETF'leri hisse gibi dalgalanır. Ama gerçek mülk alıp satma derdi yok, anında nakde çevirebilirsin."
+      }
+    },
+    "byCategory": {
+      "stocks": {
+        "type": "Hisse / Hisse ETF",
+        "what": "Bir şirketin veya şirket sepetinin sahiplik payı. Şirket büyüdükçe, senin payın da değerlenir.",
+        "why": "Uzun vadede en yüksek getiriyi sağlayan varlık sınıfı — enflasyonun çok üstünde büyüme potansiyeli.",
+        "risk": "Kısa vadede sert düşüşler olabilir. Toparlanma tarihsel olarak çoğu zaman gelmiştir, ama süresi yıllar alabilir."
+      },
+      "gold": {
+        "type": "Altın",
+        "what": "Binlerce yıldır değerini koruyan kıymetli maden. \"Kriz sigortası\" olarak bilinir.",
+        "why": "Hisse düşerken altın genelde yükselir. Portföyünün dengeyi korumasını sağlar.",
+        "risk": "Uzun vadede hisseler kadar kazandırmaz, ama paranın erimesini engeller."
+      },
+      "fund": {
+        "type": "Yatırım Fonu",
+        "what": "Profesyonellerin senin adına yönettiği ortak yatırım havuzu. Fon platformları üzerinden alınıp satılır.",
+        "why": "Tek tek hisse seçmek zorunda kalmazsın. Uzmanlar senin için en iyi karışımı yönetir.",
+        "risk": "Fon yönetim ücreti kesilir. Ve fonun performansı, yöneticinin kararlarına bağlıdır."
+      }
+    }
+  },
+  "timeMachine": {
+    "title": "Zaman Makinesi",
+    "subtitle": "Bu portföyü geçmişte kursaydın ne olurdu? Sadece kazancı değil, en kötü anı da gösteririz — <0>dibi görmek</0> cesaretin gerçek testi.",
+    "error": "Simülasyon şu an çalıştırılamadı — birazdan tekrar dene.",
+    "years": "{{n}} yıl",
+    "wouldBe": "{{amount}} olurdu…",
+    "afterInflation": "Enflasyon sonrası (<0>reel</0>)",
+    "worstMoment": "En kötü anında",
+    "roughRide": "Bir noktada paranın {{lost}}'si \"kaybolmuş\" görünecekti. O gün satmasaydın bugün {{outcome}} — buna hazır mısın?",
+    "inProfit": "kârdaydın",
+    "recovering": "toparlanma yolundaydın",
+    "calmRide": "Bu portföy geçmişte görece sakin bir yolculuk sunmuş — ama geçmiş, geleceğin garantisi değil."
+  },
+  "scenarios": {
+    "title": "Gelecek Senaryoları",
+    "subtitle": "\"Param {{years}} yılda ne olur?\" — <0>tahmin değil</0>, varlığın kendi geçmişinde yaşanmış tüm {{years}} yıllık dönemlerin aralığı.",
+    "error": "Senaryolar şu an hesaplanamadı",
+    "wholePortfolio": "🧺 Tüm Portföy",
+    "inWholePortfolio": "tüm portföyünde",
+    "show": "Göster",
+    "resultIntro": "<0>{{amount}}</0>, {{target}} {{years}} yıl kalsaydı (geçmiş {{history}} yılın {{windows}} dönemine göre):",
+    "bad": "Kötü dönem",
+    "typical": "Tipik dönem",
+    "good": "İyi dönem"
+  },
+  "whatIf": {
+    "title": "Ne olurdu?",
+    "subtitle": "Portföyünle ilgili \"ya şöyle olsaydı\" sorularını sor — cevap gerçek hesaplamadan gelir, tahmin değil.",
+    "placeholder": "örn: 20.000 TL daha eklesem?",
+    "ask": "Sor",
+    "error": "Şu an cevaplanamadı",
+    "sug1": "10.000 TL daha eklesem ne değişir?",
+    "sug2": "Daha temkinli olsam portföyüm nasıl olurdu?",
+    "sug3": "Daha agresif olsam ne olurdu?",
+    "notUnderstood": "Bunu bütçe veya risk değişikliği sorusu olarak anlayamadım — \"X TL eklesem\" ya da \"daha agresif/temkinli olsam\" gibi sorabilirsin."
+  },
+  "practice": {
+    "title": "Önce Sahte Parayla Dene",
+    "subtitle": "Gerçek para riske atmadan bu portföyü sanal 100.000 TL ile kur — gerçek piyasa verisiyle nasıl hareket ettiğini gör.",
+    "start": "Sanal Portföyü Kur",
+    "error": "Sanal portföy şu an başlatılamadı",
+    "virtualNow": "Sanal 100.000 TL şu an",
+    "thisWeek": "Bu hafta",
+    "mover": "Bu haftanın en hareketli varlığı <0>{{ticker}}</0> ({{pct}}%). Bu dalgalanmayı hissettin mi? Gerçek parayla da böyle olacak — fark, şimdi hiçbir şey kaybetmiyor olman.",
+    "honesty": "Bu rakam tek bir haftanın gerçek piyasa hareketi — bir getiri sözü değil. Eksi kapanan haftalar da olur; mesele o haftalarda satmamayı öğrenmek."
+  },
+  "guide": {
+    "title": "İlk Yatırım Rehberi",
+    "subtitle": "Aracı kurum → Para yatır → İlk emir — adım adım Türkiye rehberi",
+    "prev": "← Önceki",
+    "next": "Sonraki →",
+    "steps": {
+      "1": {
+        "title": "Aracı Kurum Nedir?",
+        "body": "Hisse senedi ve fon alıp satman için bir aracı kuruma ihtiyacın var. Banka hesabına benzer ama yatırım için. Türkiye'de faaliyet gösteren kurumların SPK lisansı olmak zorundadır.",
+        "tip": "💡 Kurumun lisanslı olduğunu SPK'nın resmî listesinden kendin doğrula (spk.gov.tr). Biz belirli bir kurum önermiyoruz — hiçbirinden komisyon almıyoruz."
+      },
+      "2": {
+        "title": "Hesap Nasıl Açılır?",
+        "body": "1. Seçtiğin kurumun web sitesine git.\n2. \"Hesap Aç\" butonuna tıkla.\n3. TC Kimlik No, e-posta, telefon gir.\n4. Video görüşmesiyle veya şubede kimlik doğrula.\n5. 1–3 iş günü içinde hesabın aktif olur.",
+        "tip": "💡 Çoğu kurum için mobil uygulama üzerinden uzaktan açılış mümkün — şubeye gitme zorunluluğu yok."
+      },
+      "3": {
+        "title": "Para Nasıl Yatırılır?",
+        "body": "EFT veya havale ile kendi banka hesabından aracı kurum hesabına para gönderirsin. Genellikle aynı gün ya da 1 iş günü içinde görünür.",
+        "tip": "💡 Küçük başla — ilk deneme için 500–1000 TL yeterli. Hepsini tek seferde yatırmak zorunda değilsin."
+      },
+      "4": {
+        "title": "İlk Emir Nasıl Verilir?",
+        "body": "1. Uygulamada \"Emir Ver\" veya \"Al\" bölümüne git.\n2. Almak istediğin varlığı ara.\n3. Miktar gir (kaç lot / TL).\n4. \"Piyasa Emri\" seç — anlık fiyattan alınır.\n5. Onayla.",
+        "tip": "💡 Önemli: Portföyünde yurtdışı borsalarda işlem gören ETF'ler varsa (SPY, QQQ gibi), bunlar BIST'te işlem görmez. Bunun için aracı kurumunun yurtdışı piyasa hizmeti vermesi gerekir; genellikle ayrı bir başvuru ve döviz dönüşümü gerektirir. Hesap açmadan önce \"yurtdışı ETF alabiliyor muyum, komisyonu ne?\" diye sor."
+      },
+      "5": {
+        "title": "Takip ve Sabır",
+        "body": "Aldıktan sonra günlük fiyat değişimlerine bakma alışkanlığı edinme — bu kaygıyı artırır. Haftada bir bakman yeterli. Lumos zaten büyük değişimlerde seni bilgilendirir.",
+        "tip": "💡 Altın kural: Almayı düşündüğün parayı 5 yıl görmeyecekmişsin gibi davran. Kısa vadeli ihtiyaçların için kullanma."
+      }
+    }
+  },
+  "advisor": {
+    "greeting": "Lumos Danışman.\n\nYatırım ve bu uygulamayla ilgili aklına takılan her şeyi kendi cümlelerinle yazabilirsin — hazır sorulardan seçmek zorunda değilsin. Kavramları açıklarım, portföyündeki bir kararın nedenini anlatırım, bir haberi yorumlarım.\n\nTek sınır: belirli bir hisse/fon için \"al\" ya da \"sat\" demem ve piyasanın yönünü tahmin etmem — bunlar kimsenin dürüstçe bilemeyeceği şeyler. Bunun dışında sorabileceğin şey sınırlı değil.",
+    "title": "Lumos Danışman",
+    "subtitle": "Sorularını yanıtlar — tavsiye değil, eğitim",
+    "typing": "yazıyor…",
+    "suggestionsLabel": "Örnek başlangıçlar — ya da aşağıya kendi sorunu yaz:",
+    "placeholder": "Bir şey sor…",
+    "error": "Şu an cevap veremedim — birazdan tekrar dene.",
+    "openLabel": "Danışmana sor",
+    "sug1": "ETF nedir, örnekle anlat",
+    "sug2": "Risk skorum ne anlama geliyor?",
+    "sug3": "Enflasyonda param neden eriyor?",
+    "sug4": "Portföyümde neden altın var?",
+    "sug5": "Piyasa düşerse ne yapmalıyım?",
+    "sug6": "Dolar mı altın mı tutmalıyım?"
+  },
+  "panic": {
+    "openLabel": "Panik anı desteği",
+    "fallbackMessage": "Acele bir karar vermek zorunda değilsin. Bir düşüş, ancak sattığında kesinleşir.",
+    "fallbackFact": "Bu ekranı kapatıp hiçbir şey yapmamak da geçerli bir karardır.",
+    "fallbackClosing": "Karar senin. Acele etmene gerek yok — rakamlar yerinde duruyor.",
+    "pauseTitle": "Karar vermeden önce dur",
+    "pauseBody": "Düşüşte acele satış, yatırımcıların en sık yaptığı ve en pahalıya mal olan hatadır. Birkaç saniye sonra elindeki gerçek rakamları göstereceğim.",
+    "showNow": "Rakamları şimdi göster →",
+    "yourSituation": "Senin durumun",
+    "stickToPlan": "Planıma sadık kalıyorum",
+    "stillWorried": "Hâlâ endişeliyim"
+  },
+  "isikTut": {
+    "label": "💡 Işık Tut"
+  },
+  "glossary": {
+    "volatilite": "Fiyatın ne kadar inişli çıkışlı olduğu. Yüksek volatilite = büyük dalgalar; risk de fırsat da büyür.",
+    "çeşitlendirme": "Yumurtaları tek sepete koymamak. Farklı varlıklara dağıtınca tek bir kötü gün her şeyini götürmez.",
+    "etf": "Hazır yatırım sepeti. Tek alımda onlarca hisseye birden ortak olursun — tek tek seçmek zorunda kalmazsın.",
+    "fon": "Profesyonellerin senin yerine yönettiği ortak yatırım havuzu. TEFAS üzerinden alınıp satılır.",
+    "reit": "Gayrimenkul şirketi hissesi (GYO). Daire almadan, küçük tutarlarla emlak yatırımcısı olmanın yolu.",
+    "temettü": "Şirketin kârından sana düşen pay. Kira gibi düşün — hisseni tuttuğun sürece gelir getirir.",
+    "risk skoru": "1-10 arası profil puanın. Ne kadar dalgalanmaya dayanabileceğini gösterir; portföyün buna göre kurulur.",
+    "likidite": "Varlığını ne kadar hızlı nakde çevirebildiğin. Hisse dakikalar, arsa aylar sürebilir.",
+    "amortisman": "Varlığın zamanla değer kaybı. Arabalar için kaçınılmaz — bu yüzden araba yatırım değil, giderdir.",
+    "enflasyon": "Paranın alım gücünün erimesi. %50 enflasyonda yastık altındaki 100 TL, bir yıl sonra 67 TL gibi davranır.",
+    "reel getiri": "Enflasyondan arındırılmış gerçek kazanç. %45 kazandın ama enflasyon %60 ise gerçekte kaybettin.",
+    "drawdown": "Tepeden dibe en büyük düşüş. \"En kötü gününde ne kadar eksideydin?\" sorusunun cevabı."
+  },
+  "feedback": {
+    "open": "Buna dair bir şey söyle",
+    "openLabel": "Geri bildirim gönder",
+    "thanks": "Aldım, teşekkürler. Gerçekten okuyorum.",
+    "title": "Ne oldu?",
+    "subtitle": "Anlamadığın, saçma bulduğun ya da bozuk olan her şeyi yaz. Kısa olabilir.",
+    "catConfusing": "Anlamadım",
+    "catBug": "Bir şey bozuk",
+    "catIdea": "Önerim var",
+    "catOther": "Başka",
+    "placeholder": "Örn: risk skorunun nasıl çıktığını anlamadım",
+    "error": "Gönderilemedi — tekrar deneyebilirsin.",
+    "privacy": "Hangi ekranda olduğun otomatik eklenir. Başka hiçbir şey toplanmaz."
+  },
+  "holdings": {
+    "types": {
+      "stock": "Hisse",
+      "fund": "Fon",
+      "etf": "ETF",
+      "real_estate": "Konut",
+      "land": "Arsa",
+      "vehicle": "Araç",
+      "gold": "Altın",
+      "crypto": "Kripto",
+      "cash": "Nakit",
+      "other": "Diğer"
+    },
+    "emotions": {
+      "prompt": "Bu kararı ne verdirdi? (ops.)",
+      "plan": "Planımın parçası",
+      "fomo": "Kaçırma korkusu (FOMO)",
+      "tuyo": "Tüyo / tavsiye",
+      "panik": "Panik / acele"
+    },
+    "loadError": "Varlıklar yüklenemedi",
+    "addError": "Varlık eklenemedi",
+    "title": "Varlıklarım",
+    "subtitle": "Borsa + emlak + aracın — tüm servetin tek resimde",
+    "totalValue": "Toplam Değer",
+    "erosionTitle": "Param eriyor mu?",
+    "erosionBody": "Kasada bekleyen <0>{{idle}}</0>'nin bu ay enflasyon nedeniyle gerçek değeri ~<1>{{amount}}</1> azaldı (aylık enflasyon %{{pct}}).",
+    "erosionCash": "Nakit varlıkların (Varlıklarım'a eklediğin nakit): <0>{{amount}}</0>",
+    "erosionBudget": "Yatırılmamış bütçen (bildirdiğin bütçe − yatırdığın): <0>{{amount}}</0>",
+    "erosionFormula": "Toplam × aylık TÜFE (%{{pct}}) = {{amount}}",
+    "healthTitle": "Fener Skoru: {{score}}/100",
+    "healthBody": "Fener, portföyünün sağlığını tek bakışta gösterir: varlıkların ne kadar çeşitli ve gerektiğinde ne kadar kolay nakde çevrilebilir olduğuna bakar.",
+    "rebuildCta": "↻ Kalan {{amount}} ile portföyümü güncelle",
+    "purchase": "Alış",
+    "current": "Güncel",
+    "live": "● canlı",
+    "liveBoughtToday": "● canlı · bugün alındı",
+    "indexEstimate": "endeks tahmini",
+    "manual": "manuel",
+    "liveHint": "(canlı takip için adet veya alış tarihi ekle)",
+    "deleteLabel": "Sil",
+    "loading": "Varlıkların yükleniyor…",
+    "emptyTitle": "Henüz varlığın yok",
+    "emptyBody": "İlk ışığı birlikte yakalayalım — bir varlık ekleyerek başla.",
+    "namePlaceholder": "Ad (örn: Gölbaşı arsa, SPY ETF)",
+    "vehicleTitle": "🚗 Araban serveti mi, gideri mi?",
+    "vehicleBody": "Araç servet resmine dahil edilebilir — ama dikkatli ol: her yıl %10–20 değer kaybeder (amortisman), üstüne kasko + MTV + bakım gelir. Lumos asla araç almayı yatırım olarak önermez.",
+    "vehicleTip": "Bunu eklemek istiyorsan güncel piyasa değerini \"Güncel tahmini değer\"e yaz.",
+    "tickerPlaceholder": "Sembol (örn: SPY, THYAO.IS)",
+    "amountPlaceholder": "Alış tutarı (TL)",
+    "currentPlaceholder": "Güncel tahmini değer (opsiyonel)",
+    "add": "Ekle",
+    "addCta": "+ Varlık Ekle",
+    "remainingBudget": "Kalan Bütçe",
+    "lookupCta": "Bul",
+    "lookupPrice": "Güncel fiyat: {{price}} {{currency}}",
+    "lookupNotFound": "Sembol şu an doğrulanamadı — fiyat servisi geçici olarak cevap vermiyor olabilir. Tekrar deneyebilir ya da adı ve tutarı kendin yazıp devam edebilirsin. (Borsa İstanbul hisseleri sonuna \".IS\" ister: THYAO.IS gibi.)",
+    "quantityPlaceholder": "Kaç adet aldın? (ops. — canlı takibi açar)",
+    "computedNote": "{{quantity}} adet × {{price}} = {{total}} olarak dolduruldu. Farklı bir fiyattan aldıysan tutarı elle değiştirebilirsin."
+  },
+  "fx": {
+    "title": "Kur Dağılımı",
+    "subtitle": "TL vs Döviz bazlı varlıkların",
+    "riskLabel": "Kur riski",
+    "high": "Yüksek",
+    "mid": "Orta",
+    "low": "Düşük",
+    "highMsg": "Portföyünün büyük çoğunluğu TL bazlı. TL değer kaybettiğinde tüm portföyün etkilenir. Döviz bazlı varlık eklemeyi düşünebilirsin.",
+    "midMsg": "TL ve döviz arasında makul bir denge var. Bu dağılım kur dalgalanmalarına karşı kısmen koruma sağlar.",
+    "lowMsg": "Portföyün ağırlıklı olarak döviz bazlı. TL'nin değer kaybından doğal olarak korunuyorsun.",
+    "tryLegend": "🇹🇷 TL — %{{pct}}",
+    "fxLegend": "🌍 Döviz — %{{pct}}"
+  },
+  "drift": {
+    "title": "Portföyün dengede mi?",
+    "balanced": "Dengede",
+    "notable": "Hafif sapma",
+    "serious": "Belirgin sapma",
+    "target": "hedef %{{pct}}",
+    "actual": "şu an %{{pct}}",
+    "categories": {
+      "stocks": "Hisse / ETF",
+      "reit": "Gayrimenkul",
+      "bond": "Tahvil",
+      "fund": "Fon",
+      "gold": "Altın",
+      "cash": "Nakit",
+      "other": "Diğer"
+    }
+  },
+  "chart": {
+    "title": "Portföyün Nasıl Gidiyor?",
+    "m1": "1 Ay",
+    "m3": "3 Ay",
+    "y1": "1 Yıl",
+    "error": "Değer geçmişi şu an yüklenemedi.",
+    "liveNote": "{{count}} varlık gerçek piyasa kapanışlarını takip ediyor",
+    "flatNote": "{{count}} varlık (nakit/manuel) son bilinen değerinde sabit",
+    "dipNote": "Düşüş günleri normaldir — mesele o günlerde satmamak.",
+    "pending": "Grafik, varlıkların birkaç gün veri biriktirince burada belirecek."
+  },
+  "comparison": {
+    "balanced": "Portföyün Dengede",
+    "deviations": "Hedef Dağılımdan Sapmalar",
+    "subtitle": "Risk {{score}}/10 profiline göre önerilen vs gerçek dağılım",
+    "actualLegend": "■ Gerçek dağılım",
+    "targetLegend": "■ Hedef dağılım"
+  },
+  "dailyTip": {
+    "label": "Bugün Öğrendin",
+    "next": "Karta dokun → sıradaki kavram",
+    "nextLabel": "Sonraki ipucu",
+    "tips": {
+      "etf": {
+        "title": "ETF Aslında Bir Sepettir",
+        "body": "Tek alımda onlarca hisseye birden ortak olursun. Tek tek seçme derdi yok — hazır paketlenmiş yatırım."
+      },
+      "diversification": {
+        "title": "Yumurtaları Tek Sepete Koyma",
+        "body": "Farklı varlıklara dağıtınca tek bir kötü gün her şeyini götürmez. Buna çeşitlendirme denir."
+      },
+      "inflation": {
+        "title": "Enflasyon Paranı Eritir",
+        "body": "%50 enflasyonda yastık altındaki 100 TL, bir yıl sonra 67 TL gibi davranır. Yatırım yapmamak da bir risk."
+      },
+      "dividend": {
+        "title": "Temettü = Kira Gibi",
+        "body": "Şirketin kârından sana düşen pay. Hisseni tuttuğun sürece düzenli gelir getirir — mülk kiralamak gibi."
+      },
+      "reel-return": {
+        "title": "Reel Getiri Gerçek Kazanç",
+        "body": "%45 kazandın ama enflasyon %60 ise gerçekte kaybettin. Her zaman enflasyondan arındırılmış getiriye bak."
+      },
+      "liquidity": {
+        "title": "Likidite Hayat Kurtarır",
+        "body": "Hisse dakikalar içinde nakde döner, arsa aylar sürebilir. Acil paraya ihtiyacın olabilir — bunu unutma."
+      },
+      "drawdown": {
+        "title": "Düşüşler Normal",
+        "body": "Piyasalar sık sık %10-15 düşüş yaşar. Bu panik değil, doğal döngü. Satmadığın sürece zarar kesinleşmez."
+      },
+      "gold": {
+        "title": "Altın Sigorta Gibi",
+        "body": "Kriz dönemlerinde hisse düşerken altın genelde yükselir. Portföyünün \"koruma kalkanı\" olarak düşün."
+      },
+      "patience": {
+        "title": "Sabır En İyi Strateji",
+        "body": "S&P 500 tarihindeki 10 yıllık dönemlerin büyük çoğunluğu kazandırmıştır — ama 2000-2009 gibi kaybettiren dönemler de var. Zaman en güçlü aracın, garantin değil."
+      },
+      "reit": {
+        "title": "Ev Almadan Emlakçı Ol",
+        "body": "REIT ETF'leri ile küçük tutarlarla gayrimenkul geliri elde edebilirsin. Mülk almadan emlak yatırımcısı olmanın yolu."
+      },
+      "fomo": {
+        "title": "FOMO Düşmanın",
+        "body": "\"Herkes alıyor, ben de alayım\" en tehlikeli yatırım cümlesidir. Her yükselişte alsan, genelde tepeyi yakalar düşersin."
+      },
+      "cost-avg": {
+        "title": "Düzenli Yatırım Riski Azaltır",
+        "body": "Her ay aynı tutarı yatırmak, bazı ay ucuza bazı ay pahalıya almana sebep olur. Sonuç: ortalamanın altında maliyet."
+      }
+    }
+  },
+  "goal": {
+    "title": "🎯 Hedefim",
+    "subtitle": "\"3 yılda ev peşinatı\" gibi bir hedefi somut aylık plana çevirelim.",
+    "targetPlaceholder": "Hedef tutar (örn: 800000)",
+    "withinYears": "{{n}} yıl içinde",
+    "savingsPlaceholder": "Mevcut birikim (ops.)",
+    "monthlyPlaceholder": "Şu an ayda ne kadar biriktiriyorsun? (ops.)",
+    "plan": "Planla",
+    "error": "Hesaplanamadı",
+    "alreadyOnTrack": "Mevcut birikimin hedefe kendi kendine ulaşıyor — ekstra katkı gerekmiyor.",
+    "needMonthly": "Hedefe zamanında ulaşmak için ayda yaklaşık <0>{{amount}}</0> biriktirmelisin.",
+    "realValueNote": "%{{inflation}} enflasyon varsayımıyla, {{target}} hedefin o gün bugünün parasıyla ≈ <0>{{real}}</0> değerinde olacak. Sabit bir hedef zamanla alım gücü kaybeder — hedefi buna göre gözden geçirmek isteyebilirsin.",
+    "atYourPace": "Mevcut temponla ({{amount}}/ay):",
+    "onTrack": "✓ Hedefe zamanında ulaşıyorsun.",
+    "delayed": "Bu tempoda hedefin yaklaşık <0>{{months}} ay</0> gecikir.",
+    "progress": "İlerleme: %{{pct}}",
+    "howTitle": "Bu hesap neye göre yapılıyor?",
+    "howBody": "Biriktirdiğin paranın boşta beklemediği, risk profiline uygun bir portföyde yılda ortalama %{{growth}} büyüdüğü varsayılıyor. Bu oran uydurma değil: canlı enflasyon (%{{inflation}}) üzerine, çeşitlendirilmiş bir portföyün uzun vadede kazandığı varsayılan reel primin eklenmesiyle bulunuyor. Süre {{months}} aya çevriliyor ve her ayki katkının kalan süre boyunca büyümesi hesaba katılıyor.",
+    "howFormula": "aylık katkı = (hedef − mevcut birikimin büyümüş hâli) × r / ((1+r)^ay − 1),  r = aylık getiri",
+    "howCaveat": "Bu bir tahmin değil, bir planlama varsayımı: piyasa her yıl aynı oranda büyümez, bazı yıllar eksi kapatır. Oran daha düşük olursa aylık katkı yetmez — planı yılda bir gözden geçirmek iyi bir alışkanlıktır."
   }
 }

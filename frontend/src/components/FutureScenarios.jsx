@@ -2,6 +2,7 @@ import { useState } from 'react'
 import api, { extractErrorMessage } from '../utils/api'
 import IsikTut from './IsikTut'
 import useMarket from '../hooks/useMarket'
+import { Trans, useTranslation } from 'react-i18next'
 
 function BandRow({ label, tone, data, amount }) {
   const { fmt, money } = useMarket()
@@ -34,6 +35,7 @@ function BandRow({ label, tone, data, amount }) {
 const PORTFOLIO_OPTION = '__portfolio__'
 
 export default function FutureScenarios({ allocations, budget }) {
+  const { t } = useTranslation()
   const { money } = useMarket()
   const [ticker, setTicker] = useState(PORTFOLIO_OPTION)
   const [years, setYears] = useState(5)
@@ -54,7 +56,7 @@ export default function FutureScenarios({ allocations, budget }) {
         : await api.post('/planning/projection/asset', { ticker, amount: budget, years })
       setResult({ ...res.data, isPortfolio })
     } catch (err) {
-      setError(extractErrorMessage(err, 'Senaryolar şu an hesaplanamadı'))
+      setError(extractErrorMessage(err, t('scenarios.error')))
     } finally {
       setLoading(false)
     }
@@ -62,26 +64,26 @@ export default function FutureScenarios({ allocations, budget }) {
 
   return (
     <div className="card">
-      <h3 style={{ marginBottom: 4 }}>Gelecek Senaryoları</h3>
+      <h3 style={{ marginBottom: 4 }}>{t('scenarios.title')}</h3>
       <p style={{ fontSize: 13, opacity: 0.8, marginBottom: 12 }}>
-        "Param {years} yılda ne olur?" — <IsikTut term="volatilite">tahmin değil</IsikTut>,
-        varlığın kendi geçmişinde yaşanmış tüm {years} yıllık dönemlerin aralığı.
+        <Trans i18nKey="scenarios.subtitle" values={{ years }}
+               components={[<IsikTut key="a" term="volatilite" />]} />
       </p>
 
       <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
         <select className="input" style={{ flex: 2 }} value={ticker}
                 onChange={e => { setTicker(e.target.value); setResult(null) }}>
-          <option value={PORTFOLIO_OPTION}>🧺 Tüm Portföy</option>
+          <option value={PORTFOLIO_OPTION}>{t('scenarios.wholePortfolio')}</option>
           {allocations?.map(a => (
             <option key={a.ticker} value={a.ticker}>{a.name} ({a.ticker})</option>
           ))}
         </select>
         <select className="input" style={{ flex: 1 }} value={years}
                 onChange={e => { setYears(Number(e.target.value)); setResult(null) }}>
-          {[1, 3, 5].map(y => <option key={y} value={y}>{y} yıl</option>)}
+          {[1, 3, 5].map(y => <option key={y} value={y}>{t('timeMachine.years', { n: y })}</option>)}
         </select>
         <button className="btn btn-primary" onClick={run} disabled={loading || !ticker}>
-          {loading ? <span className="spinner" style={{ width: 16, height: 16 }} /> : 'Göster'}
+          {loading ? <span className="spinner" style={{ width: 16, height: 16 }} /> : t('scenarios.show')}
         </button>
       </div>
 
@@ -94,12 +96,17 @@ export default function FutureScenarios({ allocations, budget }) {
       {result?.available && (
         <>
           <p style={{ fontSize: 13, marginBottom: 4 }}>
-            <strong>{money(budget)}</strong>, {result.isPortfolio ? 'tüm portföyünde' : result.ticker} {years} yıl kalsaydı
-            (geçmiş {result.history_years} yılın {result.windows_analysed} dönemine göre):
+            <Trans i18nKey="scenarios.resultIntro"
+                   values={{
+                     amount: money(budget),
+                     target: result.isPortfolio ? t('scenarios.inWholePortfolio') : result.ticker,
+                     years, history: result.history_years, windows: result.windows_analysed,
+                   }}
+                   components={[<strong key="a" />]} />
           </p>
-          <BandRow label="Kötü dönem"  tone="bad"  data={result.pessimistic} amount={budget} />
-          <BandRow label="Tipik dönem" tone="mid"  data={result.typical}     amount={budget} />
-          <BandRow label="İyi dönem"   tone="good" data={result.optimistic}  amount={budget} />
+          <BandRow label={t('scenarios.bad')}  tone="bad"  data={result.pessimistic} amount={budget} />
+          <BandRow label={t('scenarios.typical')} tone="mid"  data={result.typical}     amount={budget} />
+          <BandRow label={t('scenarios.good')}   tone="good" data={result.optimistic}  amount={budget} />
           <p style={{ fontSize: 12, opacity: 0.6, marginTop: 8, lineHeight: 1.5 }}>
             {result.honesty_note}
           </p>

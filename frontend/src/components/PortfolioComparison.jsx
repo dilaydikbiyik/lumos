@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '@clerk/clerk-react'
 import api, { setAuthToken } from '../utils/api'
@@ -7,12 +8,6 @@ import api, { setAuthToken } from '../utils/api'
  * Shows drift from the target allocation + a short action hint.
  */
 
-const CATEGORY_LABELS = {
-  stock: 'Hisse', fund: 'Fon', etf: 'ETF',
-  real_estate: 'Emlak', land: 'Arsa', vehicle: 'Araç',
-  gold: 'Altın', crypto: 'Kripto', cash: 'Nakit', other: 'Diğer',
-}
-
 const CATEGORY_COLORS = {
   stock: 'var(--firefly)', fund: 'var(--accent)', etf: 'var(--accent-2)',
   real_estate: 'var(--green)', land: '#8B7355', gold: '#FFD700',
@@ -21,6 +16,7 @@ const CATEGORY_COLORS = {
 
 
 export default function PortfolioComparison() {
+  const { t } = useTranslation()
   const { getToken } = useAuth()
   const [data, setData] = useState(null)
 
@@ -60,7 +56,6 @@ export default function PortfolioComparison() {
         if (actualPct > 0 || targetPct > 0) {
           comparison.push({
             type,
-            label: CATEGORY_LABELS[type] || type,
             color: CATEGORY_COLORS[type] || 'var(--text-dim)',
             actual: Math.round(actualPct),
             target: Math.round(targetPct),
@@ -92,10 +87,10 @@ export default function PortfolioComparison() {
         <span style={{ fontSize: 18 }}>{isBalanced ? '✅' : '⚖️'}</span>
         <div>
           <h3 style={{ fontSize: 14, fontWeight: 700 }}>
-            {isBalanced ? 'Portföyün Dengede' : 'Hedef Dağılımdan Sapmalar'}
+            {isBalanced ? t('comparison.balanced') : t('comparison.deviations')}
           </h3>
           <p style={{ fontSize: 11, color: 'var(--text-dim)', marginTop: 2 }}>
-            Risk {data.riskScore}/10 profiline göre önerilen vs gerçek dağılım
+            {t('comparison.subtitle', { score: data.riskScore })}
           </p>
         </div>
       </div>
@@ -111,7 +106,7 @@ export default function PortfolioComparison() {
                   background: item.color, display: 'inline-block',
                   marginRight: 6, verticalAlign: 'middle',
                 }} />
-                {item.label}
+                {t('holdings.types.' + item.type, { defaultValue: item.type })}
               </span>
               <span style={{
                 fontSize: 11, fontWeight: 600,
@@ -152,8 +147,8 @@ export default function PortfolioComparison() {
 
       {/* Lejant */}
       <div style={{ display: 'flex', gap: 16, marginTop: 12, fontSize: 10, color: 'var(--text-dim)' }}>
-        <span>■ Gerçek dağılım</span>
-        <span style={{ opacity: 0.5 }}>■ Hedef dağılım</span>
+        <span>{t('comparison.actualLegend')}</span>
+        <span style={{ opacity: 0.5 }}>{t('comparison.targetLegend')}</span>
       </div>
     </div>
   )

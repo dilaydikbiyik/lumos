@@ -1,106 +1,49 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 /**
  * "What is it / why is it in your portfolio / what's the risk" card for
  * every portfolio item. Static dictionary based — no LLM call, zero cost.
+ *
+ * The educational copy lives in the locale files (explainer.byTicker.* /
+ * explainer.byCategory.*); only language-independent presentation stays here.
+ * Ticker dots are folded to underscores because "." nests i18next keys.
  */
 
-const ASSET_INFO = {
-  'XU100.IS': {
-    type: 'Hisse Endeksi',
-    icon: '🇹🇷',
-    color: 'var(--red)',
-    what: 'BIST 100, Türkiye\'nin en büyük 100 şirketinin hisselerinden oluşan bir endeks. THY, Aselsan, BİM gibi dev şirketler bu sepetin içinde.',
-    why: 'Türk ekonomisi büyüdükçe bu şirketlerin değeri de büyür. Kendi ülkende yatırım yapmanın en kolay yolu.',
-    risk: 'Kısa vadede %20-30 düşüşler olabilir. Ama uzun vadede (5+ yıl) Türkiye borsası tarihsel olarak enflasyonun üstünde getiri sağlamıştır.',
-  },
-  'SPY': {
-    type: 'Amerikan Hisse ETF',
-    icon: '🇺🇸',
-    color: 'var(--accent-2)',
-    what: 'S&P 500 — dünyanın en büyük 500 Amerikan şirketinin sepeti. Apple, Google, Amazon, Tesla hepsi içinde.',
-    why: 'Dolar bazlı kazanç sağlar + ABD piyasası tarihsel olarak en istikrarlı büyüyen piyasa. TL eriyor derdine karşı bir kalkan.',
-    risk: 'Dolar düşerse TL değerin azalır. Ama 10 yılda S&P 500, hiçbir 10 yıllık dönemde zarar ettirmemiştir.',
-  },
-  'QQQ': {
-    type: 'Teknoloji ETF',
-    icon: '💻',
-    color: '#9B59B6',
-    what: 'Nasdaq 100 — dünya teknoloji devlerinin sepeti. Apple, Microsoft, NVIDIA, Meta gibi şirketler.',
-    why: 'Teknoloji sektörü uzun vadede en hızlı büyüyen sektör. Dolar bazlı, yüksek büyüme potansiyeli.',
-    risk: 'Teknoloji hisseleri daha çok dalgalanır. 2022\'de %33 düşüp 2023\'te %55 çıktı — kalp dayanıklılığı gerektirir.',
-  },
-  'GLD': {
-    type: 'Altın ETF',
-    icon: '🥇',
-    color: 'var(--firefly)',
-    what: 'Fiziksel altının borsa hissesi versiyonu. Gram altın almak yerine, dolar bazlı altın fiyatına ortak olursun.',
-    why: 'Altın, kriz dönemlerinde "güvenli liman" görevi görür. Hisse düşerken altın genelde yükselir — portföyünü dengeye getirir.',
-    risk: 'Altın uzun vadede hisse kadar hızlı büyümez. Ama paranı koruma gücü çok yüksektir.',
-  },
-  'VNQ': {
-    type: 'Gayrimenkul ETF (REIT)',
-    icon: '🏢',
-    color: 'var(--accent-2)',
-    what: 'Vanguard REIT ETF — ABD\'deki ticari binalar, alışveriş merkezleri ve konutlara yatırım yapan bir emlak sepeti.',
-    why: 'Daire almaya bütçen yetmese bile, küçük tutarlarla gayrimenkul geliri elde edebilirsin. Kira gibi düzenli temettü öder.',
-    risk: 'Faiz oranları yükseldiğinde gayrimenkul fiyatları baskılanabilir. Fiziksel emlak gibi "dokunulabilir" değil.',
-  },
-  'SCHH': {
-    type: 'ABD Konut REIT ETF',
-    icon: '🏠',
-    color: 'var(--green)',
-    what: 'Schwab US REIT ETF — konut ağırlıklı Amerikan gayrimenkul sepeti.',
-    why: 'VNQ\'ya benzer ama daha konut ağırlıklı. İki REIT\'le riski dağıtırsın — hepsi tek sepette olmaz.',
-    risk: 'REIT ETF\'leri hisse gibi dalgalanır. Ama gerçek mülk alıp satma derdi yok, anında nakde çevirebilirsin.',
-  },
+const ASSET_META = {
+  'XU100.IS': { icon: '🇹🇷', color: 'var(--red)' },
+  'SPY':      { icon: '🇺🇸', color: 'var(--accent-2)' },
+  'QQQ':      { icon: '💻', color: '#9B59B6' },
+  'GLD':      { icon: '🥇', color: 'var(--firefly)' },
+  'VNQ':      { icon: '🏢', color: 'var(--accent-2)' },
+  'SCHH':     { icon: '🏠', color: 'var(--green)' },
 }
 
-// Generic explanation for unknown tickers
-const DEFAULT_INFO = {
-  stocks: {
-    type: 'Hisse / Hisse ETF',
-    icon: '📈',
-    color: 'var(--accent)',
-    what: 'Bir şirketin veya şirket sepetinin sahiplik payı. Şirket büyüdükçe, senin payın da değerlenir.',
-    why: 'Uzun vadede en yüksek getiriyi sağlayan varlık sınıfı — enflasyonun çok üstünde büyüme potansiyeli.',
-    risk: 'Kısa vadede sert düşüşler olabilir. Ama zamanla toparlanma tarihsel olarak istisnasız gerçekleşmiştir.',
-  },
-  gold: {
-    type: 'Altın',
-    icon: '🥇',
-    color: 'var(--firefly)',
-    what: 'Binlerce yıldır değerini koruyan kıymetli maden. "Kriz sigortası" olarak bilinir.',
-    why: 'Hisse düşerken altın genelde yükselir. Portföyünün dengeyi korumasını sağlar.',
-    risk: 'Uzun vadede hisseler kadar kazandırmaz, ama paranın erimesini engeller.',
-  },
-  fund: {
-    type: 'Yatırım Fonu',
-    icon: '🧺',
-    color: 'var(--accent)',
-    what: 'Profesyonellerin senin adına yönettiği ortak yatırım havuzu. TEFAS üzerinden alınıp satılır.',
-    why: 'Tek tek hisse seçmek zorunda kalmazsın. Uzmanlar senin için en iyi karışımı yönetir.',
-    risk: 'Fon yönetim ücreti kesilir. Ve fonun performansı, yöneticinin kararlarına bağlıdır.',
-  },
-}
-
-function getAssetInfo(allocation) {
-  if (ASSET_INFO[allocation.ticker]) return ASSET_INFO[allocation.ticker]
-  // Fallback: category-based generic explanation
-  const category = allocation.category || 'stocks'
-  return DEFAULT_INFO[category] || DEFAULT_INFO.stocks
+const CATEGORY_META = {
+  stocks: { icon: '📈', color: 'var(--accent)' },
+  gold:   { icon: '🥇', color: 'var(--firefly)' },
+  fund:   { icon: '🧺', color: 'var(--accent)' },
 }
 
 export default function AssetExplainer({ allocation, onClose, color }) {
+  const { t, i18n } = useTranslation()
   const [activeTab, setActiveTab] = useState('what')
-  const info = getAssetInfo(allocation)
+
+  const tickerKey = (allocation.ticker || '').replace(/\./g, '_')
+  const hasTickerCopy = i18n.exists(`explainer.byTicker.${tickerKey}.what`)
+  const category = CATEGORY_META[allocation.category] ? allocation.category : 'stocks'
+  const base = hasTickerCopy
+    ? `explainer.byTicker.${tickerKey}`
+    : `explainer.byCategory.${category}`
+  const meta = (hasTickerCopy && ASSET_META[allocation.ticker]) || CATEGORY_META[category]
+
   // The pie slice's colour wins — the card must match what was clicked
-  const accent = color || info.color
+  const accent = color || meta.color
 
   const tabs = [
-    { key: 'what', label: 'Bu Nedir?', icon: '📖' },
-    { key: 'why',  label: 'Neden Var?', icon: '🎯' },
-    { key: 'risk', label: 'Riski Ne?', icon: '⚡' },
+    { key: 'what', label: t('explainer.tabs.what'), icon: '📖' },
+    { key: 'why',  label: t('explainer.tabs.why'),  icon: '🎯' },
+    { key: 'risk', label: t('explainer.tabs.risk'), icon: '⚡' },
   ]
 
   return (
@@ -110,7 +53,6 @@ export default function AssetExplainer({ allocation, onClose, color }) {
       animation: 'fade-in 0.3s ease',
       position: 'relative',
     }}>
-      {/* Kapat butonu */}
       <button
         onClick={onClose}
         style={{
@@ -118,7 +60,7 @@ export default function AssetExplainer({ allocation, onClose, color }) {
           background: 'none', border: 'none', color: 'var(--text-dim)',
           cursor: 'pointer', fontSize: 18, padding: '4px 8px',
         }}
-        aria-label="Kapat"
+        aria-label={t('common.close')}
       >
         ✕
       </button>
@@ -128,7 +70,7 @@ export default function AssetExplainer({ allocation, onClose, color }) {
         <span style={{
           fontSize: 28,
           filter: `drop-shadow(0 0 8px ${accent}40)`,
-        }}>{info.icon}</span>
+        }}>{meta.icon}</span>
         <div>
           <h3 style={{ fontSize: 15, fontWeight: 700 }}>
             {allocation.name}
@@ -136,7 +78,7 @@ export default function AssetExplainer({ allocation, onClose, color }) {
           <div style={{ fontSize: 12, color: 'var(--text-dim)', display: 'flex', gap: 8, marginTop: 2 }}>
             <span>{allocation.ticker}</span>
             <span>·</span>
-            <span>{info.type}</span>
+            <span>{t(`${base}.type`)}</span>
             <span>·</span>
             <span style={{ color: accent, fontWeight: 600 }}>
               %{(allocation.weight * 100).toFixed(0)}
@@ -177,7 +119,7 @@ export default function AssetExplainer({ allocation, onClose, color }) {
         fontSize: 13.5, lineHeight: 1.7, color: 'var(--text)',
         animation: 'fade-in 0.2s ease',
       }}>
-        {info[activeTab]}
+        {t(`${base}.${activeTab}`)}
       </p>
     </div>
   )

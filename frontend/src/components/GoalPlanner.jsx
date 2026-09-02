@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import api, { extractErrorMessage } from '../utils/api'
 import useMarket from '../hooks/useMarket'
+import { Trans, useTranslation } from 'react-i18next'
 
 /**
  * Goal-based investing — turns a goal like "800.000 TL house deposit in
@@ -8,6 +9,7 @@ import useMarket from '../hooks/useMarket'
  * delay implied by the user's current pace.
  */
 export default function GoalPlanner() {
+  const { t } = useTranslation()
   const { money } = useMarket()
   const [form, setForm] = useState({ target_amount: '', years: 3, current_savings: '', monthly: '' })
   const [plan, setPlan] = useState(null)
@@ -38,63 +40,90 @@ export default function GoalPlanner() {
         setProgress(drift.data)
       }
     } catch (err) {
-      setError(extractErrorMessage(err, 'Hesaplanamadı'))
+      setError(extractErrorMessage(err, t('goal.error')))
     }
   }
 
   return (
     <div className="card">
-      <h3 style={{ marginBottom: 4 }}>🎯 Hedefim</h3>
+      <h3 style={{ marginBottom: 4 }}>{t('goal.title')}</h3>
       <p style={{ fontSize: 13, opacity: 0.8, marginBottom: 12 }}>
-        "3 yılda ev peşinatı" gibi bir hedefi somut aylık plana çevirelim.
+        {t('goal.subtitle')}
       </p>
       <form onSubmit={run} style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-        <input className="input" type="number" placeholder="Hedef tutar (TL, örn: 800000)" required min="1"
+        <input className="input" type="number" placeholder={t('goal.targetPlaceholder')} required min="1"
                value={form.target_amount} onChange={e => setForm({ ...form, target_amount: e.target.value })} />
         <div style={{ display: 'flex', gap: 8 }}>
           <select className="input" style={{ flex: 1 }} value={form.years}
                   onChange={e => setForm({ ...form, years: e.target.value })}>
-            {[1, 2, 3, 5, 10].map(y => <option key={y} value={y}>{y} yıl içinde</option>)}
+            {[1, 2, 3, 5, 10].map(y => <option key={y} value={y}>{t('goal.withinYears', { n: y })}</option>)}
           </select>
-          <input className="input" type="number" placeholder="Mevcut birikim (ops.)" min="0" style={{ flex: 1 }}
+          <input className="input" type="number" placeholder={t('goal.savingsPlaceholder')} min="0" style={{ flex: 1 }}
                  value={form.current_savings} onChange={e => setForm({ ...form, current_savings: e.target.value })} />
         </div>
-        <input className="input" type="number" placeholder="Şu an ayda ne kadar biriktiriyorsun? (ops.)" min="0"
+        <input className="input" type="number" placeholder={t('goal.monthlyPlaceholder')} min="0"
                value={form.monthly} onChange={e => setForm({ ...form, monthly: e.target.value })} />
-        <button className="btn btn-primary" type="submit">Planla</button>
+        <button className="btn btn-primary" type="submit">{t('goal.plan')}</button>
       </form>
 
       {plan && (
         <div style={{ marginTop: 14 }}>
           {plan.already_on_track ? (
             <p style={{ fontSize: 14, color: 'var(--green, #4ade80)' }}>
-              Mevcut birikimin hedefe kendi kendine ulaşıyor — ekstra katkı gerekmiyor.
+              {t('goal.alreadyOnTrack')}
             </p>
           ) : (
             <p style={{ fontSize: 14 }}>
-              Hedefe zamanında ulaşmak için ayda yaklaşık{' '}
-              <strong style={{ fontSize: 17 }}>{money(plan.monthly_contribution)}</strong> biriktirmelisin.
+              <Trans i18nKey="goal.needMonthly"
+                     values={{ amount: money(plan.monthly_contribution) }}
+                     components={[<strong key="a" style={{ fontSize: 17 }} />]} />
             </p>
           )}
 
           {plan.target_real_value != null && (
             <p style={{ fontSize: 12, opacity: 0.7, marginTop: 8, lineHeight: 1.5 }}>
-              ℹ️ %{plan.annual_inflation_pct} enflasyon varsayımıyla, {money(Number(form.target_amount))} hedefin
-              o gün bugünün parasıyla ≈ <strong>{money(plan.target_real_value)}</strong> değerinde olacak.
-              Sabit bir TL hedefi zamanla alım gücü kaybeder — hedefi buna göre gözden geçirmek isteyebilirsin.
+              ℹ️ <Trans i18nKey="goal.realValueNote"
+                        values={{
+                          inflation: plan.annual_inflation_pct,
+                          target: money(Number(form.target_amount)),
+                          real: money(plan.target_real_value),
+                        }}
+                        components={[<strong key="a" />]} />
             </p>
           )}
+
+          {/* "What is this based on?" — every other engine in the app shows
+              its formula; this one quietly did not, and a user asked. */}
+          <details style={{ marginTop: 10 }}>
+            <summary style={{ cursor: 'pointer', fontSize: 'var(--t-micro)', color: 'var(--text-dim)' }}>
+              {t('goal.howTitle')}
+            </summary>
+            <div style={{
+              marginTop: 6, fontSize: 'var(--t-micro)', color: 'var(--text-muted)', lineHeight: 1.7,
+            }}>
+              <p>{t('goal.howBody', {
+                growth: plan.annual_growth_pct,
+                inflation: plan.annual_inflation_pct,
+                months: plan.months ?? Math.round(Number(form.years) * 12),
+              })}</p>
+              <p style={{ marginTop: 6, fontFamily: 'ui-monospace, SFMono-Regular, monospace' }}>
+                {t('goal.howFormula')}
+              </p>
+              <p style={{ marginTop: 6 }}>{t('goal.howCaveat')}</p>
+            </div>
+          </details>
 
           {progress && (
             <div style={{ marginTop: 10, padding: 10, borderRadius: 10, border: '1px solid var(--border)' }}>
               <div style={{ fontSize: 13, marginBottom: 6 }}>
-                Mevcut temponla ({money(form.monthly)}/ay):
+                {t('goal.atYourPace', { amount: money(form.monthly) })}
               </div>
               {progress.on_track ? (
-                <p style={{ fontSize: 14, color: 'var(--green, #4ade80)' }}>✓ Hedefe zamanında ulaşıyorsun.</p>
+                <p style={{ fontSize: 14, color: 'var(--green, #4ade80)' }}>{t('goal.onTrack')}</p>
               ) : (
                 <p style={{ fontSize: 14, color: 'var(--red)' }}>
-                  ⏳ Bu tempoda hedefin yaklaşık <strong>{progress.delay_months} ay</strong> gecikir.
+                  ⏳ <Trans i18nKey="goal.delayed" values={{ months: progress.delay_months }}
+                            components={[<strong key="a" />]} />
                 </p>
               )}
               <div style={{ marginTop: 8, height: 8, borderRadius: 4, background: 'var(--border)', overflow: 'hidden' }}>
@@ -103,7 +132,7 @@ export default function GoalPlanner() {
                   background: 'linear-gradient(90deg, #8b8bf5, #4ade80)',
                 }} />
               </div>
-              <div style={{ fontSize: 12, opacity: 0.7, marginTop: 4 }}>İlerleme: %{progress.progress_pct}</div>
+              <div style={{ fontSize: 12, opacity: 0.7, marginTop: 4 }}>{t('goal.progress', { pct: progress.progress_pct })}</div>
             </div>
           )}
         </div>

@@ -1,10 +1,10 @@
 import { useState, useRef, useEffect } from 'react'
 import MessageBubble from './MessageBubble'
 import useChat from '../hooks/useChat'
-
-const INTRO = "Merhaba! Ben Lumos.\n\nSana 9 kısa soru soracağım ve kişisel risk profilini oluşturacağım. Hazır mısın?\n\n**1. soru — Yatırıma ayırabileceğin bütçen nedir?** (Örn: 50.000 TL)"
+import { useTranslation } from 'react-i18next'
 
 export default function ChatWindow({ onProfileComplete, onFirstMessage }) {
+  const { t } = useTranslation()
   const { messages, isLoading, error, sendMessage, pendingProfile, confirmProfile,
           retryExtract, quizFinished } = useChat(onProfileComplete)
   const [input, setInput] = useState('')
@@ -43,7 +43,7 @@ export default function ChatWindow({ onProfileComplete, onFirstMessage }) {
         /* smooth momentum scroll on iOS */
         WebkitOverflowScrolling: 'touch',
       }}>
-        <MessageBubble role="assistant" content={INTRO} />
+        <MessageBubble role="assistant" content={t('quiz.intro')} />
 
         {messages.map((msg, i) => (
           <MessageBubble key={i} role={msg.role} content={msg.content} />
@@ -70,10 +70,10 @@ export default function ChatWindow({ onProfileComplete, onFirstMessage }) {
           >
             {revealing
               ? <span className="spinner" style={{ width: 18, height: 18 }} />
-              : 'Okudum, risk profilimi göster →'}
+              : t('quiz.reveal')}
           </button>
           <p style={{ fontSize: 'var(--t-micro)', color: 'var(--text-dim)', textAlign: 'center', marginTop: 8 }}>
-            Acelen yok — yukarıyı istediğin kadar okuyabilirsin.
+            {t('quiz.noRush')}
           </p>
         </div>
       ) : quizFinished ? (
@@ -83,10 +83,10 @@ export default function ChatWindow({ onProfileComplete, onFirstMessage }) {
           <button className="btn btn-primary btn-full" disabled={isLoading} onClick={retryExtract}>
             {isLoading
               ? <span className="spinner" style={{ width: 18, height: 18 }} />
-              : 'Tekrar dene'}
+              : t('common.tryAgain')}
           </button>
           <p style={{ fontSize: 'var(--t-micro)', color: 'var(--text-dim)', textAlign: 'center', marginTop: 8 }}>
-            Cevapların kayıtlı — baştan başlaman gerekmiyor.
+            {t('quiz.answersKept')}
           </p>
         </div>
       ) : (
@@ -99,7 +99,7 @@ export default function ChatWindow({ onProfileComplete, onFirstMessage }) {
           className="input"
           value={input}
           onChange={e => setInput(e.target.value)}
-          placeholder="Cevabını yaz…"
+          placeholder={t('quiz.inputPlaceholder')}
           disabled={isLoading}
           autoComplete="off"
           enterKeyHint="send"
@@ -116,7 +116,7 @@ export default function ChatWindow({ onProfileComplete, onFirstMessage }) {
       </form>
       )}
       <p style={{ fontSize: 10, color: 'var(--text-dim)', textAlign: 'center', marginTop: 8 }}>
-        Yalnızca eğitim amaçlıdır — yatırım tavsiyesi değildir.
+        {t('common.eduFooter')}
       </p>
     </div>
   )

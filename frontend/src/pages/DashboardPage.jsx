@@ -113,8 +113,12 @@ export default function DashboardPage() {
         {/* ── Courage Score — the visible face of the vision ── */}
         <ReadinessScore />
 
-        {/* ── Daily tip ── */}
-        <DailyTip />
+        {/* ── Daily tip ──
+            Held back until the wealth summary has arrived. It renders with no
+            network of its own, so showing it first left the dashboard as a
+            lone tip card for seconds — a tester read that as stray metadata.
+            A tip is secondary content; it should never be the whole page. */}
+        {holdingsSummary && <DailyTip />}
 
         {/* ── Summary card ── */}
         {holdingsSummary && (

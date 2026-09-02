@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 /**
  * BeginnerGuide — the guided first-investment journey.
@@ -7,49 +8,15 @@ import { useState } from 'react'
  */
 
 const STEPS = [
-  {
-    id: 1,
-    emoji: '🏦',
-    title: 'Aracı Kurum Nedir?',
-    body: 'Hisse senedi ve fon alıp satman için bir aracı kuruma ihtiyacın var. Banka hesabına benzer ama yatırım için. Türkiye\'de faaliyet gösteren kurumların SPK lisansı olmak zorundadır.',
-    // Deliberately no broker names: we take no commission and endorse nobody,
-    // and a list would go stale. The regulator's own list is the honest source.
-    tip: '💡 Kurumun lisanslı olduğunu SPK\'nın resmî listesinden kendin doğrula (spk.gov.tr). Biz belirli bir kurum önermiyoruz — hiçbirinden komisyon almıyoruz.',
-  },
-  {
-    id: 2,
-    emoji: '📋',
-    title: 'Hesap Nasıl Açılır?',
-    body: '1. Seçtiğin kurumun web sitesine git.\n2. "Hesap Aç" butonuna tıkla.\n3. TC Kimlik No, e-posta, telefon gir.\n4. Video görüşmesiyle veya şubede kimlik doğrula.\n5. 1–3 iş günü içinde hesabın aktif olur.',
-    tip: '💡 Çoğu kurum için mobil uygulama üzerinden uzaktan açılış mümkün — şubeye gitme zorunluluğu yok.',
-  },
-  {
-    id: 3,
-    emoji: '💳',
-    title: 'Para Nasıl Yatırılır?',
-    body: 'EFT veya havale ile kendi banka hesabından aracı kurum hesabına para gönderirsin. Genellikle aynı gün ya da 1 iş günü içinde görünür.',
-    tip: '💡 Küçük başla — ilk deneme için 500–1000 TL yeterli. Hepsini tek seferde yatırmak zorunda değilsin.',
-  },
-  {
-    id: 4,
-    emoji: '🛒',
-    title: 'İlk Emir Nasıl Verilir?',
-    body: '1. Uygulamada "Emir Ver" veya "Al" bölümüne git.\n2. Almak istediğin varlığı ara.\n3. Miktar gir (kaç lot / TL).\n4. "Piyasa Emri" seç — anlık fiyattan alınır.\n5. Onayla.',
-    // The portfolio can include US-listed ETFs (SPY, QQQ...), which a standard
-    // Turkish equity account does not necessarily reach. Saying "just search
-    // the ticker" would send a beginner into a wall on their first attempt.
-    tip: '💡 Önemli: Portföyünde yurtdışı borsalarda işlem gören ETF\'ler varsa (SPY, QQQ gibi), bunlar BIST\'te işlem görmez. Bunun için aracı kurumunun yurtdışı piyasa hizmeti vermesi gerekir; genellikle ayrı bir başvuru ve döviz dönüşümü gerektirir. Hesap açmadan önce "yurtdışı ETF alabiliyor muyum, komisyonu ne?" diye sor.',
-  },
-  {
-    id: 5,
-    emoji: '📊',
-    title: 'Takip ve Sabır',
-    body: 'Aldıktan sonra günlük fiyat değişimlerine bakma alışkanlığı edinme — bu kaygıyı artırır. Haftada bir bakman yeterli. Lumos zaten büyük değişimlerde seni bilgilendirir.',
-    tip: '💡 Altın kural: Almayı düşündüğün parayı 5 yıl görmeyecekmişsin gibi davran. Kısa vadeli ihtiyaçların için kullanma.',
-  },
+  { id: 1, emoji: '🏦' },
+  { id: 2, emoji: '📋' },
+  { id: 3, emoji: '💳' },
+  { id: 4, emoji: '🛒' },
+  { id: 5, emoji: '📊' },
 ]
 
 export default function BeginnerGuide({ defaultExpanded = false }) {
+  const { t } = useTranslation()
   const [expanded, setExpanded] = useState(defaultExpanded)
   const [activeStep, setActiveStep] = useState(0)
 
@@ -67,10 +34,10 @@ export default function BeginnerGuide({ defaultExpanded = false }) {
         <span style={{ fontSize: 20 }}>🎓</span>
         <div style={{ flex: 1 }}>
           <p style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)' }}>
-            İlk Yatırım Rehberi
+            {t('guide.title')}
           </p>
           <p style={{ fontSize: 11, color: 'var(--text-dim)', marginTop: 2 }}>
-            Aracı kurum → Para yatır → İlk emir — adım adım Türkiye rehberi
+            {t('guide.subtitle')}
           </p>
         </div>
         <span style={{
@@ -107,20 +74,20 @@ export default function BeginnerGuide({ defaultExpanded = false }) {
             background: 'var(--bg)', border: '1px solid var(--border)',
           }}>
             <p style={{ fontSize: 14, fontWeight: 700, marginBottom: 10 }}>
-              {STEPS[activeStep].emoji} {STEPS[activeStep].title}
+              {STEPS[activeStep].emoji} {t(`guide.steps.${STEPS[activeStep].id}.title`)}
             </p>
             <p style={{
               fontSize: 13, color: 'var(--text-muted)',
               lineHeight: 1.7, whiteSpace: 'pre-line', marginBottom: 12,
             }}>
-              {STEPS[activeStep].body}
+              {t(`guide.steps.${STEPS[activeStep].id}.body`)}
             </p>
             <div style={{
               fontSize: 12, lineHeight: 1.6, padding: '8px 12px',
               background: 'var(--firefly-dim)', borderRadius: 'var(--radius-xs)',
               color: 'var(--text)',
             }}>
-              {STEPS[activeStep].tip}
+              {t(`guide.steps.${STEPS[activeStep].id}.tip`)}
             </div>
           </div>
 
@@ -132,7 +99,7 @@ export default function BeginnerGuide({ defaultExpanded = false }) {
               disabled={activeStep === 0}
               onClick={() => setActiveStep(s => s - 1)}
             >
-              ← Önceki
+              {t('guide.prev')}
             </button>
             <button
               className="btn btn-ghost"
@@ -140,7 +107,7 @@ export default function BeginnerGuide({ defaultExpanded = false }) {
               disabled={activeStep === STEPS.length - 1}
               onClick={() => setActiveStep(s => s + 1)}
             >
-              Sonraki →
+              {t('guide.next')}
             </button>
           </div>
         </div>

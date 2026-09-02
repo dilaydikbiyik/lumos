@@ -4,16 +4,18 @@ import { useAuth } from '@clerk/clerk-react'
 import api from '../utils/api'
 import useMarket from '../hooks/useMarket'
 import { readJSON, writeJSON, userKey } from '../utils/storage'
+import { useTranslation } from 'react-i18next'
 
 const RANGES = [
-  { days: 30, label: '1 Ay' },
-  { days: 90, label: '3 Ay' },
-  { days: 365, label: '1 Yıl' },
+  { days: 30, label: 'chart.m1' },
+  { days: 90, label: 'chart.m3' },
+  { days: 365, label: 'chart.y1' },
 ]
 
 /** Daily value of the user's REAL holdings since purchase — live tickers
     follow actual closes; cash/manual assets are carried flat (no fake wiggle). */
 export default function PortfolioValueChart({ holdingsCount }) {
+  const { t } = useTranslation()
   const { money } = useMarket()
   const { userId } = useAuth()
   const [days, setDays] = useState(30)
@@ -30,7 +32,7 @@ export default function PortfolioValueChart({ holdingsCount }) {
         setData(res.data); setError(null)
         writeJSON(ck, res.data)
       })
-      .catch(() => { if (!cancelled) setError('Değer geçmişi şu an yüklenemedi.') })
+      .catch(() => { if (!cancelled) setError(t('chart.error')) })
     return () => { cancelled = true }
   }, [days, holdingsCount, ck])
 
@@ -42,7 +44,7 @@ export default function PortfolioValueChart({ holdingsCount }) {
   return (
     <div className="card">
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 4 }}>
-        <strong style={{ fontSize: 14 }}>Portföyün Nasıl Gidiyor?</strong>
+        <strong style={{ fontSize: 14 }}>{t('chart.title')}</strong>
         <div style={{ marginLeft: 'auto', display: 'flex', gap: 4 }}>
           {RANGES.map(r => (
             <button key={r.days} className="btn btn-ghost"
@@ -52,7 +54,7 @@ export default function PortfolioValueChart({ holdingsCount }) {
                 background: days === r.days ? 'var(--firefly-dim)' : 'transparent',
                 color: days === r.days ? 'var(--firefly)' : 'var(--text-dim)',
               }}>
-              {r.label}
+              {t(r.label)}
             </button>
           ))}
         </div>
@@ -85,24 +87,24 @@ export default function PortfolioValueChart({ holdingsCount }) {
                   background: 'var(--bg-card)', border: '1px solid var(--border)',
                   borderRadius: 8, fontSize: 12,
                 }}
-                formatter={v => [money(v), 'Değer']}
-                labelFormatter={d => new Date(d).toLocaleDateString('tr-TR')}
+                formatter={v => [money(v), t('common.value')]}
+                labelFormatter={d => new Date(d).toLocaleDateString()}
               />
               <Area type="monotone" dataKey="value" stroke={color} strokeWidth={2}
                     fill="url(#pvFill)" animationDuration={500} />
             </AreaChart>
           </ResponsiveContainer>
           <p style={{ fontSize: 11, color: 'var(--text-dim)', marginTop: 6, lineHeight: 1.5 }}>
-            {data.live_count > 0 && `${data.live_count} varlık gerçek piyasa kapanışlarını takip ediyor`}
+            {data.live_count > 0 && t('chart.liveNote', { count: data.live_count })}
             {data.live_count > 0 && data.flat_count > 0 && ' · '}
-            {data.flat_count > 0 && `${data.flat_count} varlık (nakit/manuel) son bilinen değerinde sabit`}
-            . Düşüş günleri normaldir — mesele o günlerde satmamak.
+            {data.flat_count > 0 && t('chart.flatNote', { count: data.flat_count })}
+            {'. '}{t('chart.dipNote')}
           </p>
         </>
       )}
       {data && data.series.length < 2 && !error && (
         <p style={{ fontSize: 12, color: 'var(--text-dim)' }}>
-          Grafik, varlıkların birkaç gün veri biriktirince burada belirecek.
+          {t('chart.pending')}
         </p>
       )}
     </div>

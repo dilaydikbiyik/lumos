@@ -4,6 +4,7 @@ import { useAuth } from '@clerk/clerk-react'
 import api, { extractErrorMessage } from '../utils/api'
 import useMarket from '../hooks/useMarket'
 import { readJSON, userKey } from '../utils/storage'
+import { useTranslation } from 'react-i18next'
 
 // portfolio category -> holding asset type
 const CATEGORY_TO_TYPE = {
@@ -17,6 +18,7 @@ const NO_TICKER_TYPES = new Set(['cash'])
  * with one tap.
  */
 export default function BoughtItBridge({ allocations, budget }) {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const { money } = useMarket()
   const { userId } = useAuth()
@@ -75,7 +77,7 @@ export default function BoughtItBridge({ allocations, budget }) {
       }
       navigate('/holdings')
     } catch (err) {
-      setError(extractErrorMessage(err, 'Aktarım tamamlanamadı — Varlıklarım sayfasından tek tek ekleyebilirsin.'))
+      setError(extractErrorMessage(err, t('bridge.transferError')))
       setSaving(false)
     }
   }
@@ -83,7 +85,7 @@ export default function BoughtItBridge({ allocations, budget }) {
   if (alreadyRecorded === null) {
     return (
       <div className="card" style={{ opacity: 0.6 }}>
-        <p style={{ fontSize: 'var(--t-small)' }}>Varlıklarım kontrol ediliyor…</p>
+        <p style={{ fontSize: 'var(--t-small)' }}>{t('bridge.checking')}</p>
       </div>
     )
   }
@@ -91,13 +93,12 @@ export default function BoughtItBridge({ allocations, budget }) {
   if (alreadyRecorded && !addingMore) {
     return (
       <div className="card">
-        <h3 style={{ marginBottom: 4 }}>Bu portföy Varlıklarım&apos;da ✓</h3>
+        <h3 style={{ marginBottom: 4 }}>{t('bridge.recordedTitle')}</h3>
         <p style={{ fontSize: 'var(--t-small)', opacity: 0.8, marginBottom: 12 }}>
-          Bu varlıkları daha önce işledin — güncel değerlerini Varlıklarım&apos;dan takip
-          edebilirsin.
+          {t('bridge.recordedBody')}
         </p>
         <button className="btn btn-ghost btn-full" onClick={() => navigate('/holdings')}>
-          Varlıklarım&apos;a git →
+          {t('bridge.goHoldings')}
         </button>
         {/* Regular investors buy the same mix again every month; "already
             recorded" must inform, never block. */}
@@ -106,7 +107,7 @@ export default function BoughtItBridge({ allocations, budget }) {
           style={{ marginTop: 8, fontSize: 'var(--t-micro)', color: 'var(--text-dim)' }}
           onClick={() => setAddingMore(true)}
         >
-          Yeni bir alım daha işlemek istiyorum
+          {t('bridge.addAnother')}
         </button>
       </div>
     )
@@ -115,16 +116,15 @@ export default function BoughtItBridge({ allocations, budget }) {
   return (
     <div className="card">
       <h3 style={{ marginBottom: 4 }}>
-        {addingMore ? 'Yeni alımını işle' : 'Bu portföyü aldın mı?'}
+        {addingMore ? t('bridge.newPurchaseTitle') : t('bridge.boughtTitle')}
       </h3>
       <p style={{ fontSize: 13, opacity: 0.8, marginBottom: 12 }}>
-        Alımını kendi aracı kurumunda yaptıysan, portföyü tek tıkla
-        Varlıklarım'a işleyelim — kalan bütçen otomatik güncellenir.
+        {t('bridge.body')}
       </p>
       <button className="btn btn-primary btn-full" onClick={transfer} disabled={saving}>
         {saving
           ? <span className="spinner" style={{ width: 18, height: 18 }} />
-          : `Aldım — ${money(budget)}'lik dağılımı işle`}
+          : t('bridge.recordCta', { amount: money(budget) })}
       </button>
       {error && <p style={{ color: 'var(--red)', fontSize: 13, marginTop: 10 }}>{error}</p>}
     </div>

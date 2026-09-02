@@ -10,29 +10,22 @@ import { UserButton, useAuth } from '@clerk/clerk-react'
 import api, { extractErrorMessage, setAuthToken } from '../utils/api'
 import useMarket from '../hooks/useMarket'
 import { readJSON, writeJSON, userKey } from '../utils/storage'
+import { Trans, useTranslation } from 'react-i18next'
 
-const TYPE_LABELS = {
-  stock: 'Hisse', fund: 'Fon', etf: 'ETF',
-  real_estate: 'Konut', land: 'Arsa', vehicle: 'Araç',
-  gold: 'Altın', crypto: 'Kripto', cash: 'Nakit', other: 'Diğer',
-}
+const TYPE_KEYS = ['stock', 'fund', 'etf', 'real_estate', 'land', 'vehicle', 'gold', 'crypto', 'cash', 'other']
 const OFF_EXCHANGE = ['real_estate', 'land', 'vehicle', 'cash', 'other']
 
 const EMPTY_FORM = {
-  asset_type: 'stock', name: '', ticker: '',
+  asset_type: 'stock', name: '', ticker: '', quantity: '',
   purchase_amount: '', manual_current_value: '', note: '', emotion_tag: '',
 }
 
-// One-tap emotion tag — data source for the behaviour coach, fully optional
-const EMOTIONS = [
-  { value: '', label: 'Bu kararı ne verdirdi? (ops.)' },
-  { value: 'plan', label: 'Planımın parçası' },
-  { value: 'fomo', label: 'Kaçırma korkusu (FOMO)' },
-  { value: 'tuyo', label: 'Tüyo / tavsiye' },
-  { value: 'panik', label: 'Panik / acele' },
-]
+// One-tap emotion tag — data source for the behaviour coach, fully optional.
+// '' maps to the prompt label; the rest carry their own locale keys.
+const EMOTION_VALUES = ['', 'plan', 'fomo', 'tuyo', 'panik']
 
 export default function HoldingsPage() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const { getToken, userId } = useAuth()
   const { money } = useMarket()
@@ -45,6 +38,8 @@ export default function HoldingsPage() {
   const [health, setHealth] = useState(cached?.health ?? null)
   const [profile, setProfile] = useState(cached?.profile ?? null)
   const [form, setForm] = useState(EMPTY_FORM)
+  // idle | loading | found | notfound — drives the symbol field's own feedback
+  const [lookup, setLookup] = useState({ state: 'idle', data: null })
   const [showForm, setShowForm] = useState(false)
   const [error, setError] = useState(null)
   // "Empty portfolio" and "still fetching" must never look the same
@@ -72,12 +67,42 @@ export default function HoldingsPage() {
       try {
         await refresh()
       } catch {
-        if (!cancelled) setError('Varlıklar yüklenemedi')
+        if (!cancelled) setError(t('holdings.loadError'))
       }
     }
     load()
     return () => { cancelled = true }
   }, [refresh])
+
+  // Typing a symbol should not also mean typing its name and hunting for its
+  // price. Looking it up fills both AND validates the symbol: one that fails
+  // to resolve would otherwise be saved and silently never track live.
+  async function lookupTicker() {
+    const symbol = form.ticker.trim()
+    if (!symbol || lookup.state === 'loading') return
+    setLookup({ state: 'loading', data: null })
+    try {
+      const res = await api.get('/holdings/lookup', { params: { ticker: symbol } })
+      setLookup({ state: 'found', data: res.data })
+      setForm(f => ({
+        ...f,
+        ticker: res.data.ticker,
+        // Never overwrite a name the user chose to write themselves — and
+        // never invent one: the exchange sometimes returns a price with no
+        // name, in which case the field stays theirs to fill.
+        name: f.name.trim() || res.data.name || '',
+      }))
+    } catch {
+      setLookup({ state: 'notfound', data: null })
+    }
+  }
+
+  // Quantity × looked-up price — the number a user actually knows ("I bought
+  // 10 shares") turned into the number the form needs.
+  const lookedUpPrice = lookup.state === 'found' ? lookup.data.price : null
+  const computedAmount = lookedUpPrice && Number(form.quantity) > 0
+    ? lookedUpPrice * Number(form.quantity)
+    : null
 
   async function addHolding(e) {
     e.preventDefault()
@@ -89,15 +114,18 @@ export default function HoldingsPage() {
         purchase_amount: Number(form.purchase_amount),
       }
       if (form.ticker) body.ticker = form.ticker.toUpperCase()
+      // Quantity unlocks live tracking, so keep it when the user gave one.
+      if (Number(form.quantity) > 0) body.quantity = Number(form.quantity)
       if (form.manual_current_value) body.manual_current_value = Number(form.manual_current_value)
       if (form.note) body.note = form.note
       if (form.emotion_tag) body.emotion_tag = form.emotion_tag
       await api.post('/holdings', body)
       setForm(EMPTY_FORM)
+      setLookup({ state: 'idle', data: null })
       setShowForm(false)
       await refresh()
     } catch (err) {
-      setError(extractErrorMessage(err, 'Varlık eklenemedi'))
+      setError(extractErrorMessage(err, t('holdings.addError')))
     }
   }
 
@@ -118,19 +146,19 @@ export default function HoldingsPage() {
 
       <div className="page-content" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
         <div>
-          <h2>Varlıklarım</h2>
-          <p style={{ fontSize: 13, marginTop: 4 }}>Borsa + emlak + aracın — tüm servetin tek resimde</p>
+          <h2>{t('holdings.title')}</h2>
+          <p style={{ fontSize: 13, marginTop: 4 }}>{t('holdings.subtitle')}</p>
         </div>
 
         {/* Wealth summary */}
         {summary && (
           <div className="card" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
             <div>
-              <div className="num-label">Toplam Değer</div>
+              <div className="num-label">{t('holdings.totalValue')}</div>
               <div className="num-lead">{money(summary.total_current_value)}</div>
             </div>
             <div>
-              <div className="num-label">Kalan Bütçe</div>
+              <div className="num-label">{t('holdings.remainingBudget')}</div>
               <div className="num-lead" style={{ color: 'var(--green, #4ade80)' }}>
                 {summary.remaining_budget != null ? money(summary.remaining_budget) : '—'}
               </div>
@@ -143,13 +171,16 @@ export default function HoldingsPage() {
           <div className="card" style={{ borderColor: 'var(--red)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
               <Icon name="droplet" size={18} color="var(--red)" />
-              <strong style={{ fontSize: 14 }}>Param eriyor mu?</strong>
+              <strong style={{ fontSize: 14 }}>{t('holdings.erosionTitle')}</strong>
             </div>
             <p style={{ fontSize: 'var(--t-small)', lineHeight: 1.6 }}>
-              Kasada bekleyen <strong>{money(summary.cash_erosion.idle_cash ?? 0)}</strong>&apos;nin
-              bu ay enflasyon nedeniyle gerçek değeri
-              ~<strong>{money(summary.cash_erosion.erosion_amount)}</strong> azaldı
-              (aylık enflasyon %{summary.cash_erosion.monthly_inflation_pct}).
+              <Trans i18nKey="holdings.erosionBody"
+                     values={{
+                       idle: money(summary.cash_erosion.idle_cash ?? 0),
+                       amount: money(summary.cash_erosion.erosion_amount),
+                       pct: summary.cash_erosion.monthly_inflation_pct,
+                     }}
+                     components={[<strong key="a" />, <strong key="b" />]} />
             </p>
             {/* Where that number comes from — a figure the user never typed
                 needs its own arithmetic shown, or it reads as invented. */}
@@ -157,10 +188,17 @@ export default function HoldingsPage() {
               marginTop: 8, paddingTop: 8, borderTop: '1px solid var(--border)',
               fontSize: 'var(--t-micro)', color: 'var(--text-muted)', lineHeight: 1.7,
             }}>
-              <div>Nakit varlıkların (Varlıklarım&apos;a eklediğin nakit): <strong>{money(summary.cash_erosion.cash_holdings ?? 0)}</strong></div>
-              <div>Yatırılmamış bütçen (bildirdiğin bütçe − yatırdığın): <strong>{money(summary.cash_erosion.uninvested_budget ?? 0)}</strong></div>
+              <div><Trans i18nKey="holdings.erosionCash"
+                     values={{ amount: money(summary.cash_erosion.cash_holdings ?? 0) }}
+                     components={[<strong key="a" />]} /></div>
+              <div><Trans i18nKey="holdings.erosionBudget"
+                     values={{ amount: money(summary.cash_erosion.uninvested_budget ?? 0) }}
+                     components={[<strong key="a" />]} /></div>
               <div style={{ marginTop: 2 }}>
-                Toplam × aylık TÜFE (%{summary.cash_erosion.monthly_inflation_pct}) = {money(summary.cash_erosion.erosion_amount)}
+                {t('holdings.erosionFormula', {
+                  pct: summary.cash_erosion.monthly_inflation_pct,
+                  amount: money(summary.cash_erosion.erosion_amount),
+                })}
               </div>
             </div>
           </div>
@@ -171,11 +209,10 @@ export default function HoldingsPage() {
           <div className="card">
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
               <Icon name="bulb" size={22} glow />
-              <strong>Fener Skoru: {health.overall}/100</strong>
+              <strong>{t('holdings.healthTitle', { score: health.overall })}</strong>
             </div>
             <p style={{ fontSize: 11.5, color: 'var(--text-dim)', lineHeight: 1.5, marginBottom: 8 }}>
-              Fener, portföyünün sağlığını tek bakışta gösterir: varlıkların ne kadar
-              çeşitli ve gerektiğinde ne kadar kolay nakde çevrilebilir olduğuna bakar.
+              {t('holdings.healthBody')}
             </p>
             {health.notes.map((n, i) => (
               <p key={i} style={{ fontSize: 13, lineHeight: 1.6, opacity: 0.85 }}>{n}</p>
@@ -204,7 +241,7 @@ export default function HoldingsPage() {
               },
             })}
           >
-            ↻ Kalan {money(summary.remaining_budget)} ile portföyümü güncelle
+            {t('holdings.rebuildCta', { amount: money(summary.remaining_budget) })}
           </button>
         )}
 
@@ -212,13 +249,13 @@ export default function HoldingsPage() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {holdings.map(h => (
             <div key={h.id} className="card" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <span style={{ fontSize: 14 }}>{TYPE_LABELS[h.asset_type] || h.asset_type}</span>
+              <span style={{ fontSize: 14 }}>{t('holdings.types.' + h.asset_type, { defaultValue: h.asset_type })}</span>
               <div style={{ flex: 1 }}>
                 <div style={{ fontWeight: 600, fontSize: 14 }}>{h.name}</div>
                 <div style={{ fontSize: 12, opacity: 0.7 }}>
-                  Alış: {money(h.purchase_amount)}
+                  {t('holdings.purchase')}: {money(h.purchase_amount)}
                   {h.current_value != null && h.value_source !== 'purchase' && (
-                    <> · Güncel: <strong style={{ color: 'var(--text)' }}>{money(h.current_value)}</strong>
+                    <> · {t('holdings.current')}: <strong style={{ color: 'var(--text)' }}>{money(h.current_value)}</strong>
                       {h.value_change_pct != null && (
                         <span style={{
                           marginLeft: 6, fontWeight: 700,
@@ -232,27 +269,27 @@ export default function HoldingsPage() {
                           ? (h.purchase_date === new Date().toISOString().slice(0, 10)
                               // A 0% move on the day of purchase is correct, not a
                               // broken feed — say which it is instead of leaving doubt.
-                              ? '● canlı · bugün alındı'
-                              : '● canlı')
-                          : h.value_source === 'index' ? 'endeks tahmini' : 'manuel'}
+                              ? t('holdings.liveBoughtToday')
+                              : t('holdings.live'))
+                          : h.value_source === 'index' ? t('holdings.indexEstimate') : t('holdings.manual')}
                       </span>
                     </>
                   )}
                   {(h.current_value == null || h.value_source === 'purchase') && h.ticker && (
                     <span style={{ marginLeft: 6, fontSize: 10, opacity: 0.55 }}>
-                      (canlı takip için adet veya alış tarihi ekle)
+                      {t('holdings.liveHint')}
                     </span>
                   )}
                 </div>
               </div>
-              <button className="btn btn-ghost" onClick={() => remove(h.id)} aria-label="Sil" style={{ padding: '4px 10px' }}>✕</button>
+              <button className="btn btn-ghost" onClick={() => remove(h.id)} aria-label={t('holdings.deleteLabel')} style={{ padding: '4px 10px' }}>✕</button>
             </div>
           ))}
           {!loaded && holdings.length === 0 && (
             <div className="card" style={{ textAlign: 'center', padding: '36px 24px' }}>
               <span className="spinner" style={{ width: 22, height: 22, display: 'inline-block' }} />
               <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 10 }}>
-                Varlıkların yükleniyor…
+                {t('holdings.loading')}
               </p>
             </div>
           )}
@@ -272,10 +309,10 @@ export default function HoldingsPage() {
               <div style={{ position: 'relative', zIndex: 1 }}>
                 <FireflyMark size={46} />
                 <p style={{ fontSize: 14, fontWeight: 600, marginBottom: 4 }}>
-                  Henüz varlığın yok
+                  {t('holdings.emptyTitle')}
                 </p>
                 <p style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.6 }}>
-                  İlk ışığı birlikte yakalayalım — bir varlık ekleyerek başla.
+                  {t('holdings.emptyBody')}
                 </p>
               </div>
             </div>
@@ -287,9 +324,9 @@ export default function HoldingsPage() {
           <form className="card" onSubmit={addHolding} style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             <select className="input" value={form.asset_type}
                     onChange={e => setForm({ ...form, asset_type: e.target.value })}>
-              {Object.entries(TYPE_LABELS).map(([v, label]) => <option key={v} value={v}>{label}</option>)}
+              {TYPE_KEYS.map(v => <option key={v} value={v}>{t('holdings.types.' + v)}</option>)}
             </select>
-            <input className="input" placeholder="Ad (örn: Gölbaşı arsa, SPY ETF)" required
+            <input className="input" placeholder={t('holdings.namePlaceholder')} required
                    value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
             {/* 🚗 Vehicle warning — "is your car wealth or an expense?" */}
             {isVehicle && (
@@ -300,37 +337,94 @@ export default function HoldingsPage() {
                 fontSize: 12, lineHeight: 1.65,
               }}>
                 <p style={{ fontWeight: 700, marginBottom: 6, color: 'var(--text)' }}>
-                  🚗 Araban serveti mi, gideri mi?
+                  {t('holdings.vehicleTitle')}
                 </p>
                 <p style={{ color: 'var(--text-muted)', marginBottom: 6 }}>
-                  Araç servet resmine dahil edilebilir — ama dikkatli ol: her yıl %10–20 değer kaybeder (amortisman),
-                  üstüne kasko + MTV + bakım gelir. Lumos asla araç almayı yatırım olarak önermez.
+                  {t('holdings.vehicleBody')}
                 </p>
                 <p style={{ color: 'var(--firefly)', fontWeight: 600 }}>
-                  <Icon name="bulb" size={13} /> Bunu eklemek istiyorsan güncel piyasa değerini "Güncel tahmini değer"e yaz.
+                  <Icon name="bulb" size={13} /> {t('holdings.vehicleTip')}
                 </p>
               </div>
             )}
             {needsTicker && (
-              <input className="input" placeholder="Sembol (örn: SPY, THYAO.IS)" required
-                     value={form.ticker} onChange={e => setForm({ ...form, ticker: e.target.value })} />
+              <>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <input className="input" style={{ flex: 1 }} placeholder={t('holdings.tickerPlaceholder')} required
+                         value={form.ticker}
+                         onChange={e => { setForm({ ...form, ticker: e.target.value }); setLookup({ state: 'idle', data: null }) }}
+                         onBlur={lookupTicker}
+                         onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); lookupTicker() } }} />
+                  <button type="button" className="btn btn-ghost" onClick={lookupTicker}
+                          disabled={!form.ticker.trim() || lookup.state === 'loading'}
+                          style={{ flexShrink: 0 }}>
+                    {lookup.state === 'loading'
+                      ? <span className="spinner" style={{ width: 16, height: 16 }} />
+                      : t('holdings.lookupCta')}
+                  </button>
+                </div>
+
+                {/* What the symbol resolved to — proof it will track live, and
+                    the price the quantity field multiplies against. */}
+                {lookup.state === 'found' && (
+                  <div style={{
+                    padding: '10px 12px', borderRadius: 'var(--radius-xs)',
+                    background: 'var(--firefly-dim)', fontSize: 12.5, lineHeight: 1.6,
+                  }}>
+                    <strong>{lookup.data.name || lookup.data.ticker}</strong>
+                    <div style={{ color: 'var(--text-muted)', marginTop: 2 }}>
+                      {t('holdings.lookupPrice', {
+                        price: lookup.data.price,
+                        currency: lookup.data.currency || '',
+                      })}
+                    </div>
+                  </div>
+                )}
+                {lookup.state === 'notfound' && (
+                  <p style={{ fontSize: 12.5, color: 'var(--red)', lineHeight: 1.6 }}>
+                    {t('holdings.lookupNotFound')}
+                  </p>
+                )}
+
+                <input className="input" type="number" step="any" min="0"
+                       placeholder={t('holdings.quantityPlaceholder')}
+                       value={form.quantity}
+                       onChange={e => {
+                         const quantity = e.target.value
+                         // Filling the amount for them is the point; they can
+                         // still overwrite it if they paid a different price.
+                         const auto = lookedUpPrice && Number(quantity) > 0
+                           ? String(Math.round(lookedUpPrice * Number(quantity) * 100) / 100)
+                           : form.purchase_amount
+                         setForm({ ...form, quantity, purchase_amount: auto })
+                       }} />
+              </>
             )}
-            <input className="input" type="number" placeholder="Alış tutarı (TL)" required min="1"
+            <input className="input" type="number" placeholder={t('holdings.amountPlaceholder')} required min="1"
                    value={form.purchase_amount} onChange={e => setForm({ ...form, purchase_amount: e.target.value })} />
-            <input className="input" type="number" placeholder="Güncel tahmini değer (opsiyonel)" min="1"
+            {computedAmount != null && (
+              <p style={{ fontSize: 'var(--t-micro)', color: 'var(--text-dim)', marginTop: -4, lineHeight: 1.5 }}>
+                {t('holdings.computedNote', {
+                  quantity: form.quantity,
+                  price: lookedUpPrice,
+                  total: Math.round(computedAmount * 100) / 100,
+                })}
+              </p>
+            )}
+            <input className="input" type="number" placeholder={t('holdings.currentPlaceholder')} min="1"
                    value={form.manual_current_value} onChange={e => setForm({ ...form, manual_current_value: e.target.value })} />
             <select className="input" value={form.emotion_tag}
                     onChange={e => setForm({ ...form, emotion_tag: e.target.value })}>
-              {EMOTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+              {EMOTION_VALUES.map(v => <option key={v} value={v}>{t(v ? 'holdings.emotions.' + v : 'holdings.emotions.prompt')}</option>)}
             </select>
             <div style={{ display: 'flex', gap: 8 }}>
-              <button className="btn btn-primary" type="submit" style={{ flex: 1 }}>Ekle</button>
-              <button className="btn btn-ghost" type="button" onClick={() => setShowForm(false)}>Vazgeç</button>
+              <button className="btn btn-primary" type="submit" style={{ flex: 1 }}>{t('holdings.add')}</button>
+              <button className="btn btn-ghost" type="button" onClick={() => setShowForm(false)}>{t('common.cancel')}</button>
             </div>
           </form>
         ) : (
           <button className="btn btn-primary btn-full" onClick={() => setShowForm(true)}>
-            + Varlık Ekle
+            {t('holdings.addCta')}
           </button>
         )}
 
