@@ -34,6 +34,7 @@ def check(
     budget: float,
     card_monthly_rate_pct: float | None = None,
     portfolio_annual_growth_pct: float | None = None,
+    market: str = "TR",
 ) -> dict | None:
     """
     Compare paying the debt against investing the same money for one year.
@@ -47,7 +48,7 @@ def check(
     if card_monthly_rate_pct is None:
         card_monthly_rate_pct = CARD_MONTHLY_RATE_PCT
     if portfolio_annual_growth_pct is None:
-        portfolio_annual_growth_pct = assumptions.portfolio_growth_pct()
+        portfolio_annual_growth_pct = assumptions.portfolio_growth_pct(market)
 
     debt_annual_pct = annual_rate_from_monthly(card_monthly_rate_pct)
 
@@ -75,6 +76,6 @@ def check(
         "covers_debt": budget >= debt,
         "assumptions": {
             "card_monthly_rate_pct": card_monthly_rate_pct,
-            "annual_inflation_pct": assumptions.annual_inflation_pct(),
+            "annual_inflation_pct": assumptions.annual_inflation_pct(market),
         },
     }

@@ -27,10 +27,13 @@ async def recommend(
     """
     POST /recommend — risk score + budget in, portfolio weights + explanation out.
     """
-    portfolio = build_portfolio(risk_score=body.risk_score, budget=body.budget)
-
-    # Fetch user profile for personalised explanation
+    # Resolve the market BEFORE building: it selects the investable universe.
     user = await user_repository.get_by_clerk_id(db, user_id)
+    market = (user.market if user else None) or "TR"
+    portfolio = await asyncio.to_thread(
+        build_portfolio, body.risk_score, body.budget, market
+    )
+
     user_profile = {}
     if user:
         user_profile = {

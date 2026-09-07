@@ -1100,17 +1100,75 @@ SEC/BaFin surface. Book the lawyer before Phase 4; the answer may change scope
       switcher that flips 10% of the copy reads as broken.
 - [ ] Number/date formatting per locale everywhere (`useMarket` fmt vs i18n).
 
-### Phase 2 — US + DE market packs (real data)
+### Phase 2 — US + DE market packs (real data) — DONE
 
-- [ ] US: FRED adapters — CPI (CPIAUCSL) + Case-Shiller (CSUSHPINSA).
-      **User: register a free FRED API key.**
-- [ ] DE: Destatis/ECB CPI + a housing series; German UI (`de.json`) — EN in
-      Germany is a half-measure.
-- [ ] **PRIIPs realism**: EU retail cannot buy US-domiciled ETFs (no KID).
-      The DE asset universe must be UCITS funds; repeat none of the
-      "search SPY at a Turkish broker" mistake.
-- [ ] Per-market asset universes + broker/tax notes reviewed for realism.
-- [ ] Trust chips and market-specific copy from the pack, not hardcoded.
+No API keys were needed after all: both sources answer unauthenticated, so
+the FRED registration on the original plan is off the critical path.
+
+- [x] US inflation + rent: **BLS public API**, no key (CPI-U 3.36%/yr, rent
+      2.86%/yr measured). House PRICES remain honestly absent — a rent index
+      measures what it costs to OCCUPY housing, not what homes sell for, and
+      substituting one for the other would corrupt every buy-vs-rent verdict.
+      Case-Shiller needs a free FRED key; the pack declares `none` until then.
+- [x] DE inflation + rent + **a real house price index**: Eurostat, no key
+      (HICP 2.0%/yr; prc_hpi_q measured 1.4%/yr through 2026-Q1).
+- [x] **PRIIPs realism.** EU retail cannot buy US-domiciled ETFs, so the DE
+      universe is UCITS-only — including the DEFENSIVE sleeve, which still
+      quietly held BIL and BND after the growth sleeve was fixed. A German
+      portfolio is now EUNL/IQQP/EUNA/XEON, every one of them tradeable in
+      Germany.
+- [x] **Country rates moved into the pack.** A 39% mortgage, a 4% deed fee
+      and 20% VAT are facts about Türkiye, not constants: they lived in
+      `assumptions.py` and were silently applied to every market. Now
+      TR 39%/10y, US 6.5%/30y, DE 3.8%/20y, with their own transfer taxes,
+      commissions, upkeep and rental yields.
+- [x] Market threaded through inflation, assumptions, goal planner,
+      rent-vs-buy, debt check and the portfolio engine.
+- [x] `GET /users/markets/pack` returns the market's educational content in
+      the UI's language.
+
+### Language × market independence
+
+The two are separate axes, and a mid-flight correction caught that they were
+being welded together in three places:
+
+- [x] Pack copy was written one-language-per-country, so an English reader
+      who picked Germany got German prose. Every pack now carries tr/en/de
+      and resolves with `pack.say(field, lang)`.
+- [x] `X-Lumos-Lang` accepted only tr/en, so German requests fell back to
+      Turkish silently.
+- [x] The AI prompt fallback went straight to Turkish, so a German user got
+      a Turkish quiz. Added `system_prompt.de.txt` + `advisor_prompt.de.txt`,
+      and the chain now falls to English before Turkish.
+- [x] `de.json` UI locale (core journey), language switcher next to the
+      market switcher, i18next fallback `de → en → tr`.
+- Tested as a cross-product: every language × every market returns distinct,
+  correct copy, and the PRIIPs warning reaches an English reader on the
+  German market.
+
+### Caught by verifying in production, not locally
+
+- [x] **US inflation was a lie in production.** It read exactly 3.0% — the
+      hardcoded fallback — while presenting itself as measured. BLS caps the
+      keyless endpoint at 25 requests/day per IP and our datacenter shares
+      that budget. Bundled `us_cpi_index.json` / `us_rent_index.json`
+      snapshots now back it, mirroring what Türkiye already had, so a blocked
+      call degrades to a real 3.36% rather than an invented number.
+      `scripts/refresh_us_index.py` regenerates them and refuses to overwrite
+      with anything shorter or older.
+- [x] **Türkiye was still inheriting the shared universe**, so a Turkish user
+      could get the identical portfolio as a US one. All three packs now
+      declare their assets explicitly.
+
+### Open observation (product decision, not a bug)
+
+A Turkish user can still end up with no BIST exposure at all: the engine
+ranks the growth sleeve by volatility, and Turkish equities are volatile
+enough that SPY outranks XU100.IS. Production returned `SPY, SCHH, BND, BIL`
+for a balanced Turkish profile — defensible arithmetic, but it means a
+Turkish beginner's whole portfolio sits in USD, which is a large implicit
+currency bet. The currency-exposure card flags it after the fact. Worth
+deciding deliberately: a home-market floor, or leave the formula alone.
 
 ### Phase 3 — professionalize for production
 

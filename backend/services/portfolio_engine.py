@@ -152,7 +152,7 @@ def _defensive_rationale(category: str, weight: float, defensive_target: float) 
     )
 
 
-def build_portfolio(risk_score: float, budget: float) -> PortfolioRecommendResponse:
+def build_portfolio(risk_score: float, budget: float, market: str = "TR") -> PortfolioRecommendResponse:
     """
     Compute a glide-path portfolio: a risk-sized defensive sleeve (cash + bonds)
     plus a volatility-blended growth sleeve (equities + gold + REIT).
@@ -166,9 +166,22 @@ def build_portfolio(risk_score: float, budget: float) -> PortfolioRecommendRespo
         and fully transparent allocation logic in metadata.
     """
     include_reits = should_include_reits(budget)
-    growth_universe = _load_universe()
+    # The investable universe is a legal fact, not a preference: EU retail
+    # investors cannot buy US-domiciled ETFs (no PRIIPs Key Information
+    # Document), so a market that defines its own universe always wins over
+    # the shared default. Recommending SPY to a German user would name
+    # something their broker must refuse.
+    from backend.markets import get_market_pack
+
+    pack = get_market_pack(market)
+    growth_universe = list(pack.asset_universe) or _load_universe()
     if include_reits:
-        growth_universe = growth_universe + get_reit_assets()
+        growth_universe = growth_universe + (list(pack.reit_assets) or get_reit_assets())
+
+    # The defensive sleeve is bound by the same rule — BIL and BND are
+    # US-domiciled, so a German portfolio cannot hold them either.
+    cash_asset = pack.cash_asset or _CASH_ASSET
+    bond_asset = pack.bond_asset or _BOND_ASSET
 
     # Fetch volatility ONLY for the real, fetchable growth tickers
     growth_tickers = [a["ticker"] for a in growth_universe]
@@ -230,13 +243,13 @@ def build_portfolio(risk_score: float, budget: float) -> PortfolioRecommendRespo
     # ── Defensive sleeve: sized directly, split cash/bond by risk ──
     defensive_categories: dict[str, str] = {}
     if n_defensive == 1:
-        weights[_CASH_ASSET["ticker"]] = defensive_target
-        defensive_categories[_CASH_ASSET["ticker"]] = "cash"
+        weights[cash_asset["ticker"]] = defensive_target
+        defensive_categories[cash_asset["ticker"]] = "cash"
     elif n_defensive == 2:
-        weights[_CASH_ASSET["ticker"]] = defensive_target * cash_share
-        weights[_BOND_ASSET["ticker"]] = defensive_target * (1 - cash_share)
-        defensive_categories[_CASH_ASSET["ticker"]] = "cash"
-        defensive_categories[_BOND_ASSET["ticker"]] = "bond"
+        weights[cash_asset["ticker"]] = defensive_target * cash_share
+        weights[bond_asset["ticker"]] = defensive_target * (1 - cash_share)
+        defensive_categories[cash_asset["ticker"]] = "cash"
+        defensive_categories[bond_asset["ticker"]] = "bond"
 
     # ── Dust floor first, then the concentration guard as the LAST step so no
     #    position can exceed the cap after the final re-normalisation ──
@@ -256,8 +269,8 @@ def build_portfolio(risk_score: float, budget: float) -> PortfolioRecommendRespo
 
     # ── Assemble allocations with per-asset rationale ──
     by_ticker = {a["ticker"]: a for a in growth_universe}
-    by_ticker[_CASH_ASSET["ticker"]] = _CASH_ASSET
-    by_ticker[_BOND_ASSET["ticker"]] = _BOND_ASSET
+    by_ticker[cash_asset["ticker"]] = cash_asset
+    by_ticker[bond_asset["ticker"]] = bond_asset
 
     allocations = []
     for t, weight in sorted(weights.items(), key=lambda kv: -kv[1]):

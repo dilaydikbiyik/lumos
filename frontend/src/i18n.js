@@ -2,6 +2,7 @@ import i18n from 'i18next'
 import { initReactI18next } from 'react-i18next'
 import tr from './locales/tr.json'
 import en from './locales/en.json'
+import de from './locales/de.json'
 
 /**
  * Language is a DEVICE preference, deliberately separate from the market:
@@ -15,6 +16,7 @@ const STORAGE_KEY = 'lumos-language'
 export const LANGUAGES = [
   { code: 'tr', label: 'Türkçe' },
   { code: 'en', label: 'English' },
+  { code: 'de', label: 'Deutsch' },
 ]
 
 function initialLanguage() {
@@ -30,14 +32,19 @@ function initialLanguage() {
   } catch { /* storage blocked — fall through */ }
   // First visit: follow the browser. Anything non-Turkish gets English —
   // a UI in a language you can't read is worse than a merely foreign one.
-  const nav = (typeof navigator !== 'undefined' && navigator.language) || 'tr'
-  return nav.toLowerCase().startsWith('tr') ? 'tr' : 'en'
+  const nav = ((typeof navigator !== 'undefined' && navigator.language) || 'tr').toLowerCase()
+  if (nav.startsWith('tr')) return 'tr'
+  if (nav.startsWith('de')) return 'de'
+  return 'en'
 }
 
 i18n.use(initReactI18next).init({
-  resources: { tr: { translation: tr }, en: { translation: en } },
+  resources: { tr: { translation: tr }, en: { translation: en }, de: { translation: de } },
   lng: initialLanguage(),
-  fallbackLng: 'tr',   // untranslated keys show Turkish, never raw key names
+  // A missing German key falls to English, not Turkish: showing a German
+  // reader Turkish is worse than showing them English. Turkish stays the
+  // final backstop because it is still the most complete file.
+  fallbackLng: { de: ['en', 'tr'], en: ['tr'], default: ['tr'] },
   interpolation: { escapeValue: false },  // React already escapes
   returnEmptyString: false,
 })

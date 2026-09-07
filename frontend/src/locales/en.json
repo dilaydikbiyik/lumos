@@ -540,5 +540,10 @@
     "howBody": "It assumes the money you save doesn't sit idle but grows in a portfolio matching your risk profile, at an average {{growth}}% a year. That rate isn't invented: it's live inflation ({{inflation}}%) plus the real premium a diversified portfolio is assumed to earn over the long run. The horizon is converted to {{months}} months, and each contribution's growth over the remaining time is counted.",
     "howFormula": "monthly = (target − grown value of current savings) × r / ((1+r)^months − 1),  r = monthly return",
     "howCaveat": "This is a planning assumption, not a forecast: markets don't grow the same amount every year, and some years close down. If the rate turns out lower, the monthly figure won't be enough — reviewing the plan once a year is a good habit."
+  },
+  "market": {
+    "label": "Market",
+    "select": "Select market",
+    "limitedData": "limited data"
   }
 }

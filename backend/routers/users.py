@@ -1,10 +1,11 @@
 from typing import Literal, Optional
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 from pydantic import BaseModel, ConfigDict
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.db.database import get_db
+from backend.limiter import limiter
 from backend.middleware.verify_clerk import get_current_user
 from backend.repositories import holding_repository, user_repository
 
@@ -135,6 +136,48 @@ async def list_markets():
     from backend.markets import public_markets
 
     return {"markets": public_markets()}
+
+
+@router.get("/markets/pack")
+@limiter.limit("30/minute")
+async def market_pack_content(
+    request: Request,
+    user_id: str = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    The educational content for the user's market, in the UI's language.
+
+    Market and language are separate choices: an English reader investing in
+    Germany needs German RULES in English PROSE. This endpoint is where the
+    two meet — the pack supplies the facts, the header supplies the wording.
+    """
+    from backend.markets import get_market_pack
+    from backend.middleware.language import get_language
+
+    user = await user_repository.get_or_create(db, user_id)
+    pack = get_market_pack(user.market)
+    lang = get_language(request)
+    return {
+        "code": pack.code,
+        "name": pack.name,
+        "currency": pack.currency,
+        "regulator": pack.regulator,
+        "broker_note": pack.say("broker_note", lang),
+        "tax_note": pack.say("tax_note", lang),
+        "disclaimer": pack.say("disclaimer", lang),
+        "fear_options": pack.fears(lang),
+        "live_inflation": pack.inflation_source != "none",
+        "live_housing_index": pack.housing_index_source != "none",
+        "assumptions": {
+            "mortgage_rate_pct": pack.mortgage_rate_pct,
+            "mortgage_term_years": pack.mortgage_term_years,
+            "transfer_tax_pct": pack.transfer_tax_pct,
+            "agency_commission_pct": pack.agency_commission_pct,
+            "vat_pct": pack.vat_pct,
+            "annual_upkeep_pct": pack.annual_upkeep_pct,
+        },
+    }
 
 
 @router.patch("/me/market", response_model=UserRead)

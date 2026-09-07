@@ -503,7 +503,10 @@ def chat(
     from backend.services.chat_context import build_market_context
 
     variants = _ADVISOR_PROMPTS if mode == "advisor" else _SYSTEM_PROMPTS
-    base = variants.get(language) or variants["tr"]
+    # Falling straight back to Turkish meant a German user got a Turkish quiz
+    # — the same language/market coupling we removed elsewhere. English is the
+    # safer intermediate; Turkish stays the final backstop.
+    base = variants.get(language) or variants.get("en") or variants["tr"]
     system = base + (context or "") + build_market_context()
 
     # Generous budget: gemini-2.5-flash spends "thinking" tokens from the same

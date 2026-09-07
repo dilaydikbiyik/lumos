@@ -25,12 +25,8 @@ Still deliberately simple: fixed nominal rates, no taxes, no maintenance/
 aidat, no transaction costs. A comparison tool, not a promise of precision.
 """
 
+from backend.markets import get_market_pack as _pack
 from backend.services import assumptions
-
-# Gross rental yield used to back out a home price when the user doesn't give
-# one: annual_rent / yield. ~5% is realistic for large Turkish cities.
-DEFAULT_GROSS_RENTAL_YIELD = 0.05
-
 
 def _mortgage_payment(loan: float, monthly_rate: float, term_months: int) -> float:
     """Fixed monthly installment for an amortizing loan (annuity formula)."""
@@ -52,6 +48,7 @@ def compare_rent_vs_buy(
     mortgage_annual_rate_pct: float | None = None,
     mortgage_term_years: int | None = None,
     down_payment_includes_costs: bool = False,
+    market: str = "TR",
 ) -> dict:
     """
     Compare buying vs renting the SAME home over `years`, with an equal
@@ -64,21 +61,21 @@ def compare_rent_vs_buy(
     """
     # 0) Resolve live market-linked assumptions (overridable) ------------------
     if housing_annual_growth_pct is None:
-        housing_annual_growth_pct = assumptions.housing_growth_pct()
+        housing_annual_growth_pct = assumptions.housing_growth_pct(market)
     if portfolio_annual_growth_pct is None:
-        portfolio_annual_growth_pct = assumptions.portfolio_growth_pct()
+        portfolio_annual_growth_pct = assumptions.portfolio_growth_pct(market)
     if rent_annual_growth_pct is None:
-        rent_annual_growth_pct = assumptions.rent_growth_pct()
+        rent_annual_growth_pct = assumptions.rent_growth_pct(market)
     if mortgage_annual_rate_pct is None:
-        mortgage_annual_rate_pct = assumptions.mortgage_rate_pct()
+        mortgage_annual_rate_pct = assumptions.mortgage_rate_pct(market)
     if mortgage_term_years is None:
-        mortgage_term_years = assumptions.mortgage_term_years()
+        mortgage_term_years = assumptions.mortgage_term_years(market)
 
     # 1) Establish a consistent home price -------------------------------------
     estimated = False
     if not home_price or home_price <= 0:
         # Back out from rent so the two scenarios describe the same property
-        home_price = (monthly_rent * 12) / DEFAULT_GROSS_RENTAL_YIELD
+        home_price = (monthly_rent * 12) / assumptions.gross_rental_yield(market)
         estimated = True
     # A down payment can't exceed the home's value
     down_payment = min(down_payment, home_price)
@@ -92,7 +89,7 @@ def compare_rent_vs_buy(
     # Leaving them out silently flatters buying, which is the default bias we
     # are trying to correct — so the buyer's side starts this much behind.
     purchase_costs = home_price * (
-        assumptions.TITLE_DEED_FEE_PCT + assumptions.agency_commission_with_vat_pct()
+        assumptions.transfer_tax_pct(market) + assumptions.agency_commission_with_vat_pct(market)
     ) / 100
 
     # People think in "the money I have", not "the down payment after fees".
@@ -111,7 +108,7 @@ def compare_rent_vs_buy(
 
     # Dues, insurance and upkeep fall on the owner every month, whatever the
     # market does. Charged on the home's current (appreciating) value.
-    upkeep_m = assumptions.ANNUAL_UPKEEP_PCT / 100 / 12
+    upkeep_m = assumptions.annual_upkeep_pct(market) / 100 / 12
     housing_m = (1 + housing_annual_growth_pct / 100) ** (1 / 12) - 1
 
     # 2) Month-by-month simulation ---------------------------------------------
@@ -165,9 +162,9 @@ def compare_rent_vs_buy(
 
     # Real (inflation-adjusted) net worth — the nominal figures above are big
     # mostly because of inflation; these say what they're worth in today's money.
-    inflation_pct = assumptions.annual_inflation_pct()
-    buy_net_real = assumptions.real_value(buy_net, years, inflation_pct)
-    rent_net_real = assumptions.real_value(rent_net, years, inflation_pct)
+    inflation_pct = assumptions.annual_inflation_pct(market)
+    buy_net_real = assumptions.real_value(buy_net, years, inflation_pct, market)
+    rent_net_real = assumptions.real_value(rent_net, years, inflation_pct, market)
 
     return {
         "years": years,
@@ -213,12 +210,13 @@ def compare_rent_vs_buy(
             "rent_annual_growth_pct": rent_annual_growth_pct,
             "mortgage_annual_rate_pct": mortgage_annual_rate_pct,
             "mortgage_term_years": mortgage_term_years,
-            "gross_rental_yield_pct": round(DEFAULT_GROSS_RENTAL_YIELD * 100, 1),
-            "title_deed_fee_pct": assumptions.TITLE_DEED_FEE_PCT,
-            "agency_commission_pct": assumptions.AGENCY_COMMISSION_PCT,
-            "vat_pct": assumptions.VAT_PCT,
-            "agency_commission_with_vat_pct": assumptions.agency_commission_with_vat_pct(),
-            "annual_upkeep_pct": assumptions.ANNUAL_UPKEEP_PCT,
+            "gross_rental_yield_pct": round(assumptions.gross_rental_yield(market) * 100, 1),
+            "title_deed_fee_pct": assumptions.transfer_tax_pct(market),
+            "agency_commission_pct": _pack(market).agency_commission_pct,
+            "vat_pct": _pack(market).vat_pct,
+            "agency_commission_with_vat_pct": assumptions.agency_commission_with_vat_pct(market),
+            "annual_upkeep_pct": assumptions.annual_upkeep_pct(market),
+            "market": market,
             "annual_inflation_pct": inflation_pct,
         },
     }

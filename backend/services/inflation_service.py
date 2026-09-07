@@ -31,14 +31,51 @@ def _load_static_index() -> dict[str, float]:
 _STATIC_INDEX = _load_static_index()
 
 
-def _get_index() -> dict[str, float]:
-    """Live EVDS index when available (cached daily), else the static file."""
-    from backend.services import evds_service  # local import avoids cycles
+def _get_index(market: str = "TR") -> dict[str, float]:
+    """
+    The CPI index for a market, keyed by YYYY-MM.
 
-    live = evds_service.get_live_cpi_index()
-    if live:
-        return live
-    return _STATIC_INDEX
+    Routed through the market pack rather than hardcoded: "real return" is
+    this app's core claim, and it was only ever true for Türkiye — every
+    other market silently measured US and German portfolios against Turkish
+    inflation. Falls back to the bundled Turkish static file only for TR;
+    a market whose live source fails returns nothing rather than borrowing
+    another country's prices.
+    """
+    from backend.markets import get_market_pack
+
+    source = get_market_pack(market).inflation_source
+
+    if source == "tcmb_evds":
+        from backend.services import evds_service  # local import avoids cycles
+
+        live = evds_service.get_live_cpi_index()
+        return live or _STATIC_INDEX
+    if source == "bls":
+        from backend.services import bls_service
+
+        return bls_service.get_cpi_index() or {}
+    if source == "eurostat":
+        from backend.services import eurostat_service
+
+        return eurostat_service.get_hicp_index(market) or {}
+    return {}
+
+
+def get_rent_index(market: str = "TR") -> dict[str, float]:
+    """Rent index for a market, or {} when that market has no direct series."""
+    from backend.markets import get_market_pack
+
+    source = get_market_pack(market).rent_index_source
+    if source == "bls":
+        from backend.services import bls_service
+
+        return bls_service.get_rent_index() or {}
+    if source == "eurostat":
+        from backend.services import eurostat_service
+
+        return eurostat_service.get_rent_index(market) or {}
+    return {}
 
 
 def _index_at(index: dict[str, float], sorted_months: list, month: str) -> float:
@@ -50,49 +87,55 @@ def _index_at(index: dict[str, float], sorted_months: list, month: str) -> float
     return index[sorted_months[pos]]
 
 
-def cpi_change_pct(start_month: str, end_month: str) -> float:
+def cpi_change_pct(start_month: str, end_month: str, market: str = "TR") -> float:
     """% change in the price index between two YYYY-MM months."""
-    index = _get_index()
+    index = _get_index(market)
+    if not index:
+        return 0.0
     sorted_months = sorted(index)
     start_idx = _index_at(index, sorted_months, start_month)
     end_idx = _index_at(index, sorted_months, end_month)
     return (end_idx / start_idx - 1) * 100
 
 
-def trailing_annual_inflation_pct() -> float:
+def trailing_annual_inflation_pct(market: str = "TR") -> float:
     """
     Realized inflation over the last ~12 months from the CPI index (live TCMB
     when configured, else the bundled static file). This is a MEASURED number,
     not a guess — it's what planning tools use as the live inflation assumption.
     Returns 0.0 only if the index has too few points to compute.
     """
-    index = _get_index()
+    index = _get_index(market)
     months = sorted(index)
     if len(months) < 2:
         return 0.0
     latest = months[-1]
     year, month = latest.split("-")
     a_year_ago = f"{int(year) - 1}-{month}"  # cpi_change_pct snaps to nearest prior month
-    return round(cpi_change_pct(a_year_ago, latest), 2)
+    return round(cpi_change_pct(a_year_ago, latest, market), 2)
 
 
-def real_return_pct(nominal_return_pct: float, start_month: str, end_month: str) -> float:
+def real_return_pct(nominal_return_pct: float, start_month: str, end_month: str,
+                    market: str = "TR") -> float:
     """
     Fisher-adjusted real return: what the nominal gain is actually worth
     after inflation eats into it. This is the number that keeps people
     from celebrating a loss that felt like a win.
     """
-    inflation_pct = cpi_change_pct(start_month, end_month)
+    inflation_pct = cpi_change_pct(start_month, end_month, market)
     real = ((1 + nominal_return_pct / 100) / (1 + inflation_pct / 100) - 1) * 100
     return round(real, 2)
 
 
-def monthly_cash_erosion(cash_amount: float, reference_month: Optional[str] = None) -> dict:
+def monthly_cash_erosion(cash_amount: float, reference_month: Optional[str] = None,
+                         market: str = "TR") -> dict:
     """
     'Param eriyor mu?' — how much real purchasing power idle cash loses
     per month at the most recent known inflation rate.
     """
-    index = _get_index()
+    index = _get_index(market)
+    if len(index) < 2:
+        return {"monthly_inflation_pct": 0.0, "erosion_amount": 0.0}
     sorted_months = sorted(index)
     reference_month = reference_month or sorted_months[-1]
     idx = sorted_months.index(reference_month) if reference_month in sorted_months else len(sorted_months) - 1
@@ -101,7 +144,7 @@ def monthly_cash_erosion(cash_amount: float, reference_month: Optional[str] = No
 
     prev_month = sorted_months[idx - 1]
     curr_month = sorted_months[idx]
-    monthly_pct = cpi_change_pct(prev_month, curr_month)
+    monthly_pct = cpi_change_pct(prev_month, curr_month, market)
     erosion = cash_amount * (monthly_pct / 100)
     return {
         "monthly_inflation_pct": round(monthly_pct, 2),

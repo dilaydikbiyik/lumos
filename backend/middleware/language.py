@@ -8,7 +8,7 @@ locale, so an old client keeps behaving exactly as before.
 
 from fastapi import Request
 
-SUPPORTED = {"tr", "en"}
+SUPPORTED = {"tr", "en", "de"}
 
 
 def get_language(request: Request) -> str:

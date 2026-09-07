@@ -147,9 +147,46 @@ def test_all_packs_have_required_content():
     for code, pack in MARKET_PACKS.items():
         assert pack.currency and pack.locale, code
         assert pack.regulator, code
-        assert pack.tax_note and "professional" in pack.disclaimer, code
+        assert pack.tax_note, code
+        # Language and market are independent axes, so every pack must speak
+        # every UI language: an English reader may pick the German market.
+        for lang in ("tr", "en", "de"):
+            assert len(pack.say("broker_note", lang)) > 40, (code, lang)
+            assert len(pack.say("tax_note", lang)) > 40, (code, lang)
+            assert len(pack.say("disclaimer", lang)) > 60, (code, lang)
+            assert len(pack.fears(lang)) >= 3, (code, lang)
         assert len(pack.listing_sites) >= 1, code
         assert len(pack.fear_options) >= 3, code
+
+
+def test_every_pack_carries_its_own_country_rates():
+    """
+    Mortgage rates and transfer taxes are facts about a country. They lived in
+    a shared constants module until US and DE arrived, which meant a German
+    buyer was quietly run through Türkiye's 39% mortgage.
+    """
+    rates = {c: (p.mortgage_rate_pct, p.transfer_tax_pct, p.mortgage_term_years)
+             for c, p in MARKET_PACKS.items()}
+    assert len(set(rates.values())) == len(rates), rates
+    for code, pack in MARKET_PACKS.items():
+        assert 0 < pack.mortgage_rate_pct < 100, code
+        assert 0 <= pack.transfer_tax_pct < 30, code
+        assert 0 < pack.gross_rental_yield < 0.5, code
+
+
+def test_eu_pack_offers_no_us_domiciled_etfs():
+    """
+    PRIIPs bars EU retail investors from US-domiciled ETFs — they carry no Key
+    Information Document, so European brokers refuse the order. Recommending
+    SPY to a German user names something they cannot legally buy.
+    """
+    de = MARKET_PACKS["DE"]
+    tickers = [a["ticker"] for a in de.asset_universe + de.reit_assets]
+    assert tickers, "DE must define its own universe, not inherit the US one"
+    us_domiciled = {"SPY", "QQQ", "VOO", "VTI", "VNQ", "SCHH", "GLD", "BND", "BIL", "VXUS"}
+    assert not (set(tickers) & us_domiciled), tickers
+    # Every DE holding trades on a German venue
+    assert all(t.endswith(".DE") for t in tickers), tickers
 
 
 def test_unknown_market_falls_back_to_tr():
@@ -437,3 +474,180 @@ def test_prompt_variants_cover_the_same_contract():
     assert "Q9" in en                                  # all nine questions present
     assert not re.search(r"[şğıŞĞİ]", en)              # no Turkish leaked into EN
     assert "EXCLUSIVELY in English" in en
+
+
+def test_language_and_market_are_independent():
+    """
+    Picking English must not force a market, and picking a market must not
+    force a language: an English reader investing in Germany has to get
+    German market FACTS in English PROSE. Writing each pack in one national
+    language quietly welded the two axes together.
+    """
+    de = MARKET_PACKS["DE"]
+    tr = MARKET_PACKS["TR"]
+
+    # German market, English reader — English words, German rules
+    english_de = de.say("broker_note", "en")
+    assert "UCITS" in english_de
+    assert "Aktien" not in english_de
+
+    # Turkish market, English reader
+    english_tr = tr.say("broker_note", "en")
+    assert "brokerage" in english_tr.lower()
+
+    # Turkish market, German reader
+    assert de.say("broker_note", "de") != de.say("broker_note", "en")
+    assert tr.say("disclaimer", "de") != tr.say("disclaimer", "tr")
+
+    # Fear options keep stable ids across languages so stored answers survive
+    # a language switch — the label changes, the key never does.
+    assert set(de.fears("en")) == set(de.fears("de")) == set(de.fears("tr"))
+
+
+def test_missing_translation_never_renders_blank():
+    """A pack with a gap must fall back, not show an empty screen."""
+    import dataclasses
+
+    from backend.markets import MARKET_PACKS
+
+    partial = dataclasses.replace(MARKET_PACKS["TR"], broker_note={"en": "Only English here."})
+    assert partial.say("broker_note", "de") == "Only English here."
+    assert partial.say("broker_note", "tr") == "Only English here."
+
+
+def test_pack_endpoint_crosses_every_language_with_every_market(client):
+    """
+    The product requirement in one test: someone on the English UI must be
+    able to invest in Türkiye AND in Germany, and Turkish must not disappear
+    for anyone. Language picks the words, the market picks the rules.
+    """
+    import asyncio
+
+    from backend.main import app
+    from backend.middleware.verify_clerk import get_current_user
+    from backend.repositories import user_repository
+    from backend.tests.conftest import _TestSession
+
+    app.dependency_overrides[get_current_user] = lambda: "user_cross_1"
+
+    def set_market(code):
+        async def go():
+            async with _TestSession() as db:
+                user = await user_repository.get_or_create(db, "user_cross_1")
+                user.market = code
+                await db.commit()
+        asyncio.run(go())
+
+    seen = {}
+    for market in ("TR", "US", "DE"):
+        set_market(market)
+        for lang in ("tr", "en", "de"):
+            res = client.get("/users/markets/pack", headers={"X-Lumos-Lang": lang})
+            assert res.status_code == 200, (market, lang, res.text)
+            body = res.json()
+            assert body["code"] == market
+            assert body["broker_note"] and body["tax_note"] and body["disclaimer"]
+            assert len(body["fear_options"]) >= 3
+            seen[(market, lang)] = body["broker_note"]
+
+    # Same market, three languages → three different texts (same facts)
+    for market in ("TR", "US", "DE"):
+        texts = {seen[(market, lang)] for lang in ("tr", "en", "de")}
+        assert len(texts) == 3, market
+
+    # Same language, three markets → three different texts (same language)
+    for lang in ("tr", "en", "de"):
+        texts = {seen[(market, lang)] for market in ("TR", "US", "DE")}
+        assert len(texts) == 3, lang
+
+    # The PRIIPs warning is a German-MARKET fact, so it must reach an English
+    # reader who selected Germany — that is the whole point of the split.
+    assert "UCITS" in seen[("DE", "en")]
+    assert "UCITS" in seen[("DE", "tr")]
+
+
+def test_pack_endpoint_reports_country_rates_not_shared_constants(client):
+    """A German buyer must never be quoted Türkiye's mortgage rate."""
+    import asyncio
+
+    from backend.main import app
+    from backend.middleware.verify_clerk import get_current_user
+    from backend.repositories import user_repository
+    from backend.tests.conftest import _TestSession
+
+    app.dependency_overrides[get_current_user] = lambda: "user_rates_1"
+
+    rates = {}
+    for market in ("TR", "US", "DE"):
+        async def go(code=market):
+            async with _TestSession() as db:
+                user = await user_repository.get_or_create(db, "user_rates_1")
+                user.market = code
+                await db.commit()
+        asyncio.run(go())
+        rates[market] = client.get("/users/markets/pack").json()["assumptions"]
+
+    assert rates["TR"]["mortgage_rate_pct"] > 20     # high-inflation economy
+    assert rates["DE"]["mortgage_rate_pct"] < 10
+    assert rates["US"]["mortgage_rate_pct"] < 10
+    assert rates["DE"]["mortgage_term_years"] != rates["TR"]["mortgage_term_years"]
+    assert rates["US"]["vat_pct"] == 0               # no VAT on US home purchases
+
+
+def test_every_ui_language_has_its_own_quiz_prompt():
+    """
+    A German reader must not be handed the Turkish quiz. The prompt variants
+    are the AI-layer half of "language and market are independent".
+    """
+    import re
+
+    from backend.services.ai_service import _ADVISOR_PROMPTS, _SYSTEM_PROMPTS
+
+    for variants in (_SYSTEM_PROMPTS, _ADVISOR_PROMPTS):
+        assert set(variants) >= {"tr", "en", "de"}
+
+    de = _SYSTEM_PROMPTS["de"]
+    assert "[PROFILE_COMPLETE]" in de          # completion protocol intact
+    assert "Q9" in de                          # all nine questions survive
+    assert "EXCLUSIVELY in German" in de
+    assert not re.search(r"[şğıŞĞİ]", de)      # no Turkish leaked in
+    assert "Wie viel kannst du zum Investieren" in de
+
+
+def test_unknown_language_falls_back_to_english_not_turkish():
+    """Turkish is the most complete file, but it is the WRONG fallback for a
+    reader who chose neither — English is the safer intermediate."""
+    from backend.services import ai_service
+
+    captured = {}
+
+    def fake_dispatch(messages, system, **kwargs):
+        captured["system"] = system
+        return "ok"
+
+    original = ai_service._dispatch
+    ai_service._dispatch = fake_dispatch
+    try:
+        ai_service.chat([{"role": "user", "content": "hi"}], language="fr")
+        assert "EXCLUSIVELY in English" in captured["system"]
+    finally:
+        ai_service._dispatch = original
+
+
+def test_each_market_declares_its_own_universe():
+    """
+    Every pack states its investable assets rather than inheriting a shared
+    file. Türkiye silently fell through to the default set, so a Turkish user
+    could be handed the identical portfolio as a US user with no local
+    exposure at all — the markets were not actually differentiated.
+    """
+    universes = {}
+    for code, pack in MARKET_PACKS.items():
+        assert pack.asset_universe, code
+        assert pack.reit_assets, code
+        universes[code] = {a["ticker"] for a in pack.asset_universe}
+
+    # Türkiye keeps local equities on the menu
+    assert "XU100.IS" in universes["TR"]
+    # and no two markets offer an identical menu
+    assert len({frozenset(u) for u in universes.values()}) == len(universes)

@@ -15,11 +15,22 @@ from backend.schemas.planning import (
     ListingBridgeRequest,
     RentVsBuyRequest,
 )
+from backend.repositories import user_repository
 from backend.services.goal_planner import progress_and_drift, required_monthly_contribution
 from backend.services.listing_bridge import build_listing_links
 from backend.services.rent_vs_buy import compare_rent_vs_buy
 
 router = APIRouter()
+
+
+async def _market_of(db: AsyncSession, user_id: str) -> str:
+    """
+    The user's market drives every rate below. Mortgage rates, transfer taxes
+    and inflation are facts about a country, not constants: running a German
+    buyer through Türkiye's 39% mortgage produced a confident wrong answer.
+    """
+    user = await user_repository.get_or_create(db, user_id)
+    return user.market or "TR"
 
 
 @router.post("/rent-vs-buy")
@@ -28,13 +39,18 @@ async def rent_vs_buy(
     request: Request,
     body: RentVsBuyRequest,
     user_id: str = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
 ):
     """Rent or buy? — two honest side-by-side projections of the SAME home."""
-    return compare_rent_vs_buy(
-        body.down_payment, body.monthly_rent, body.years, home_price=body.home_price,
-        mortgage_annual_rate_pct=body.mortgage_annual_rate_pct,
-        mortgage_term_years=body.mortgage_term_years,
-        down_payment_includes_costs=body.down_payment_includes_costs,
+    market = await _market_of(db, user_id)
+    return await asyncio.to_thread(
+        compare_rent_vs_buy,
+        body.down_payment, body.monthly_rent, body.years, body.home_price,
+        None, None, None,
+        body.mortgage_annual_rate_pct,
+        body.mortgage_term_years,
+        body.down_payment_includes_costs,
+        market,
     )
 
 
@@ -44,9 +60,14 @@ async def goal_plan(
     request: Request,
     body: GoalPlanRequest,
     user_id: str = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
 ):
     """Required monthly contribution to hit a target amount by a deadline."""
-    return required_monthly_contribution(body.target_amount, body.years, body.current_savings)
+    market = await _market_of(db, user_id)
+    return await asyncio.to_thread(
+        required_monthly_contribution,
+        body.target_amount, body.years, body.current_savings, None, market,
+    )
 
 
 @router.post("/goal-progress")
@@ -55,11 +76,14 @@ async def goal_progress(
     request: Request,
     body: GoalProgressRequest,
     user_id: str = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
 ):
     """Drift check: at the user's actual contribution rate, will they make the deadline?"""
-    return progress_and_drift(
+    market = await _market_of(db, user_id)
+    return await asyncio.to_thread(
+        progress_and_drift,
         body.target_amount, body.years_remaining,
-        body.current_savings, body.actual_monthly_contribution,
+        body.current_savings, body.actual_monthly_contribution, None, market,
     )
 
 
@@ -90,8 +114,7 @@ async def listing_links(
     db: AsyncSession = Depends(get_db),
 ):
     """Filter-ready deep links to real estate portals — no scraping, no listing data stored."""
-    from backend.repositories import user_repository
-
+    
     user = await user_repository.get_or_create(db, user_id)
     return {"links": build_listing_links(body.il, body.ilce, body.asset_type, market=user.market, detail=body.detail)}
 

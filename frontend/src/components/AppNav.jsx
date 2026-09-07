@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 import api, { setAuthToken } from '../utils/api'
 import LumosLogo from './LumosLogo'
 import MarketSwitcher from './MarketSwitcher'
+import LanguageSwitcher from './LanguageSwitcher'
 
 /* ── Inline SVG icons — lightweight, crisp alternative to emoji ── */
 const icons = {
@@ -114,9 +115,16 @@ function NavSurfaces() {
           })}
         </nav>
 
-        {/* Footer: market selector — currency and data sources follow it */}
-        <div style={{ marginTop: 'auto', padding: '12px 10px 4px' }}>
+        {/* Footer: two INDEPENDENT choices. The market decides the rules,
+            rates and investable instruments; the language decides the words.
+            An English reader can invest in Türkiye, a Turkish reader can look
+            at Germany — neither setting implies the other. */}
+        <div style={{
+          marginTop: 'auto', padding: '12px 10px 4px',
+          display: 'flex', flexDirection: 'column', gap: 8,
+        }}>
           <MarketSwitcher />
+          <LanguageSwitcher />
         </div>
       </aside>
 

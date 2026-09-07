@@ -129,27 +129,26 @@ def test_upkeep_accumulates_over_the_horizon():
     assert long["buy"]["total_upkeep_paid"] > short["buy"]["total_upkeep_paid"] > 0
 
 
-def test_costs_make_buying_less_attractive():
+def test_costs_make_buying_less_attractive(monkeypatch):
     """The whole point: ignoring these silently favours buying."""
-    from backend.services import assumptions
+    import dataclasses
+
+    from backend import markets
+    from backend.services import rent_vs_buy as rvb
     from backend.services.rent_vs_buy import compare_rent_vs_buy
 
     with_costs = compare_rent_vs_buy(2_000_000, 30_000, 10, home_price=5_000_000)
 
-    deed, agency, upkeep = (
-        assumptions.TITLE_DEED_FEE_PCT,
-        assumptions.AGENCY_COMMISSION_PCT,
-        assumptions.ANNUAL_UPKEEP_PCT,
+    # The rates moved into the market pack, so patching the old module-level
+    # constants silently compared a scenario against itself — this test passed
+    # while measuring nothing until the pack refactor exposed it.
+    free = dataclasses.replace(
+        markets.get_market_pack("TR"),
+        transfer_tax_pct=0.0, agency_commission_pct=0.0, annual_upkeep_pct=0.0,
     )
-    assumptions.TITLE_DEED_FEE_PCT = 0.0
-    assumptions.AGENCY_COMMISSION_PCT = 0.0
-    assumptions.ANNUAL_UPKEEP_PCT = 0.0
-    try:
-        without = compare_rent_vs_buy(2_000_000, 30_000, 10, home_price=5_000_000)
-    finally:
-        assumptions.TITLE_DEED_FEE_PCT = deed
-        assumptions.AGENCY_COMMISSION_PCT = agency
-        assumptions.ANNUAL_UPKEEP_PCT = upkeep
+    monkeypatch.setattr(markets, "get_market_pack", lambda code="TR": free)
+    monkeypatch.setattr(rvb, "_pack", lambda code="TR": free)
+    without = compare_rent_vs_buy(2_000_000, 30_000, 10, home_price=5_000_000)
 
     buy_edge_with = with_costs["buy"]["net_worth"] - with_costs["rent"]["net_worth"]
     buy_edge_without = without["buy"]["net_worth"] - without["rent"]["net_worth"]
