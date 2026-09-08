@@ -26,6 +26,11 @@ REAL_ESTATE_TYPES = {"real_estate", "land"}
 
 NATIONAL_KFE_SERIES = "TP.KFE.TR"
 
+# What a pre-currency-column row was denominated in. Every such row was
+# created while the app served only Türkiye, and their amounts reconcile
+# exactly against lira budgets.
+LEGACY_CURRENCY = "TRY"
+
 # Which currency a symbol is quoted in. Resolved from the exchange suffix
 # because it is deterministic and free; an unsuffixed US listing is the
 # default. A wrong guess here becomes a wrong portfolio value, so anything
@@ -105,9 +110,13 @@ def _exchange_values(holdings, user_currency: str = "TRY") -> dict[int, dict]:
 
         latest = float(series.iloc[-1])
         asset_ccy = ticker_currency(h.ticker)
-        # A row written before the column existed has no currency; it always
-        # implicitly meant the user's, so that is what it is read as.
-        held_ccy = (getattr(h, "currency", None) or user_currency).upper()
+        # NULL means the row predates the currency column, i.e. it was written
+        # when the app was Türkiye-only. Reading it as the user's CURRENT
+        # market would let a market switch silently rewrite history: the same
+        # 100.000 TRY position read as EUR reports a different return in a
+        # different currency. Legacy rows are backfilled; this constant is the
+        # stable answer for any that are not.
+        held_ccy = (getattr(h, "currency", None) or LEGACY_CURRENCY).upper()
 
         # Today's rate turns the quote into the currency the user thinks in.
         to_held_now = fx_service.rate(asset_ccy, held_ccy)

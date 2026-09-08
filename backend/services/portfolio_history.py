@@ -22,7 +22,7 @@ from backend.services.holdings_valuation import (
     current_value,
 )
 from backend.services import fx_service
-from backend.services.holdings_valuation import ticker_currency
+from backend.services.holdings_valuation import LEGACY_CURRENCY, ticker_currency
 from backend.services.market_data import fetch_price_history
 
 logger = logging.getLogger("lumos.portfolio_history")
@@ -66,7 +66,7 @@ def portfolio_value_history(holdings, days: int = 30, user_currency: str = "TRY"
         # is in theirs. Summing units × dollar price into a lira total was the
         # same missing conversion that reported a break-even SPY position as a
         # 97% loss — this chart had it too.
-        held_ccy = (getattr(h, "currency", None) or user_currency).upper()
+        held_ccy = (getattr(h, "currency", None) or LEGACY_CURRENCY).upper()
         asset_ccy = ticker_currency(h.ticker) if h.ticker else held_ccy
         fx_now = fx_service.rate(asset_ccy, held_ccy)
 

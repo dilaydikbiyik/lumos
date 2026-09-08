@@ -8,7 +8,11 @@ import { useTranslation } from 'react-i18next'
 
 // portfolio category -> holding asset type
 const CATEGORY_TO_TYPE = {
+  // 'bond' was missing, so every bond position the bridge recorded landed in
+  // 'other' — a type the valuation layer does not price, leaving it frozen at
+  // its purchase amount forever.
   stocks: 'stock', reit: 'etf', fund: 'fund', gold: 'gold', cash: 'cash',
+  bond: 'etf',
 }
 const NO_TICKER_TYPES = new Set(['cash'])
 
