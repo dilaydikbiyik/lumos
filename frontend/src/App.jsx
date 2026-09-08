@@ -3,6 +3,7 @@ import FireflyMark from './components/FireflyMark'
 import { useEffect } from 'react'
 import { ClerkLoading, SignedIn, SignedOut, RedirectToSignIn, useAuth } from '@clerk/clerk-react'
 import AppNav from './components/AppNav'
+import { useTranslation } from 'react-i18next'
 import FeedbackButton from './components/FeedbackButton'
 import PanicButton from './components/PanicButton'
 import AdvisorChat from './components/AdvisorChat'
@@ -48,11 +49,12 @@ function AuthBridge() {
 /** Visible state while Clerk loads and during the sign-in redirect —
     a signed-out visitor on a protected link never sees a black screen. */
 function AuthPending() {
+  const { t } = useTranslation()
   return (
     <div className="page" style={{ alignItems: 'center', justifyContent: 'center', minHeight: '100dvh' }}>
       <FireflyMark size={40} />
       <p style={{ marginTop: 14, fontSize: 13, color: 'var(--text-muted)' }}>
-        Giriş sayfasına yönlendiriliyorsun…
+        {t('common.redirecting')}
       </p>
     </div>
   )

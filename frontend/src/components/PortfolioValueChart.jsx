@@ -21,7 +21,7 @@ export default function PortfolioValueChart({ holdingsCount }) {
   const [days, setDays] = useState(30)
   const ck = userKey(`history-${days}`, userId)
   const [data, setData] = useState(() => readJSON(ck))
-  const [error, setError] = useState(null)
+  const [error, setError] = useState(false)
 
   useEffect(() => {
     if (!holdingsCount) return
@@ -29,10 +29,10 @@ export default function PortfolioValueChart({ holdingsCount }) {
     api.get('/holdings/history', { params: { days } })
       .then(res => {
         if (cancelled) return
-        setData(res.data); setError(null)
+        setData(res.data); setError(false)
         writeJSON(ck, res.data)
       })
-      .catch(() => { if (!cancelled) setError(t('chart.error')) })
+      .catch(() => { if (!cancelled) setError(true) })
     return () => { cancelled = true }
   }, [days, holdingsCount, ck])
 
@@ -60,7 +60,7 @@ export default function PortfolioValueChart({ holdingsCount }) {
         </div>
       </div>
 
-      {error && <p style={{ fontSize: 12, color: 'var(--text-dim)' }}>{error}</p>}
+      {error && <p style={{ fontSize: 12, color: 'var(--text-dim)' }}>{t('chart.error')}</p>}
 
       {data && data.series.length >= 2 && (
         <>

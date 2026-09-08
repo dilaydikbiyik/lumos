@@ -4,52 +4,22 @@ import LumosLogo from '../components/LumosLogo'
 import { useNavigate } from 'react-router-dom'
 import { UserButton } from '@clerk/clerk-react'
 import api from '../utils/api'
+import { useTranslation } from 'react-i18next'
 
 const FEARS = [
-  {
-    id: 'param_eriyor',
-    icon: '💧',
-    label: 'Param erir / değerini kaybeder',
-    sublabel: 'Enflasyon karşısında elimdekini koruyamam',
-    color: 'rgba(91,142,240,0.14)',
-    border: 'rgba(91,142,240,0.4)',
-  },
-  {
-    id: 'kandirilirim',
-    icon: '🎭',
-    label: 'Kandırılırım / dolandırılırım',
-    sublabel: 'Güvenilir olmayan platform veya tavsiyeye denk gelirim',
-    color: 'rgba(245,81,95,0.12)',
-    border: 'rgba(245,81,95,0.35)',
-  },
-  {
-    id: 'anlamiyorum',
-    icon: '🌫️',
-    label: 'Hiçbir şey anlamıyorum',
-    sublabel: 'Terimler ve grafikler aklımı karıştırıyor',
-    color: 'rgba(124,111,247,0.12)',
-    border: 'rgba(124,111,247,0.38)',
-  },
-  {
-    id: 'batiririm',
-    icon: '📉',
-    label: 'Yanlış karar verip batırırım',
-    sublabel: 'Kaybedemeyeceğim paralarımı risk altına sokarım',
-    color: 'rgba(245,165,36,0.12)',
-    border: 'rgba(245,165,36,0.4)',
-  },
+  { id: 'param_eriyor', icon: '💧', color: 'rgba(91,142,240,0.14)',  border: 'rgba(91,142,240,0.4)'  },
+  { id: 'kandirilirim', icon: '🎭', color: 'rgba(245,81,95,0.12)',   border: 'rgba(245,81,95,0.35)'  },
+  { id: 'anlamiyorum',  icon: '🌫️', color: 'rgba(124,111,247,0.12)', border: 'rgba(124,111,247,0.38)' },
+  { id: 'batiririm',    icon: '📉', color: 'rgba(245,165,36,0.12)',  border: 'rgba(245,165,36,0.4)'  },
 ]
 
 // Local copy of reassurance messages — matches backend exactly so we can show
 // them instantly without waiting for the DB write (optimistic UX).
-const REASSURANCE = {
-  param_eriyor: 'Anlıyoruz — bu yüzden her portföyde enflasyona karşı reel getiriyi de göstereceğiz, sadece nominal sayıyı değil.',
-  kandirilirim: 'Bu haklı bir endişe. Lumos sana hiçbir hisse/fon satmıyor, komisyon almıyor — sadece bilgi veriyor. Kararı hep sen verirsin.',
-  anlamiyorum:  'Sorun değil, kimse doğuştan bilmiyor. Her terimi günlük dille açıklayacağız — anlamadığın hiçbir şeyi geçmeyeceğiz.',
-  batiririm:    'Bu korku çoğu yeni başlayanda var. Küçük adımlarla, sanal pratikle başlayacağız — gerçek parayla asla acele etmeyeceksin.',
-}
+// Reassurance copy lives in the locale files, keyed by the same fear id the
+// backend stores — so the stored answer survives a language switch.
 
 export default function FearCheckInPage() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const [saving, setSaving] = useState(null)
   const [reassurance, setReassurance] = useState(null)
@@ -60,7 +30,7 @@ export default function FearCheckInPage() {
     // Show reassurance immediately — no waiting for the backend.
     // Fire the save in the background; failure here is non-critical
     // (the fear tag is re-derivable and the reassurance is local).
-    setReassurance(REASSURANCE[fearId])
+    setReassurance(t('fear.reassurance.' + fearId))
     api.patch('/users/me/fear-check-in', { primary_fear: fearId }).catch(() => {})
   }
 
@@ -123,12 +93,11 @@ export default function FearCheckInPage() {
             fontSize: 12, letterSpacing: '0.12em', textTransform: 'uppercase',
             color: 'var(--firefly)', fontWeight: 700, marginBottom: 8,
           }}>
-            Adım 2 / 3
+            {t('fear.step')}
           </p>
-          <h2 style={{ marginBottom: 8 }}>Yatırımda seni en çok ne korkutuyor?</h2>
+          <h2 style={{ marginBottom: 8 }}>{t('fear.title')}</h2>
           <p style={{ fontSize: 13, lineHeight: 1.6 }}>
-            Bu korku bastırılacak bir şey değil — seni daha iyi anlamamız için bir ipucu.
-            Seçtiğin korkuya özel bir yaklaşım geliştiririz.
+            {t('fear.subtitle')}
           </p>
         </div>
 
@@ -175,10 +144,10 @@ export default function FearCheckInPage() {
 
                 <div style={{ flex: 1 }}>
                   <div style={{ fontWeight: 600, fontSize: 14, marginBottom: 3, color: 'var(--text)' }}>
-                    {f.label}
+                    {t('fear.options.' + f.id + '.label')}
                   </div>
                   <div style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.5 }}>
-                    {f.sublabel}
+                    {t('fear.options.' + f.id + '.sublabel')}
                   </div>
                 </div>
 

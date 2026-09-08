@@ -17,7 +17,9 @@
     "back": "← Geri",
     "eduFooter": "Yalnızca eğitim amaçlıdır — yatırım tavsiyesi değildir.",
     "close": "Kapat",
-    "value": "Değer"
+    "value": "Değer",
+    "loading": "Yükleniyor…",
+    "redirecting": "Giriş sayfasına yönlendiriliyorsun…"
   },
   "onboarding": {
     "tagline": "Yatırım karanlık bir orman gibi görünür.",
@@ -66,7 +68,10 @@
     "reveal": "Okudum, risk profilimi göster →",
     "noRush": "Acelen yok — yukarıyı istediğin kadar okuyabilirsin.",
     "answersKept": "Cevapların kayıtlı — baştan başlaman gerekmiyor.",
-    "inputPlaceholder": "Cevabını yaz…"
+    "inputPlaceholder": "Cevabını yaz…",
+    "extractError": "Cevapların özetlenemedi — tekrar deneyebilirsin.",
+    "saveError": "Profilin kaydedilemedi — tekrar deneyebilirsin, cevapların duruyor.",
+    "sendError": "Mesaj gönderilemedi — tekrar dene"
   },
   "profile": {
     "bands": {
@@ -111,7 +116,8 @@
     "howtoLayerTitle": "Nasıl alırım?",
     "howtoLayerHint": "Aracı kurum hesabı açmaktan ilk emri vermeye kadar adım adım rehber.",
     "disclaimer": "Bu bilgiler yalnızca eğitim amaçlıdır. Geçmiş performans, gelecek sonuçların garantisi değildir. Yatırım kararlarınız için lisanslı bir finansal danışmana başvurun.",
-    "backToDashboard": "Panele dön →"
+    "backToDashboard": "Panele dön →",
+    "error": "Portföy önerisi alınamadı"
   },
   "rationale": {
     "title": "Neden bu dağılım?",
@@ -547,5 +553,181 @@
     "label": "Pazar",
     "select": "Pazar seç",
     "limitedData": "sınırlı veri"
+  },
+  "path": {
+    "step": "Adım 1 / 3",
+    "title": "Nasıl yatırım yapmak istersin?",
+    "subtitle": "Yol her an değiştirilebilir — bu bir taahhüt değil, başlangıç noktası.",
+    "options": {
+      "stocks": {
+        "title": "Sadece Borsa",
+        "desc": "Hisse, fon ve ETF dünyasına odaklan — emlak modülleri görünmez."
+      },
+      "real_estate": {
+        "title": "Sadece Emlak",
+        "desc": "Arsa ve konut fırsatlarını öğrenerek keşfet — borsa önerisi dayatılmaz."
+      },
+      "hybrid": {
+        "title": "İkisi Birden",
+        "desc": "Bütçeni iki dünya arasında dengeli böl — tam Lumos deneyimi."
+      },
+      "undecided": {
+        "title": "Kararsızım",
+        "desc": "Sorun değil! Profilini çıkaralım, birlikte en uygun yolu bulalım."
+      }
+    }
+  },
+  "readiness": {
+    "title": "Cesaret Skoru",
+    "ready": "Gerçek yatırıma hazırsın",
+    "progressing": "Her adım seni biraz daha hazırlıyor"
+  },
+  "fear": {
+    "step": "Adım 2 / 3",
+    "title": "Yatırımda seni en çok ne korkutuyor?",
+    "subtitle": "Bu korku bastırılacak bir şey değil — seni daha iyi anlamamız için bir ipucu. Seçtiğin korkuya özel bir yaklaşım geliştiririz.",
+    "options": {
+      "param_eriyor": {
+        "label": "Param erir / değerini kaybeder",
+        "sublabel": "Enflasyon karşısında elimdekini koruyamam"
+      },
+      "kandirilirim": {
+        "label": "Kandırılırım / dolandırılırım",
+        "sublabel": "Güvenilir olmayan platform veya tavsiyeye denk gelirim"
+      },
+      "anlamiyorum": {
+        "label": "Hiçbir şey anlamıyorum",
+        "sublabel": "Terimler ve grafikler aklımı karıştırıyor"
+      },
+      "batiririm": {
+        "label": "Yanlış karar verip batırırım",
+        "sublabel": "Kaybedemeyeceğim paralarımı risk altına sokarım"
+      }
+    },
+    "reassurance": {
+      "param_eriyor": "Anlıyoruz — bu yüzden her portföyde enflasyona karşı reel getiriyi de göstereceğiz, sadece nominal sayıyı değil.",
+      "kandirilirim": "Bu haklı bir endişe. Lumos sana hiçbir hisse/fon satmıyor, komisyon almıyor — sadece bilgi veriyor. Kararı hep sen verirsin.",
+      "anlamiyorum": "Sorun değil, kimse doğuştan bilmiyor. Her terimi günlük dille açıklayacağız — anlamadığın hiçbir şeyi geçmeyeceğiz.",
+      "batiririm": "Bu korku çoğu yeni başlayanda var. Küçük adımlarla, sanal pratikle başlayacağız — gerçek parayla asla acele etmeyeceksin."
+    }
+  },
+  "dashboard": {
+    "erodingPerMonth": "{{amount}}/ay eriyor",
+    "title": "Kontrol Paneli",
+    "subtitle": "Tüm servetin, tek bakışta.",
+    "showDetails": "Detayları Göster (karşılaştırma & hedef)",
+    "collapse": "↑ Küçült",
+    "wealthSummary": "Servet Özeti",
+    "planDone": "Aylık planın <0>{{plan}}</0> — bu ay <1>{{done}}</1> ekledin, plan tamam ✓",
+    "planRemaining": "Aylık planın <0>{{plan}}</0> — bu ay <1>{{done}}</1> eklendi, kalan <2>{{left}}</2>. Eklediğinde Varlıklarım'a işlemeyi unutma.",
+    "manageAssets": "Varlıklarımı Yönet →",
+    "journeyTitle": "Yolculuğun burada başlıyor",
+    "journeyBody": "Seni tanıyalım, korkularını dinleyelim ve sana özel bir portföy oluşturalım.",
+    "journeyCta": "Seni Tanıyalım →",
+    "riskProfile": "Risk Profilin",
+    "refresh": "↻ Yenile",
+    "editProfile": "✏️ Profili Güncelle",
+    "profileReadyTitle": "Profilin hazır, sıra portföyde!",
+    "profileReadyBody": "Senin risk profiline uygun bir portföy oluşturalım.",
+    "buildPortfolio": "Portföyümü Oluştur"
+  },
+  "news": {
+    "title": "Bugün Ne Oldu?"
+  },
+  "headlines": {
+    "title": "Manşet Oku, Paniklemeden Anla",
+    "nextLabel": "Sonraki manşet",
+    "progress": "{{seen}}/{{total}} manşet gerçeği öğrenildi · karta dokun → sıradaki",
+    "headline-crash": {
+      "headline": "📰 \"BORSA ÇAKILDI\"",
+      "reality": "BIST 100 büyük ihtimalle %2–4 düştü. Tarihsel olarak bu düşüşler çoğu zaman aylar içinde telafi edilir. \"Çakılmak\" manşet için cazip, yatırımcı için norm.",
+      "action": "Sakin kal. Bugün satmak, kaybı gerçeğe dönüştürür."
+    },
+    "headline-crash-global": {
+      "headline": "📰 \"KRİZ GELİYOR\"",
+      "reality": "Kriz öngörüleri medyada sürekli var — çoğu gerçekleşmez. Gerçekleşenlerin ardından piyasalar tarihsel olarak toparlanmıştır, ama bu birkaç yıl sürebilir.",
+      "action": "Panikle değil, çeşitlendirmeyle hazırlan."
+    },
+    "headline-gold": {
+      "headline": "📰 \"ALTIN REKORA KOŞTU\"",
+      "reality": "Altın yükselince genellikle belirsizlik var demektir. Bu, diğer varlıklarının değersizleştiği anlamına gelmez — her varlık farklı koşulda parlar.",
+      "action": "Tek varlığa bağlı kalmak risklidir. Denge önemli."
+    },
+    "headline-dolar": {
+      "headline": "📰 \"DOLAR PATLIYOR\"",
+      "reality": "Yerel para değer kaybedince döviz bazlı varlıkların yerel karşılığı yükselir. Portföyünde döviz bazlı varlık varsa bu manşet seni koruyabilir.",
+      "action": "Kur riski için portföyde döviz bazlı varlık tut."
+    }
+  },
+  "explore": {
+    "title": "Emlak Keşfet",
+    "subtitle": "İl il konut m² fiyatları ve gerçek (<0>enflasyon sonrası</0>) değerlenme — resmî endeks verisiyle",
+    "scenarioError": "Senaryo hesaplanamadı",
+    "whatIfBought": "{{amount}} TL ile {{province}}'de konut alsaydım?",
+    "bandIntro": "Merkez bankasının <0>{{province}}</0> konut fiyat endeksine göre, geçmişteki tüm 5 yıllık dönemler tek tek hesaplandı. Bugün bu parayla konut alsaydın, o dönemlerin sonunda elindeki değer şu aralıkta olurdu:",
+    "worstBand": "En kötü dönemlerden biri (%10'luk dilim)",
+    "typicalBand": "Tipik dönem (ortanca)",
+    "bestBand": "En iyi dönemlerden biri (%90'lık dilim)",
+    "real": "reel",
+    "microLocation": "📍 İlçe/köy düzeyinde resmî fiyat verisi yayınlanmıyor — mikro konum için seni doğrudan ilanlara götürüyoruz:",
+    "districtPlaceholder": "İlçe (örn: Keşan)",
+    "neighbourhoodPlaceholder": "Köy/mahalle (örn: Çeribaşı)",
+    "land": "Arsa",
+    "flat": "Daire",
+    "refresh": "Yenile",
+    "listingsAt": "{{site}}'de ilanlar →",
+    "linkError": "Link üretilemedi",
+    "listingsTitle": "🔗 İlanlara Git",
+    "listingsBody": "Beğendiğin bölge için filtresi hazır ilan araması — satın almayı ilan sitesinde yaparsın, sonra buraya döner \"Aldım\" dersin.",
+    "provincePlaceholder": "İl (örn: Ankara)",
+    "districtOptional": "İlçe (opsiyonel)",
+    "otherMarket": "<0>{{market}}</0> pazarı için canlı konut verisi entegrasyonu yolda. Bu sayfa şu an yalnızca Türkiye verisiyle çalışıyor — sana başka bir ülkenin verisini \"buymuş gibi\" göstermeyiz.",
+    "switchToTr": "Pazarı sol menüden 🇹🇷 Türkiye'ye alarak il il m² fiyatlarını görebilirsin.",
+    "lastYears": "Son {{n}} yıl",
+    "searchPlaceholder": "İl ara (örn: Muğla, Eskişehir...)",
+    "searchLabel": "İl ara",
+    "amountPlaceholder": "Senaryo tutarı (TL)",
+    "amountLabel": "Senaryo tutarı",
+    "noResults": "\"{{search}}\" bulunamadı — 81 ilin tamamında arayabilirsin.",
+    "showingFirst": "İlk 12 il gösteriliyor — diğer iller için yukarıdan ara.",
+    "dataError": "İl verisi şu an alınamıyor — birazdan tekrar dene.",
+    "fetchLinks": "Linkleri Getir"
+  },
+  "rvb": {
+    "title": "Kirada mı otur, ev mi al?",
+    "subtitle": "Aynı evi iki senaryoda karşılaştırırız: peşinat + kredi ile satın almak, ya da kirada kalıp farkı yatırmak. Ev almak her zaman kazanç değildir.",
+    "cashPlaceholder": "Cebindeki toplam nakit (TL)",
+    "downPaymentPlaceholder": "Peşinat / birikimin (TL)",
+    "cashIncludesCosts": "Bu rakam elimdeki tüm nakit — tapu ve komisyonu buradan düş",
+    "rentPlaceholder": "Şu anki aylık kiran (TL)",
+    "homePricePlaceholder": "Evin fiyatı (opsiyonel — boşsa kiradan tahmin edilir)",
+    "incomePlaceholder": "Aylık net gelirin (opsiyonel — taksit gücünü kontrol eder)",
+    "projectionYears": "{{n}} yıllık projeksiyon",
+    "ownLoanTerms": "Kredi koşullarını kendim gireyim",
+    "ratePlaceholder": "Faiz (%/yıl)",
+    "termPlaceholder": "Vade (yıl)",
+    "ownLoanHint": "Bankandan aldığın gerçek teklifi gir. Boş bırakırsan piyasa ortalaması kullanılır.",
+    "comparedHome": "Karşılaştırılan ev: <0>{{price}} TL</0> · aylık kredi taksiti ≈ <1>{{installment}} TL</1>",
+    "estimatedFromRent": "(kiradan tahmin edildi)",
+    "cashBreakdown": "<0>{{cash}}</0> TL nakdinin {{costs}} TL'si tapu ve komisyona gidiyor; eve peşinat olarak <1>{{applied}} TL</1> kalıyor.",
+    "affordabilityTight": "Taksit, gelirinin %{{pct}}'i — bankalar genelde gelirin ~%45'inin üzerindeki taksitlere kredi vermez. Bu ev bu peşinatla şu an gerçekçi olmayabilir; daha yüksek peşinat ya da daha uygun bir ev düşünebilirsin.",
+    "affordabilityOk": "Taksit, gelirinin %{{pct}}'i — genel kabul gören güvenli sınır ~%45'in altında, bu plan gelirine uygun görünüyor.",
+    "loanCost": "<0>Kredinin maliyeti</0> ({{rate}}%/yıl, {{term}} yıl vade)<1/>Çekilen kredi <2>{{principal}} TL</2> · vade sonunda toplam ödenen <3>{{total}} TL</3><4/>Bunun <5>{{interest}} TL</5>'si faiz — yani anaparanın <6>{{ratio}}%</6>'i kadar.",
+    "payingTwice": "Faiz, çektiğin krediden fazla: evi iki kez ödüyorsun.",
+    "fixedRateNote": "Sabit faizli hesaptır; enflasyon yüksek seyrederse taksitin reel yükü zamanla hafifler.",
+    "ifBuy": "Ev alırsan",
+    "ifRent": "Kirada kalırsan",
+    "netWorthAfter": "{{years}} yıl sonra net servetin",
+    "inTodaysMoney": "bugünkü alım gücüyle ≈ {{amount}} TL",
+    "equityLine": "Ev değeri {{value}} − kalan kredi {{loan}}",
+    "costsLine": "Alım masrafı {{costs}} · aidat/bakım {{upkeep}}",
+    "rentLine": "Peşinat + fark yatırımda · ödenen kira {{rent}} TL",
+    "verdictBuy": "Bu varsayımlarla <0>satın almak</0> yaklaşık <1>{{amount}} TL</1> daha avantajlı görünüyor.",
+    "verdictRent": "Bu varsayımlarla <0>kirada kalıp yatırım yapmak</0> yaklaşık <1>{{amount}} TL</1> daha avantajlı görünüyor.",
+    "assumptions": "Varsayımlar: konut +%{{housing}}/yıl, portföy +%{{portfolio}}/yıl, kredi %{{rate}}/yıl ({{term}} yıl vade), enflasyon %{{inflation}}/yıl ({{asOf}} verisi). Alım masrafları dahildir: tapu harcı %{{deed}} + emlakçı komisyonu %{{agency}} + KDV (%{{vat}}) = %{{agencyVat}}; ayrıca aidat, DASK ve bakım için yılda ev değerinin %{{upkeep}}'i. Tapu harcının tamamının alıcıya yazılması yaygın piyasa uygulamasına dayanan bir varsayımdır; kanunen yarısı satıcıya aittir ve taraflar farklı anlaşabilir. Bu oranlar mevzuat ve teamülle belirlenir, zamanla değişir. Büyük rakamlar çoğunlukla enflasyondan şişer; \"bugünkü alım gücü\" satırı gerçek değeri gösterir. Hesap, evde oturmaya devam ettiğin varsayımına dayanır; bu nedenle satış hâlinde doğabilecek vergiler ile ev sahibi olmanın parasal olmayan değeri dahil değildir — o kararın duygusal tarafı da meşrudur."
+  },
+  "meta": {
+    "title": "Lumos — Akıllı Yatırım Asistanı",
+    "description": "Korkusuz, öğrenerek yatırım: yapay zeka destekli risk profili, şeffaf portföy önerisi, emlak + borsa tek çatıda. Eğitim amaçlıdır."
   }
 }

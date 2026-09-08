@@ -1,11 +1,12 @@
 import { useState, useCallback } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '@clerk/clerk-react'
 import api, { setAuthToken } from '../utils/api'
 import { readJSON, writeJSON, userKey } from '../utils/storage'
 
 // The recommendation is deterministic for a given (risk, budget) — cache it
 // per user so revisiting the portfolio page renders instantly instead of
-// showing a "hazırlanıyor" screen; a background refresh keeps it current.
+// showing a "preparing" screen; a background refresh keeps it current.
 export function readCachedPortfolio(userId) {
   return readJSON(userKey('portfolio', userId))
 }
@@ -15,6 +16,7 @@ function cachePortfolio(userId, data) {
 }
 
 export default function usePortfolio() {
+  const { t } = useTranslation()
   const { getToken, userId } = useAuth()
   const [portfolio, setPortfolio] = useState(() => readCachedPortfolio(userId))
   const [profile, setProfile] = useState(null)
@@ -65,7 +67,7 @@ export default function usePortfolio() {
     } catch (err) {
       // With a cached portfolio on screen, a transient refresh failure is
       // not worth an error banner.
-      if (!hasCache) setError(err.response?.data?.detail || 'Öneri alınamadı')
+      if (!hasCache) setError(err.response?.data?.detail || t('recommend.error'))
     } finally {
       setIsLoading(false)
     }
@@ -80,7 +82,7 @@ export default function usePortfolio() {
       setProfile(res.data)
       return res.data
     } catch (err) {
-      setError(err.response?.data?.detail || 'Profil kaydedilemedi')
+      setError(err.response?.data?.detail || t('quiz.saveError'))
     } finally {
       setIsLoading(false)
     }

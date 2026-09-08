@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useAuth } from '@clerk/clerk-react'
 import api, { setAuthToken } from '../utils/api'
+import { useTranslation } from 'react-i18next'
 
 /**
  * Courage Score — the visible face of the vision. No black box: 5
@@ -8,6 +9,7 @@ import api, { setAuthToken } from '../utils/api'
  * The 60% threshold triggers the "ready for real investing" message.
  */
 export default function ReadinessScore() {
+  const { t } = useTranslation()
   const { getToken, isSignedIn } = useAuth()
   const [data, setData] = useState(null)
 
@@ -69,11 +71,11 @@ export default function ReadinessScore() {
           </div>
         </div>
         <div>
-          <strong style={{ fontSize: 14 }}>Cesaret Skoru</strong>
+          <strong style={{ fontSize: 14 }}>{t('readiness.title')}</strong>
           <p style={{ fontSize: 12, opacity: 0.7, margin: 0 }}>
             {ready_for_real_investing
-              ? 'Gerçek yatırıma hazırsın'
-              : 'Her adım seni biraz daha hazırlıyor'}
+              ? t('readiness.ready')
+              : t('readiness.progressing')}
           </p>
         </div>
       </div>

@@ -72,7 +72,9 @@ export default function HoldingsPage() {
     }
     load()
     return () => { cancelled = true }
-  }, [refresh])
+    // `t` changes only when the language does, and the backend returns
+    // localized advice — reloading then is what we want.
+  }, [refresh, t])
 
   // Typing a symbol should not also mean typing its name and hunting for its
   // price. Looking it up fills both AND validates the symbol: one that fails

@@ -17,7 +17,9 @@
     "back": "← Back",
     "eduFooter": "Educational purposes only — not investment advice.",
     "close": "Close",
-    "value": "Value"
+    "value": "Value",
+    "loading": "Loading…",
+    "redirecting": "Redirecting you to the sign-in page…"
   },
   "onboarding": {
     "tagline": "Investing looks like a dark forest.",
@@ -66,7 +68,10 @@
     "reveal": "I've read it — show my risk profile →",
     "noRush": "No rush — read the above for as long as you like.",
     "answersKept": "Your answers are saved — no need to start over.",
-    "inputPlaceholder": "Type your answer…"
+    "inputPlaceholder": "Type your answer…",
+    "extractError": "Your answers couldn't be summarised — you can try again.",
+    "saveError": "Your profile couldn't be saved — you can try again, your answers are safe.",
+    "sendError": "Couldn't send the message — try again"
   },
   "profile": {
     "bands": {
@@ -111,7 +116,8 @@
     "howtoLayerTitle": "How do I buy it?",
     "howtoLayerHint": "A step-by-step guide, from opening a brokerage account to placing the first order.",
     "disclaimer": "This information is educational only. Past performance does not guarantee future results. Consult a licensed financial advisor for your investment decisions.",
-    "backToDashboard": "Back to dashboard →"
+    "backToDashboard": "Back to dashboard →",
+    "error": "The portfolio suggestion couldn't be loaded"
   },
   "rationale": {
     "title": "Why this split?",
@@ -547,5 +553,181 @@
     "label": "Market",
     "select": "Select market",
     "limitedData": "limited data"
+  },
+  "path": {
+    "step": "Step 1 / 3",
+    "title": "How do you want to invest?",
+    "subtitle": "You can change path at any time — this is a starting point, not a commitment.",
+    "options": {
+      "stocks": {
+        "title": "Stocks Only",
+        "desc": "Focus on stocks, funds and ETFs — the real-estate modules stay hidden."
+      },
+      "real_estate": {
+        "title": "Real Estate Only",
+        "desc": "Explore land and housing opportunities by learning — no stock suggestions forced on you."
+      },
+      "hybrid": {
+        "title": "Both",
+        "desc": "Split your budget evenly across both worlds — the full Lumos experience."
+      },
+      "undecided": {
+        "title": "Not Sure Yet",
+        "desc": "That's fine! Let's build your profile and find the right path together."
+      }
+    }
+  },
+  "readiness": {
+    "title": "Courage Score",
+    "ready": "You're ready for real investing",
+    "progressing": "Every step gets you a little more ready"
+  },
+  "fear": {
+    "step": "Step 2 / 3",
+    "title": "What scares you most about investing?",
+    "subtitle": "This fear isn't something to suppress — it's a clue that helps us understand you. We'll shape our approach around the one you pick.",
+    "options": {
+      "param_eriyor": {
+        "label": "My money will melt away",
+        "sublabel": "I can't protect what I have against inflation"
+      },
+      "kandirilirim": {
+        "label": "I'll be tricked or scammed",
+        "sublabel": "I'll run into an untrustworthy platform or piece of advice"
+      },
+      "anlamiyorum": {
+        "label": "I don't understand any of it",
+        "sublabel": "The terms and charts just confuse me"
+      },
+      "batiririm": {
+        "label": "I'll decide wrong and lose it all",
+        "sublabel": "I'll risk money I can't afford to lose"
+      }
+    },
+    "reassurance": {
+      "param_eriyor": "We understand — that's why every portfolio shows the real return after inflation, not just the nominal number.",
+      "kandirilirim": "That's a fair worry. Lumos sells you no stock or fund and takes no commission — it only informs. The decision is always yours.",
+      "anlamiyorum": "That's fine, nobody is born knowing this. We'll explain every term in everyday language and skip nothing you don't follow.",
+      "batiririm": "Most beginners feel this. We'll start with small steps and virtual practice — you'll never be rushed with real money."
+    }
+  },
+  "dashboard": {
+    "erodingPerMonth": "{{amount}}/month eroding",
+    "title": "Dashboard",
+    "subtitle": "All of your wealth, at a glance.",
+    "showDetails": "Show details (comparison & target)",
+    "collapse": "↑ Collapse",
+    "wealthSummary": "Wealth Summary",
+    "planDone": "Your monthly plan is <0>{{plan}}</0> — you added <1>{{done}}</1> this month, plan complete ✓",
+    "planRemaining": "Your monthly plan is <0>{{plan}}</0> — <1>{{done}}</1> added this month, <2>{{left}}</2> to go. Once you add it, remember to record it under My Assets.",
+    "manageAssets": "Manage My Assets →",
+    "journeyTitle": "Your journey starts here",
+    "journeyBody": "Let's get to know you, hear what worries you, and build a portfolio made for you.",
+    "journeyCta": "Get to Know Me →",
+    "riskProfile": "Your Risk Profile",
+    "refresh": "↻ Refresh",
+    "editProfile": "✏️ Update Profile",
+    "profileReadyTitle": "Your profile is ready — now the portfolio!",
+    "profileReadyBody": "Let's build a portfolio that fits your risk profile.",
+    "buildPortfolio": "Build My Portfolio"
+  },
+  "news": {
+    "title": "What Happened Today?"
+  },
+  "headlines": {
+    "title": "Read the Headline, Understand It Without Panic",
+    "nextLabel": "Next headline",
+    "progress": "{{seen}}/{{total}} headlines decoded · tap the card → next one",
+    "headline-crash": {
+      "headline": "📰 \"THE MARKET CRASHED\"",
+      "reality": "The index most likely fell 2–4%. Historically such drops have usually been recovered within months. \"Crash\" is attractive for a headline and ordinary for an investor.",
+      "action": "Stay calm. Selling today turns the drop into a real loss."
+    },
+    "headline-crash-global": {
+      "headline": "📰 \"A CRISIS IS COMING\"",
+      "reality": "Crisis predictions are constant in the media — most never arrive. After the ones that did, markets have historically recovered, though it can take years.",
+      "action": "Prepare with diversification, not with panic."
+    },
+    "headline-gold": {
+      "headline": "📰 \"GOLD HITS A RECORD\"",
+      "reality": "Gold rising usually means uncertainty is around. It does not mean your other assets became worthless — different assets shine in different conditions.",
+      "action": "Depending on one asset is risky. Balance matters."
+    },
+    "headline-dolar": {
+      "headline": "📰 \"THE DOLLAR IS SURGING\"",
+      "reality": "When the local currency weakens, the local value of FX-based assets rises. If your portfolio holds some, this headline may be protecting you.",
+      "action": "Hold some FX-based assets to balance currency risk."
+    }
+  },
+  "explore": {
+    "title": "Explore Real Estate",
+    "subtitle": "Housing prices per m² province by province, and the real (<0>after-inflation</0>) appreciation — from official index data",
+    "scenarioError": "The scenario couldn't be calculated",
+    "whatIfBought": "What if I had bought property in {{province}} with {{amount}}?",
+    "bandIntro": "Using the central bank's housing price index for <0>{{province}}</0>, every 5-year window in the past was computed one by one. If you had bought property with this money, here is the range your holding would have been worth at the end of those windows:",
+    "worstBand": "One of the worst windows (10th percentile)",
+    "typicalBand": "A typical window (median)",
+    "bestBand": "One of the best windows (90th percentile)",
+    "real": "real",
+    "microLocation": "📍 No official price data is published at district or village level — for micro-locations we send you straight to the listings:",
+    "districtPlaceholder": "District (e.g. Keşan)",
+    "neighbourhoodPlaceholder": "Village/neighbourhood (e.g. Çeribaşı)",
+    "land": "Land",
+    "flat": "Flat",
+    "refresh": "Refresh",
+    "listingsAt": "Listings on {{site}} →",
+    "linkError": "The link couldn't be generated",
+    "listingsTitle": "🔗 Go to the Listings",
+    "listingsBody": "A pre-filtered listing search for the area you like — you make the purchase on the listing site, then come back here and say \"I bought it\".",
+    "provincePlaceholder": "Province (e.g. Ankara)",
+    "districtOptional": "District (optional)",
+    "otherMarket": "Live housing data for the <0>{{market}}</0> market is on the way. This page currently runs on Turkish data only — we will not show you another country's data as though it were yours.",
+    "switchToTr": "Switch the market to 🇹🇷 Türkiye in the left menu to see prices per m² by province.",
+    "lastYears": "Last {{n}} years",
+    "searchPlaceholder": "Search a province (e.g. Muğla, Eskişehir...)",
+    "searchLabel": "Search province",
+    "amountPlaceholder": "Scenario amount",
+    "amountLabel": "Scenario amount",
+    "noResults": "\"{{search}}\" not found — you can search across all 81 provinces.",
+    "showingFirst": "Showing the first 12 provinces — search above for the rest.",
+    "dataError": "Province data can't be reached right now — try again shortly.",
+    "fetchLinks": "Fetch the Links"
+  },
+  "rvb": {
+    "title": "Rent, or buy?",
+    "subtitle": "We compare the same home two ways: buying with a down payment plus a mortgage, or renting and investing the difference. Buying is not always the win.",
+    "cashPlaceholder": "All the cash you have",
+    "downPaymentPlaceholder": "Down payment / your savings",
+    "cashIncludesCosts": "This figure is all my cash — take the transfer tax and commission out of it",
+    "rentPlaceholder": "Your current monthly rent",
+    "homePricePlaceholder": "The home's price (optional — estimated from rent if blank)",
+    "incomePlaceholder": "Your monthly net income (optional — checks affordability)",
+    "projectionYears": "{{n}}-year projection",
+    "ownLoanTerms": "Let me enter my own loan terms",
+    "ratePlaceholder": "Rate (%/yr)",
+    "termPlaceholder": "Term (years)",
+    "ownLoanHint": "Enter the real offer from your bank. Left blank, a market average is used.",
+    "comparedHome": "Home compared: <0>{{price}}</0> · monthly mortgage payment ≈ <1>{{installment}}</1>",
+    "estimatedFromRent": "(estimated from the rent)",
+    "cashBreakdown": "<0>{{cash}}</0> of your cash goes {{costs}} to transfer tax and commission; <1>{{applied}}</1> is left as the down payment.",
+    "affordabilityTight": "The payment is {{pct}}% of your income — banks generally won't lend past about 45%. This home may not be realistic on this down payment right now; consider a larger deposit or a more affordable home.",
+    "affordabilityOk": "The payment is {{pct}}% of your income — below the widely accepted ~45% safety line, so this plan looks affordable.",
+    "loanCost": "<0>What the loan costs</0> ({{rate}}%/yr, {{term}}-year term)<1/>Borrowed <2>{{principal}}</2> · total paid over the full term <3>{{total}}</3><4/>Of which <5>{{interest}}</5> is interest — that is <6>{{ratio}}%</6> of the principal.",
+    "payingTwice": "The interest exceeds what you borrowed: you're paying for the home twice.",
+    "fixedRateNote": "This assumes a fixed rate; if inflation stays high, the real burden of the payment eases over time.",
+    "ifBuy": "If you buy",
+    "ifRent": "If you rent",
+    "netWorthAfter": "your net worth after {{years}} years",
+    "inTodaysMoney": "in today's money ≈ {{amount}}",
+    "equityLine": "Home value {{value}} − remaining loan {{loan}}",
+    "costsLine": "Purchase costs {{costs}} · dues/upkeep {{upkeep}}",
+    "rentLine": "Deposit + difference invested · rent paid {{rent}}",
+    "verdictBuy": "On these assumptions <0>buying</0> looks about <1>{{amount}}</1> better.",
+    "verdictRent": "On these assumptions <0>renting and investing</0> looks about <1>{{amount}}</1> better.",
+    "assumptions": "Assumptions: housing +{{housing}}%/yr, portfolio +{{portfolio}}%/yr, mortgage {{rate}}%/yr ({{term}}-year term), inflation {{inflation}}%/yr (data through {{asOf}}). Purchase costs are included: transfer tax {{deed}}% + agency commission {{agency}}% + VAT ({{vat}}%) = {{agencyVat}}%; plus {{upkeep}}% of the home's value per year for dues, insurance and upkeep. Charging the buyer the entire transfer tax is an assumption based on common market practice; by law half belongs to the seller and the parties may agree otherwise. These rates are set by regulation and custom and change over time. Large figures are inflated mostly by inflation; the \"in today's money\" line shows the real value. The calculation assumes you keep living in the home, so taxes arising on a sale and the non-financial value of owning are excluded — the emotional side of that decision is legitimate too."
+  },
+  "meta": {
+    "title": "Lumos — Smart Investment Assistant",
+    "description": "Fearless, learn-by-doing investing: an AI-assisted risk profile, a transparent portfolio suggestion, real estate and the stock market under one roof. For education only."
   }
 }

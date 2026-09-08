@@ -5,6 +5,7 @@ import api, { extractErrorMessage, setAuthToken } from '../utils/api'
 import LumosLogo from '../components/LumosLogo'
 import IsikTut from '../components/IsikTut'
 import useMarket from '../hooks/useMarket'
+import { Trans, useTranslation } from 'react-i18next'
 
 // EVERY amount on this page is TCMB TL/m² data — it stays pinned to
 // TRY + tr-TR regardless of the user's market (pretending to convert
@@ -13,6 +14,7 @@ import useMarket from '../hooks/useMarket'
 const fmt = n => new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 0 }).format(n)
 
 function ProvinceScenario({ province, amount }) {
+  const { t } = useTranslation()
   const [band, setBand] = useState(null)
   const [links, setLinks] = useState(null)
   const [loading, setLoading] = useState(false)
@@ -40,7 +42,7 @@ function ProvinceScenario({ province, amount }) {
       ])
       setBand(b.data)
     } catch (err) {
-      setError(extractErrorMessage(err, 'Senaryo hesaplanamadı'))
+      setError(extractErrorMessage(err, t('explore.scenarioError')))
     } finally {
       setLoading(false)
     }
@@ -52,7 +54,7 @@ function ProvinceScenario({ province, amount }) {
         <button className="btn btn-ghost" style={{ width: '100%' }} onClick={run} disabled={loading}>
           {loading
             ? <span className="spinner" style={{ width: 16, height: 16 }} />
-            : `${fmt(parseTL(amount) || 1000000)} TL ile ${province.province}'de konut alsaydım?`}
+            : t('explore.whatIfBought', { amount: fmt(parseTL(amount) || 1000000), province: province.province })}
         </button>
       )}
       {error && <p style={{ color: 'var(--red)', fontSize: 12 }}>{error}</p>}
@@ -60,49 +62,47 @@ function ProvinceScenario({ province, amount }) {
       {band?.available && (
         <div style={{ fontSize: 13, lineHeight: 1.7 }}>
           <p style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.6, marginBottom: 8 }}>
-            TCMB&apos;nin {province.province} konut fiyat endeksine göre, geçmişteki
-            <strong> tüm 5 yıllık dönemler</strong> tek tek hesaplandı. Bugün bu parayla
-            konut alsaydın, o dönemlerin sonunda elindeki değer şu aralıkta olurdu:
+            <Trans i18nKey="explore.bandIntro" values={{ province: province.province }}
+                   components={[<strong key="a" />]} />
           </p>
-          <div>En kötü dönemlerden biri (%10&apos;luk dilim): <strong style={{ color: 'var(--red)' }}>{fmt(band.pessimistic.value)} TL</strong>
-            {band.real_band && <span style={{ fontSize: 11, opacity: 0.7 }}> · reel {band.real_band.pessimistic_pct > 0 ? '+' : ''}{band.real_band.pessimistic_pct}%</span>}
+          <div>{t('explore.worstBand')}: <strong style={{ color: 'var(--red)' }}>{fmt(band.pessimistic.value)} TL</strong>
+            {band.real_band && <span style={{ fontSize: 11, opacity: 0.7 }}> · {t('explore.real')} {band.real_band.pessimistic_pct > 0 ? '+' : ''}{band.real_band.pessimistic_pct}%</span>}
           </div>
-          <div>Tipik dönem (ortanca): <strong style={{ color: 'var(--firefly, #F5A524)' }}>{fmt(band.typical.value)} TL</strong>
-            {band.real_band && <span style={{ fontSize: 11, opacity: 0.7 }}> · reel {band.real_band.typical_pct > 0 ? '+' : ''}{band.real_band.typical_pct}%</span>}
+          <div>{t('explore.typicalBand')}: <strong style={{ color: 'var(--firefly, #F5A524)' }}>{fmt(band.typical.value)} TL</strong>
+            {band.real_band && <span style={{ fontSize: 11, opacity: 0.7 }}> · {t('explore.real')} {band.real_band.typical_pct > 0 ? '+' : ''}{band.real_band.typical_pct}%</span>}
           </div>
-          <div>En iyi dönemlerden biri (%90&apos;lık dilim): <strong style={{ color: 'var(--green, #3DD68C)' }}>{fmt(band.optimistic.value)} TL</strong>
-            {band.real_band && <span style={{ fontSize: 11, opacity: 0.7 }}> · reel {band.real_band.optimistic_pct > 0 ? '+' : ''}{band.real_band.optimistic_pct}%</span>}
+          <div>{t('explore.bestBand')}: <strong style={{ color: 'var(--green, #3DD68C)' }}>{fmt(band.optimistic.value)} TL</strong>
+            {band.real_band && <span style={{ fontSize: 11, opacity: 0.7 }}> · {t('explore.real')} {band.real_band.optimistic_pct > 0 ? '+' : ''}{band.real_band.optimistic_pct}%</span>}
           </div>
           {links && (
             <div style={{ marginTop: 10, padding: 10, borderRadius: 10, border: '1px dashed var(--border)' }}>
               <p style={{ fontSize: 12, opacity: 0.75, marginBottom: 8 }}>
-                📍 İlçe/köy düzeyinde resmi fiyat verisi yayınlanmıyor — mikro konum
-                için seni doğrudan ilanlara götürüyoruz:
+                {t('explore.microLocation')}
               </p>
               <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}
                    onClick={e => e.stopPropagation()}>
-                <input className="input" placeholder="İlçe (örn: Keşan)" value={ilce}
+                <input className="input" placeholder={t('explore.districtPlaceholder')} value={ilce}
                        onChange={e => setIlce(e.target.value)}
                        style={{ flex: 1, minWidth: 100, fontSize: 13 }} />
-                <input className="input" placeholder="Köy/mahalle (örn: Çeribaşı)" value={detail}
+                <input className="input" placeholder={t('explore.neighbourhoodPlaceholder')} value={detail}
                        onChange={e => setDetail(e.target.value)}
                        style={{ flex: 1, minWidth: 120, fontSize: 13 }} />
                 <select className="input" value={assetType}
                         onChange={e => setAssetType(e.target.value)}
                         style={{ flex: 0.7, minWidth: 80, fontSize: 13 }}>
-                  <option value="arsa">Arsa</option>
-                  <option value="daire">Daire</option>
+                  <option value="arsa">{t('explore.land')}</option>
+                  <option value="daire">{t('explore.flat')}</option>
                 </select>
                 <button className="btn btn-ghost" style={{ fontSize: 12 }}
                         onClick={() => fetchLinks().catch(() => {})}>
-                  Yenile
+                  {t('explore.refresh')}
                 </button>
               </div>
               <div style={{ display: 'flex', gap: 8 }}>
                 {links.map(l => (
                   <a key={l.site} href={l.url} target="_blank" rel="noopener noreferrer"
                      className="btn btn-ghost" style={{ flex: 1, textAlign: 'center', fontSize: 12, textDecoration: 'none' }}>
-                    {l.site}'de ilanlar →
+                    {t('explore.listingsAt', { site: l.site })}
                   </a>
                 ))}
               </div>
@@ -116,6 +116,7 @@ function ProvinceScenario({ province, amount }) {
 }
 
 function ProvinceCard({ province, amount }) {
+  const { t } = useTranslation()
   const realPositive = (province.real_change_pct ?? 0) > 0
   const [open, setOpen] = useState(false)
   return (
@@ -138,7 +139,7 @@ function ProvinceCard({ province, amount }) {
           fontSize: 13, fontWeight: 700,
           color: realPositive ? 'var(--green, #4ade80)' : 'var(--red)',
         }}>
-          reel {province.real_change_pct > 0 ? '+' : ''}{province.real_change_pct}%
+          {t('explore.real')} {province.real_change_pct > 0 ? '+' : ''}{province.real_change_pct}%
         </div>
       </div>
       {open && <div style={{ flexBasis: '100%' }}><ProvinceScenario province={province} amount={amount} /></div>}
@@ -147,6 +148,7 @@ function ProvinceCard({ province, amount }) {
 }
 
 function RentVsBuy() {
+  const { t } = useTranslation()
   const [form, setForm] = useState({ down_payment: '', monthly_rent: '', home_price: '', income: '', years: 10, rate: '', term: '', cash_includes_costs: false })
   const [result, setResult] = useState(null)
   const [error, setError] = useState(null)
@@ -189,7 +191,7 @@ function RentVsBuy() {
           .then(() => setSavedIncome(income)).catch(() => {})
       }
     } catch (err) {
-      setError(extractErrorMessage(err, 'Hesaplanamadı'))
+      setError(extractErrorMessage(err, t('goal.error')))
     } finally {
       setLoading(false)
     }
@@ -199,14 +201,13 @@ function RentVsBuy() {
 
   return (
     <div className="card">
-      <h3 style={{ marginBottom: 4 }}>Kirada mı otur, ev mi al?</h3>
+      <h3 style={{ marginBottom: 4 }}>{t('rvb.title')}</h3>
       <p style={{ fontSize: 13, opacity: 0.8, marginBottom: 12 }}>
-        Aynı evi iki senaryoda karşılaştırırız: peşinat + kredi ile satın almak, ya da
-        kirada kalıp farkı yatırmak. Ev almak her zaman kazanç değildir.
+        {t('rvb.subtitle')}
       </p>
       <form onSubmit={run} style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
         <input className="input" type="text" inputMode="numeric"
-               placeholder={form.cash_includes_costs ? 'Cebindeki toplam nakit (TL)' : 'Peşinat / birikimin (TL)'}
+               placeholder={form.cash_includes_costs ? t('rvb.cashPlaceholder') : t('rvb.downPaymentPlaceholder')}
                required
                value={form.down_payment} onChange={e => setForm({ ...form, down_payment: e.target.value })} />
         {/* Buyers think in "money I have", not "down payment net of fees".
@@ -219,38 +220,38 @@ function RentVsBuy() {
           <input type="checkbox" checked={form.cash_includes_costs}
                  onChange={e => setForm({ ...form, cash_includes_costs: e.target.checked })}
                  style={{ marginTop: 2, accentColor: 'var(--accent)', width: 15, height: 15, flexShrink: 0 }} />
-          Bu rakam elimdeki tüm nakit — tapu ve komisyonu buradan düş
+          {t('rvb.cashIncludesCosts')}
         </label>
-        <input className="input" type="text" inputMode="numeric" placeholder="Şu anki aylık kiran (TL)" required
+        <input className="input" type="text" inputMode="numeric" placeholder={t('rvb.rentPlaceholder')} required
                value={form.monthly_rent} onChange={e => setForm({ ...form, monthly_rent: e.target.value })} />
-        <input className="input" type="text" inputMode="numeric" placeholder="Evin fiyatı (opsiyonel — boşsa kiradan tahmin edilir)"
+        <input className="input" type="text" inputMode="numeric" placeholder={t('rvb.homePricePlaceholder')}
                value={form.home_price} onChange={e => setForm({ ...form, home_price: e.target.value })} />
         {savedIncome == null && (
-          <input className="input" type="text" inputMode="numeric" placeholder="Aylık net gelirin (opsiyonel — taksit gücünü kontrol eder)"
+          <input className="input" type="text" inputMode="numeric" placeholder={t('rvb.incomePlaceholder')}
                  value={form.income} onChange={e => setForm({ ...form, income: e.target.value })} />
         )}
         <select className="input" value={form.years} onChange={e => setForm({ ...form, years: e.target.value })}>
-          {[5, 10, 20].map(y => <option key={y} value={y}>{y} yıllık projeksiyon</option>)}
+          {[5, 10, 20].map(y => <option key={y} value={y}>{t('rvb.projectionYears', { n: y })}</option>)}
         </select>
-        {/* Bank offers vary a lot; boş bırakılırsa piyasa ortalaması kullanılır. */}
+        {/* Bank offers vary a lot; left blank, the market average is used. */}
         <details>
           <summary style={{ fontSize: 12.5, color: 'var(--text-dim)', cursor: 'pointer' }}>
-            Kredi koşullarını kendim gireyim
+            {t('rvb.ownLoanTerms')}
           </summary>
           <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
             <input className="input" type="text" inputMode="decimal" style={{ flex: 1 }}
-                   placeholder="Faiz (%/yıl)"
+                   placeholder={t('rvb.ratePlaceholder')}
                    value={form.rate} onChange={e => setForm({ ...form, rate: e.target.value })} />
             <input className="input" type="text" inputMode="numeric" style={{ flex: 1 }}
-                   placeholder="Vade (yıl)"
+                   placeholder={t('rvb.termPlaceholder')}
                    value={form.term} onChange={e => setForm({ ...form, term: e.target.value })} />
           </div>
           <p style={{ fontSize: 11, color: 'var(--text-dim)', marginTop: 6, lineHeight: 1.5 }}>
-            Bankandan aldığın gerçek teklifi gir. Boş bırakırsan piyasa ortalaması kullanılır.
+            {t('rvb.ownLoanHint')}
           </p>
         </details>
         <button className="btn btn-primary" type="submit" disabled={loading}>
-          {loading ? 'Hesaplanıyor…' : 'Karşılaştır'}
+          {loading ? t('common.calculating') : t('common.compare')}
         </button>
       </form>
 
@@ -258,17 +259,19 @@ function RentVsBuy() {
         <div style={{ marginTop: 14 }}>
           {/* Consistency line — the same home under both scenarios */}
           <div style={{ fontSize: 12, opacity: 0.8, marginBottom: 10, lineHeight: 1.5 }}>
-            Karşılaştırılan ev: <strong>{fmt(result.home_price)} TL</strong>
-            {result.home_price_estimated && ' (kiradan tahmin edildi)'} · aylık kredi taksiti
-            ≈ <strong>{fmt(result.monthly_mortgage)} TL</strong>
+            <Trans i18nKey="rvb.comparedHome"
+                   values={{ price: fmt(result.home_price), installment: fmt(result.monthly_mortgage) }}
+                   components={[<strong key="a" />, <strong key="b" />]} />
+            {result.home_price_estimated && ' ' + t('rvb.estimatedFromRent')}
             {/* The number people forget to budget for. */}
             {form.cash_includes_costs && result.buy.purchase_costs > 0 && (
               <><br />
               <span style={{ color: 'var(--text-muted)' }}>
-                {fmt(result.buy.cash_available)} TL nakdinin{' '}
-                <strong>{fmt(result.buy.purchase_costs)} TL</strong>&apos;si tapu ve komisyona
-                gidiyor; eve peşinat olarak{' '}
-                <strong>{fmt(result.buy.down_payment_applied)} TL</strong> kalıyor.
+                <Trans i18nKey="rvb.cashBreakdown"
+                       values={{ cash: fmt(result.buy.cash_available),
+                                 costs: fmt(result.buy.purchase_costs),
+                                 applied: fmt(result.buy.down_payment_applied) }}
+                       components={[<strong key="a" />, <strong key="b" />]} />
               </span></>
             )}
           </div>
@@ -286,8 +289,8 @@ function RentVsBuy() {
                 color: ratio > 0.45 ? 'var(--red)' : 'var(--text-muted)',
               }}>
                 {ratio > 0.45
-                  ? `Taksit, gelirinin %${pct}'i — bankalar genelde gelirin ~%45'inin üzerindeki taksitlere kredi vermez. Bu ev bu peşinatla şu an gerçekçi olmayabilir; daha yüksek peşinat ya da daha uygun bir ev düşünebilirsin.`
-                  : `Taksit, gelirinin %${pct}'i — genel kabul gören güvenli sınır ~%45'in altında, bu plan gelirine uygun görünüyor.`}
+                  ? t('rvb.affordabilityTight', { pct })
+                  : t('rvb.affordabilityOk', { pct })}
               </div>
             )
           })()}
@@ -300,17 +303,22 @@ function RentVsBuy() {
               borderRadius: 'var(--radius-xs)', border: '1px solid var(--border)',
               background: 'var(--bg-input)',
             }}>
-              <strong>Kredinin maliyeti</strong> ({result.assumptions.mortgage_annual_rate_pct}%/yıl,{' '}
-              {result.assumptions.mortgage_term_years} yıl vade)<br />
-              Çekilen kredi <strong>{fmt(result.loan.principal)} TL</strong> · vade sonunda toplam
-              ödenen <strong>{fmt(result.loan.total_over_full_term)} TL</strong><br />
-              Bunun <strong>{fmt(result.loan.interest_over_full_term)} TL</strong>&apos;si faiz — yani
-              anaparanın <strong>{Math.round(result.loan.interest_over_full_term / result.loan.principal * 100)}%</strong>&apos;i kadar.
+              <Trans i18nKey="rvb.loanCost"
+                     values={{
+                       rate: result.assumptions.mortgage_annual_rate_pct,
+                       term: result.assumptions.mortgage_term_years,
+                       principal: fmt(result.loan.principal),
+                       total: fmt(result.loan.total_over_full_term),
+                       interest: fmt(result.loan.interest_over_full_term),
+                       ratio: Math.round(result.loan.interest_over_full_term / result.loan.principal * 100),
+                     }}
+                     components={[<strong key="a" />, <br key="b" />, <strong key="c" />,
+                                  <strong key="d" />, <br key="e" />, <strong key="f" />, <strong key="g" />]} />
               {result.loan.interest_over_full_term > result.loan.principal && (
-                <> Faiz, çektiğin krediden fazla: evi iki kez ödüyorsun.</>
+                <> {t('rvb.payingTwice')}</>
               )}
               <div style={{ fontSize: 11, opacity: 0.65, marginTop: 4 }}>
-                Sabit faizli hesaptır; enflasyon yüksek seyrederse taksitin reel yükü zamanla hafifler.
+                {t('rvb.fixedRateNote')}
               </div>
             </div>
           )}
@@ -322,18 +330,17 @@ function RentVsBuy() {
               background: buyWins ? 'var(--firefly-dim)' : 'transparent',
             }}>
               <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 6 }}>
-                🏠 Ev alırsan {buyWins && '✓'}
+                🏠 {t('rvb.ifBuy')} {buyWins && '✓'}
               </div>
-              <div style={{ fontSize: 12, opacity: 0.75 }}>{result.years} yıl sonra net servetin</div>
+              <div style={{ fontSize: 12, opacity: 0.75 }}>{t('rvb.netWorthAfter', { years: result.years })}</div>
               <div style={{ fontSize: 17, fontWeight: 700 }}>{fmt(result.buy.net_worth)} TL</div>
               <div style={{ fontSize: 11, opacity: 0.6, marginTop: 2 }}>
-                bugünkü alım gücüyle ≈ {fmt(result.buy.net_worth_real)} TL
+                {t('rvb.inTodaysMoney', { amount: fmt(result.buy.net_worth_real) })}
               </div>
               <div style={{ fontSize: 12, opacity: 0.7, marginTop: 6, lineHeight: 1.5 }}>
-                Ev değeri {fmt(result.buy.home_value)} − kalan kredi {fmt(result.buy.remaining_loan)}
+                {t('rvb.equityLine', { value: fmt(result.buy.home_value), loan: fmt(result.buy.remaining_loan) })}
                 {result.buy.purchase_costs > 0 && (
-                  <><br />Alım masrafı {fmt(result.buy.purchase_costs)} · aidat/bakım{' '}
-                  {fmt(result.buy.total_upkeep_paid)}</>
+                  <><br />{t('rvb.costsLine', { costs: fmt(result.buy.purchase_costs), upkeep: fmt(result.buy.total_upkeep_paid) })}</>
                 )}
               </div>
             </div>
@@ -343,15 +350,15 @@ function RentVsBuy() {
               background: !buyWins ? 'var(--firefly-dim)' : 'transparent',
             }}>
               <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 6 }}>
-                Kirada kalırsan {!buyWins && '✓'}
+                {t('rvb.ifRent')} {!buyWins && '✓'}
               </div>
-              <div style={{ fontSize: 12, opacity: 0.75 }}>{result.years} yıl sonra net servetin</div>
+              <div style={{ fontSize: 12, opacity: 0.75 }}>{t('rvb.netWorthAfter', { years: result.years })}</div>
               <div style={{ fontSize: 17, fontWeight: 700 }}>{fmt(result.rent.net_worth)} TL</div>
               <div style={{ fontSize: 11, opacity: 0.6, marginTop: 2 }}>
-                bugünkü alım gücüyle ≈ {fmt(result.rent.net_worth_real)} TL
+                {t('rvb.inTodaysMoney', { amount: fmt(result.rent.net_worth_real) })}
               </div>
               <div style={{ fontSize: 12, opacity: 0.7, marginTop: 6, lineHeight: 1.5 }}>
-                Peşinat + fark yatırımda · ödenen kira {fmt(result.rent.total_rent_paid)} TL
+                {t('rvb.rentLine', { rent: fmt(result.rent.total_rent_paid) })}
               </div>
             </div>
           </div>
@@ -361,29 +368,26 @@ function RentVsBuy() {
             background: 'var(--bg-input)', fontSize: 13, lineHeight: 1.6,
           }}>
             {buyWins
-              ? <>Bu varsayımlarla <strong>satın almak</strong> yaklaşık{' '}
-                  <strong>{fmt(result.difference)} TL</strong> daha avantajlı görünüyor.</>
-              : <>Bu varsayımlarla <strong>kirada kalıp yatırım yapmak</strong> yaklaşık{' '}
-                  <strong>{fmt(result.difference)} TL</strong> daha avantajlı görünüyor.</>}
+              ? <Trans i18nKey="rvb.verdictBuy" values={{ amount: fmt(result.difference) }}
+                         components={[<strong key="a" />, <strong key="b" />]} />
+              : <Trans i18nKey="rvb.verdictRent" values={{ amount: fmt(result.difference) }}
+                         components={[<strong key="a" />, <strong key="b" />]} />}
           </div>
 
           <p style={{ fontSize: 12, opacity: 0.6, lineHeight: 1.5, marginTop: 10 }}>
-            Varsayımlar: konut +%{result.assumptions.housing_annual_growth_pct}/yıl,
-            portföy +%{result.assumptions.portfolio_annual_growth_pct}/yıl,
-            kredi %{result.assumptions.mortgage_annual_rate_pct}/yıl ({result.assumptions.mortgage_term_years} yıl vade),
-            enflasyon %{result.assumptions.annual_inflation_pct}/yıl.
-            Alım masrafları dahildir: tapu harcı %{result.assumptions.title_deed_fee_pct} +
-            emlakçı komisyonu %{result.assumptions.agency_commission_pct} + KDV
-            (%{result.assumptions.vat_pct}) = %{result.assumptions.agency_commission_with_vat_pct};
-            ayrıca aidat, DASK ve bakım için yılda ev değerinin
-            %{result.assumptions.annual_upkeep_pct}&apos;i.
-            Tapu harcının tamamının alıcıya yazılması yaygın piyasa uygulamasına dayanan bir
-            varsayımdır; kanunen yarısı satıcıya aittir ve taraflar farklı anlaşabilir. Bu
-            oranlar mevzuat ve teamülle belirlenir, zamanla değişir. Büyük TL rakamları
-            çoğunlukla enflasyondan şişer; “bugünkü alım gücü” satırı gerçek değeri gösterir.
-            Hesap, evde oturmaya devam ettiğin varsayımına dayanır; bu nedenle satış hâlinde
-            doğabilecek vergiler ile ev sahibi olmanın parasal olmayan değeri dahil değildir —
-            o kararın duygusal tarafı da meşrudur.
+            {t('rvb.assumptions', {
+              housing: result.assumptions.housing_annual_growth_pct,
+              portfolio: result.assumptions.portfolio_annual_growth_pct,
+              rate: result.assumptions.mortgage_annual_rate_pct,
+              term: result.assumptions.mortgage_term_years,
+              inflation: result.assumptions.annual_inflation_pct,
+              asOf: result.assumptions.inflation_as_of || '—',
+              deed: result.assumptions.title_deed_fee_pct,
+              agency: result.assumptions.agency_commission_pct,
+              vat: result.assumptions.vat_pct,
+              agencyVat: result.assumptions.agency_commission_with_vat_pct,
+              upkeep: result.assumptions.annual_upkeep_pct,
+            })}
           </p>
         </div>
       )}
@@ -393,6 +397,7 @@ function RentVsBuy() {
 }
 
 function ListingLinks() {
+  const { t } = useTranslation()
   const [form, setForm] = useState({ il: '', ilce: '', asset_type: 'arsa' })
   const [links, setLinks] = useState(null)
   const [error, setError] = useState(null)
@@ -404,28 +409,27 @@ function ListingLinks() {
       const res = await api.post('/planning/listing-links', form)
       setLinks(res.data.links)
     } catch (err) {
-      setError(extractErrorMessage(err, 'Link üretilemedi'))
+      setError(extractErrorMessage(err, t('explore.linkError')))
     }
   }
 
   return (
     <div className="card">
-      <h3 style={{ marginBottom: 4 }}>🔗 İlanlara Git</h3>
+      <h3 style={{ marginBottom: 4 }}>{t('explore.listingsTitle')}</h3>
       <p style={{ fontSize: 13, opacity: 0.8, marginBottom: 12 }}>
-        Beğendiğin bölge için filtresi hazır ilan araması — satın almayı ilan sitesinde yaparsın,
-        sonra buraya döner "Aldım" dersin.
+        {t('explore.listingsBody')}
       </p>
       <form onSubmit={run} style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-        <input className="input" placeholder="İl (örn: Ankara)" required style={{ flex: 2, minWidth: 120 }}
+        <input className="input" placeholder={t('explore.provincePlaceholder')} required style={{ flex: 2, minWidth: 120 }}
                value={form.il} onChange={e => setForm({ ...form, il: e.target.value })} />
-        <input className="input" placeholder="İlçe (opsiyonel)" style={{ flex: 2, minWidth: 120 }}
+        <input className="input" placeholder={t('explore.districtOptional')} style={{ flex: 2, minWidth: 120 }}
                value={form.ilce} onChange={e => setForm({ ...form, ilce: e.target.value })} />
         <select className="input" style={{ flex: 1, minWidth: 90 }} value={form.asset_type}
                 onChange={e => setForm({ ...form, asset_type: e.target.value })}>
-          <option value="arsa">Arsa</option>
-          <option value="daire">Daire</option>
+          <option value="arsa">{t('explore.land')}</option>
+          <option value="daire">{t('explore.flat')}</option>
         </select>
-        <button className="btn btn-primary" type="submit" style={{ flexBasis: '100%' }}>Linkleri Getir</button>
+        <button className="btn btn-primary" type="submit" style={{ flexBasis: '100%' }}>{t('explore.fetchLinks')}</button>
       </form>
       {links && (
         <div style={{ display: 'flex', gap: 10, marginTop: 12 }}>
@@ -443,6 +447,7 @@ function ListingLinks() {
 }
 
 export default function ExplorePage() {
+  const { t } = useTranslation()
   const { getToken } = useAuth()
   const { pack } = useMarket()
   const [provinces, setProvinces] = useState(null)
@@ -489,16 +494,15 @@ export default function ExplorePage() {
           <UserButton afterSignOutUrl="/" />
         </header>
         <div className="page-content">
-          <h2>Emlak Keşfet</h2>
+          <h2>{t('explore.title')}</h2>
           <div className="card" style={{ marginTop: 16, textAlign: 'center', padding: 28 }}>
             <div style={{ fontSize: 32, marginBottom: 10 }}>🌍</div>
             <p style={{ fontSize: 14, lineHeight: 1.7 }}>
-              <strong>{pack.name}</strong> pazarı için canlı konut verisi entegrasyonu yolda.
-              Bu sayfa şu an yalnızca Türkiye (TCMB) verisiyle çalışıyor — sana
-              başka bir ülkenin verisini "buymuş gibi" göstermeyiz.
+              <Trans i18nKey="explore.otherMarket" values={{ market: pack.name }}
+                     components={[<strong key="a" />]} />
             </p>
             <p style={{ fontSize: 12, opacity: 0.65, marginTop: 10 }}>
-              Pazarı sol menüden 🇹🇷 Türkiye'ye alarak il il m² fiyatlarını görebilirsin.
+              {t('explore.switchToTr')}
             </p>
           </div>
         </div>
@@ -515,9 +519,10 @@ export default function ExplorePage() {
 
       <div className="page-content" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
         <div>
-          <h2>Emlak Keşfet</h2>
+          <h2>{t('explore.title')}</h2>
           <p style={{ fontSize: 13, marginTop: 4 }}>
-            İl il konut m² fiyatları ve gerçek (<IsikTut term="reel getiri">enflasyon sonrası</IsikTut>) değerlenme — TCMB verisiyle
+            <Trans i18nKey="explore.subtitle"
+                   components={[<IsikTut key="a" term="reel getiri" />]} />
           </p>
         </div>
 
@@ -529,29 +534,29 @@ export default function ExplorePage() {
                       className={`btn ${horizon === y ? 'btn-primary' : 'btn-ghost'}`}
                       style={{ flex: 1 }}
                       onClick={() => setHorizon(y)}>
-                Son {y} yıl
+                {t('explore.lastYears', { n: y })}
               </button>
             ))}
           </div>
 
           <input
             className="input"
-            placeholder="İl ara (örn: Muğla, Eskişehir...)"
+            placeholder={t('explore.searchPlaceholder')}
             value={search}
             onChange={e => setSearch(e.target.value)}
             style={{ marginBottom: 12 }}
-            aria-label="İl ara"
+            aria-label={t('explore.searchLabel')}
           />
 
           <input
             className="input"
             type="text"
             inputMode="numeric"
-            placeholder="Senaryo tutarı (TL)"
+            placeholder={t('explore.amountPlaceholder')}
             value={scenarioAmount}
             onChange={e => setScenarioAmount(e.target.value)}
             style={{ marginBottom: 12 }}
-            aria-label="Senaryo tutarı"
+            aria-label={t('explore.amountLabel')}
           />
 
           {loading && (
@@ -566,13 +571,13 @@ export default function ExplorePage() {
                 {visible.map(p => <ProvinceCard key={p.code} province={p} amount={scenarioAmount} />)}
                 {visible.length === 0 && (
                   <p style={{ fontSize: 13, opacity: 0.7, textAlign: 'center', padding: 12 }}>
-                    "{search}" bulunamadı — 81 ilin tamamında arayabilirsin.
+                    {t('explore.noResults', { search })}
                   </p>
                 )}
               </div>
               {!q && (
                 <p style={{ fontSize: 12, opacity: 0.55, marginTop: 8, textAlign: 'center' }}>
-                  İlk 12 il gösteriliyor — diğer iller için yukarıdan ara.
+                  {t('explore.showingFirst')}
                 </p>
               )}
               <p style={{ fontSize: 12, opacity: 0.6, marginTop: 10, lineHeight: 1.5 }}>
@@ -583,7 +588,7 @@ export default function ExplorePage() {
 
           {!loading && !provinces?.available && (
             <div className="card" style={{ textAlign: 'center', padding: 24 }}>
-              <p style={{ fontSize: 14 }}>İl verisi şu an alınamıyor — birazdan tekrar dene.</p>
+              <p style={{ fontSize: 14 }}>{t('explore.dataError')}</p>
             </div>
           )}
         </div>

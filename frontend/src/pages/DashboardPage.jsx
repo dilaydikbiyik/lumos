@@ -15,9 +15,11 @@ import usePortfolio from '../hooks/usePortfolio'
 import useMarket from '../hooks/useMarket'
 import api, { setAuthToken } from '../utils/api'
 import { useState } from 'react'
+import { Trans, useTranslation } from 'react-i18next'
 
 /** Progressive UI: minimal view for new users, deepens via "Show More" */
 function ProgressiveDetails({ holdingsSummary, portfolio }) {
+  const { t } = useTranslation()
   const [expanded, setExpanded] = useState(false)
   // No holdings → hide the details section
   const hasData = holdingsSummary?.total_current_value > 0 || portfolio
@@ -30,7 +32,7 @@ function ProgressiveDetails({ holdingsSummary, portfolio }) {
           className="btn btn-ghost"
           style={{ width: '100%', fontSize: 13, border: '1px dashed var(--border)' }}
         >
-          <Icon name="chart" size={14} /> Detayları Göster (karşılaştırma & hedef)
+          <Icon name="chart" size={14} /> {t('dashboard.showDetails')}
         </button>
       ) : (
         <>
@@ -41,7 +43,7 @@ function ProgressiveDetails({ holdingsSummary, portfolio }) {
             className="btn btn-ghost"
             style={{ width: '100%', fontSize: 12, color: 'var(--text-dim)' }}
           >
-            ↑ Küçült
+            {t('dashboard.collapse')}
           </button>
         </>
       )}
@@ -49,12 +51,9 @@ function ProgressiveDetails({ holdingsSummary, portfolio }) {
   )
 }
 
-const TYPE_TR = {
-  stock: 'Hisse', fund: 'Fon', etf: 'ETF', real_estate: 'Konut', land: 'Arsa',
-  vehicle: 'Araç', gold: 'Altın', crypto: 'Kripto', cash: 'Nakit', other: 'Diğer',
-}
 
 export default function DashboardPage() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const { getToken } = useAuth()
   const { fmt, money, unit } = useMarket()
@@ -89,7 +88,7 @@ export default function DashboardPage() {
   if (isLoading) return (
     <div className="page" style={{ alignItems: 'center', justifyContent: 'center' }}>
       <div className="light-loader" style={{ width: 20, height: 20 }} />
-      <p style={{ marginTop: 16, fontSize: 13, color: 'var(--text-muted)' }}>Yükleniyor…</p>
+      <p style={{ marginTop: 16, fontSize: 13, color: 'var(--text-muted)' }}>{t('common.loading')}</p>
     </div>
   )
 
@@ -105,9 +104,9 @@ export default function DashboardPage() {
         {/* ── Greeting header ── */}
         <div>
           <h2 style={{ marginBottom: 4 }}>
-            <span className="gradient-text">Kontrol Paneli</span>
+            <span className="gradient-text">{t('dashboard.title')}</span>
           </h2>
-          <p style={{ fontSize: 13 }}>Tüm servetin, tek bakışta.</p>
+          <p style={{ fontSize: 13 }}>{t('dashboard.subtitle')}</p>
         </div>
 
         {/* ── Courage Score — the visible face of the vision ── */}
@@ -128,22 +127,22 @@ export default function DashboardPage() {
             boxShadow: '0 4px 24px rgba(245,165,36,0.08)',
           }}>
             <p style={{ fontSize: 11, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--firefly)', fontWeight: 700, marginBottom: 14 }}>
-              Servet Özeti
+              {t('dashboard.wealthSummary')}
             </p>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
               <div>
-                <div className="num-label">Toplam Değer</div>
+                <div className="num-label">{t('holdings.totalValue')}</div>
                 <div className="num-hero" style={{ color: 'var(--firefly)' }}>
                   {fmt(holdingsSummary.total_current_value)} <span style={{ fontSize: 13, fontWeight: 500 }}>{unit}</span>
                 </div>
                 {holdingsSummary.total_purchase_amount > 0 && (
                   <div style={{ fontSize: 11, color: 'var(--text-dim)', marginTop: 3 }}>
-                    Alış: {money(holdingsSummary.total_purchase_amount)}
+                    {t('holdings.purchase')}: {money(holdingsSummary.total_purchase_amount)}
                   </div>
                 )}
               </div>
               <div>
-                <div className="num-label">Kalan Bütçe</div>
+                <div className="num-label">{t('holdings.remainingBudget')}</div>
                 <div className="num-hero" style={{
                   color: holdingsSummary.remaining_budget > 0 ? 'var(--green)' : 'var(--text-muted)',
                 }}>
@@ -154,13 +153,13 @@ export default function DashboardPage() {
                 </div>
                 {holdingsSummary.cash_erosion && holdingsSummary.remaining_budget > 0 && (
                   <div style={{ fontSize: 11, color: 'var(--red)', marginTop: 3 }}>
-                    ↓ {money(holdingsSummary.cash_erosion.erosion_amount)}/ay eriyor
+                    ↓ {t('dashboard.erodingPerMonth', { amount: money(holdingsSummary.cash_erosion.erosion_amount) })}
                   </div>
                 )}
               </div>
             </div>
 
-            {/* Monthly plan tracker — quiz Q1 said "her ay düzenli" */}
+            {/* Monthly plan tracker — for users whose quiz answer was "regularly, every month" */}
             {holdingsSummary.monthly_contribution > 0 && (
               <div style={{
                 marginTop: 14, padding: '10px 12px', borderRadius: 'var(--radius-xs)',
@@ -172,9 +171,12 @@ export default function DashboardPage() {
                   const done = holdingsSummary.invested_this_month || 0
                   const left = Math.max(plan - done, 0)
                   return done >= plan
-                    ? <>Aylık planın <strong>{money(plan)}</strong> — bu ay <strong>{money(done)}</strong> ekledin, plan tamam ✓</>
-                    : <>Aylık planın <strong>{money(plan)}</strong> — bu ay <strong>{money(done)}</strong> eklendi,
-                        kalan <strong>{money(left)}</strong>. Eklediğinde Varlıklarım'a işlemeyi unutma.</>
+                    ? <Trans i18nKey="dashboard.planDone"
+                             values={{ plan: money(plan), done: money(done) }}
+                             components={[<strong key="a" />, <strong key="b" />]} />
+                    : <Trans i18nKey="dashboard.planRemaining"
+                             values={{ plan: money(plan), done: money(done), left: money(left) }}
+                             components={[<strong key="a" />, <strong key="b" />, <strong key="c" />]} />
                 })()}
               </div>
             )}
@@ -206,7 +208,7 @@ export default function DashboardPage() {
                     return (
                       <span key={type} style={{ fontSize: 11, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 4 }}>
                         <span style={{ width: 7, height: 7, borderRadius: '50%', background: colors[i % colors.length], display: 'inline-block' }} />
-                        {TYPE_TR[type] || type} %{pct}
+                        {t('holdings.types.' + type, { defaultValue: type })} %{pct}
                       </span>
                     )
                   })}
@@ -219,7 +221,7 @@ export default function DashboardPage() {
               style={{ width: '100%', marginTop: 14, fontSize: 13 }}
               onClick={() => navigate('/holdings')}
             >
-              Varlıklarımı Yönet →
+              {t('dashboard.manageAssets')}
             </button>
           </div>
         )}
@@ -246,12 +248,12 @@ export default function DashboardPage() {
             }} />
             <div style={{ position: 'relative', zIndex: 1 }}>
               <FireflyMark size={48} style={{ display: 'block', margin: '0 auto 12px', filter: 'drop-shadow(0 0 12px rgba(245,165,36,0.4))' }} />
-              <p style={{ fontSize: 15, fontWeight: 600, marginBottom: 6 }}>Yolculuğun burada başlıyor</p>
+              <p style={{ fontSize: 15, fontWeight: 600, marginBottom: 6 }}>{t('dashboard.journeyTitle')}</p>
               <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 20 }}>
-                Seni tanıyalım, korkularını dinleyelim ve sana özel bir portföy oluşturalım.
+                {t('dashboard.journeyBody')}
               </p>
               <button className="btn btn-primary btn-full" onClick={() => navigate('/profile')}>
-                Seni Tanıyalım →
+                {t('dashboard.journeyCta')}
               </button>
             </div>
           </div>
@@ -261,17 +263,17 @@ export default function DashboardPage() {
             <div className="card">
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
                 <div>
-                  <h3>Risk Profilin</h3>
+                  <h3>{t('dashboard.riskProfile')}</h3>
                   <p style={{ fontSize: 12, marginTop: 2 }}>{profile.label}</p>
                 </div>
                 <span className="badge badge-amber">{profile.risk_score}/10</span>
               </div>
               <div style={{ display: 'flex', gap: 10 }}>
                 <button className="btn btn-ghost" style={{ flex: 1, fontSize: 13 }} onClick={handleRerun}>
-                  ↻ Yenile
+                  {t('dashboard.refresh')}
                 </button>
                 <button className="btn btn-ghost" style={{ flex: 1, fontSize: 13 }} onClick={() => navigate('/profile')}>
-                  ✏️ Profili Güncelle
+                  {t('dashboard.editProfile')}
                 </button>
               </div>
             </div>
@@ -282,10 +284,10 @@ export default function DashboardPage() {
             ) : (
               <div className="card" style={{ textAlign: 'center', padding: '32px 24px' }}>
                 <FireflyMark size={40} style={{ display: 'block', margin: '0 auto 10px', filter: 'drop-shadow(0 0 8px rgba(245,165,36,0.3))' }} />
-                <p style={{ fontSize: 14, marginBottom: 6 }}>Profilin hazır, sıra portföyde!</p>
-                <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 18 }}>Senin risk profiline uygun bir portföy oluşturalım.</p>
+                <p style={{ fontSize: 14, marginBottom: 6 }}>{t('dashboard.profileReadyTitle')}</p>
+                <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 18 }}>{t('dashboard.profileReadyBody')}</p>
                 <button className="btn btn-primary" onClick={handleRerun}>
-                  Portföyümü Oluştur
+                  {t('dashboard.buildPortfolio')}
                 </button>
               </div>
             )}

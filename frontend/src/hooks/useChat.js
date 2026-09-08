@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '@clerk/clerk-react'
 import api, { extractErrorMessage, setAuthToken } from '../utils/api'
 import { readJSON, writeJSON, removeKey, userKey } from '../utils/storage'
@@ -6,6 +7,7 @@ import { readJSON, writeJSON, removeKey, userKey } from '../utils/storage'
 const COMPLETE_MARKER = '[PROFILE_COMPLETE]'
 
 export default function useChat(onProfileComplete) {
+  const { t } = useTranslation()
   const { getToken, userId } = useAuth()
   // Answering nine questions is real work. Keep the transcript so switching
   // tabs (or an accidental back gesture on mobile) doesn't throw it away.
@@ -59,7 +61,7 @@ export default function useChat(onProfileComplete) {
         await extract(full)
       }
     } catch (err) {
-      setError(extractErrorMessage(err, 'Mesaj gönderilemedi — tekrar dene'))
+      setError(extractErrorMessage(err, t('quiz.sendError')))
     } finally {
       setIsLoading(false)
     }
@@ -73,7 +75,7 @@ export default function useChat(onProfileComplete) {
       const res = await api.post('/chat/extract-profile', { messages: transcript })
       setPendingProfile(res.data)
     } catch (err) {
-      setError(extractErrorMessage(err, 'Cevapların özetlenemedi — tekrar deneyebilirsin.'))
+      setError(extractErrorMessage(err, t('quiz.extractError')))
     }
   }
 
@@ -93,7 +95,7 @@ export default function useChat(onProfileComplete) {
     // the user on the chat, so say so instead of appearing to do nothing.
     const ok = await onProfileComplete(pendingProfile)
     if (ok === false) {
-      setError('Profilin kaydedilemedi — tekrar deneyebilirsin, cevapların duruyor.')
+      setError(t('quiz.saveError'))
       return
     }
     removeKey(draftKey)   // saved for good; the draft has served its purpose

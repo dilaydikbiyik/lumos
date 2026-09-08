@@ -49,13 +49,22 @@ i18n.use(initReactI18next).init({
   returnEmptyString: false,
 })
 
+/** index.html can only carry one language; the tab title and the description
+    a link preview shows should follow the reader's choice, not the file. */
+function applyDocumentLanguage(code) {
+  document.documentElement.lang = code
+  document.title = i18n.t('meta.title')
+  document.querySelector('meta[name="description"]')
+    ?.setAttribute('content', i18n.t('meta.description'))
+}
+
 export function setLanguage(code) {
   if (!LANGUAGES.some(l => l.code === code)) return
   try { localStorage.setItem(STORAGE_KEY, code) } catch { /* fine */ }
   i18n.changeLanguage(code)
-  document.documentElement.lang = code
+  applyDocumentLanguage(code)
 }
 
-document.documentElement.lang = i18n.language
+applyDocumentLanguage(i18n.language)
 
 export default i18n

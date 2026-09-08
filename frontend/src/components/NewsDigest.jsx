@@ -2,12 +2,14 @@ import { useEffect, useState } from 'react'
 import Icon from './Icon'
 import { useAuth } from '@clerk/clerk-react'
 import api, { setAuthToken } from '../utils/api'
+import { useTranslation } from 'react-i18next'
 
 /**
  * "What happened today?" — at most 3 calm, beginner-friendly news items.
  * Silent on failure: with no news the card simply never appears.
  */
 export default function NewsDigest() {
+  const { t } = useTranslation()
   const { getToken } = useAuth()
   const [items, setItems] = useState(null)
   const [expanded, setExpanded] = useState(null)
@@ -45,7 +47,7 @@ export default function NewsDigest() {
           filter: 'drop-shadow(0 0 6px rgba(245,165,36,0.4))',
         }}><Icon name="news" size={18} glow /></span>
         <h3 style={{ fontSize: 14, fontWeight: 700, color: 'var(--text)' }}>
-          Bugün Ne Oldu?
+          {t('news.title')}
         </h3>
         <span style={{
           fontSize: 10, color: 'var(--firefly)', background: 'var(--firefly-dim)',

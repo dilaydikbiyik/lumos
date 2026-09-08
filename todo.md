@@ -1087,17 +1087,24 @@ SEC/BaFin surface. Book the lawyer before Phase 4; the answer may change scope
       English, same marker protocol and guardrails) + `advisor_prompt.en.txt`;
       `ai_service.chat(language=...)` selects, contract enforced by tests.
 - [x] Pattern conversions: AppNav, OnboardingPage, DisclaimerModal.
-- [~] Convert the remaining frontend files to `t()` keys. Done: quiz flow,
-      Profile, Recommend + its cards (explainer, rationale, time machine,
-      scenarios, what-if, practice, beginner guide, bridge), Holdings + its
-      cards (drift, FX, value chart, comparison), and the global chrome
-      (advisor, panic button, glossary tooltip, feedback, daily tip, goal
-      planner). Remaining: ExplorePage (largest), Dashboard shell,
-      FearCheckIn, PathSelection, HeadlineEducation, MarketSwitcher.
+- [x] Convert every frontend file to `t()` keys — finished with ExplorePage
+      (the largest, 87 strings), the Dashboard shell, FearCheckIn,
+      PathSelection, HeadlineEducation, NewsDigest and MarketSwitcher.
+      A checker now walks every `t()` / `i18nKey` call against all three
+      locale files: 0 missing keys, 0 interpolation mismatches, and no
+      hard-coded Turkish left outside code comments. German is complete
+      too (163 keys that had been silently falling back to English).
+- [x] `de.json` filled in full. The fallback chain de → en → tr stays as the
+      backstop, but nothing reaches it any more.
+- [x] Tab title and meta description follow the chosen language — index.html
+      can only carry one, and it had an English title over a Turkish
+      description.
 - [ ] Backend engine strings (risk factors, drift labels, summaries — 21
       files) keyed by request language.
-- [ ] Language switcher in the UI — only AFTER coverage is complete; a
-      switcher that flips 10% of the copy reads as broken.
+- [x] Language switcher in the UI, on the landing/login page header as well
+      as inside the app — deliberately a separate control from the market
+      switcher, because language is a device preference and market is where
+      you invest.
 - [ ] Number/date formatting per locale everywhere (`useMarket` fmt vs i18n).
 
 ### Phase 2 — US + DE market packs (real data) — DONE

@@ -6,30 +6,10 @@
  */
 
 const SCENARIOS = [
-  {
-    id: 'headline-crash',
-    headline: '📰 "BORSA ÇAKILDI"',
-    reality: 'BIST 100 büyük ihtimalle %2–4 düştü. Tarihsel olarak bu düşüşler 3–6 ayda telafi edilir. "Çakılmak" manşet için cazip, yatırımcı için norm.',
-    action: 'Sakin kal. Bugün satmak, kaybı gerçeğe dönüştürür.',
-  },
-  {
-    id: 'headline-crash-global',
-    headline: '📰 "KRİZ GELİYOR"',
-    reality: 'Kriz öngörüleri medyada sürekli var — çoğu gerçekleşmez. Gerçekleşen krizlerin %80\'i de 2–5 yılda portföyleri eski seviyeye getirdi.',
-    action: 'Panikle değil, çeşitlendirmeyle hazırlan.',
-  },
-  {
-    id: 'headline-gold',
-    headline: '📰 "ALTIN REKORA KOŞTU"',
-    reality: 'Altın yükselince genellikle belirsizlik var demektir. Bu, diğer varlıklarının değersizleştiği anlamına gelmez — her varlık farklı koşulda parlar.',
-    action: 'Tek varlığa bağlı kalmak risklidir. Denge önemli.',
-  },
-  {
-    id: 'headline-dolar',
-    headline: '📰 "DOLAR PATLIYOR"',
-    reality: 'TL değer kaybedince döviz bazlı varlıkların TL karşılığı yükselir. Portföyünde SPY veya GLD varsa bu manşet seni koruyabilir.',
-    action: 'Kur riski için portföyde döviz bazlı varlık tut.',
-  },
+  { id: 'headline-crash' },
+  { id: 'headline-crash-global' },
+  { id: 'headline-gold' },
+  { id: 'headline-dolar' },
 ]
 
 const STORAGE_KEY = 'lumos-seen-headlines'
@@ -40,6 +20,7 @@ function getSeenHeadlines() {
 
 import { useState } from 'react'
 import Icon from './Icon'
+import { useTranslation } from 'react-i18next'
 
 function markHeadlineSeen(id) {
   const seen = getSeenHeadlines()
@@ -49,6 +30,7 @@ function markHeadlineSeen(id) {
 }
 
 export default function HeadlineEducation() {
+  const { t } = useTranslation()
   // Tap the card to mark the current headline learned and move to the next —
   // a mini-carousel over the 4 scenarios.
   const [idx, setIdx] = useState(() => {
@@ -81,7 +63,7 @@ export default function HeadlineEducation() {
       className="card"
       onClick={advance}
       role="button"
-      aria-label="Sonraki manşet"
+      aria-label={t('headlines.nextLabel')}
       style={{
         background: 'linear-gradient(135deg, var(--bg-card) 0%, rgba(248,113,113,0.03) 100%)',
         border: '1px solid rgba(248,113,113,0.15)',
@@ -103,15 +85,15 @@ export default function HeadlineEducation() {
         color: 'var(--red)', textTransform: 'uppercase', letterSpacing: '0.08em',
         marginBottom: 10,
       }}>
-        <Icon name="news" size={12} color="var(--red)" /> Manşet Oku, Paniklemeden Anla
+        <Icon name="news" size={12} color="var(--red)" /> {t('headlines.title')}
       </span>
 
       <p style={{ fontSize: 18, fontWeight: 800, marginBottom: 10 }}>
-        {scenario.headline}
+        {t('headlines.' + scenario.id + '.headline')}
       </p>
 
       <p style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.65, marginBottom: 10 }}>
-        {scenario.reality}
+        {t('headlines.' + scenario.id + '.reality')}
       </p>
 
       <p style={{
@@ -119,7 +101,7 @@ export default function HeadlineEducation() {
         padding: '8px 12px', borderRadius: 'var(--radius-xs)',
         background: 'var(--firefly-dim)', color: 'var(--firefly)',
       }}>
-        {scenario.action}
+        {t('headlines.' + scenario.id + '.action')}
       </p>
 
       {/* Progress */}
@@ -134,7 +116,7 @@ export default function HeadlineEducation() {
         }} />
       </div>
       <p style={{ fontSize: 10, color: 'var(--text-dim)', marginTop: 4 }}>
-        {seen.length}/{SCENARIOS.length} manşet gerçeği öğrenildi · karta dokun → sıradaki
+        {t('headlines.progress', { seen: seen.length, total: SCENARIOS.length })}
       </p>
     </div>
   )

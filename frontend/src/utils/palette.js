@@ -3,7 +3,7 @@
 export const COLORS = ['#7C6FF7', '#5B8EF0', '#3DD68C', '#F5A524', '#F5515F', '#A78BFA', '#34D399']
 
 export const CATEGORY_COLORS = {
-  gold:   '#F5A524',  // ateşböceği amber
+  gold:   '#F5A524',  // firefly amber
   stocks: '#E8663F',  // ember
   reit:   '#7A4A93',  // mor / erik
   bond:   '#1FB2A6',  // teal

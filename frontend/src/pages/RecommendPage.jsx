@@ -122,7 +122,7 @@ export default function RecommendPage() {
           </div>
         </div>
 
-        {/* ── Layer 1: PORTFÖYÜN — what you got and why (always visible) ── */}
+        {/* ── Layer 1: YOUR PORTFOLIO — what you got and why (always visible) ── */}
         <PortfolioChart allocations={portfolio.allocations} onSliceClick={setSelectedTicker} />
 
         {selectedAlloc && (

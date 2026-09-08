@@ -17,7 +17,9 @@
     "back": "← Zurück",
     "close": "Schließen",
     "value": "Wert",
-    "eduFooter": "Nur zu Bildungszwecken — keine Anlageberatung."
+    "eduFooter": "Nur zu Bildungszwecken — keine Anlageberatung.",
+    "loading": "Wird geladen…",
+    "redirecting": "Du wirst zur Anmeldeseite weitergeleitet…"
   },
   "language": {
     "label": "Sprache"
@@ -71,7 +73,10 @@
     "reveal": "Gelesen — zeig mir mein Risikoprofil →",
     "noRush": "Keine Eile — lies oben so lange du möchtest.",
     "answersKept": "Deine Antworten sind gespeichert — du musst nicht von vorn beginnen.",
-    "inputPlaceholder": "Schreib deine Antwort…"
+    "inputPlaceholder": "Schreib deine Antwort…",
+    "extractError": "Deine Antworten konnten nicht zusammengefasst werden — versuch es erneut.",
+    "saveError": "Dein Profil konnte nicht gespeichert werden — versuch es erneut, deine Antworten sind sicher.",
+    "sendError": "Nachricht konnte nicht gesendet werden — versuch es erneut"
   },
   "profile": {
     "bands": {
@@ -116,7 +121,8 @@
     "howtoLayerTitle": "Wie kaufe ich das?",
     "howtoLayerHint": "Schritt für Schritt: vom Depot eröffnen bis zur ersten Order.",
     "disclaimer": "Diese Informationen dienen nur der Bildung. Vergangene Wertentwicklung ist keine Garantie für die Zukunft. Wende dich für Anlageentscheidungen an eine lizenzierte Fachperson.",
-    "backToDashboard": "Zurück zur Übersicht →"
+    "backToDashboard": "Zurück zur Übersicht →",
+    "error": "Der Portfoliovorschlag konnte nicht geladen werden"
   },
   "rationale": {
     "title": "Warum diese Aufteilung?",
@@ -297,6 +303,431 @@
     "drawdown": "Der größte Rückgang vom Hoch zum Tief. Die Antwort auf \"wie tief im Minus warst du am schlimmsten Tag?\""
   },
   "fx": {
-    "fxHeavyMsg": "Dein Portfolio ist fast vollständig in Fremdwährung. Das schützt dich, wenn die Heimatwährung schwächer wird — aber Miete, Lebensmittel und ein künftiges Zuhause sind darin bepreist, und nichts gleicht eine Gegenbewegung aus. Das kann sinnvoll sein; entscheide es nur bewusst."
+    "fxHeavyMsg": "Dein Portfolio ist fast vollständig in Fremdwährung. Das schützt dich, wenn die Heimatwährung schwächer wird — aber Miete, Lebensmittel und ein künftiges Zuhause sind darin bepreist, und nichts gleicht eine Gegenbewegung aus. Das kann sinnvoll sein; entscheide es nur bewusst.",
+    "title": "Währungsaufteilung",
+    "subtitle": "Deine TL- gegenüber deinen fremdwährungsbasierten Anlagen",
+    "riskLabel": "Währungsrisiko",
+    "high": "Hoch",
+    "mid": "Mittel",
+    "low": "Niedrig",
+    "highMsg": "Der größte Teil deines Portfolios lautet auf TL. Wertet die Lira ab, spürt es das ganze Portfolio. Erwäge, fremdwährungsbasierte Anlagen beizumischen.",
+    "midMsg": "Zwischen TL und Fremdwährung besteht eine vernünftige Balance. Diese Aufteilung schützt teilweise vor Währungsschwankungen.",
+    "lowMsg": "Dein Portfolio ist überwiegend fremdwährungsbasiert. Vor einer Abwertung der Lira bist du damit von Natur aus geschützt.",
+    "tryLegend": "🇹🇷 TL — {{pct}}%",
+    "fxLegend": "🌍 Fremdwährung — {{pct}}%"
+  },
+  "path": {
+    "step": "Schritt 1 / 3",
+    "title": "Wie möchtest du investieren?",
+    "subtitle": "Du kannst den Weg jederzeit ändern — das ist ein Startpunkt, keine Festlegung.",
+    "options": {
+      "stocks": {
+        "title": "Nur Börse",
+        "desc": "Konzentriere dich auf Aktien, Fonds und ETFs — die Immobilien-Module bleiben ausgeblendet."
+      },
+      "real_estate": {
+        "title": "Nur Immobilien",
+        "desc": "Entdecke Grundstücke und Wohnungen im Lernmodus — keine Aktienvorschläge."
+      },
+      "hybrid": {
+        "title": "Beides",
+        "desc": "Teile dein Budget ausgewogen auf beide Welten auf — das volle Lumos-Erlebnis."
+      },
+      "undecided": {
+        "title": "Noch unsicher",
+        "desc": "Kein Problem! Erstellen wir dein Profil und finden gemeinsam den passenden Weg."
+      }
+    }
+  },
+  "readiness": {
+    "title": "Mut-Wert",
+    "ready": "Du bist bereit für echtes Investieren",
+    "progressing": "Jeder Schritt macht dich ein Stück bereiter"
+  },
+  "fear": {
+    "step": "Schritt 2 / 3",
+    "title": "Was macht dir am Investieren am meisten Angst?",
+    "subtitle": "Diese Angst muss nicht weg — sie ist ein Hinweis, der uns hilft, dich zu verstehen. Wir richten unser Vorgehen nach deiner Wahl aus.",
+    "options": {
+      "param_eriyor": {
+        "label": "Mein Geld schmilzt dahin",
+        "sublabel": "Ich kann mein Erspartes nicht gegen die Inflation schützen"
+      },
+      "kandirilirim": {
+        "label": "Ich werde übers Ohr gehauen",
+        "sublabel": "Ich gerate an eine unseriöse Plattform oder Empfehlung"
+      },
+      "anlamiyorum": {
+        "label": "Ich verstehe davon nichts",
+        "sublabel": "Die Begriffe und Charts verwirren mich nur"
+      },
+      "batiririm": {
+        "label": "Ich entscheide falsch und verliere alles",
+        "sublabel": "Ich riskiere Geld, dessen Verlust ich mir nicht leisten kann"
+      }
+    },
+    "reassurance": {
+      "param_eriyor": "Wir verstehen das — deshalb zeigt jedes Portfolio die reale Rendite nach Inflation, nicht nur die nominale Zahl.",
+      "kandirilirim": "Eine berechtigte Sorge. Lumos verkauft dir weder Aktie noch Fonds und nimmt keine Provision — es informiert nur. Die Entscheidung bleibt immer deine.",
+      "anlamiyorum": "Das ist in Ordnung, niemand wird damit geboren. Wir erklären jeden Begriff in Alltagssprache und überspringen nichts, was du nicht verstehst.",
+      "batiririm": "Diese Angst haben die meisten Anfänger. Wir starten mit kleinen Schritten und virtueller Übung — mit echtem Geld wird nichts überstürzt."
+    }
+  },
+  "dashboard": {
+    "erodingPerMonth": "{{amount}}/Monat schmelzen dahin",
+    "title": "Übersicht",
+    "subtitle": "Dein gesamtes Vermögen auf einen Blick.",
+    "showDetails": "Details anzeigen (Vergleich & Ziel)",
+    "collapse": "↑ Einklappen",
+    "wealthSummary": "Vermögensübersicht",
+    "planDone": "Dein Monatsplan liegt bei <0>{{plan}}</0> — diesen Monat hast du <1>{{done}}</1> eingezahlt, Plan erfüllt ✓",
+    "planRemaining": "Dein Monatsplan liegt bei <0>{{plan}}</0> — diesen Monat wurden <1>{{done}}</1> eingezahlt, es fehlen <2>{{left}}</2>. Denk daran, es nach dem Einzahlen unter Meine Anlagen einzutragen.",
+    "manageAssets": "Meine Anlagen verwalten →",
+    "journeyTitle": "Hier beginnt deine Reise",
+    "journeyBody": "Lass uns dich kennenlernen, deine Sorgen hören und ein Portfolio bauen, das zu dir passt.",
+    "journeyCta": "Lern mich kennen →",
+    "riskProfile": "Dein Risikoprofil",
+    "refresh": "↻ Aktualisieren",
+    "editProfile": "✏️ Profil aktualisieren",
+    "profileReadyTitle": "Dein Profil steht — jetzt das Portfolio!",
+    "profileReadyBody": "Lass uns ein Portfolio bauen, das zu deinem Risikoprofil passt.",
+    "buildPortfolio": "Mein Portfolio erstellen"
+  },
+  "news": {
+    "title": "Was ist heute passiert?"
+  },
+  "headlines": {
+    "title": "Schlagzeile lesen, ohne Panik verstehen",
+    "nextLabel": "Nächste Schlagzeile",
+    "progress": "{{seen}}/{{total}} Schlagzeilen entschlüsselt · Karte antippen → nächste",
+    "headline-crash": {
+      "headline": "📰 \"DER MARKT IST ABGESTÜRZT\"",
+      "reality": "Der Index ist höchstwahrscheinlich 2–4% gefallen. Historisch wurden solche Rückgänge meist innerhalb von Monaten aufgeholt. \"Absturz\" klingt gut in einer Schlagzeile und ist für Anleger normal.",
+      "action": "Bleib ruhig. Heute zu verkaufen macht aus dem Rückgang einen echten Verlust."
+    },
+    "headline-crash-global": {
+      "headline": "📰 \"EINE KRISE KOMMT\"",
+      "reality": "Krisenprognosen gibt es in den Medien ständig — die meisten treten nie ein. Nach denen, die eintraten, haben sich die Märkte historisch erholt, was aber Jahre dauern kann.",
+      "action": "Bereite dich mit Streuung vor, nicht mit Panik."
+    },
+    "headline-gold": {
+      "headline": "📰 \"GOLD AUF REKORDHOCH\"",
+      "reality": "Steigendes Gold bedeutet meist, dass Unsicherheit im Spiel ist. Es heißt nicht, dass deine anderen Anlagen wertlos geworden sind — jede Anlage glänzt unter anderen Bedingungen.",
+      "action": "Sich auf eine einzige Anlage zu verlassen ist riskant. Balance zählt."
+    },
+    "headline-dolar": {
+      "headline": "📰 \"DER DOLLAR EXPLODIERT\"",
+      "reality": "Wenn die Heimatwährung schwächer wird, steigt der lokale Wert von Fremdwährungsanlagen. Hält dein Portfolio welche, schützt dich diese Schlagzeile womöglich.",
+      "action": "Halte einige Fremdwährungsanlagen, um das Währungsrisiko auszugleichen."
+    }
+  },
+  "explore": {
+    "title": "Immobilien entdecken",
+    "subtitle": "Wohnpreise pro m² nach Provinz und die reale (<0>inflationsbereinigte</0>) Wertentwicklung — aus offiziellen Indexdaten",
+    "scenarioError": "Das Szenario konnte nicht berechnet werden",
+    "whatIfBought": "Was, wenn ich mit {{amount}} in {{province}} eine Immobilie gekauft hätte?",
+    "bandIntro": "Anhand des Wohnpreisindex der Zentralbank für <0>{{province}}</0> wurde jedes 5-Jahres-Fenster der Vergangenheit einzeln berechnet. Hätte man mit diesem Geld gekauft, läge der Wert am Ende dieser Fenster in dieser Spanne:",
+    "worstBand": "Eines der schlechtesten Fenster (10. Perzentil)",
+    "typicalBand": "Ein typisches Fenster (Median)",
+    "bestBand": "Eines der besten Fenster (90. Perzentil)",
+    "real": "real",
+    "microLocation": "📍 Auf Kreis- oder Dorfebene werden keine offiziellen Preisdaten veröffentlicht — für Mikrolagen führen wir dich direkt zu den Inseraten:",
+    "districtPlaceholder": "Kreis (z. B. Keşan)",
+    "neighbourhoodPlaceholder": "Dorf/Viertel (z. B. Çeribaşı)",
+    "land": "Grundstück",
+    "flat": "Wohnung",
+    "refresh": "Aktualisieren",
+    "listingsAt": "Inserate auf {{site}} →",
+    "linkError": "Der Link konnte nicht erzeugt werden",
+    "listingsTitle": "🔗 Zu den Inseraten",
+    "listingsBody": "Eine vorgefilterte Inseratsuche für deine Wunschgegend — den Kauf tätigst du auf der Inseratseite und kommst dann hierher zurück und sagst \"Gekauft\".",
+    "provincePlaceholder": "Provinz (z. B. Ankara)",
+    "districtOptional": "Kreis (optional)",
+    "otherMarket": "Die Live-Immobiliendaten für den Markt <0>{{market}}</0> sind in Arbeit. Diese Seite läuft derzeit nur mit türkischen Daten — wir zeigen dir die Daten eines anderen Landes nicht so, als wären es deine.",
+    "switchToTr": "Stelle den Markt links im Menü auf 🇹🇷 Türkiye, um die m²-Preise nach Provinz zu sehen.",
+    "lastYears": "Letzte {{n}} Jahre",
+    "searchPlaceholder": "Provinz suchen (z. B. Muğla, Eskişehir...)",
+    "searchLabel": "Provinz suchen",
+    "amountPlaceholder": "Szenariobetrag",
+    "amountLabel": "Szenariobetrag",
+    "noResults": "\"{{search}}\" nicht gefunden — du kannst alle 81 Provinzen durchsuchen.",
+    "showingFirst": "Die ersten 12 Provinzen werden angezeigt — für die übrigen oben suchen.",
+    "dataError": "Die Provinzdaten sind gerade nicht erreichbar — versuch es gleich noch einmal.",
+    "fetchLinks": "Links abrufen"
+  },
+  "rvb": {
+    "title": "Mieten oder kaufen?",
+    "subtitle": "Wir vergleichen dieselbe Immobilie auf zwei Wegen: kaufen mit Eigenkapital plus Kredit, oder mieten und die Differenz anlegen. Kaufen ist nicht immer der Gewinn.",
+    "cashPlaceholder": "Dein gesamtes Bargeld",
+    "downPaymentPlaceholder": "Eigenkapital / deine Ersparnisse",
+    "cashIncludesCosts": "Das ist mein gesamtes Bargeld — zieh Grunderwerbsteuer und Provision davon ab",
+    "rentPlaceholder": "Deine aktuelle Monatsmiete",
+    "homePricePlaceholder": "Preis der Immobilie (optional — sonst aus der Miete geschätzt)",
+    "incomePlaceholder": "Dein monatliches Nettoeinkommen (optional — prüft die Tragfähigkeit)",
+    "projectionYears": "{{n}}-Jahres-Projektion",
+    "ownLoanTerms": "Ich gebe meine eigenen Kreditkonditionen ein",
+    "ratePlaceholder": "Zins (%/Jahr)",
+    "termPlaceholder": "Laufzeit (Jahre)",
+    "ownLoanHint": "Gib das echte Angebot deiner Bank ein. Leer gelassen wird ein Marktdurchschnitt verwendet.",
+    "comparedHome": "Verglichene Immobilie: <0>{{price}}</0> · monatliche Rate ≈ <1>{{installment}}</1>",
+    "estimatedFromRent": "(aus der Miete geschätzt)",
+    "cashBreakdown": "Von deinen <0>{{cash}}</0> gehen {{costs}} an Grunderwerbsteuer und Provision; als Eigenkapital bleiben <1>{{applied}}</1>.",
+    "affordabilityTight": "Die Rate beträgt {{pct}}% deines Einkommens — Banken vergeben in der Regel nichts über rund 45%. Diese Immobilie ist mit diesem Eigenkapital derzeit womöglich nicht realistisch; überlege mehr Eigenkapital oder eine günstigere Immobilie.",
+    "affordabilityOk": "Die Rate beträgt {{pct}}% deines Einkommens — unter der allgemein akzeptierten Grenze von rund 45%, dieser Plan wirkt tragfähig.",
+    "loanCost": "<0>Was der Kredit kostet</0> ({{rate}}%/Jahr, {{term}} Jahre Laufzeit)<1/>Aufgenommen <2>{{principal}}</2> · über die gesamte Laufzeit gezahlt <3>{{total}}</3><4/>Davon sind <5>{{interest}}</5> Zinsen — also <6>{{ratio}}%</6> der Kreditsumme.",
+    "payingTwice": "Die Zinsen übersteigen den Kredit: du bezahlst die Immobilie zweimal.",
+    "fixedRateNote": "Gerechnet mit festem Zins; bleibt die Inflation hoch, sinkt die reale Last der Rate mit der Zeit.",
+    "ifBuy": "Wenn du kaufst",
+    "ifRent": "Wenn du mietest",
+    "netWorthAfter": "dein Nettovermögen nach {{years}} Jahren",
+    "inTodaysMoney": "in heutigem Geld ≈ {{amount}}",
+    "equityLine": "Immobilienwert {{value}} − Restkredit {{loan}}",
+    "costsLine": "Kaufnebenkosten {{costs}} · Hausgeld/Instandhaltung {{upkeep}}",
+    "rentLine": "Eigenkapital + Differenz angelegt · gezahlte Miete {{rent}}",
+    "verdictBuy": "Unter diesen Annahmen wirkt <0>Kaufen</0> um rund <1>{{amount}}</1> vorteilhafter.",
+    "verdictRent": "Unter diesen Annahmen wirkt <0>Mieten und Anlegen</0> um rund <1>{{amount}}</1> vorteilhafter.",
+    "assumptions": "Annahmen: Immobilien +{{housing}}%/Jahr, Portfolio +{{portfolio}}%/Jahr, Kredit {{rate}}%/Jahr ({{term}} Jahre Laufzeit), Inflation {{inflation}}%/Jahr (Daten bis {{asOf}}). Kaufnebenkosten sind enthalten: Grunderwerbsteuer {{deed}}% + Maklerprovision {{agency}}% + MwSt. ({{vat}}%) = {{agencyVat}}%; dazu {{upkeep}}% des Immobilienwerts pro Jahr für Hausgeld, Versicherung und Instandhaltung. Dem Käufer die gesamte Grunderwerbsteuer zuzurechnen ist eine Annahme aus der gängigen Marktpraxis; rechtlich entfällt die Hälfte auf den Verkäufer, und die Parteien können es anders vereinbaren. Diese Sätze werden durch Gesetz und Gepflogenheit bestimmt und ändern sich. Große Zahlen sind meist von der Inflation aufgebläht; die Zeile \"in heutigem Geld\" zeigt den realen Wert. Die Rechnung geht davon aus, dass du wohnen bleibst — Steuern bei einem Verkauf und der nicht-finanzielle Wert des Eigentums sind daher nicht enthalten; die emotionale Seite dieser Entscheidung ist ebenso legitim."
+  },
+  "reit": {
+    "title": "Immobilien anlegen: REIT-ETFs",
+    "body": "Wenn dein Budget für eine eigene Immobilie nicht reicht, kannst du mit <0>REIT-ETFs</0> in den Immobilienmarkt investieren. Sie werden wie Aktien gehandelt und halten Dutzende Gewerbeobjekte und Wohnungen — du hast Anteil an Immobilienerträgen, ohne eine Immobilie zu kaufen."
+  },
+  "explainer": {
+    "tabs": {
+      "what": "Was ist das?",
+      "why": "Warum ist es dabei?",
+      "risk": "Das Risiko"
+    },
+    "byTicker": {
+      "XU100_IS": {
+        "type": "Aktienindex",
+        "what": "BIST 100 — ein Index der 100 größten börsennotierten Unternehmen der Türkei, darunter Schwergewichte wie Turkish Airlines, Aselsan und BİM.",
+        "why": "Wächst die türkische Wirtschaft, wächst auch der Wert dieser Unternehmen. Der einfachste Weg, in den heimischen Markt zu investieren.",
+        "risk": "Kurzfristig sind Rückgänge von 20–30% möglich. Langfristig (5+ Jahre) hat der türkische Markt die Inflation historisch geschlagen."
+      },
+      "SPY": {
+        "type": "US-Aktien-ETF",
+        "what": "Der S&P 500 — ein Korb der 500 größten US-Unternehmen. Apple, Google, Amazon und Tesla sind alle enthalten.",
+        "why": "Renditen in Dollar aus einem der beständigsten Wachstumsmärkte der Geschichte.",
+        "risk": "In der großen Mehrheit der 10-Jahres-Fenster war er positiv — mit Ausnahmen: das „verlorene Jahrzehnt\" 2000–2009 endete im Minus. Ein langer Horizont genügt meist; garantiert ist er nie."
+      },
+      "QQQ": {
+        "type": "Technologie-ETF",
+        "what": "Der Nasdaq 100 — ein Korb der weltweiten Technologieriesen: Apple, Microsoft, NVIDIA, Meta und mehr.",
+        "why": "Technologie war langfristig der am schnellsten wachsende Sektor. Auf Dollarbasis, mit hohem Wachstumspotenzial.",
+        "risk": "Tech-Aktien schwanken stärker. 2022 −33%, 2023 +55% — das braucht starke Nerven."
+      },
+      "GLD": {
+        "type": "Gold-ETF",
+        "what": "Physisches Gold in Börsenform. Statt Gold grammweise zu kaufen, hältst du einen Anteil am Dollar-Goldpreis.",
+        "why": "Gold gilt in Krisen als „sicherer Hafen\". Fallen Aktien, steigt Gold oft — das hält dein Portfolio im Gleichgewicht.",
+        "risk": "Langfristig wächst Gold nicht so stark wie Aktien. Seine Kraft, Geld zu erhalten, ist aber sehr hoch."
+      },
+      "VNQ": {
+        "type": "Immobilien-ETF (REIT)",
+        "what": "Vanguard REIT ETF — ein Immobilienkorb, der in US-Gewerbeobjekte, Einkaufszentren und Wohnimmobilien investiert.",
+        "why": "Auch wenn eine Wohnung das Budget sprengt, kannst du mit kleinen Beträgen Immobilienerträge erzielen. Zahlt regelmäßig Dividenden, wie Miete.",
+        "risk": "Steigende Zinsen können auf Immobilienpreise drücken. Und es ist nicht „anfassbar\" wie eine echte Immobilie."
+      },
+      "SCHH": {
+        "type": "US-Wohnimmobilien-REIT-ETF",
+        "what": "Schwab US REIT ETF — ein amerikanischer Immobilienkorb mit Schwerpunkt Wohnen.",
+        "why": "Ähnlich wie VNQ, aber stärker auf Wohnimmobilien gewichtet. Immobilienmarkt mit der Bequemlichkeit einer Aktie.",
+        "risk": "REIT-ETFs schwanken wie Aktien. Dafür entfällt der Aufwand von Kauf und Verkauf einer Immobilie, und du kommst sofort an dein Geld."
+      }
+    },
+    "byCategory": {
+      "stocks": {
+        "type": "Aktie / Aktien-ETF",
+        "what": "Ein Eigentumsanteil an einem Unternehmen oder an einem Korb von Unternehmen. Wächst das Geschäft, wächst dein Anteil.",
+        "why": "Die Anlageklasse mit der höchsten Langfristrendite — Wachstumspotenzial deutlich über der Inflation.",
+        "risk": "Kurzfristig kommt es zu scharfen Rückgängen. Die Erholung kam historisch meistens, kann aber Jahre dauern."
+      },
+      "gold": {
+        "type": "Gold",
+        "what": "Ein Edelmetall, das seit Jahrtausenden Wert hält. Bekannt als „Krisenversicherung\".",
+        "why": "Fallen Aktien, steigt Gold oft. Es hilft deinem Portfolio, die Balance zu halten.",
+        "risk": "Es verdient langfristig nicht wie Aktien, bewahrt dein Geld aber vor dem Dahinschmelzen."
+      },
+      "fund": {
+        "type": "Investmentfonds",
+        "what": "Eine gebündelte Anlage, die Profis für dich verwalten; gekauft und verkauft über Fondsplattformen.",
+        "why": "Du musst keine Einzelaktien auswählen — Fachleute stellen die Mischung für dich zusammen.",
+        "risk": "Verwaltungsgebühren werden abgezogen, und die Wertentwicklung hängt von den Entscheidungen des Managements ab."
+      }
+    }
+  },
+  "timeMachine": {
+    "title": "Zeitmaschine",
+    "subtitle": "Was wäre, wenn du dieses Portfolio in der Vergangenheit aufgebaut hättest? Wir zeigen nicht nur den Gewinn, sondern auch den schlimmsten Moment — <0>den Tiefpunkt zu sehen</0> ist die eigentliche Mutprobe.",
+    "error": "Die Simulation ließ sich gerade nicht ausführen — versuch es gleich noch einmal.",
+    "years": "{{n}} J.",
+    "wouldBe": "Aus {{amount}} wären geworden…",
+    "afterInflation": "Nach Inflation (<0>real</0>)",
+    "worstMoment": "Im schlimmsten Moment",
+    "roughRide": "Zwischenzeitlich hätten {{lost}} deines Geldes „weg\" ausgesehen. Hättest du an dem Tag nicht verkauft, wärst du heute {{outcome}} — bist du dafür bereit?",
+    "inProfit": "im Plus",
+    "recovering": "auf dem Weg der Erholung",
+    "calmRide": "Dieses Portfolio hatte in der Vergangenheit eine vergleichsweise ruhige Fahrt — die Vergangenheit garantiert für die Zukunft aber nichts."
+  },
+  "scenarios": {
+    "title": "Zukunftsszenarien",
+    "subtitle": "„Was passiert mit meinem Geld in {{years}} Jahren?\" — <0>keine Prognose</0>: die Spanne aller {{years}}-Jahres-Fenster aus der eigenen Geschichte der Anlage.",
+    "error": "Die Szenarien ließen sich gerade nicht berechnen",
+    "wholePortfolio": "🧺 Gesamtes Portfolio",
+    "inWholePortfolio": "in deinem gesamten Portfolio",
+    "show": "Anzeigen",
+    "resultIntro": "Wären <0>{{amount}}</0> {{years}} Jahre lang {{target}} geblieben (auf Basis von {{windows}} Fenstern aus {{history}} Jahren Historie):",
+    "bad": "Schlechte Phase",
+    "typical": "Typische Phase",
+    "good": "Gute Phase"
+  },
+  "whatIf": {
+    "title": "Was würde passieren?",
+    "subtitle": "Stell „Was wäre wenn\"-Fragen zu deinem Portfolio — die Antwort kommt aus einer echten Rechnung, nicht aus einer Vermutung.",
+    "placeholder": "z. B. was wäre, wenn ich 20.000 mehr einzahle?",
+    "ask": "Fragen",
+    "error": "Konnte gerade nicht beantwortet werden",
+    "sug1": "Was ändert sich, wenn ich 10.000 mehr einzahle?",
+    "sug2": "Wie sähe mein Portfolio aus, wenn ich vorsichtiger wäre?",
+    "sug3": "Was wäre, wenn ich offensiver vorgehe?",
+    "notUnderstood": "Ich konnte darin keine Budget- oder Risikoänderung erkennen — versuch es etwa mit „was wäre, wenn ich X einzahle\" oder „was wäre, wenn ich offensiver/vorsichtiger wäre\"."
+  },
+  "practice": {
+    "title": "Probier es erst mit Spielgeld",
+    "subtitle": "Bau dieses Portfolio mit virtuellen 100.000 TL auf, bevor du echtes Geld riskierst — und sieh an echten Marktdaten, wie es sich bewegt.",
+    "start": "Virtuelles Portfolio einrichten",
+    "error": "Das virtuelle Portfolio ließ sich gerade nicht starten",
+    "virtualNow": "Virtuelle 100.000 TL sind jetzt",
+    "thisWeek": "Diese Woche",
+    "mover": "Am stärksten bewegt hat sich diese Woche <0>{{ticker}}</0> ({{pct}}%). Hast du diesen Ausschlag gespürt? Mit echtem Geld fühlt es sich genauso an — nur verlierst du gerade nichts.",
+    "honesty": "Diese Zahl ist eine Woche echter Marktbewegung — kein Renditeversprechen. Manche Wochen schließen im Minus; die Kunst ist, dann nicht zu verkaufen."
+  },
+  "guide": {
+    "title": "Leitfaden zur ersten Anlage",
+    "subtitle": "Broker → Einzahlen → Erste Order — Schritt für Schritt für die Türkei",
+    "prev": "← Zurück",
+    "next": "Weiter →",
+    "steps": {
+      "1": {
+        "title": "Was ist ein Broker?",
+        "body": "Um Aktien und Fonds zu kaufen und zu verkaufen, brauchst du ein Depot bei einem Broker. Das ist wie ein Bankkonto, nur fürs Anlegen. In der Türkei muss jeder tätige Broker eine Lizenz der Kapitalmarktbehörde SPK besitzen.",
+        "tip": "💡 Prüfe die Lizenz selbst in der offiziellen Liste der Aufsicht (spk.gov.tr). Wir empfehlen keinen bestimmten Broker — von keinem erhalten wir Provision."
+      },
+      "2": {
+        "title": "Wie eröffne ich ein Depot?",
+        "body": "1. Geh auf die Website deines gewählten Brokers.\n2. Tippe auf „Konto eröffnen\".\n3. Gib deine Ausweisnummer, E-Mail und Telefonnummer ein.\n4. Weise deine Identität per Videoanruf oder in einer Filiale nach.\n5. Das Konto ist innerhalb von 1–3 Werktagen aktiv.",
+        "tip": "💡 Die meisten Broker ermöglichen die Eröffnung vollständig aus der Ferne über ihre App — ein Filialbesuch ist nicht nötig."
+      },
+      "3": {
+        "title": "Wie zahle ich Geld ein?",
+        "body": "Überweise Geld von deinem eigenen Bankkonto auf das Depotkonto. Es ist meist am selben oder am nächsten Werktag da.",
+        "tip": "💡 Fang klein an — 500 bis 1.000 TL reichen für einen ersten Versuch völlig. Du musst nicht alles auf einmal einzahlen."
+      },
+      "4": {
+        "title": "Wie gebe ich die erste Order auf?",
+        "body": "1. Geh in der App zum Bereich „Order aufgeben\" oder „Kaufen\".\n2. Such die gewünschte Anlage.\n3. Gib die Menge ein (Stück / Betrag).\n4. Wähle „Market-Order\" — sie wird zum aktuellen Kurs ausgeführt.\n5. Bestätige.",
+        "tip": "💡 Wichtig: Enthält dein Portfolio ETFs von ausländischen Börsen (etwa SPY oder QQQ), werden diese nicht an der BIST gehandelt. Dein Broker muss Zugang zu Auslandsmärkten anbieten, wofür meist ein separater Antrag und eine Währungsumrechnung nötig sind. Frag vor der Depoteröffnung: „Kann ich ausländische ETFs kaufen, und wie hoch ist die Provision?\""
+      },
+      "5": {
+        "title": "Beobachten und Geduld",
+        "body": "Gewöhn dir nach dem Kauf nicht an, täglich die Kurse zu prüfen — das nährt nur die Unruhe. Einmal pro Woche genügt. Über große Bewegungen informiert dich Lumos ohnehin.",
+        "tip": "💡 Goldene Regel: Behandle das Geld so, als sähest du es 5 Jahre lang nicht. Nutze keine Mittel, die du kurzfristig brauchst."
+      }
+    }
+  },
+  "drift": {
+    "title": "Ist dein Portfolio im Gleichgewicht?",
+    "balanced": "Im Gleichgewicht",
+    "notable": "Leichte Abweichung",
+    "serious": "Deutliche Abweichung",
+    "target": "Ziel {{pct}}%",
+    "actual": "aktuell {{pct}}%",
+    "categories": {
+      "stocks": "Aktien / ETF",
+      "reit": "Immobilien",
+      "bond": "Anleihen",
+      "fund": "Fonds",
+      "gold": "Gold",
+      "cash": "Bargeld",
+      "other": "Sonstiges"
+    }
+  },
+  "chart": {
+    "title": "Wie läuft dein Portfolio?",
+    "m1": "1 Mon.",
+    "m3": "3 Mon.",
+    "y1": "1 Jahr",
+    "error": "Der Wertverlauf ließ sich gerade nicht laden.",
+    "liveNote": "{{count}} Anlagen folgen echten Börsenschlusskursen",
+    "flatNote": "{{count}} Anlagen (Bargeld/manuell) werden zum zuletzt bekannten Wert konstant gehalten",
+    "dipNote": "Verlusttage sind normal — es geht darum, an ihnen nicht zu verkaufen.",
+    "pending": "Sobald deine Anlagen einige Tage an Daten gesammelt haben, erscheint hier der Chart."
+  },
+  "comparison": {
+    "balanced": "Dein Portfolio ist ausgewogen",
+    "deviations": "Abweichungen vom Ziel",
+    "subtitle": "Empfohlene und tatsächliche Aufteilung für dein Risikoprofil {{score}}/10",
+    "actualLegend": "■ Tatsächliche Aufteilung",
+    "targetLegend": "■ Zielaufteilung"
+  },
+  "dailyTip": {
+    "label": "Heute gelernt",
+    "next": "Karte antippen → nächstes Konzept",
+    "nextLabel": "Nächster Tipp",
+    "tips": {
+      "etf": {
+        "title": "Ein ETF ist eigentlich ein Korb",
+        "body": "Ein einziger Kauf macht dich zum Miteigentümer Dutzender Aktien. Kein Einzelnes-Aussuchen — Anlegen, fertig verpackt."
+      },
+      "diversification": {
+        "title": "Nicht alle Eier in einen Korb",
+        "body": "Verteilst du auf verschiedene Anlagen, kann ein schlechter Tag nicht alles mitnehmen. Das nennt man Diversifikation."
+      },
+      "inflation": {
+        "title": "Inflation lässt dein Geld schmelzen",
+        "body": "Bei 50% Inflation verhalten sich 100 unter der Matratze ein Jahr später wie 67. Nicht anzulegen ist auch ein Risiko."
+      },
+      "dividend": {
+        "title": "Eine Dividende ist wie Miete",
+        "body": "Dein Anteil am Gewinn des Unternehmens. Solange du die Aktie hältst, zahlt sie dir regelmäßig — wie eine vermietete Wohnung."
+      },
+      "reel-return": {
+        "title": "Die reale Rendite ist der echte Gewinn",
+        "body": "45% verdient, aber die Inflation lag bei 60%? Dann hast du verloren. Sieh dir immer die inflationsbereinigte Rendite an."
+      },
+      "liquidity": {
+        "title": "Liquidität rettet dich",
+        "body": "Aktien werden in Minuten zu Bargeld, ein Grundstück kann Monate brauchen. Du könntest dringend Geld benötigen — vergiss das nicht."
+      },
+      "drawdown": {
+        "title": "Rückgänge sind normal",
+        "body": "Märkte fallen häufig um 10–15%. Das ist keine Panik, sondern der natürliche Zyklus. Kein Verlust ist festgeschrieben, solange du nicht verkaufst."
+      },
+      "gold": {
+        "title": "Gold ist wie eine Versicherung",
+        "body": "In Krisen steigt Gold meist, während Aktien fallen. Betrachte es als „Schutzschild\" deines Portfolios."
+      },
+      "patience": {
+        "title": "Geduld ist die beste Strategie",
+        "body": "Die große Mehrheit der 10-Jahres-Fenster in der Geschichte des S&P 500 war positiv — Phasen wie 2000–2009 verloren allerdings Geld. Zeit ist dein stärkstes Werkzeug, keine Garantie."
+      },
+      "reit": {
+        "title": "Vermieter sein, ohne ein Haus zu kaufen",
+        "body": "Mit REIT-ETFs erzielst du schon mit kleinen Beträgen Immobilienerträge. Ein Weg, Immobilieninvestor zu sein, ohne eine Immobilie zu kaufen."
+      },
+      "fomo": {
+        "title": "FOMO ist dein Feind",
+        "body": "„Alle kaufen, also kaufe ich auch\" ist der gefährlichste Satz beim Anlegen. Wer jede Rally kauft, erwischt meist das Hoch."
+      },
+      "cost-avg": {
+        "title": "Regelmäßiges Anlegen senkt das Risiko",
+        "body": "Legst du monatlich denselben Betrag an, kaufst du in manchen Monaten günstig und in anderen teuer. Das Ergebnis: ein unterdurchschnittlicher Einstandspreis."
+      }
+    }
+  },
+  "meta": {
+    "title": "Lumos — Intelligenter Anlage-Assistent",
+    "description": "Angstfrei investieren und dabei lernen: KI-gestütztes Risikoprofil, transparenter Portfoliovorschlag, Immobilien und Börse unter einem Dach. Nur zu Bildungszwecken."
   }
 }

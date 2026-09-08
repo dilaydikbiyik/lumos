@@ -3,43 +3,17 @@ import LumosLogo from '../components/LumosLogo'
 import { useNavigate } from 'react-router-dom'
 import { UserButton } from '@clerk/clerk-react'
 import api from '../utils/api'
+import { useTranslation } from 'react-i18next'
 
 const PATHS = [
-  {
-    id: 'stocks',
-    icon: '🏦',
-    title: 'Sadece Borsa',
-    desc: 'Hisse, fon ve ETF dünyasına odaklan — emlak modülleri görünmez.',
-    color: 'rgba(91,142,240,0.15)',
-    border: 'rgba(91,142,240,0.35)',
-  },
-  {
-    id: 'real_estate',
-    icon: '🏘️',
-    title: 'Sadece Emlak',
-    desc: 'Arsa ve konut fırsatlarını öğrenerek keşfet — borsa önerisi dayatılmaz.',
-    color: 'rgba(61,214,140,0.12)',
-    border: 'rgba(61,214,140,0.32)',
-  },
-  {
-    id: 'hybrid',
-    icon: '⚖️',
-    title: 'İkisi Birden',
-    desc: 'Bütçeni iki dünya arasında dengeli böl — tam Lumos deneyimi.',
-    color: 'rgba(245,165,36,0.12)',
-    border: 'rgba(245,165,36,0.4)',
-  },
-  {
-    id: 'undecided',
-    icon: '🤷',
-    title: 'Kararsızım',
-    desc: 'Sorun değil! Profilini çıkaralım, birlikte en uygun yolu bulalım.',
-    color: 'rgba(124,111,247,0.12)',
-    border: 'rgba(124,111,247,0.32)',
-  },
+  { id: 'stocks',      icon: '🏦', color: 'rgba(91,142,240,0.15)',  border: 'rgba(91,142,240,0.35)' },
+  { id: 'real_estate', icon: '🏘️', color: 'rgba(61,214,140,0.12)',  border: 'rgba(61,214,140,0.32)' },
+  { id: 'hybrid',      icon: '⚖️', color: 'rgba(245,165,36,0.12)',  border: 'rgba(245,165,36,0.4)'  },
+  { id: 'undecided',   icon: '🤷', color: 'rgba(124,111,247,0.12)', border: 'rgba(124,111,247,0.32)' },
 ]
 
 export default function PathSelectionPage() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const [saving, setSaving] = useState(null)
   const [error, setError] = useState(null)
@@ -70,11 +44,11 @@ export default function PathSelectionPage() {
             fontSize: 12, letterSpacing: '0.12em', textTransform: 'uppercase',
             color: 'var(--firefly)', fontWeight: 700, marginBottom: 8,
           }}>
-            Adım 1 / 3
+            {t('path.step')}
           </p>
-          <h2 style={{ marginBottom: 8 }}>Nasıl yatırım yapmak istersin?</h2>
+          <h2 style={{ marginBottom: 8 }}>{t('path.title')}</h2>
           <p style={{ fontSize: 13 }}>
-            Yol her an değiştirilebilir — bu bir taahhüt değil, başlangıç noktası.
+            {t('path.subtitle')}
           </p>
         </div>
 
@@ -125,10 +99,10 @@ export default function PathSelectionPage() {
 
                 <div style={{ flex: 1 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 3 }}>
-                    <strong style={{ fontSize: 15 }}>{p.title}</strong>
+                    <strong style={{ fontSize: 15 }}>{t('path.options.' + p.id + '.title')}</strong>
                   </div>
                   <span style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.5 }}>
-                    {p.desc}
+                    {t('path.options.' + p.id + '.desc')}
                   </span>
                 </div>
 

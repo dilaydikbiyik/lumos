@@ -7,6 +7,7 @@ import { SignInButton, SignedIn, SignedOut, UserButton } from '@clerk/clerk-reac
 import DisclaimerModal from '../components/DisclaimerModal'
 import Icon from '../components/Icon'
 import { isInAppBrowser } from '../utils/inAppBrowser'
+import LanguageSwitcher from '../components/LanguageSwitcher'
 import { Trans, useTranslation } from 'react-i18next'
 
 // 10 fireflies — drift toward the title
@@ -65,9 +66,15 @@ export default function OnboardingPage() {
   return (
     <div className="page">
       {/* Navbar */}
+      {/* The language picker lived only in the signed-in sidebar, so the one
+          page everybody sees first — the one you land on before signing in —
+          had no way to change it. */}
       <header className="navbar">
         <LumosLogo />
-        <SignedIn><UserButton afterSignOutUrl="/" /></SignedIn>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginLeft: 'auto' }}>
+          <LanguageSwitcher compact />
+          <SignedIn><UserButton afterSignOutUrl="/" /></SignedIn>
+        </div>
       </header>
 
       <div
