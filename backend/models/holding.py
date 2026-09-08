@@ -25,7 +25,14 @@ class Holding(Base):
     ticker: Mapped[Optional[str]] = mapped_column(String, nullable=True)  # exchange assets only
 
     purchase_date: Mapped[Optional[date]] = mapped_column(Date, nullable=True)
-    purchase_amount: Mapped[float] = mapped_column(Float, nullable=False)  # total paid, TRY
+    # Total paid, in `currency`. This used to be documented as "TRY" while the
+    # app happily stored euro and dollar amounts in it, then compared them to
+    # dollar-quoted prices without converting — which reported a break-even
+    # SPY position as a 97% loss. The unit is now recorded, not assumed.
+    purchase_amount: Mapped[float] = mapped_column(Float, nullable=False)
+    # ISO 4217 of purchase_amount. NULL = legacy row, read as the user's market
+    # currency, which is what those rows always implicitly meant.
+    currency: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     quantity: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
 
     # Manual valuation for off-exchange assets (land, apartment, vehicle...)

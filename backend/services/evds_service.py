@@ -23,7 +23,11 @@ logger = logging.getLogger("lumos.evds")
 
 BASE_URL = "https://evds3.tcmb.gov.tr/igmevdsms-dis"
 
-CPI_SERIES = "TP.FG.J0"
+# TÜFE. TP.FG.J0 was the original choice but TCMB stopped publishing it at
+# 2026-01 while its other series kept updating, so the app's flagship
+# inflation number quietly went eight months stale. This series is current
+# to the previous month.
+CPI_SERIES = "TP.TUFE1YI.T1"
 
 # NUTS2 housing index series -> human-readable region (province list)
 KFE_REGIONS = {

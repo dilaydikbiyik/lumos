@@ -16,7 +16,8 @@ from backend.schemas.holding import (
     HoldingUpdate,
     PortfolioSummary,
 )
-from backend.services import inflation_service, ticker_lookup
+from backend.markets import get_market_pack
+from backend.services import fx_service, inflation_service, ticker_lookup
 from backend.services.holdings_valuation import current_value, enrich_holdings
 
 router = APIRouter()
@@ -28,10 +29,15 @@ async def lookup_ticker(
     request: Request,
     ticker: str,
     user_id: str = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
 ):
     """
     Resolve a symbol to its real name, price and currency so the user does not
     have to type them — and so a mistyped symbol is caught before it is saved.
+
+    The price also comes back in the USER's currency. Without that the client
+    filled "quantity × price" into an amount field labelled in lira while the
+    price was in dollars, storing a 48x-wrong number.
     """
     if not ticker or len(ticker) > 20:
         raise HTTPException(status_code=422, detail="Geçersiz sembol.")
@@ -43,7 +49,23 @@ async def lookup_ticker(
         # blip on a perfectly valid symbol. The client says so, and never
         # blocks the user from adding the asset by hand.
         raise HTTPException(status_code=404, detail="Sembol şu an doğrulanamadı.")
+
+    user = await user_repository.get_or_create(db, user_id)
+    user_ccy = _currency_of(user)
+    asset_ccy = (result.get("currency") or "USD").upper()
+    converted = await asyncio.to_thread(
+        fx_service.convert, result["price"], asset_ccy, user_ccy
+    )
+    result["user_currency"] = user_ccy
+    # None when the rate is unknown — the client then declines to auto-fill
+    # rather than filling in a number from the wrong currency.
+    result["price_in_user_currency"] = round(converted, 4) if converted is not None else None
     return result
+
+
+def _currency_of(user) -> str:
+    """The currency a user's totals are expressed in — their market's."""
+    return get_market_pack(getattr(user, "market", None)).currency
 
 
 def _serialize(holding, enrichment: dict) -> HoldingRead:
@@ -65,7 +87,7 @@ async def list_holdings(
     user = await user_repository.get_or_create(db, user_id)
     holdings = await holding_repository.list_for_user(db, user.id)
     # enrich_holdings calls yfinance (sync HTTP) — run in thread pool
-    enrichment = await asyncio.to_thread(enrich_holdings, holdings)
+    enrichment = await asyncio.to_thread(enrich_holdings, holdings, _currency_of(user))
     return [_serialize(h, enrichment) for h in holdings]
 
 
@@ -81,7 +103,13 @@ async def create_holding(
             detail="Exchange-traded assets (stock/fund/etf/gold/crypto) require a ticker.",
         )
     user = await user_repository.get_or_create(db, user_id)
-    return await holding_repository.create(db, user.id, body.model_dump())
+    payload = body.model_dump()
+    # Amounts are always entered in the currency the UI is showing, which is
+    # the market's. Recording it removes the assumption that every stored
+    # figure is lira — the assumption that let dollars be compared to lira.
+    payload.setdefault("currency", None)
+    payload["currency"] = payload.get("currency") or _currency_of(user)
+    return await holding_repository.create(db, user.id, payload)
 
 
 @router.patch("/{holding_id}", response_model=HoldingRead)
@@ -127,7 +155,7 @@ async def value_history(
     days = max(7, min(days, 365))
     user = await user_repository.get_or_create(db, user_id)
     holdings = await holding_repository.list_for_user(db, user.id)
-    return await asyncio.to_thread(portfolio_value_history, holdings, days)
+    return await asyncio.to_thread(portfolio_value_history, holdings, days, _currency_of(user))
 
 
 @router.get("/drift")
@@ -150,7 +178,7 @@ async def portfolio_drift(
     if not holdings:
         return {"available": False, "reason": "Henüz takip ettiğin bir varlık yok."}
 
-    enrichment = await asyncio.to_thread(enrich_holdings, holdings)
+    enrichment = await asyncio.to_thread(enrich_holdings, holdings, _currency_of(user))
     values = {h.id: current_value(h, enrichment) for h in holdings}
     target = await asyncio.to_thread(
         build_portfolio, user.risk_score, user.budget or sum(values.values()),
@@ -170,7 +198,7 @@ async def health_score(
 
     user = await user_repository.get_or_create(db, user_id)
     holdings = await holding_repository.list_for_user(db, user.id)
-    enrichment = await asyncio.to_thread(enrich_holdings, holdings)
+    enrichment = await asyncio.to_thread(enrich_holdings, holdings, _currency_of(user))
     by_type: dict[str, float] = {}
     for h in holdings:
         by_type[h.asset_type] = by_type.get(h.asset_type, 0.0) + current_value(h, enrichment)
@@ -191,7 +219,7 @@ async def portfolio_summary(
     user = await user_repository.get_or_create(db, user_id)
     holdings = await holding_repository.list_for_user(db, user.id)
 
-    enrichment = await asyncio.to_thread(enrich_holdings, holdings)
+    enrichment = await asyncio.to_thread(enrich_holdings, holdings, _currency_of(user))
     total_invested = sum(h.purchase_amount for h in holdings)
     total_value = sum(current_value(h, enrichment) for h in holdings)
     by_type: dict[str, float] = {}

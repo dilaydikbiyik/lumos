@@ -21,12 +21,14 @@ from backend.services.holdings_valuation import (
     enrich_holdings,
     current_value,
 )
+from backend.services import fx_service
+from backend.services.holdings_valuation import ticker_currency
 from backend.services.market_data import fetch_price_history
 
 logger = logging.getLogger("lumos.portfolio_history")
 
 
-def portfolio_value_history(holdings, days: int = 30) -> dict:
+def portfolio_value_history(holdings, days: int = 30, user_currency: str = "TRY") -> dict:
     """Return {series, change_amount, change_pct, live_count, flat_count}."""
     window_start = date.today() - timedelta(days=days)
 
@@ -53,19 +55,28 @@ def portfolio_value_history(holdings, days: int = 30) -> dict:
     if not idx:
         idx = [date.today()]
 
-    enrichment = enrich_holdings(holdings)
+    enrichment = enrich_holdings(holdings, user_currency)
     live_ids = set()
     per_day = {d: 0.0 for d in idx}
 
     for h in holdings:
         series = history.get(h.ticker) if h.ticker else None
         units = None
-        if h in live and series is not None and not series.empty:
+        # A price is quoted in the asset's currency; the amount the user typed
+        # is in theirs. Summing units × dollar price into a lira total was the
+        # same missing conversion that reported a break-even SPY position as a
+        # 97% loss — this chart had it too.
+        held_ccy = (getattr(h, "currency", None) or user_currency).upper()
+        asset_ccy = ticker_currency(h.ticker) if h.ticker else held_ccy
+        fx_now = fx_service.rate(asset_ccy, held_ccy)
+
+        if h in live and series is not None and not series.empty and fx_now is not None:
             units = h.quantity
             if units is None:
                 entry = _price_on_or_before(series, h.purchase_date)
-                if entry and entry > 0:
-                    units = h.purchase_amount / entry
+                fx_then = fx_service.rate(asset_ccy, held_ccy, h.purchase_date)
+                if entry and entry > 0 and fx_then:
+                    units = h.purchase_amount / (entry * fx_then)
         if units is not None and series is not None and not series.empty:
             live_ids.add(h.id)
             daily = series.copy()
@@ -78,7 +89,7 @@ def portfolio_value_history(holdings, days: int = 30) -> dict:
                 if price is not None and not pd.isna(price):
                     last_price = float(price)
                 if last_price is not None:
-                    per_day[d] += units * last_price
+                    per_day[d] += units * last_price * fx_now
         else:
             # Flat carry at best-known value from its purchase date onward
             val = current_value(h, enrichment)

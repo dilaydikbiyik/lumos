@@ -415,7 +415,8 @@
     "lookupPrice": "Current price: {{price}} {{currency}}",
     "lookupNotFound": "Couldn't verify that symbol right now — the price service may be temporarily unavailable. Try again, or just type the name and amount yourself. (Borsa İstanbul stocks need a \".IS\" suffix, like THYAO.IS.)",
     "quantityPlaceholder": "How many did you buy? (opt. — enables live tracking)",
-    "computedNote": "Filled in as {{quantity}} × {{price}} = {{total}}. If you paid a different price, you can edit the amount."
+    "computedNote": "Filled in as {{quantity}} × {{price}} = {{total}}. If you paid a different price, you can edit the amount.",
+    "lookupConverted": "≈ {{price}} {{currency}}"
   },
   "fx": {
     "title": "Currency Split",

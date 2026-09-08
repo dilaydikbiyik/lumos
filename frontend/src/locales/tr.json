@@ -415,7 +415,8 @@
     "lookupPrice": "Güncel fiyat: {{price}} {{currency}}",
     "lookupNotFound": "Sembol şu an doğrulanamadı — fiyat servisi geçici olarak cevap vermiyor olabilir. Tekrar deneyebilir ya da adı ve tutarı kendin yazıp devam edebilirsin. (Borsa İstanbul hisseleri sonuna \".IS\" ister: THYAO.IS gibi.)",
     "quantityPlaceholder": "Kaç adet aldın? (ops. — canlı takibi açar)",
-    "computedNote": "{{quantity}} adet × {{price}} = {{total}} olarak dolduruldu. Farklı bir fiyattan aldıysan tutarı elle değiştirebilirsin."
+    "computedNote": "{{quantity}} adet × {{price}} = {{total}} olarak dolduruldu. Farklı bir fiyattan aldıysan tutarı elle değiştirebilirsin.",
+    "lookupConverted": "≈ {{price}} {{currency}}"
   },
   "fx": {
     "title": "Kur Dağılımı",

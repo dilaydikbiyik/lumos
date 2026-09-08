@@ -40,6 +40,7 @@ def required_monthly_contribution(
             "projected_shortfall_or_surplus": round(-remaining, 2),
             "target_real_value": round(assumptions.real_value(target_amount, years, inflation_pct, market), 2),
             "annual_inflation_pct": inflation_pct,
+            "inflation_as_of": assumptions.inflation_as_of(market),
             "annual_growth_pct": annual_growth_pct,
         }
 
@@ -61,6 +62,7 @@ def required_monthly_contribution(
         # a reminder that a fixed TL goal loses purchasing power over time.
         "target_real_value": round(assumptions.real_value(target_amount, years, inflation_pct, market), 2),
         "annual_inflation_pct": inflation_pct,
+        "inflation_as_of": assumptions.inflation_as_of(market),
         # Surfaced so the UI can say what rate the plan assumed: a monthly
         # figure with no stated growth rate is a number the user must take on
         # faith, which is exactly what this app refuses to ask of them.
@@ -112,5 +114,6 @@ def progress_and_drift(
         "on_track": projected_at_deadline >= target_amount,
         "delay_months": delay_months,
         "annual_inflation_pct": inflation_pct,
+        "inflation_as_of": assumptions.inflation_as_of(market),
         "annual_growth_pct": annual_growth_pct,
     }

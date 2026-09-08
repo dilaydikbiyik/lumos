@@ -13,10 +13,12 @@ import pandas as pd
 from backend.services.holdings_valuation import current_value, enrich_holdings
 
 
-def _h(id, asset_type, ticker=None, amount=100000, qty=None, pdate=None, manual=None):
+def _h(id, asset_type, ticker=None, amount=100000, qty=None, pdate=None,
+       manual=None, currency="TRY"):
     return SimpleNamespace(
         id=id, asset_type=asset_type, ticker=ticker, purchase_amount=amount,
         quantity=qty, purchase_date=pdate, manual_current_value=manual,
+        currency=currency,
     )
 
 
@@ -25,11 +27,12 @@ def _series(values, start="2025-01-01"):
 
 
 def test_stock_with_quantity_revalues_live():
-    # 5 units, current price 240 → live value 1200; purchase 1000 → +20%
-    holding = _h(1, "stock", ticker="SPY", amount=1000, qty=5)
+    # 5 units, current price 240 → live value 1200; purchase 1000 → +20%.
+    # A Turkish-quoted symbol keeps the arithmetic free of any FX step.
+    holding = _h(1, "stock", ticker="THYAO.IS", amount=1000, qty=5)
     with patch("backend.services.holdings_valuation.fetch_price_history",
-               return_value={"SPY": _series([200.0, 220.0, 240.0])}):
-        e = enrich_holdings([holding])
+               return_value={"THYAO.IS": _series([200.0, 220.0, 240.0])}):
+        e = enrich_holdings([holding], "TRY")
     assert e[1]["value"] == 1200
     assert e[1]["source"] == "live"
     assert e[1]["change_pct"] == 20.0
@@ -37,9 +40,9 @@ def test_stock_with_quantity_revalues_live():
 
 def test_stock_with_purchase_date_infers_units():
     # Purchase-day price 100 → 1000 TL = 10 units; today 150 → 1500 (+50%)
-    holding = _h(2, "etf", ticker="GLD", amount=1000, pdate=date(2025, 1, 1))
+    holding = _h(2, "etf", ticker="XU100.IS", amount=1000, pdate=date(2025, 1, 1))
     with patch("backend.services.holdings_valuation.fetch_price_history",
-               return_value={"GLD": _series([100.0, 120.0, 150.0])}):
+               return_value={"XU100.IS": _series([100.0, 120.0, 150.0])}):
         e = enrich_holdings([holding])
     assert e[2]["value"] == 1500
     assert e[2]["change_pct"] == 50.0
@@ -99,3 +102,70 @@ def test_list_endpoint_carries_valuation_fields(client):
     # conftest kills the network → purchase basis; fields still present
     assert mine["current_value"] == 1000
     assert mine["value_source"] == "purchase"
+
+
+# ── Currency ─────────────────────────────────────────────────────────────────
+#
+# The app had no conversion step at all: it multiplied units by a dollar price
+# and compared the result to a lira amount. A Turkish user holding two shares
+# of SPY, roughly break-even, was told they had lost 97.6% of their money.
+
+def test_foreign_asset_is_converted_into_the_users_currency():
+    holding = _h(1, "stock", ticker="SPY", amount=64000, qty=2, currency="TRY")
+    with patch("backend.services.holdings_valuation.fetch_price_history",
+               return_value={"SPY": _series([700.0, 750.0, 770.0])}), \
+         patch("backend.services.fx_service.rate", return_value=48.0):
+        e = enrich_holdings([holding], "TRY")
+
+    # 2 shares × $770 × 48 = 73,920 TRY, not $1,540 compared against 64,000 TRY
+    assert e[1]["value"] == 73920.0
+    assert e[1]["currency"] == "TRY"
+    assert e[1]["change_pct"] == 15.5
+
+
+def test_units_inferred_from_a_past_purchase_use_that_days_rate():
+    """
+    Using today's rate to back out units would fold every FX move since the
+    purchase into the unit count, cancelling the currency gain the user
+    actually made.
+    """
+    def rate_on(base, quote, on=None):
+        return 30.0 if on else 48.0        # lira weakened since the purchase
+
+    holding = _h(2, "stock", ticker="SPY", amount=30000, pdate=date(2025, 1, 1),
+                 currency="TRY")
+    with patch("backend.services.holdings_valuation.fetch_price_history",
+               return_value={"SPY": _series([100.0, 100.0, 100.0])}), \
+         patch("backend.services.fx_service.rate", side_effect=rate_on):
+        e = enrich_holdings([holding], "TRY")
+
+    # 30,000 TRY ÷ (price 100 × rate 30) = 10 units; today 10 × 100 × 48
+    assert e[2]["value"] == 48000.0
+    # The dollar price never moved, so the whole +60% is the currency
+    assert e[2]["change_pct"] == 60.0
+
+
+def test_a_local_asset_is_untouched_by_conversion():
+    holding = _h(3, "stock", ticker="THYAO.IS", amount=25000, qty=100, currency="TRY")
+    with patch("backend.services.holdings_valuation.fetch_price_history",
+               return_value={"THYAO.IS": _series([250.0, 280.0, 300.0])}):
+        e = enrich_holdings([holding], "TRY")
+    assert e[3]["value"] == 30000.0
+
+
+def test_an_unknown_rate_means_no_valuation_not_an_assumed_one():
+    """Assuming parity is how a 48x error gets presented as a fact."""
+    holding = _h(4, "stock", ticker="SPY", amount=64000, qty=2, currency="TRY")
+    with patch("backend.services.holdings_valuation.fetch_price_history",
+               return_value={"SPY": _series([700.0, 770.0])}), \
+         patch("backend.services.fx_service.rate", return_value=None):
+        e = enrich_holdings([holding], "TRY")
+    assert 4 not in e          # falls back to purchase basis, shows no change
+
+
+def test_ticker_currency_is_read_from_the_listing_venue():
+    from backend.services.holdings_valuation import ticker_currency
+
+    assert ticker_currency("THYAO.IS") == "TRY"
+    assert ticker_currency("EUNL.DE") == "EUR"
+    assert ticker_currency("XU100.IS") == "TRY"

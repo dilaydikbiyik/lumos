@@ -22,6 +22,10 @@ class HoldingCreate(BaseModel):
     ticker: Optional[str] = Field(None, max_length=20)
     purchase_date: Optional[date] = None
     purchase_amount: float = Field(..., gt=0)
+    # ISO 4217 of purchase_amount. Omitted = the user's market currency. It is
+    # recorded rather than assumed because the app previously took every stored
+    # amount for lira and compared it to dollar-quoted prices.
+    currency: Optional[str] = Field(None, min_length=3, max_length=3)
     quantity: Optional[float] = Field(None, gt=0)
     manual_current_value: Optional[float] = Field(None, gt=0)
     note: Optional[str] = Field(None, max_length=1000)

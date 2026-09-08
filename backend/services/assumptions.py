@@ -82,6 +82,16 @@ def annual_inflation_pct(market: str = "TR") -> float:
     return fallback
 
 
+def inflation_as_of(market: str = "TR") -> str | None:
+    """Month the market's inflation figure is measured through (YYYY-MM)."""
+    try:
+        from backend.services import inflation_service
+
+        return inflation_service.index_as_of(market)
+    except Exception:
+        return None
+
+
 def _apply_spread(base_pct: float, real_spread_pct: float) -> float:
     """Compound a real spread onto a nominal base (Fisher): (1+b)(1+s)−1."""
     return round(((1 + base_pct / 100) * (1 + real_spread_pct / 100) - 1) * 100, 1)

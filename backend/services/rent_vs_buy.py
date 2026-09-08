@@ -28,6 +28,7 @@ aidat, no transaction costs. A comparison tool, not a promise of precision.
 from backend.markets import get_market_pack as _pack
 from backend.services import assumptions
 
+
 def _mortgage_payment(loan: float, monthly_rate: float, term_months: int) -> float:
     """Fixed monthly installment for an amortizing loan (annuity formula)."""
     if loan <= 0:
@@ -218,5 +219,6 @@ def compare_rent_vs_buy(
             "annual_upkeep_pct": assumptions.annual_upkeep_pct(market),
             "market": market,
             "annual_inflation_pct": inflation_pct,
+        "inflation_as_of": assumptions.inflation_as_of(market),
         },
     }

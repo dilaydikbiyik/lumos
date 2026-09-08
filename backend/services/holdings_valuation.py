@@ -16,7 +16,7 @@ import logging
 from datetime import date
 from typing import Optional
 
-from backend.services import evds_service
+from backend.services import evds_service, fx_service
 from backend.services.market_data import fetch_price_history
 
 logger = logging.getLogger("lumos.valuation")
@@ -25,6 +25,39 @@ EXCHANGE_TYPES = {"stock", "fund", "etf", "gold", "crypto"}
 REAL_ESTATE_TYPES = {"real_estate", "land"}
 
 NATIONAL_KFE_SERIES = "TP.KFE.TR"
+
+# Which currency a symbol is quoted in. Resolved from the exchange suffix
+# because it is deterministic and free; an unsuffixed US listing is the
+# default. A wrong guess here becomes a wrong portfolio value, so anything
+# unrecognised falls through to the lookup service rather than being assumed.
+_SUFFIX_CURRENCY = {
+    ".IS": "TRY",   # Borsa İstanbul
+    ".DE": "EUR",   # Xetra / German venues
+    ".F": "EUR",    # Frankfurt
+    ".PA": "EUR", ".AS": "EUR", ".MI": "EUR",
+    ".L": "GBP",    # London
+    ".SW": "CHF",
+    ".TO": "CAD",
+}
+
+
+def ticker_currency(ticker: str) -> str:
+    """ISO 4217 the symbol is quoted in."""
+    symbol = (ticker or "").upper()
+    for suffix, currency in _SUFFIX_CURRENCY.items():
+        if symbol.endswith(suffix):
+            return currency
+    # Ask the quote service before falling back — it knows listings our
+    # suffix table doesn't.
+    try:
+        from backend.services import ticker_lookup
+
+        info = ticker_lookup.lookup(symbol)
+        if info and info.get("currency"):
+            return info["currency"].upper()
+    except Exception:
+        pass
+    return "USD"
 
 
 def _price_on_or_before(series, target: date) -> Optional[float]:
@@ -38,8 +71,17 @@ def _price_on_or_before(series, target: date) -> Optional[float]:
         return None
 
 
-def _exchange_values(holdings) -> dict[int, dict]:
-    """Live values for exchange assets — one batched yfinance call."""
+def _exchange_values(holdings, user_currency: str = "TRY") -> dict[int, dict]:
+    """
+    Live values for exchange assets — one batched yfinance call, then a
+    currency step that used to be missing entirely.
+
+    A price is quoted in the asset's own currency; the user typed what they
+    paid in theirs. Multiplying units by a dollar price and comparing the
+    result to a lira amount reported a break-even SPY position as a 97% loss.
+    Everything below is converted into the user's currency before it is shown
+    or compared.
+    """
     tickers = sorted({
         h.ticker for h in holdings
         if h.asset_type in EXCHANGE_TYPES and h.ticker
@@ -62,21 +104,36 @@ def _exchange_values(holdings) -> dict[int, dict]:
             continue
 
         latest = float(series.iloc[-1])
+        asset_ccy = ticker_currency(h.ticker)
+        # A row written before the column existed has no currency; it always
+        # implicitly meant the user's, so that is what it is read as.
+        held_ccy = (getattr(h, "currency", None) or user_currency).upper()
+
+        # Today's rate turns the quote into the currency the user thinks in.
+        to_held_now = fx_service.rate(asset_ccy, held_ccy)
+        if to_held_now is None:
+            # Unknown rate must mean "can't value this", never an assumed 1.0.
+            continue
 
         units = h.quantity
         if units is None and h.purchase_date is not None:
             entry_price = _price_on_or_before(series, h.purchase_date)
-            if entry_price and entry_price > 0:
-                units = h.purchase_amount / entry_price
+            # The purchase amount is in the user's currency, the entry price in
+            # the asset's — convert at the rate that applied ON THAT DAY, not
+            # today's, or the unit count absorbs every FX move since.
+            to_held_then = fx_service.rate(asset_ccy, held_ccy, h.purchase_date)
+            if entry_price and entry_price > 0 and to_held_then:
+                units = h.purchase_amount / (entry_price * to_held_then)
 
         if units is None:
             # No units and no purchase date — not enough data for live tracking
             continue
 
-        live_value = round(units * latest, 2)
+        live_value = round(units * latest * to_held_now, 2)
         out[h.id] = {
             "value": live_value,
             "source": "live",
+            "currency": held_ccy,
             "change_pct": round((live_value / h.purchase_amount - 1) * 100, 1)
             if h.purchase_amount else None,
         }
@@ -129,13 +186,16 @@ def _real_estate_values(holdings) -> dict[int, dict]:
     return out
 
 
-def enrich_holdings(holdings) -> dict[int, dict]:
+def enrich_holdings(holdings, user_currency: str = "TRY") -> dict[int, dict]:
     """
     Map of holding.id -> {"value", "source", "change_pct"}.
     Priority: manual > live/index > purchase (absent entries mean purchase).
+
+    `user_currency` is the currency every returned value is expressed in, so
+    a total can be summed without adding dollars to lira.
     """
     enrichment: dict[int, dict] = {}
-    enrichment.update(_exchange_values(holdings))
+    enrichment.update(_exchange_values(holdings, user_currency))
     enrichment.update(_real_estate_values(holdings))
 
     # manual overrides everything

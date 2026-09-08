@@ -97,9 +97,13 @@ export default function HoldingsPage() {
     }
   }
 
-  // Quantity × looked-up price — the number a user actually knows ("I bought
-  // 10 shares") turned into the number the form needs.
-  const lookedUpPrice = lookup.state === 'found' ? lookup.data.price : null
+  // Quantity × price — the number a user actually knows ("I bought 10 shares")
+  // turned into the number the form needs. Deliberately the price in the
+  // USER's currency: multiplying by the quoted price filled a lira-labelled
+  // field with dollars, storing an amount ~48x wrong.
+  const lookedUpPrice = lookup.state === 'found'
+    ? lookup.data.price_in_user_currency
+    : null
   const computedAmount = lookedUpPrice && Number(form.quantity) > 0
     ? lookedUpPrice * Number(form.quantity)
     : null
@@ -377,6 +381,15 @@ export default function HoldingsPage() {
                         price: lookup.data.price,
                         currency: lookup.data.currency || '',
                       })}
+                      {/* Foreign listing: show the converted price too, so the
+                          amount the form fills in is never a surprise. */}
+                      {lookup.data.price_in_user_currency != null
+                        && lookup.data.currency !== lookup.data.user_currency && (
+                        <> · {t('holdings.lookupConverted', {
+                          price: Math.round(lookup.data.price_in_user_currency * 100) / 100,
+                          currency: lookup.data.user_currency,
+                        })}</>
+                      )}
                     </div>
                   </div>
                 )}

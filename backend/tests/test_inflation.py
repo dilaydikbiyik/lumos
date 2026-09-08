@@ -43,11 +43,38 @@ def test_monthly_cash_erosion_scales_with_amount():
     assert result["erosion_amount"] >= 0
 
 
-def test_live_index_used_when_available():
-    fake_live = {"2026-01": 100.0, "2026-02": 105.0}
+def test_fresher_live_index_wins_over_the_bundled_file():
+    # Live data that reaches further forward than the bundled snapshot
+    fake_live = {"2099-01": 100.0, "2099-02": 105.0}
     with patch("backend.services.evds_service.get_live_cpi_index", return_value=fake_live):
-        pct = cpi_change_pct("2026-01", "2026-02")
+        pct = cpi_change_pct("2099-01", "2099-02")
     assert pct == pytest.approx(5.0, abs=0.01)
+
+
+def test_a_stalled_live_series_loses_to_a_fresher_bundled_file():
+    """
+    "Live always wins" is wrong when the upstream series stalls. TCMB stopped
+    publishing the CPI series this app used at 2026-01 while the repo already
+    carried data through 2026-06, so preferring live served numbers eight
+    months older than what was on disk.
+    """
+    from backend.services.inflation_service import _STATIC_INDEX, _get_index
+
+    stalled = {"2020-01": 100.0, "2020-02": 101.0}
+    with patch("backend.services.evds_service.get_live_cpi_index", return_value=stalled):
+        chosen = _get_index("TR")
+
+    assert max(chosen) == max(_STATIC_INDEX)
+    assert max(chosen) > max(stalled)
+
+
+def test_index_as_of_reports_the_month_actually_covered():
+    """A rate with no 'as of' date is a claim about today that may be stale."""
+    from backend.services.inflation_service import index_as_of
+
+    fake_live = {"2099-01": 100.0, "2099-05": 110.0}
+    with patch("backend.services.evds_service.get_live_cpi_index", return_value=fake_live):
+        assert index_as_of("TR") == "2099-05"
 
 
 def test_years_to_months_ago_format():

@@ -50,7 +50,10 @@ def _get_index(market: str = "TR") -> dict[str, float]:
         from backend.services import evds_service  # local import avoids cycles
 
         live = evds_service.get_live_cpi_index()
-        return live or _STATIC_INDEX
+        # Freshest wins, rather than "live always". The upstream series can
+        # stall — one did, at 2026-01 — and blindly preferring it served data
+        # eight months older than the copy already bundled in the repo.
+        return _freshest(live, _STATIC_INDEX)
     if source == "bls":
         from backend.services import bls_service
 
@@ -60,6 +63,27 @@ def _get_index(market: str = "TR") -> dict[str, float]:
 
         return eurostat_service.get_hicp_index(market) or {}
     return {}
+
+
+def index_as_of(market: str = "TR") -> Optional[str]:
+    """
+    The most recent month the CPI index actually covers, as YYYY-MM.
+
+    Published with a lag that differs by country — and one upstream series
+    stalled for eight months without warning. A number carrying a visible
+    "as of" date is one a user can judge; the same number without it is a
+    claim about today that may be nine months old.
+    """
+    index = _get_index(market)
+    return max(index) if index else None
+
+
+def _freshest(*indices) -> dict[str, float]:
+    """The index whose most recent observation is latest; {} if none have any."""
+    usable = [i for i in indices if i]
+    if not usable:
+        return {}
+    return max(usable, key=lambda i: max(i))
 
 
 def get_rent_index(market: str = "TR") -> dict[str, float]:

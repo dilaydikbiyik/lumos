@@ -19,8 +19,14 @@
     "value": "Wert",
     "eduFooter": "Nur zu Bildungszwecken — keine Anlageberatung."
   },
-  "language": { "label": "Sprache" },
-  "market": { "label": "Markt", "select": "Markt wählen", "limitedData": "eingeschränkte Daten" },
+  "language": {
+    "label": "Sprache"
+  },
+  "market": {
+    "label": "Markt",
+    "select": "Markt wählen",
+    "limitedData": "eingeschränkte Daten"
+  },
   "onboarding": {
     "tagline": "Investieren wirkt wie ein dunkler Wald.",
     "heroPrefix": "Lumos,",
@@ -68,7 +74,11 @@
     "inputPlaceholder": "Schreib deine Antwort…"
   },
   "profile": {
-    "bands": { "low": "Konservativ", "medium": "Ausgewogen", "high": "Offensiv" },
+    "bands": {
+      "low": "Konservativ",
+      "medium": "Ausgewogen",
+      "high": "Offensiv"
+    },
     "step": "Schritt 3 / 3",
     "title": "Lernen wir dich kennen",
     "subtitle": "9 kurze Fragen — die KI erstellt dein Profil und richtet dein Portfolio danach aus.",
@@ -147,9 +157,16 @@
   },
   "holdings": {
     "types": {
-      "stock": "Aktie", "fund": "Fonds", "etf": "ETF",
-      "real_estate": "Wohnung", "land": "Grundstück", "vehicle": "Fahrzeug",
-      "gold": "Gold", "crypto": "Krypto", "cash": "Bargeld", "other": "Sonstiges"
+      "stock": "Aktie",
+      "fund": "Fonds",
+      "etf": "ETF",
+      "real_estate": "Wohnung",
+      "land": "Grundstück",
+      "vehicle": "Fahrzeug",
+      "gold": "Gold",
+      "crypto": "Krypto",
+      "cash": "Bargeld",
+      "other": "Sonstiges"
     },
     "emotions": {
       "prompt": "Was hat diese Entscheidung ausgelöst? (opt.)",
@@ -196,7 +213,8 @@
     "lookupPrice": "Aktueller Kurs: {{price}} {{currency}}",
     "lookupNotFound": "Das Symbol konnte gerade nicht bestätigt werden — der Kursdienst ist eventuell kurz nicht erreichbar. Versuch es erneut oder trage Name und Betrag einfach selbst ein.",
     "quantityPlaceholder": "Wie viele Stück? (opt. — aktiviert Live-Verfolgung)",
-    "computedNote": "Eingetragen als {{quantity}} × {{price}} = {{total}}. Wenn du zu einem anderen Kurs gekauft hast, kannst du den Betrag ändern."
+    "computedNote": "Eingetragen als {{quantity}} × {{price}} = {{total}}. Wenn du zu einem anderen Kurs gekauft hast, kannst du den Betrag ändern.",
+    "lookupConverted": "≈ {{price}} {{currency}}"
   },
   "goal": {
     "title": "🎯 Mein Ziel",
@@ -261,7 +279,9 @@
     "sug5": "Was soll ich tun, wenn der Markt fällt?",
     "sug6": "Soll ich Dollar oder Gold halten?"
   },
-  "isikTut": { "label": "💡 Licht drauf" },
+  "isikTut": {
+    "label": "💡 Licht drauf"
+  },
   "glossary": {
     "volatilite": "Wie stark der Preis nach oben und unten schwankt. Hohe Volatilität = große Wellen; Risiko und Chance wachsen beide.",
     "çeşitlendirme": "Nicht alle Eier in einen Korb. Über verschiedene Anlagen verteilt kann ein schlechter Tag nicht alles mitnehmen.",
