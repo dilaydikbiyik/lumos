@@ -58,3 +58,38 @@ def test_successful_download_writes_fresh_and_stale():
     keys = list(written)
     assert any(k.startswith("stale:") for k in keys)
     assert any(not k.startswith("stale:") for k in keys)
+
+
+def test_a_partial_batch_is_never_remembered_as_last_known_good():
+    """
+    One missing symbol in a batch used to be cached — including into the
+    never-expiring copy — so a real holding sat frozen at its purchase price
+    while another symbol from the same request tracked live.
+    """
+    from unittest.mock import patch
+
+    import pandas as pd
+
+    from backend.services import cache as cache_service
+    from backend.services import market_data
+
+    idx = pd.bdate_range("2026-01-01", periods=5)
+    only_spy = pd.DataFrame(
+        {("Close", "SPY"): [1.0] * 5},
+        index=idx,
+    )
+    only_spy.columns = pd.MultiIndex.from_tuples(only_spy.columns)
+
+    writes = {}
+    with patch.object(market_data.yf, "download", return_value=only_spy), \
+         patch.object(cache_service, "get", return_value=None), \
+         patch.object(cache_service, "set",
+                      side_effect=lambda k, v, ttl=...: writes.setdefault(k, ttl)):
+        result = market_data.fetch_price_history(["SPY", "VNQ"], period="1y")
+
+    assert "SPY" in result and "VNQ" not in result
+    # The incomplete answer is usable now, but must expire soon...
+    assert any(k.startswith("price_history:") for k in writes)
+    # ...and must NOT become the permanent fallback.
+    assert not any(k.startswith("lkg:") for k in writes), writes
+    assert not any(k.startswith("stale:") for k in writes), writes

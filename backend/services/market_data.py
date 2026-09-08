@@ -21,6 +21,9 @@ logger = logging.getLogger("lumos.market_data")
 
 # Stale copies outlive the fresh cache — used only when yfinance fails
 STALE_TTL_SECONDS = 60 * 60 * 24 * 7  # 7 days
+# A batch that came back short is served for a few minutes only, so the next
+# request retries the missing symbol instead of inheriting the gap all day.
+INCOMPLETE_TTL_SECONDS = 60 * 5
 
 # REALISM NOTE (2026-07-10): Yahoo started blocking requests from old
 # yfinance versions in production, and with both cache tiers empty the user
@@ -80,6 +83,34 @@ def fetch_price_history(
             closes.columns = tickers
 
         result = {ticker: closes[ticker].dropna() for ticker in closes.columns}
+        result = {t: s for t, s in result.items() if s is not None and not s.empty}
+
+        # A batch can come back missing a symbol while every other one lands.
+        # That partial answer used to be cached — including into the
+        # never-expiring last-known-good copy — so one bad fetch froze a real
+        # holding at its purchase price indefinitely: VNQ showed no change for
+        # weeks while SPY, requested in the same call, tracked live.
+        missing = [t for t in tickers if t not in result]
+        for ticker in missing:
+            try:
+                single = yf.download(
+                    tickers=ticker, period=period,
+                    auto_adjust=True, progress=False, threads=False,
+                )
+                if single is None or single.empty:
+                    continue
+                if isinstance(single.columns, pd.MultiIndex):
+                    series = single["Close"][ticker].dropna()
+                else:
+                    series = single["Close"].dropna()
+                if not series.empty:
+                    result[ticker] = series
+                    logger.info("recovered %s with a single-ticker retry", ticker)
+            except Exception:
+                logger.warning("retry for %s failed — it stays absent", ticker)
+
+        if not result:
+            raise MarketDataError(f"yfinance returned no usable data for {tickers}")
     except Exception as exc:
         # Fallback 1: stale copy (≤7 days) — Fallback 2: last-known-good (no expiry)
         for label, key in (("stale", stale_key), ("last-known-good", lkg_key)):
@@ -92,9 +123,20 @@ def fetch_price_history(
                 return fallback
         raise MarketDataError(f"Market data fetch failed with no fallback: {exc}") from exc
 
-    cache_service.set(cache_key, result)
-    cache_service.set(stale_key, result, ttl=STALE_TTL_SECONDS)
-    cache_service.set(lkg_key, result, ttl=None)  # never expires
+    complete = all(t in result for t in tickers)
+    # An incomplete answer is worth serving now but must not be remembered as
+    # the good copy — the never-expiring fallback is exactly what turned one
+    # missing symbol into a permanently frozen holding.
+    if complete:
+        cache_service.set(cache_key, result)
+        cache_service.set(stale_key, result, ttl=STALE_TTL_SECONDS)
+        cache_service.set(lkg_key, result, ttl=None)
+    else:
+        cache_service.set(cache_key, result, ttl=INCOMPLETE_TTL_SECONDS)
+        logger.warning(
+            "partial market data for %s (missing %s) — cached briefly, not as last-known-good",
+            tickers, [t for t in tickers if t not in result],
+        )
     return result
 
 
