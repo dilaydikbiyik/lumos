@@ -7,34 +7,27 @@ import useMarket from '../hooks/useMarket'
  * message about exchange-rate risk.
  */
 
-// Known ticker → currency mapping
-const TICKER_CURRENCY = {
-  'XU100.IS': 'TRY', 'THYAO.IS': 'TRY', 'GARAN.IS': 'TRY',
-  'ASELS.IS': 'TRY', 'BIMAS.IS': 'TRY', 'EREGL.IS': 'TRY',
-  'SPY': 'USD', 'QQQ': 'USD', 'GLD': 'USD',
-  'VNQ': 'USD', 'SCHH': 'USD', 'VOO': 'USD', 'VTI': 'USD',
-  'AAPL': 'USD', 'MSFT': 'USD', 'GOOGL': 'USD', 'AMZN': 'USD',
-}
+// Which currency an asset's VALUE follows. Physical, locally-priced things
+// track the home currency; anything listed abroad tracks its own.
+const LOCAL_TYPES = new Set(['real_estate', 'land', 'vehicle', 'cash'])
+// Listing suffix → currency. A hand-maintained ticker list went stale the
+// moment the app gained a second market; the exchange suffix does not.
+const SUFFIX_CURRENCY = { '.IS': 'TRY', '.DE': 'EUR', '.F': 'EUR', '.PA': 'EUR', '.L': 'GBP' }
 
-// Default currency by asset type
-const TYPE_CURRENCY = {
-  real_estate: 'TRY', land: 'TRY', vehicle: 'TRY',
-  cash: 'TRY', gold: 'USD', crypto: 'USD',
-}
-
-function getCurrency(holding) {
-  if (holding.ticker && TICKER_CURRENCY[holding.ticker]) {
-    return TICKER_CURRENCY[holding.ticker]
+function getCurrency(holding, homeCurrency) {
+  const ticker = (holding.ticker || '').toUpperCase()
+  for (const [suffix, ccy] of Object.entries(SUFFIX_CURRENCY)) {
+    if (ticker.endsWith(suffix)) return ccy
   }
-  if (holding.ticker?.endsWith('.IS')) return 'TRY'
-  if (TYPE_CURRENCY[holding.asset_type]) return TYPE_CURRENCY[holding.asset_type]
-  return 'USD' // foreign stock/ETF default
+  if (LOCAL_TYPES.has(holding.asset_type)) return homeCurrency
+  if (holding.asset_type === 'gold' || holding.asset_type === 'crypto') return 'USD'
+  return ticker ? 'USD' : homeCurrency   // unsuffixed listings are US
 }
 
 export default function CurrencyExposure({ holdings }) {
   const { t } = useTranslation()
-  // Holding amounts are recorded in TL (TR-market component) — TRY is pinned
-  const { money } = useMarket()
+  const { money, pack } = useMarket()
+  const homeCurrency = pack?.currency || 'TRY'
   if (!holdings || holdings.length === 0) return null
 
   let tryTotal = 0
@@ -42,7 +35,7 @@ export default function CurrencyExposure({ holdings }) {
 
   holdings.forEach(h => {
     const value = h.manual_current_value || h.purchase_amount || 0
-    const currency = getCurrency(h)
+    const currency = getCurrency(h, homeCurrency)
     if (currency === 'TRY') {
       tryTotal += value
     } else {
@@ -57,13 +50,17 @@ export default function CurrencyExposure({ holdings }) {
   const usdPct = 100 - tryPct
 
   // Currency-risk message
+  // Concentration is concentration in BOTH directions. The old version called
+  // an all-FX portfolio "low risk" and described it purely as protection —
+  // true while the lira falls, and silent about the fact that the user's rent,
+  // food and future home are all priced in the currency they hold none of.
   let riskLevel, riskMessage, riskColor
   if (tryPct >= 80) {
     riskLevel = t('fx.high'); riskMessage = t('fx.highMsg'); riskColor = 'var(--red)'
-  } else if (tryPct >= 50) {
-    riskLevel = t('fx.mid'); riskMessage = t('fx.midMsg'); riskColor = 'var(--firefly)'
+  } else if (tryPct <= 20) {
+    riskLevel = t('fx.high'); riskMessage = t('fx.fxHeavyMsg'); riskColor = 'var(--firefly)'
   } else {
-    riskLevel = t('fx.low'); riskMessage = t('fx.lowMsg'); riskColor = 'var(--green)'
+    riskLevel = t('fx.mid'); riskMessage = t('fx.midMsg'); riskColor = 'var(--green)'
   }
 
   return (

@@ -295,5 +295,8 @@
     "enflasyon": "Dein Geld verliert an Kaufkraft. Bei 50% Inflation verhalten sich 100 unter der Matratze ein Jahr später wie 67.",
     "reel getiri": "Dein echter Gewinn nach Inflation. 45% gemacht, aber die Inflation lag bei 60%? Dann hast du verloren.",
     "drawdown": "Der größte Rückgang vom Hoch zum Tief. Die Antwort auf \"wie tief im Minus warst du am schlimmsten Tag?\""
+  },
+  "fx": {
+    "fxHeavyMsg": "Dein Portfolio ist fast vollständig in Fremdwährung. Das schützt dich, wenn die Heimatwährung schwächer wird — aber Miete, Lebensmittel und ein künftiges Zuhause sind darin bepreist, und nichts gleicht eine Gegenbewegung aus. Das kann sinnvoll sein; entscheide es nur bewusst."
   }
 }

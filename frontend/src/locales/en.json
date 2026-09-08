@@ -429,7 +429,8 @@
     "midMsg": "There's a reasonable balance between TL and FX. This split gives partial protection against currency swings.",
     "lowMsg": "Your portfolio leans FX-based. You're naturally protected from lira depreciation.",
     "tryLegend": "🇹🇷 TL — {{pct}}%",
-    "fxLegend": "🌍 FX — {{pct}}%"
+    "fxLegend": "🌍 FX — {{pct}}%",
+    "fxHeavyMsg": "Your portfolio is almost entirely FX-based. That protects you when the local currency weakens — but your rent, food and future home are priced in it, and nothing offsets a move the other way. It can be a reasonable stance; just make it a deliberate one, knowing it is a concentration."
   },
   "drift": {
     "title": "Is your portfolio in balance?",

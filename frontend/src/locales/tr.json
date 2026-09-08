@@ -429,7 +429,8 @@
     "midMsg": "TL ve döviz arasında makul bir denge var. Bu dağılım kur dalgalanmalarına karşı kısmen koruma sağlar.",
     "lowMsg": "Portföyün ağırlıklı olarak döviz bazlı. TL'nin değer kaybından doğal olarak korunuyorsun.",
     "tryLegend": "🇹🇷 TL — %{{pct}}",
-    "fxLegend": "🌍 Döviz — %{{pct}}"
+    "fxLegend": "🌍 Döviz — %{{pct}}",
+    "fxHeavyMsg": "Portföyün neredeyse tamamen döviz bazlı. Bu, TL değer kaybettiğinde seni korur — ama kiran, gıdan ve ileride alacağın ev TL cinsinden. Kur tersine döndüğünde dengeleyecek bir şeyin olmaz. Yön tercihi olarak makul olabilir; yine de bunun bir yoğunlaşma olduğunu bilerek yap."
   },
   "drift": {
     "title": "Portföyün dengede mi?",
