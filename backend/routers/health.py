@@ -15,6 +15,10 @@ class HealthResponse(BaseModel):
     version: str
     db: str
     ai: str
+    # Which keyed data sources are configured on THIS instance. Booleans
+    # only — a health endpoint must never echo a secret, and "is it set"
+    # is the whole question when a key was just added in the dashboard.
+    data_sources: dict[str, bool]
 
 
 @router.get("/health", response_model=HealthResponse)
@@ -43,9 +47,15 @@ async def health_check():
 
     overall = "ok" if db_status == "ok" and ai_status == "ok" else "degraded"
 
+    # Keyless sources (BLS, Eurostat) are deliberately absent: there is no
+    # key to misconfigure, so reporting them would be noise.
     return {
         "status": overall,
         "version": "1.0.0",
         "db": db_status,
         "ai": ai_status,
+        "data_sources": {
+            "tcmb_evds": bool(settings.TCMB_EVDS_API_KEY),
+            "fred": bool(settings.FRED_API_KEY),
+        },
     }
