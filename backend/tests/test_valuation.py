@@ -169,3 +169,41 @@ def test_ticker_currency_is_read_from_the_listing_venue():
     assert ticker_currency("THYAO.IS") == "TRY"
     assert ticker_currency("EUNL.DE") == "EUR"
     assert ticker_currency("XU100.IS") == "TRY"
+
+
+def test_currency_of_a_recommended_asset_needs_no_network():
+    """
+    ticker_currency ran a rate-limited lookup inside the valuation loop. When
+    it stalled in production, a holding stopped being valued and silently
+    reverted to showing its purchase price as if nothing had moved.
+    """
+    from unittest.mock import patch
+
+    from backend.services.holdings_valuation import ticker_currency
+
+    def explode(_):
+        raise AssertionError("no lookup should be needed for a known symbol")
+
+    with patch("backend.services.ticker_lookup.lookup", side_effect=explode):
+        for symbol in ("SPY", "VNQ", "BND", "BIL", "GLD", "QQQ", "SCHH"):
+            assert ticker_currency(symbol) == "USD", symbol
+        assert ticker_currency("EUNL.DE") == "EUR"
+        assert ticker_currency("XU100.IS") == "TRY"
+
+
+def test_fx_history_is_fetched_once_for_many_dates():
+    """One network call per purchase date is how a portfolio stops valuing."""
+    from datetime import date
+    from unittest.mock import patch
+
+    from backend.services import fx_service
+
+    series = {"2026-06-01": 40.0, "2026-06-22": 46.0, "2026-09-04": 48.0}
+    with patch.object(fx_service, "_series", return_value=series) as m:
+        assert fx_service.rate("USD", "TRY") == 48.0
+        assert fx_service.rate("USD", "TRY", date(2026, 6, 22)) == 46.0
+        # A non-trading day snaps back to the last known close
+        assert fx_service.rate("USD", "TRY", date(2026, 6, 23)) == 46.0
+        # Older than the series: the earliest rate beats refusing to value
+        assert fx_service.rate("USD", "TRY", date(2000, 1, 1)) == 40.0
+    assert m.call_count == 4  # one lookup each, all served from one cached series

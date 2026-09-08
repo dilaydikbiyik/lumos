@@ -46,14 +46,32 @@ _SUFFIX_CURRENCY = {
 }
 
 
+# Every symbol the app itself recommends, so resolving one never needs the
+# network. The lookup call this replaced ran inside the valuation loop and is
+# rate-limited upstream; when it stalled, a holding silently stopped being
+# valued and reverted to showing its purchase price.
+_KNOWN_CURRENCY = {
+    "SPY": "USD", "QQQ": "USD", "VOO": "USD", "VTI": "USD", "VXUS": "USD",
+    "GLD": "USD", "VNQ": "USD", "SCHH": "USD", "BND": "USD", "BIL": "USD",
+    "AGG": "USD", "IEF": "USD", "TLT": "USD",
+}
+
+
 def ticker_currency(ticker: str) -> str:
-    """ISO 4217 the symbol is quoted in."""
+    """
+    ISO 4217 the symbol is quoted in.
+
+    Deliberately offline: a listing suffix and a table of the app's own
+    universe answer every symbol we recommend. Only a genuinely unfamiliar
+    ticker reaches the network, and even then a failure degrades to USD
+    rather than leaving the holding unvalued.
+    """
     symbol = (ticker or "").upper()
+    if symbol in _KNOWN_CURRENCY:
+        return _KNOWN_CURRENCY[symbol]
     for suffix, currency in _SUFFIX_CURRENCY.items():
         if symbol.endswith(suffix):
             return currency
-    # Ask the quote service before falling back — it knows listings our
-    # suffix table doesn't.
     try:
         from backend.services import ticker_lookup
 
