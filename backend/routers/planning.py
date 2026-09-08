@@ -185,23 +185,35 @@ async def province_intelligence(
     request: Request,
     horizon_years: int = 3,
     user_id: str = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+    lang: str = Depends(language),
 ):
     """
-    Per-province housing prices (TCMB unit price, TL/m²) — 81 provinces
-    ranked by 1/3/5-year nominal + real appreciation.
+    Sub-national housing breakdown, ranked by 1/3/5-year nominal + real
+    appreciation: 81 provinces in Türkiye (TCMB unit prices, TL/m²) or 50
+    states plus DC in the US (FHFA index via FRED). The payload says which
+    kind of number it carries.
     """
     from backend.services.province_intelligence import rank_provinces
 
-    return await asyncio.to_thread(rank_provinces, horizon_years)
+    market = await _market_of(db, user_id)
+    return await asyncio.to_thread(rank_provinces, horizon_years, market, lang)
 
 
 @router.post("/projection/province")
 @limiter.limit("15/minute")
 async def province_projection(
     request: Request,
-    body: RegionProjectionRequest,  # the region_code field carries a province code here (e.g. MUGLA)
+    body: RegionProjectionRequest,  # region_code carries an area code here (MUGLA, CA)
     user_id: str = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+    lang: str = Depends(language),
 ):
-    """Province scenario band — window distribution of 16 years of unit prices."""
+    """Area scenario band — window distribution over that area's own history."""
     from backend.services.province_intelligence import project_province
-    return await asyncio.to_thread(project_province, body.region_code.upper(), body.amount, body.years)
+
+    market = await _market_of(db, user_id)
+    return await asyncio.to_thread(
+        project_province, body.region_code.upper(), body.amount, body.years,
+        market, lang,
+    )

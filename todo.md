@@ -819,9 +819,19 @@ lumos/                          ← project root
       provinces priced in lira. Rent-vs-buy and the listing bridge (each
       market's own portals) now run in every market; only the price table is
       TR-only, and the empty state says exactly why.
-- [ ] US house PRICE index still absent — Case-Shiller needs a free FRED key.
-      Until then the US pack declares `none` rather than substituting the
-      rent index, which measures a different thing.
+- [x] **US house PRICE index wired — FRED (FHFA All-Transactions HPI).** The
+      free key turned out to buy more than the national Case-Shiller number:
+      FHFA publishes the same index for all 50 states plus DC, so the US now
+      has a real state-by-state breakdown, the equivalent of the 81-province
+      table. Series verified live against fred.stlouisfed.org: `USSTHPI`
+      nationally, `{XX}STHPI` per state, both quarterly, both 1980:Q1=100.
+      Using FHFA for nation AND states keeps units identical; mixing in
+      Case-Shiller (monthly, Jan-2000=100, 20 metros) would not.
+      The table reports an INDEX, not a price level — FHFA publishes no
+      per-m² figure — so rows carry a `measure` field and the client prints
+      "price index" instead of an invented unit price. The honesty note says
+      FHFA draws on refinance appraisals as well as sales, which is where it
+      differs from Case-Shiller's repeat-sales method.
 - [ ] Concept glossary localization, not translation: examples with local currency and local products ("an ETF is a basket — with THY, Aselsan..." vs "...Apple, Microsoft...")
 
 ### Rollout Order

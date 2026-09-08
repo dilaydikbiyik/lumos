@@ -4,11 +4,16 @@ United States — Market Pack.
 Live inflation and rent come from the BLS public API with no key, so real
 returns work out of the box.
 
-House PRICES are the honest gap. BLS publishes a rent index, which measures
-what it costs to OCCUPY a home — not what homes sell for. Substituting one
-for the other would quietly corrupt every buy-vs-rent verdict, so this pack
-declares no housing index until a Case-Shiller source is wired (FRED, free
-key). The tools degrade to their stated assumptions and say so.
+House prices were the honest gap for a while: BLS publishes a rent index,
+which measures what it costs to OCCUPY a home — not what homes sell for, and
+substituting one for the other would quietly corrupt every buy-vs-rent
+verdict. That gap is now closed by FRED's FHFA All-Transactions House Price
+Index, a genuine price index published nationally AND for all 50 states plus
+DC — so the US gets a real state-by-state breakdown, the equivalent of the
+81-province table in Türkiye.
+
+FRED needs a free key. Without it fred_service reports unavailable and these
+features degrade to their stated assumptions rather than guessing.
 """
 from backend.markets.base import ListingSite, MarketPack
 
@@ -21,7 +26,8 @@ US = MarketPack(
     languages=["en"],
 
     inflation_source="bls",        # CPI-U, monthly, no key
-    housing_index_source="none",   # see the module docstring
+    housing_index_source="fred",   # FHFA All-Transactions HPI, quarterly
+    regional_housing_breakdown=True,  # 50 states + DC, same series family
     rent_index_source="bls",       # rent of primary residence
     default_index_ticker="^GSPC",
 

@@ -168,13 +168,14 @@ def test_province_table_is_gated_separately_from_the_national_index():
     """
     tr, us, de = MARKET_PACKS["TR"], MARKET_PACKS["US"], MARKET_PACKS["DE"]
 
+    # Türkiye (TCMB, 81 provinces) and the US (FHFA via FRED, 50 states + DC)
+    # publish a sub-national breakdown. Germany does not: Eurostat's house
+    # price index is national only, and inventing regions from it would be a
+    # fabrication — so Germany keeps the national index and loses the table.
     assert tr.regional_housing_breakdown is True
+    assert us.regional_housing_breakdown is True
     assert de.regional_housing_breakdown is False
-    assert us.regional_housing_breakdown is False
-
-    # Germany still has the national index, so rent-vs-buy works there.
     assert de.housing_index_source != "none"
-    assert us.housing_index_source == "none"
 
     # No pack may claim a breakdown it has no source for.
     for code, pack in MARKET_PACKS.items():

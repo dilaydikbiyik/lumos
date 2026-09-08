@@ -56,19 +56,27 @@ def test_bundled_us_snapshots_are_parseable_and_recent():
 
 def test_a_rent_index_is_never_used_as_a_house_price_index():
     """
-    BLS publishes rent, not house prices. Substituting one for the other
-    would corrupt every buy-vs-rent verdict, so the US pack must declare no
-    housing index rather than quietly borrowing the rent series.
+    A rent index measures what it costs to OCCUPY a home; a price index
+    measures what homes SELL for. The US pack used to declare no housing
+    index at all rather than borrow the BLS rent series; now it has a real
+    one (FHFA via FRED) and the two stay separate.
+
+    Note the invariant is about DATASETS, not providers: Germany draws both
+    from Eurostat, which is fine because they are different datasets
+    (prc_hpi_q vs HICP CP041). Same-provider is not evidence of substitution.
     """
     from backend.markets import get_market_pack
+    from backend.services import eurostat_service
 
     us = get_market_pack("US")
-    assert us.rent_index_source == "bls"
-    assert us.housing_index_source == "none"
+    assert us.rent_index_source == "bls"      # rent of primary residence
+    assert us.housing_index_source == "fred"  # FHFA All-Transactions HPI
 
-    # Germany does have a real price index, so it may claim one
     de = get_market_pack("DE")
     assert de.housing_index_source == "eurostat"
+    assert de.rent_index_source == "eurostat"
+    # ...but through separate readers hitting separate datasets.
+    assert eurostat_service.get_house_price_index is not eurostat_service.get_rent_index
 
 
 @pytest.mark.parametrize("market", ["TR", "US", "DE"])

@@ -1,20 +1,36 @@
 """
-Per-province housing price intelligence — the concrete answer to
-"where should I buy a home?".
+Sub-national housing intelligence — the concrete answer to "where should I
+buy a home?".
 
-TCMB per-province unit-price series (TL/m², quarterly, 2010→today): instead
-of blurry NUTS2 regions we can say "79.110 TL per m² in Muğla, +X% real
-over 5 years". Same honesty frame: it is a province average, not a
-quarter/parcel; the past is no guarantee of the future.
+Two markets, two data products, one shape:
+
+  TR   TCMB per-province unit prices (TL/m², quarterly, 2010→today). A price
+       LEVEL, so we can say "79,110 TL per m² in Muğla, +X% real over 5 years".
+  US   FHFA All-Transactions House Price Index per state via FRED (quarterly,
+       1980:Q1 = 100). An INDEX, not a level: it measures appreciation
+       faithfully but cannot answer "what does a square metre cost". Rows from
+       this market carry no price, and `measure` says which is which so the
+       client never prints an empty figure or implies the two are comparable.
+
+Germany is deliberately absent: Eurostat publishes a national house price
+index but no regional breakdown, and inventing one from the national series
+would be a fabrication.
+
+Same honesty frame throughout: these are area averages, not a specific
+neighbourhood or parcel, and the past guarantees nothing.
 """
 import logging
 from typing import Optional
 
-from backend.services import evds_service, inflation_service
+from backend.i18n import t
+from backend.services import evds_service, fred_service, inflation_service
 
 logger = logging.getLogger("lumos.province")
 
 VALID_HORIZONS = (1, 3, 5)
+
+# Both supported series are quarterly, so a horizon is that many quarters.
+_QUARTERS_PER_YEAR = 4
 
 
 def _change_over_quarters(prices: dict[str, float], quarters_back: int) -> Optional[float]:
@@ -29,42 +45,83 @@ def _change_over_quarters(prices: dict[str, float], quarters_back: int) -> Optio
     return round((prices[latest] / prices[base] - 1) * 100, 1)
 
 
-def rank_provinces(horizon_years: int = 3) -> dict:
+def _row(code: str, name: str, series: dict[str, float], quarters: int,
+         market: str, price_level: bool) -> Optional[dict]:
+    """One area's nominal and real change, or None when its history is short."""
+    change = _change_over_quarters(series, quarters)
+    if change is None:
+        return None
+
+    months = sorted(series)
+    latest_month = months[-1]
+    base_month = months[max(len(months) - 1 - quarters, 0)]
+    try:
+        real_change = inflation_service.real_return_pct(
+            change, base_month, latest_month, market
+        )
+    except Exception as exc:
+        logger.warning("real-return conversion failed for %s (%s)", code, type(exc).__name__)
+        real_change = None
+
+    return {
+        "code": code,
+        "province": name,
+        # An index has no unit price. Reporting one would be an invention.
+        "price_per_m2": round(series[latest_month]) if price_level else None,
+        "nominal_change_pct": change,
+        "real_change_pct": real_change,
+        "_latest_month": latest_month,
+    }
+
+
+def _tr_areas() -> tuple[dict[str, dict], bool]:
+    data = evds_service.get_province_unit_prices() or {}
+    return ({code: {"name": e["name"], "series": e["prices"]}
+             for code, e in data.items()}, True)
+
+
+def _us_areas() -> tuple[dict[str, dict], bool]:
+    data = fred_service.get_all_state_hpi()
+    return ({code: {"name": e["name"], "series": e["index"]}
+             for code, e in data.items()}, False)
+
+
+_SOURCES = {"TR": _tr_areas, "US": _us_areas}
+
+
+def rank_provinces(horizon_years: int = 3, market: str = "TR",
+                   lang: str = "tr") -> dict:
     """
-    Rank all 81 provinces by REAL appreciation over the chosen horizon
-    (1/3/5 years). Each row: province, current TL/m², nominal + real change.
+    Rank every area in the market by REAL appreciation over the chosen
+    horizon (1/3/5 years) — 81 provinces in Türkiye, 50 states plus DC in
+    the United States.
     """
     horizon_years = horizon_years if horizon_years in VALID_HORIZONS else 3
-    quarters = horizon_years * 4
+    quarters = horizon_years * _QUARTERS_PER_YEAR
+    market = (market or "TR").upper()
 
-    data = evds_service.get_province_unit_prices()
-    if not data:
-        return {"available": False, "provinces": [], "note": "İl verisi şu an alınamıyor."}
+    source = _SOURCES.get(market)
+    if source is None:
+        return {"available": False, "provinces": [],
+                "note": t("province.no_breakdown", lang, market=market)}
+
+    areas, price_level = source()
+    if not areas:
+        return {"available": False, "provinces": [],
+                "note": t("province.unavailable", lang)}
 
     rows = []
     latest_month = None
-    for suffix, entry in data.items():
-        prices = entry["prices"]
-        change = _change_over_quarters(prices, quarters)
-        if change is None:
+    for code, area in areas.items():
+        row = _row(code, area["name"], area["series"], quarters, market, price_level)
+        if row is None:
             continue
+        latest_month = row.pop("_latest_month")
+        rows.append(row)
 
-        months = sorted(prices)
-        latest_month = months[-1]
-        base_month = months[max(len(months) - 1 - quarters, 0)]
-        try:
-            real_change = inflation_service.real_return_pct(change, base_month, latest_month)
-        except Exception as exc:
-            logger.warning("real-return conversion failed for %s (%s)", suffix, type(exc).__name__)
-            real_change = None
-
-        rows.append({
-            "code": suffix,
-            "province": entry["name"],
-            "price_per_m2": round(prices[latest_month]),
-            "nominal_change_pct": change,
-            "real_change_pct": real_change,
-        })
+    if not rows:
+        return {"available": False, "provinces": [],
+                "note": t("province.unavailable", lang)}
 
     rows.sort(key=lambda r: (r["real_change_pct"] is None, -(r["real_change_pct"] or 0)))
     for i, row in enumerate(rows):
@@ -73,39 +130,47 @@ def rank_provinces(horizon_years: int = 3) -> dict:
     return {
         "available": True,
         "horizon_years": horizon_years,
+        "market": market,
+        # The client needs to know WHICH kind of number it received: a price
+        # level can be printed as "X per m²", an index cannot.
+        "measure": "unit_price_per_m2" if price_level else "price_index",
         "data_through": latest_month,
-        "honesty_note": (
-            "İl ortalaması birim fiyatlardır (TCMB) — mahalle/parsel analizi değildir. "
-            "Geçmiş değerlenme geleceğin garantisi değildir."
+        "honesty_note": t(
+            "province.note_tr" if price_level else "province.note_us", lang
         ),
         "provinces": rows,
     }
 
 
-def project_province(code: str, amount: float, years: int) -> dict:
+def project_province(code: str, amount: float, years: int,
+                     market: str = "TR", lang: str = "tr") -> dict:
     """
-    "What would X TL become in this province over N years?" — the
-    distribution of every rolling N-year window in the province's own
-    16-year unit-price history (not a forecast).
+    "What would X become in this area over N years?" — the distribution of
+    every rolling N-year window in the area's own history (not a forecast).
     """
     from backend.services.projection import _windowed_real_band
 
     import numpy as np
 
-    data = evds_service.get_province_unit_prices()
-    entry = data.get(code)
+    market = (market or "TR").upper()
+    source = _SOURCES.get(market)
+    if source is None:
+        return {"available": False, "reason": t("province.no_breakdown", lang, market=market)}
+
+    areas, _ = source()
+    entry = areas.get(code.upper()) or areas.get(code)
     if not entry:
-        return {"available": False, "reason": "İl verisi şu an alınamıyor."}
+        return {"available": False, "reason": t("province.unavailable", lang)}
 
-    months = sorted(entry["prices"])
-    values = np.array([entry["prices"][m] for m in months])
-    window = years * 4  # quarterly series
+    months = sorted(entry["series"])
+    values = np.array([entry["series"][m] for m in months])
+    window = years * _QUARTERS_PER_YEAR
 
-    band, real_band = _windowed_real_band(values, months, window, amount)
+    band, real_band = _windowed_real_band(values, months, window, amount, market)
     if not band:
         return {
             "available": False,
-            "reason": f"{entry['name']} için {years} yıllık pencere dağılımına yetecek geçmiş yok.",
+            "reason": t("province.no_window", lang, name=entry["name"], years=years),
         }
 
     return {
@@ -115,9 +180,6 @@ def project_province(code: str, amount: float, years: int) -> dict:
         "years": years,
         **band,
         "real_band": real_band,  # each window deflated by its OWN period inflation
-        "honesty_note": (
-            f"Bu bir tahmin DEĞİL: {entry['name']} il ortalamasının 2010'dan bugüne kendi "
-            f"geçmişindeki tüm {years} yıllık dönemlerin dağılımı. Reel bant, her dönemin "
-            "kendi enflasyonundan arındırılmıştır."
-        ),
+        "honesty_note": t("province.projection_note", lang,
+                          name=entry["name"], years=years),
     }

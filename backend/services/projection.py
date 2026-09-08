@@ -35,7 +35,7 @@ def _rolling_window_returns(values: np.ndarray, window: int, step: int) -> list[
 
 
 def _windowed_real_band(
-    values, months: list[str], window: int, amount: float,
+    values, months: list[str], window: int, amount: float, market: str = "TR",
 ) -> tuple[dict, Optional[dict]]:
     """
     NOMINAL band of rolling windows over a monthly/quarterly series, plus a
@@ -55,7 +55,7 @@ def _windowed_real_band(
         nominals.append(nominal)
         try:
             real_pct = inflation_service.real_return_pct(
-                nominal * 100, months[start], months[start + window]
+                nominal * 100, months[start], months[start + window], market
             )
             reals.append(real_pct / 100)
         except Exception:

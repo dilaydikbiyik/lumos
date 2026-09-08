@@ -115,8 +115,9 @@ function ProvinceScenario({ province, amount }) {
   )
 }
 
-function ProvinceCard({ province, amount }) {
+function ProvinceCard({ province, amount, measure }) {
   const { t } = useTranslation()
+  const { pack } = useMarket()
   const realPositive = (province.real_change_pct ?? 0) > 0
   const [open, setOpen] = useState(false)
   return (
@@ -131,7 +132,13 @@ function ProvinceCard({ province, amount }) {
       }}>{province.rank}</span>
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ fontWeight: 600, fontSize: 14 }}>{province.province}</div>
-        <div style={{ fontSize: 12, opacity: 0.7 }}>{fmt(province.price_per_m2)} TL/m²</div>
+        {/* An index has no unit price; printing an empty one would imply
+            the two markets report the same kind of number. */}
+        <div style={{ fontSize: 12, opacity: 0.7 }}>
+          {measure === 'unit_price_per_m2'
+            ? `${fmt(province.price_per_m2)} ${pack.currency_symbol}/m²`
+            : t('explore.indexOnly')}
+        </div>
       </div>
       <div style={{ textAlign: 'right', flexShrink: 0 }}>
         <div style={{ fontSize: 13 }}>+{province.nominal_change_pct}%</div>
@@ -464,6 +471,8 @@ export default function ExplorePage() {
   // second, so this table is its own gate. The rent-vs-buy calculator and
   // the listing bridge below are market-aware and run everywhere.
   const hasProvinceTable = !!pack.regional_housing_breakdown
+  // Türkiye ranks provinces, the US ranks states — the noun has to follow.
+  const areaWord = pack.code === 'US' ? 'state' : 'province'
   const [provinces, setProvinces] = useState(null)
   const [horizon, setHorizon] = useState(3)
   const [scenarioAmount, setScenarioAmount] = useState('1.000.000')
@@ -492,10 +501,13 @@ export default function ExplorePage() {
     return () => { cancelled = true }
   }, [load, horizon, hasProvinceTable])
 
-  const q = search.trim().toLocaleLowerCase('tr')
+  // Case folding is locale-specific: 'Illinois'.toLocaleLowerCase('tr') is
+  // 'ıllinois' (dotless i), which never matches what a US reader types.
+  const fold = (text) => text.toLocaleLowerCase(pack.locale || 'tr')
+  const q = fold(search.trim())
   const visible = provinces?.available
     ? (q
-        ? provinces.provinces.filter(p => p.province.toLocaleLowerCase('tr').includes(q))
+        ? provinces.provinces.filter(p => fold(p.province).includes(q))
         : provinces.provinces.slice(0, 12))
     : []
 
@@ -533,11 +545,11 @@ export default function ExplorePage() {
 
             <input
               className="input"
-              placeholder={t('explore.searchPlaceholder')}
+              placeholder={t(`explore.searchPlaceholder_${areaWord}`)}
               value={search}
               onChange={e => setSearch(e.target.value)}
               style={{ marginBottom: 12 }}
-              aria-label={t('explore.searchLabel')}
+              aria-label={t(`explore.searchLabel_${areaWord}`)}
             />
 
             <input
@@ -560,16 +572,19 @@ export default function ExplorePage() {
             {!loading && provinces?.available && (
               <>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                  {visible.map(p => <ProvinceCard key={p.code} province={p} amount={scenarioAmount} />)}
+                    {visible.map(p => (
+                    <ProvinceCard key={p.code} province={p} amount={scenarioAmount}
+                                  measure={provinces.measure} />
+                  ))}
                   {visible.length === 0 && (
                     <p style={{ fontSize: 13, opacity: 0.7, textAlign: 'center', padding: 12 }}>
-                      {t('explore.noResults', { search })}
+                      {t(`explore.noResults_${areaWord}`, { search })}
                     </p>
                   )}
                 </div>
                 {!q && (
                   <p style={{ fontSize: 12, opacity: 0.55, marginTop: 8, textAlign: 'center' }}>
-                    {t('explore.showingFirst')}
+                    {t(`explore.showingFirst_${areaWord}`)}
                   </p>
                 )}
                 <p style={{ fontSize: 12, opacity: 0.6, marginTop: 10, lineHeight: 1.5 }}>

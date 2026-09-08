@@ -397,6 +397,31 @@ _C: dict[str, dict[str, str]] = {
         "tr": "Bu korku çoğu yeni başlayanda var. Küçük adımlarla, sanal pratikle başlayacağız — gerçek parayla asla acele etmeyeceksin.",
         "en": "Most beginners feel this. We'll start with small steps and virtual practice — you'll never be rushed with real money.",
         "de": "Diese Angst haben die meisten Anfänger. Wir starten mit kleinen Schritten und virtueller Übung — mit echtem Geld wird nichts überstürzt."},
+    # ── sub-national housing breakdown ──
+    "province.unavailable": {
+        "tr": "Bölge verisi şu an alınamıyor.",
+        "en": "Area data can't be reached right now.",
+        "de": "Regionaldaten sind gerade nicht erreichbar."},
+    "province.no_breakdown": {
+        "tr": "{market} pazarı için bölge bölge konut verisi yayınlanmıyor.",
+        "en": "No area-by-area housing data is published for the {market} market.",
+        "de": "Für den Markt {market} werden keine regionalen Wohndaten veröffentlicht."},
+    "province.note_tr": {
+        "tr": "İl ortalaması birim fiyatlardır (TCMB) — mahalle/parsel analizi değildir. Geçmiş değerlenme geleceğin garantisi değildir.",
+        "en": "These are province-average unit prices (Turkish central bank) — not a neighbourhood or parcel analysis. Past appreciation guarantees nothing about the future.",
+        "de": "Das sind Durchschnittspreise je Provinz (türkische Zentralbank) — keine Viertel- oder Grundstücksanalyse. Vergangene Wertsteigerung garantiert nichts für die Zukunft."},
+    "province.note_us": {
+        "tr": "FHFA eyalet konut fiyat ENDEKSİDİR (FRED) — değerlenmeyi ölçer, metrekare fiyatını değil, o yüzden burada birim fiyat göstermiyoruz. Endeks satış fiyatlarının yanında yeniden finansman değerlemelerini de içerir; Case-Shiller'ın yalnızca tekrar satışa dayanan yönteminden bu yönüyle ayrılır. Eyalet ortalamasıdır, tek bir şehir ya da mahalle değil.",
+        "en": "This is the FHFA state house price INDEX (via FRED) — it measures appreciation, not the price of a square metre, which is why no unit price is shown. The index draws on appraisals from refinancings as well as sales, which is where it differs from Case-Shiller's repeat-sales method. It is a state average, not one city or neighbourhood.",
+        "de": "Das ist der FHFA-Häuserpreis-INDEX je Bundesstaat (über FRED) — er misst die Wertentwicklung, nicht den Quadratmeterpreis; deshalb wird hier kein Einzelpreis angezeigt. Der Index stützt sich neben Verkäufen auch auf Bewertungen aus Refinanzierungen und unterscheidet sich darin von der Wiederverkaufsmethode von Case-Shiller. Es ist ein Durchschnitt je Bundesstaat, nicht einer Stadt oder eines Viertels."},
+    "province.no_window": {
+        "tr": "{name} için {years} yıllık pencere dağılımına yetecek geçmiş yok.",
+        "en": "There isn't enough history for {name} to build a distribution of {years}-year windows.",
+        "de": "Für {name} gibt es zu wenig Historie für eine Verteilung über {years}-Jahres-Fenster."},
+    "province.projection_note": {
+        "tr": "Bu bir tahmin DEĞİL: {name} ortalamasının kendi geçmişindeki tüm {years} yıllık dönemlerin dağılımı. Reel bant, her dönemin kendi enflasyonundan arındırılmıştır.",
+        "en": "This is NOT a forecast: it's the distribution of every {years}-year period in {name}'s own history. The real band deflates each period by its own inflation.",
+        "de": "Das ist KEINE Prognose: es ist die Verteilung aller {years}-Jahres-Zeiträume aus der eigenen Historie von {name}. Die reale Spanne bereinigt jeden Zeitraum um seine eigene Inflation."},
 }
 
 
