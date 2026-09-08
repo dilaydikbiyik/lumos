@@ -143,3 +143,31 @@ def test_a_complete_state_map_is_cached():
 def test_unknown_state_code_returns_nothing():
     with patch.object(fred_service.settings, "FRED_API_KEY", "k"):
         assert fred_service.get_state_hpi("XX") is None
+
+
+def test_state_map_is_fetched_in_parallel():
+    """51 sequential round-trips on a cold cache is the difference between a
+    page that loads and one that times out on a free-tier instance."""
+    import threading
+    import time
+
+    concurrent = {"peak": 0, "now": 0}
+    lock = threading.Lock()
+    good = _observations([("2024-01-01", "100.0"), ("2024-04-01", "105.0")])
+
+    def _slow(*args, **kwargs):
+        with lock:
+            concurrent["now"] += 1
+            concurrent["peak"] = max(concurrent["peak"], concurrent["now"])
+        try:
+            time.sleep(0.02)  # long enough for overlap to be observable
+            return _Response(good)
+        finally:
+            with lock:
+                concurrent["now"] -= 1
+
+    with patch.object(fred_service.settings, "FRED_API_KEY", "k"), \
+         patch("httpx.get", _slow):
+        fred_service.get_all_state_hpi()
+
+    assert concurrent["peak"] > 1

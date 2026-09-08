@@ -25,6 +25,7 @@ the US pack keeps declaring no housing index, which is the honest state.
 """
 
 import logging
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Optional
 
 from backend.config import settings
@@ -35,6 +36,9 @@ logger = logging.getLogger("lumos.fred")
 _BASE = "https://api.stlouisfed.org/fred/series/observations"
 _TTL_SECONDS = 60 * 60 * 24
 _TIMEOUT = 25
+# Enough to collapse 51 round-trips into a few waves without looking like a
+# burst to FRED, which asks for reasonable use rather than a hard rate limit.
+_MAX_PARALLEL = 8
 
 NATIONAL_SERIES = "USSTHPI"
 
@@ -137,9 +141,12 @@ def get_all_state_hpi(since: str = "2000-01-01") -> dict[str, dict]:
     Every state's index, shaped like the TR province payload:
     {code: {"name": ..., "index": {YYYY-MM: value}}}.
 
-    51 requests is a lot to make on a page load, so the whole map is cached
-    as one entry and the per-series cache absorbs partial failures. A state
-    that fails is omitted rather than shown with a stale neighbour's numbers.
+    51 series is a lot to fetch on a page load. They are independent, so they
+    go out in parallel — sequentially this is seconds of pure round-trip on a
+    cold cache, which on a free-tier instance is the difference between a page
+    that loads and one that times out. The whole map is then cached as one
+    entry, and the per-series cache absorbs partial failures. A state that
+    fails is omitted rather than shown with a stale neighbour's numbers.
     """
     if not is_configured():
         return {}
@@ -150,10 +157,20 @@ def get_all_state_hpi(since: str = "2000-01-01") -> dict[str, dict]:
         return cached or {}
 
     out: dict[str, dict] = {}
-    for code, name in STATES.items():
-        index = _observations(series_id(code), since)
-        if index:
-            out[code] = {"name": name, "index": index}
+    with ThreadPoolExecutor(max_workers=_MAX_PARALLEL) as pool:
+        futures = {
+            pool.submit(_observations, series_id(code), since): code
+            for code in STATES
+        }
+        for future in as_completed(futures):
+            code = futures[future]
+            try:
+                index = future.result()
+            except Exception as exc:  # one state must not sink the whole map
+                logger.warning("FRED state %s failed (%s)", code, type(exc).__name__)
+                continue
+            if index:
+                out[code] = {"name": STATES[code], "index": index}
 
     if not out:
         return {}
