@@ -13,6 +13,7 @@ from typing import Optional
 import numpy as np
 
 from backend.exceptions import MarketDataError
+from backend.i18n import t
 from backend.services import evds_service, inflation_service
 from backend.services.market_data import fetch_price_history
 from backend.services.portfolio_series import build_normalized_series
@@ -87,7 +88,7 @@ def _band(returns: list[float], amount: float) -> dict:
     }
 
 
-def project_asset(ticker: str, amount: float, years: int) -> dict:
+def project_asset(ticker: str, amount: float, years: int, lang: str = "tr") -> dict:
     """
     Scenario band for an exchange-traded asset from its own daily history.
     Uses the longest history yfinance provides (up to 10y).
@@ -106,8 +107,7 @@ def project_asset(ticker: str, amount: float, years: int) -> dict:
         return {
             "available": False,
             "reason": (
-                f"{ticker} için {years} yıllık pencere dağılımı çıkaracak kadar "
-                "geçmiş veri yok — daha kısa bir vade dene."
+                t("projection.no_history_asset", lang, ticker=ticker, years=years)
             ),
         }
 
@@ -120,13 +120,13 @@ def project_asset(ticker: str, amount: float, years: int) -> dict:
         "history_years": years_covered,
         **_band(returns, amount),
         "honesty_note": (
-            f"Bu bir tahmin DEĞİL: {ticker}'nin kendi geçmişindeki tüm {years} yıllık "
-            "dönemlerin dağılımı. Gelecek bu aralığın dışına da çıkabilir."
+            t("projection.note_asset", lang, ticker=ticker, years=years)
         ),
     }
 
 
-def project_portfolio(weights: dict[str, float], amount: float, years: int) -> dict:
+def project_portfolio(weights: dict[str, float], amount: float, years: int,
+                      lang: str = "tr") -> dict:
     """
     Scenario band for a whole weighted portfolio, not a single asset.
 
@@ -147,8 +147,7 @@ def project_portfolio(weights: dict[str, float], amount: float, years: int) -> d
         return {
             "available": False,
             "reason": (
-                f"Portföyün için {years} yıllık pencere dağılımı çıkaracak kadar "
-                "ortak geçmiş veri yok — daha kısa bir vade dene."
+                t("projection.no_history_portfolio", lang, years=years)
             ),
         }
 
@@ -161,14 +160,12 @@ def project_portfolio(weights: dict[str, float], amount: float, years: int) -> d
         "tickers": list(weights),
         **_band(returns, amount),
         "honesty_note": (
-            f"Bu bir tahmin DEĞİL: tüm portföyünün (ağırlıklı) kendi geçmişindeki "
-            f"tüm {years} yıllık dönemlerin dağılımı. Çeşitlendirme bandı daraltabilir "
-            "ama garanti etmez."
+            t("projection.note_portfolio", lang, years=years)
         ),
     }
 
 
-def project_region(region_code: str, amount: float, years: int) -> dict:
+def project_region(region_code: str, amount: float, years: int, lang: str = "tr") -> dict:
     """
     Scenario band for a housing region from the TCMB index (monthly).
     Also converts the typical scenario to REAL terms so a nominal boom
@@ -177,7 +174,7 @@ def project_region(region_code: str, amount: float, years: int) -> dict:
     data = evds_service.get_regional_housing_indices()
     entry = data.get(region_code)
     if not entry:
-        return {"available": False, "reason": "Bölge verisi şu an alınamıyor."}
+        return {"available": False, "reason": t("projection.no_region", lang)}
 
     index = entry["index"]
     months_sorted = sorted(index)
@@ -190,9 +187,8 @@ def project_region(region_code: str, amount: float, years: int) -> dict:
         return {
             "available": False,
             "reason": (
-                f"TCMB bölge endeksi {available_years} yıllık geçmişe sahip — {years} yıllık "
-                "senaryo bandı için yeterli pencere yok. Daha kısa vade dene "
-                "(endeks 2023'te yeniden bazlandı)."
+                t("projection.region_short", lang,
+                  available=available_years, years=years)
             ),
         }
 
@@ -217,8 +213,6 @@ def project_region(region_code: str, amount: float, years: int) -> dict:
         **band,
         "typical_real_return_pct": real_typical,
         "honesty_note": (
-            "Bölge (NUTS2) endeksi dağılımıdır — tek bir mahalle/parsel değil. "
-            "\"60 kat arttı\" anekdotları genelde nominal ve seçilmiş örneklerdir; "
-            "reel karşılığı yanında gösteriyoruz."
+            t("projection.region_note", lang)
         ),
     }

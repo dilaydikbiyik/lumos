@@ -24,7 +24,7 @@ def test_readiness_score_reflects_milestones(client):
     after_fear = client.get("/users/me/readiness").json()
 
     assert after_fear["score"] >= baseline["score"]
-    assert after_fear["milestones"]["Korkunu paylaştın"] is True
+    assert after_fear["milestones"]["fear_shared"] is True
 
 
 def test_readiness_not_ready_below_threshold(client):

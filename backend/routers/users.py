@@ -5,6 +5,8 @@ from pydantic import BaseModel, ConfigDict
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.db.database import get_db
+from backend.i18n import t
+from backend.middleware.language import language
 from backend.limiter import limiter
 from backend.middleware.verify_clerk import get_current_user
 from backend.repositories import holding_repository, user_repository
@@ -12,14 +14,6 @@ from backend.repositories import holding_repository, user_repository
 router = APIRouter()
 
 FearTag = Literal["param_eriyor", "kandirilirim", "anlamiyorum", "batiririm"]
-
-# Reassurance copy shown once, matched to the stated fear — no AI call needed
-_FEAR_REASSURANCE = {
-    "param_eriyor": "Anlıyoruz — bu yüzden her portföyde enflasyona karşı reel getiriyi de göstereceğiz, sadece nominal sayıyı değil.",
-    "kandirilirim": "Bu haklı bir endişe. Lumos sana hiçbir hisse/fon satmıyor, komisyon almıyor — sadece bilgi veriyor. Kararı hep sen verirsin.",
-    "anlamiyorum": "Sorun değil, kimse doğuştan bilmiyor. Her terimi günlük dille açıklayacağız — anlamadığın hiçbir şeyi geçmeyeceğiz.",
-    "batiririm": "Bu korku çoğu yeni başlayanda var. Küçük adımlarla, sanal pratikle başlayacağız — gerçek parayla asla acele etmeyeceksin.",
-}
 
 
 class UserRead(BaseModel):
@@ -85,6 +79,7 @@ async def fear_check_in(
     body: FearCheckInUpdate,
     user_id: str = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
+    lang: str = Depends(language),
 ):
     """
     Onboarding fear check-in — "what scares you most about investing?"
@@ -93,7 +88,8 @@ async def fear_check_in(
     user = await user_repository.set_primary_fear(db, user_id, body.primary_fear)
     return {
         "primary_fear": user.primary_fear,
-        "reassurance": _FEAR_REASSURANCE[body.primary_fear],
+        # Reassurance matched to the stated fear — no AI call needed
+        "reassurance": t(f"fear.{body.primary_fear}", lang),
     }
 
 
@@ -110,12 +106,14 @@ async def readiness_score(
     user = await user_repository.get_or_create(db, user_id)
     holdings = await holding_repository.list_for_user(db, user.id)
 
+    # Stable keys, not sentences: the client owns the wording, so the
+    # checklist speaks whatever language the reader picked.
     milestones = {
-        "Risk profilini tamamladın": user.risk_score is not None,
-        "Yatırım yolunu seçtin": user.investment_path is not None,
-        "Korkunu paylaştın": user.primary_fear is not None,
-        "İlk varlığını ekledin": len(holdings) > 0,
-        "En az 3 varlık takip ediyorsun": len(holdings) >= 3,
+        "risk_profile": user.risk_score is not None,
+        "path_chosen": user.investment_path is not None,
+        "fear_shared": user.primary_fear is not None,
+        "first_holding": len(holdings) > 0,
+        "three_holdings": len(holdings) >= 3,
     }
     score = round(sum(milestones.values()) / len(milestones) * 100)
 
@@ -169,6 +167,8 @@ async def market_pack_content(
         "fear_options": pack.fears(lang),
         "live_inflation": pack.inflation_source != "none",
         "live_housing_index": pack.housing_index_source != "none",
+        "regional_housing_breakdown": pack.regional_housing_breakdown,
+        "listing_sites": [site.name for site in pack.listing_sites],
         "assumptions": {
             "mortgage_rate_pct": pack.mortgage_rate_pct,
             "mortgage_term_years": pack.mortgage_term_years,

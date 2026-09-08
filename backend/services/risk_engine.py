@@ -21,6 +21,7 @@ Scoring logic:
 Budget is NOT included in the formula (it affects portfolio size, not risk tolerance).
 """
 
+from backend.i18n import t
 from backend.schemas.user_profile import RiskFactor, RiskProfileAnswers, RiskProfileResponse
 from backend.services import debt_check
 
@@ -48,17 +49,16 @@ _INCOME_MODIFIER = {
 }
 
 
-def _label(score: float) -> str:
-    # Turkish labels — the UI language is Turkish; an English "Growth" badge
-    # inside Turkish copy was an inconsistency (fixed 2026-07-11)
+def _label(score: float, lang: str) -> str:
     if score <= 3:
-        return "Muhafazakâr"
+        key = "conservative"
     elif score <= 6:
-        return "Dengeli"
+        key = "balanced"
     elif score <= 8:
-        return "Büyüme Odaklı"
+        key = "growth"
     else:
-        return "Atılgan"
+        key = "aggressive"
+    return t(f"risk.label.{key}", lang)
 
 
 def _age_modifier(age: int | None) -> float:
@@ -72,30 +72,26 @@ def _age_modifier(age: int | None) -> float:
     return 0.0
 
 
-_ANSWER_LABELS = {
-    "time_horizon": {"short": "Kısa (<2 yıl)", "medium": "Orta (2-10 yıl)", "long": "Uzun (10+ yıl)"},
-    "loss_tolerance": {"low": "Düşüşte satarım", "medium": "Bekler, tutarım", "high": "Düşüşte alırım"},
-    "goal": {"preservation": "Koruma", "income": "Düzenli gelir", "growth": "Büyüme", "speculation": "Spekülasyon"},
-    "experience": {"none": "Hiç yok", "beginner": "Yeni başlayan", "intermediate": "Orta", "advanced": "İleri"},
-}
-
-_FACTOR_EXPLANATIONS = {
-    "time_horizon": "Vade uzadıkça kısa vadeli dalgalanmaların önemi azalır — en belirleyici faktör budur",
-    "loss_tolerance": "Düşüş anındaki gerçek davranışın, teoriden daha önemlidir — en yüksek ağırlık bunda",
-    "goal": "Hedefin, kabul etmen gereken risk seviyesini belirler",
-    "experience": "Deneyim, dalgalanmayı tanımayı ve panik yapmamayı kolaylaştırır",
-}
+def _answer_label(dimension: str, value: str, lang: str) -> str:
+    return t(f"risk.{dimension}.{value}", lang)
 
 
-def compute_risk_score(answers: RiskProfileAnswers) -> RiskProfileResponse:
+def _goal_in_sentence(goal: str, lang: str) -> str:
+    label = _answer_label("goal", goal, lang)
+    return label if lang == "de" else label.lower()
+
+
+def compute_risk_score(answers: RiskProfileAnswers, lang: str = "tr") -> RiskProfileResponse:
     """
     Compute a 1-10 risk score from the profile answers.
 
     Args:
         answers: Validated RiskProfileAnswers instance.
+        lang: Request language — the score is language-independent, the
+            sentences explaining it are not.
 
     Returns:
-        RiskProfileResponse with score, label, and Turkish summary.
+        RiskProfileResponse with score, label, and a summary in `lang`.
     """
     dimension_scores = {
         "time_horizon": _TIME_HORIZON_SCORES[answers.time_horizon],
@@ -106,18 +102,14 @@ def compute_risk_score(answers: RiskProfileAnswers) -> RiskProfileResponse:
     base = sum(dimension_scores[d] * _WEIGHTS[d] for d in dimension_scores)
 
     # ── transparent breakdown: where every point comes from ──
-    factor_names = {
-        "time_horizon": "Yatırım vaden",
-        "loss_tolerance": "Kayıp toleransın",
-        "goal": "Hedefin",
-        "experience": "Deneyimin",
-    }
     factors = [
         RiskFactor(
-            factor=f"{factor_names[d]} (ağırlık %{round(_WEIGHTS[d] * 100)})",
-            answer=_ANSWER_LABELS[d][getattr(answers, d)],
+            factor=t("risk.factor.weighted", lang,
+                     name=t(f"risk.factor.{d}", lang),
+                     pct=round(_WEIGHTS[d] * 100)),
+            answer=_answer_label(d, getattr(answers, d), lang),
             contribution=round(dimension_scores[d] * _WEIGHTS[d], 2),
-            explanation=_FACTOR_EXPLANATIONS[d],
+            explanation=t(f"risk.why.{d}", lang),
         )
         for d in dimension_scores
     ]
@@ -129,41 +121,45 @@ def compute_risk_score(answers: RiskProfileAnswers) -> RiskProfileResponse:
 
     if age_mod != 0 and answers.age is not None:
         factors.append(RiskFactor(
-            factor="Yaş düzeltmesi",
-            answer=f"{answers.age} yaş",
+            factor=t("risk.mod.age", lang),
+            answer=t("risk.mod.age.answer", lang, age=answers.age),
             contribution=age_mod,
-            explanation=("55+ yaşta koruma önceliği artar" if age_mod < 0
-                         else "30 yaş altı: uzun toparlanma süresi risk kapasitesini artırır"),
+            explanation=t("risk.mod.age.older" if age_mod < 0
+                          else "risk.mod.age.younger", lang),
         ))
     if income_mod != 0:
         factors.append(RiskFactor(
-            factor="Gelir istikrarı düzeltmesi",
-            answer={"variable": "Değişken gelir", "irregular": "Düzensiz gelir"}.get(answers.income_stability, str(answers.income_stability)),
+            factor=t("risk.mod.income", lang),
+            answer=t(f"risk.mod.income.{answers.income_stability}", lang),
             contribution=income_mod,
-            explanation="Öngörülemeyen gelir daha büyük güvenlik payı gerektirir — skor aşağı çekilir",
+            explanation=t("risk.mod.income.why", lang),
         ))
 
     score = round(min(max(base + modifier, 1.0), 10.0), 1)
-    label = _label(score)
+    label = _label(score, lang)
 
     # Modifier context for summary
     modifier_note = ""
     if answers.age and answers.age >= 55:
-        modifier_note += " Yaşın göz önünde bulunduruldu — koruma ağırlığı artırıldı."
+        modifier_note += t("risk.note.older", lang)
     elif answers.age and answers.age <= 30:
-        modifier_note += " Genç yaşın uzun bir yatırım ufku sağlıyor — hafifçe yukarı güncellendi."
+        modifier_note += t("risk.note.younger", lang)
     if answers.income_stability == "irregular":
-        modifier_note += " Düzensiz geliriniz risk kapasiteni sınırlıyor."
+        modifier_note += t("risk.note.irregular", lang)
     elif answers.income_stability == "variable":
-        modifier_note += " Değişken geliriniz hafifçe dikkate alındı."
+        modifier_note += t("risk.note.variable", lang)
 
-    # Readable Turkish answers — raw enum values ("long", "growth") leaked
-    # English words into a Turkish sentence
-    summary = (
-        f"Risk skoru {score}/10 ({label}). "
-        f"{_ANSWER_LABELS['time_horizon'][answers.time_horizon]} yatırım ufku, "
-        f"\"{_ANSWER_LABELS['loss_tolerance'][answers.loss_tolerance]}\" kayıp toleransı ve "
-        f"{_ANSWER_LABELS['goal'][answers.goal].lower()} hedefi temel alındı.{modifier_note}"
+    # Readable answers — raw enum values ("long", "growth") used to leak
+    # English words into the sentence whatever the language was
+    summary = t(
+        "risk.summary", lang,
+        score=score, label=label,
+        horizon=_answer_label("time_horizon", answers.time_horizon, lang),
+        tolerance=_answer_label("loss_tolerance", answers.loss_tolerance, lang),
+        # German capitalises nouns; lowercasing "Wachstum" mid-sentence is
+        # a Turkish/English habit that reads as a typo in German.
+        goal=_goal_in_sentence(answers.goal, lang),
+        note=modifier_note,
     )
 
     return RiskProfileResponse(

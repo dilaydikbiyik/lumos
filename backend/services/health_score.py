@@ -8,7 +8,10 @@ Overall = weighted mean. Every component ships with a plain-language note
 so the beginner learns WHY, not just the number (vision: explain first).
 """
 
+from backend.i18n import t as _t
+
 # vehicle/land/real_estate can take months to sell; cash is instant
+
 _LIQUID_TYPES = {"stock", "fund", "etf", "gold", "crypto", "cash"}
 
 _WEIGHTS = {"diversification": 0.6, "liquidity": 0.4}
@@ -32,12 +35,12 @@ def _liquidity_score(by_type: dict[str, float]) -> int:
     return round(liquid / total * 100)
 
 
-def compute_health(by_type: dict[str, float]) -> dict:
+def compute_health(by_type: dict[str, float], lang: str = "tr") -> dict:
     if not by_type:
         return {
             "overall": 0,
             "components": {},
-            "notes": ["Henüz varlığın yok — ilk ışığı birlikte yakalım. / No holdings yet."],
+            "notes": [_t("health.none", lang)],
         }
 
     diversification = _diversification_score(by_type)
@@ -48,18 +51,12 @@ def compute_health(by_type: dict[str, float]) -> dict:
 
     notes = []
     if diversification < 40:
-        notes.append(
-            "Servetin büyük ölçüde tek varlık tipinde toplanmış — çeşitlendirme, "
-            "tek bir kötü gün senaryosunun etkisini azaltır."
-        )
+        notes.append(_t("health.concentrated", lang))
     if liquidity < 30:
         illiquid_pct = 100 - liquidity
-        notes.append(
-            f"Varlıklarının ~%{illiquid_pct}'i hızla nakde dönmez (arsa/ev/araç). "
-            "Acil bir ihtiyaç planın var mı?"
-        )
+        notes.append(_t("health.illiquid", lang, pct=illiquid_pct))
     if not notes:
-        notes.append("Dengeli görünüyor — fenerin gür yanıyor. 🔦")
+        notes.append(_t("health.balanced", lang))
 
     return {
         "overall": overall,

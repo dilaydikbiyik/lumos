@@ -13,17 +13,12 @@ Deliberately conservative: rebalancing has costs and taxes, so we only raise a
 flag past a meaningful threshold, and we never tell anyone to buy or sell a
 specific security.
 """
+from backend.i18n import t
 
 # Below this, drift is noise — nudging someone to trade over 2 points of
 # movement would cost them more in fees than it gains.
 NOTABLE_DRIFT_PCT = 5.0
 SERIOUS_DRIFT_PCT = 10.0
-
-# Category names as the reader knows them — the message is user-facing copy
-_CATEGORY_TR = {
-    "stocks": "hisse/ETF", "reit": "gayrimenkul", "bond": "tahvil",
-    "fund": "fon", "gold": "altın", "cash": "nakit", "other": "diğer",
-}
 
 # Portfolio categories mapped onto the holding types users record
 _CATEGORY_BY_TYPE = {
@@ -53,7 +48,8 @@ def _actual_weights(holdings, values: dict[int, float],
     return out
 
 
-def compute_drift(holdings, values: dict[int, float], target_allocations) -> dict:
+def compute_drift(holdings, values: dict[int, float], target_allocations,
+                  lang: str = "tr") -> dict:
     """
     Compare what the user owns against the mix their profile calls for.
 
@@ -76,7 +72,7 @@ def compute_drift(holdings, values: dict[int, float], target_allocations) -> dic
 
     actual = _actual_weights(holdings, values, category_by_ticker)
     if not actual:
-        return {"available": False, "reason": "Henüz takip ettiğin bir varlık yok."}
+        return {"available": False, "reason": t("drift.none", lang)}
 
     categories = sorted(set(actual) | set(target))
     rows = []
@@ -94,26 +90,17 @@ def compute_drift(holdings, values: dict[int, float], target_allocations) -> dic
         })
 
     if worst < NOTABLE_DRIFT_PCT:
-        verdict, message = "balanced", (
-            "Portföyün hedefine yakın duruyor. Şu an bir şey yapman gerekmiyor — "
-            "dengeleme işlem masrafı ve vergi doğurur, gereksizken yapılmaz."
-        )
+        verdict, message = "balanced", t("drift.ok", lang)
     else:
         drifted = max(rows, key=lambda r: abs(r["diff_pct"]))
-        direction = "büyüdü" if drifted["diff_pct"] > 0 else "küçüldü"
         level = "serious" if worst >= SERIOUS_DRIFT_PCT else "notable"
-        label = _CATEGORY_TR.get(drifted["category"], drifted["category"])
-        message = (
-            f"En büyük sapma {label} tarafında: hedefin "
-            f"%{drifted['target_pct']} iken şu an %{drifted['actual_pct']} — "
-            f"yani {direction}. "
-            + ("Bu, risk profilinin öngördüğünden belirgin bir sapma; "
-               "yeni katkılarını geride kalan tarafa yönlendirmek, satmadan "
-               "dengelemenin en ucuz yoludur."
-               if level == "serious" else
-               "Henüz küçük bir sapma; acele etmene gerek yok, bir sonraki "
-               "katkında dengeleyebilirsin.")
-        )
+        message = t(
+            "drift.biggest", lang,
+            label=t(f"category.{drifted['category']}", lang),
+            target=drifted["target_pct"],
+            actual=drifted["actual_pct"],
+            direction=t("drift.grew" if drifted["diff_pct"] > 0 else "drift.shrank", lang),
+        ) + t("drift.serious" if level == "serious" else "drift.mild", lang)
         verdict = level
 
     return {
@@ -122,9 +109,5 @@ def compute_drift(holdings, values: dict[int, float], target_allocations) -> dic
         "max_drift_pct": round(worst, 1),
         "rows": rows,
         "message": message,
-        "honesty_note": (
-            "Dengeleme bir zorunluluk değil, bir tercihtir. Satış vergi ve masraf "
-            "doğurabilir; çoğu durumda yeni alımları geride kalan tarafa yönlendirmek "
-            "yeterlidir. Lumos senin adına işlem yapmaz."
-        ),
+        "honesty_note": t("drift.disclaimer", lang),
     }

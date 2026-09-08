@@ -33,6 +33,12 @@ class MarketPack:
     housing_index_source: str     # "tcmb_evds" | "eurostat" | "none"
     default_index_ticker: str     # yfinance ticker for the local blue-chip index
     rent_index_source: str = "none"   # "bls" | "eurostat" | "none"
+    # A NATIONAL house-price index and a province-by-province BREAKDOWN are
+    # different data products. Eurostat gives Germany the first but not the
+    # second, so gating the province table on housing_index_source showed a
+    # German reader Turkish provinces priced in lira. This flag is what the
+    # per-province table keys on.
+    regional_housing_breakdown: bool = False
 
     # ── Real-estate listing bridge ──
     listing_sites: list[ListingSite] = field(default_factory=list)

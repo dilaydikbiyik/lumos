@@ -5,6 +5,8 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.db.database import get_db
+from backend.i18n import t
+from backend.middleware.language import language
 from backend.limiter import limiter
 from backend.middleware.verify_clerk import get_current_user
 from backend.repositories import holding_repository, user_repository
@@ -30,6 +32,7 @@ async def lookup_ticker(
     ticker: str,
     user_id: str = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
+    lang: str = Depends(language),
 ):
     """
     Resolve a symbol to its real name, price and currency so the user does not
@@ -40,7 +43,7 @@ async def lookup_ticker(
     price was in dollars, storing a 48x-wrong number.
     """
     if not ticker or len(ticker) > 20:
-        raise HTTPException(status_code=422, detail="Geçersiz sembol.")
+        raise HTTPException(status_code=422, detail=t("error.invalid_symbol", lang))
     # yfinance is blocking HTTP — keep the event loop free
     result = await asyncio.to_thread(ticker_lookup.lookup, ticker)
     if result is None:
@@ -48,7 +51,7 @@ async def lookup_ticker(
         # service rate-limits us intermittently, so a failure here is often a
         # blip on a perfectly valid symbol. The client says so, and never
         # blocks the user from adding the asset by hand.
-        raise HTTPException(status_code=404, detail="Sembol şu an doğrulanamadı.")
+        raise HTTPException(status_code=404, detail=t("error.symbol_unverified", lang))
 
     user = await user_repository.get_or_create(db, user_id)
     user_ccy = _currency_of(user)
@@ -164,6 +167,7 @@ async def portfolio_drift(
     request: Request,
     user_id: str = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
+    lang: str = Depends(language),
 ):
     """Has the portfolio drifted away from what the risk profile called for?
     The target is recomputed from the saved risk score, so nothing is stored."""
@@ -172,18 +176,22 @@ async def portfolio_drift(
 
     user = await user_repository.get_or_create(db, user_id)
     if user.risk_score is None:
-        return {"available": False, "reason": "Önce risk profilini tamamla."}
+        return {"available": False, "reason": t("error.no_profile", lang)}
 
     holdings = await holding_repository.list_for_user(db, user.id)
     if not holdings:
-        return {"available": False, "reason": "Henüz takip ettiğin bir varlık yok."}
+        return {"available": False, "reason": t("drift.none", lang)}
 
     enrichment = await asyncio.to_thread(enrich_holdings, holdings, _currency_of(user))
     values = {h.id: current_value(h, enrichment) for h in holdings}
+    # The market picks the investable universe, so the drift target has to be
+    # built against the user's own market — comparing a German portfolio to a
+    # Turkish target would invent drift that isn't there.
     target = await asyncio.to_thread(
         build_portfolio, user.risk_score, user.budget or sum(values.values()),
+        user.market or "TR", lang,
     )
-    return compute_drift(holdings, values, target.allocations)
+    return compute_drift(holdings, values, target.allocations, lang)
 
 
 @router.get("/health")
@@ -192,6 +200,7 @@ async def health_score(
     request: Request,
     user_id: str = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
+    lang: str = Depends(language),
 ):
     """Fener: 0-100 portfolio health with plain-language notes."""
     from backend.services.health_score import compute_health
@@ -202,7 +211,7 @@ async def health_score(
     by_type: dict[str, float] = {}
     for h in holdings:
         by_type[h.asset_type] = by_type.get(h.asset_type, 0.0) + current_value(h, enrichment)
-    return compute_health(by_type)
+    return compute_health(by_type, lang)
 
 
 @router.get("/summary", response_model=PortfolioSummary)

@@ -580,7 +580,14 @@
   "readiness": {
     "title": "Cesaret Skoru",
     "ready": "Gerçek yatırıma hazırsın",
-    "progressing": "Her adım seni biraz daha hazırlıyor"
+    "progressing": "Her adım seni biraz daha hazırlıyor",
+    "milestones": {
+      "risk_profile": "Risk profilini tamamladın",
+      "path_chosen": "Yatırım yolunu seçtin",
+      "fear_shared": "Korkunu paylaştın",
+      "first_holding": "İlk varlığını ekledin",
+      "three_holdings": "En az 3 varlık takip ediyorsun"
+    }
   },
   "fear": {
     "step": "Adım 2 / 3",
@@ -691,7 +698,13 @@
     "noResults": "\"{{search}}\" bulunamadı — 81 ilin tamamında arayabilirsin.",
     "showingFirst": "İlk 12 il gösteriliyor — diğer iller için yukarıdan ara.",
     "dataError": "İl verisi şu an alınamıyor — birazdan tekrar dene.",
-    "fetchLinks": "Linkleri Getir"
+    "fetchLinks": "Linkleri Getir",
+    "noProvinceTable": "<0>{{market}}</0> pazarı için il il konut fiyat tablosu henüz yok — sana başka bir ülkenin fiyatlarını \"buymuş gibi\" göstermeyiz.",
+    "nationalIndexOnly": "{{market}} için resmî ulusal konut fiyat endeksi var ve aşağıdaki kirala-vs-satın-al hesabında kullanılıyor; bölge bölge kırılım yayınlanmıyor.",
+    "noHousingIndex": "{{market}} için ücretsiz ve anahtarsız bir konut fiyat endeksi kaynağı henüz bağlı değil. Bulunca ekleyeceğiz; o zamana kadar tahmin uydurmuyoruz.",
+    "listingsSites": "Bu pazarda: {{sites}}.",
+    "cityPlaceholder": "Şehir (örn: Berlin)",
+    "areaOptional": "Semt/bölge (opsiyonel)"
   },
   "rvb": {
     "title": "Kirada mı otur, ev mi al?",

@@ -37,9 +37,11 @@ def test_recommend_returns_portfolio_with_explanations(client):
     assert abs(sum(a["weight"] for a in body["allocations"]) - 1.0) < 1e-9
     assert body["plain_explanation"] == "Sade açıklama."
     assert body["metadata"]["reit_explanation"] == "REIT açıklaması."
-    # The market is now part of the call: it selects the investable universe,
-    # since EU users cannot legally hold the US-domiciled default set.
-    m_engine.assert_called_once_with(6.0, 100000, "TR")
+    # Market and language are both part of the call and are independent: the
+    # market selects the investable universe (EU users cannot legally hold the
+    # US-domiciled default set), the language selects the wording of the
+    # rationale. A default request is the Turkish market read in Turkish.
+    m_engine.assert_called_once_with(6.0, 100000, "TR", "tr")
 
 
 def test_recommend_skips_reit_explanation_when_no_reits(client):

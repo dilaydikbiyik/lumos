@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from backend.config import settings
 from backend.db.database import get_db
 from backend.limiter import limiter
+from backend.i18n import t
 from backend.middleware.language import get_language
 from backend.middleware.verify_clerk import get_current_user
 from backend.repositories import user_repository
@@ -57,8 +58,7 @@ async def chat_endpoint(
         raise HTTPException(
             status_code=429,
             detail=(
-                f"Günlük mesaj hakkın doldu ({tier['daily_quota']}/gün) — yarın yenilenir. "
-                "Daha fazla mesaj için planını yükseltebilirsin. / Daily limit reached; resets tomorrow."
+                t("error.quota", get_language(request), quota=tier["daily_quota"])
             ),
         )
     messages = [m.model_dump() for m in body.messages]
@@ -111,8 +111,7 @@ async def advisor_endpoint(
         raise HTTPException(
             status_code=429,
             detail=(
-                f"Günlük mesaj hakkın doldu ({tier['daily_quota']}/gün) — yarın yenilenir. "
-                "Daha fazla mesaj için planını yükseltebilirsin. / Daily limit reached; resets tomorrow."
+                t("error.quota", get_language(request), quota=tier["daily_quota"])
             ),
         )
     messages = [m.model_dump() for m in body.messages]
@@ -163,6 +162,10 @@ async def what_if_endpoint(
 
     allowed = await user_repository.consume_quota(db, user_id, settings.DAILY_MESSAGE_QUOTA)
     if not allowed:
-        raise HTTPException(status_code=429, detail="Günlük mesaj hakkın doldu — yarın yenilenir.")
+        raise HTTPException(
+            status_code=429,
+            detail=t("error.quota", get_language(request),
+                     quota=settings.DAILY_MESSAGE_QUOTA),
+        )
 
     return await asyncio.to_thread(answer_what_if, body.question, body.risk_score, body.budget)

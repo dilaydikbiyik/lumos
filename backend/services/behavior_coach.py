@@ -7,44 +7,32 @@ optional richer AI-generated version is available for the chat surface.
 """
 from typing import Optional
 
+from backend.i18n import t
 from backend.services.ai_service import generate_text
 
-# Calm, profile-specific templates — no AI call needed for the common case
-_DROP_MESSAGES = {
-    "low": (
-        "Piyasada bir düşüş görüyorsun ve bu seni tedirgin edebilir — bu son derece "
-        "doğal. Geçmişte benzer düşüşlerin çoğu zamanla toparlandı. Şu an hiçbir şey "
-        "yapmana gerek yok; planın zaten bu tür dalgalanmaları hesaba katarak kuruldu."
-    ),
-    "medium": (
-        "Bugünkü düşüş, uzun vadeli planının bir parçası olarak beklenen türden bir "
-        "dalgalanma. Elindeki bilgiye göre karar ver, ana haber başlıklarına göre değil."
-    ),
-    "high": (
-        "Düşüş gördün ve belki de bunu bir fırsat olarak değerlendirmeyi "
-        "düşünüyorsun — bu senin profiline uygun bir tepki. Yine de acele etme; "
-        "planlı hareket, dürtüsel hareketten güçlüdür."
-    ),
-}
-
-_RISE_MESSAGES = {
-    "low": "Piyasa yükseldi — güzel haber, ama bu bir sonraki düşüşte satmak için bir sebep değil. Plana sadık kalmak burada da geçerli.",
-    "medium": "Yükseliş iyi gidiyor. Bu, riskini artırmak için bir işaret değil — planın zaten dengeli kurulu.",
-    "high": "Yükseliş moralini yükseltebilir, ama aşırı güven riskli kararlara yol açabilir. Disiplin, coşkudan önce gelir.",
-}
+# Calm, profile-specific templates — no AI call needed for the common case.
+# The wording lives in the catalogue so the message speaks the reader's
+# language; only the profile→tone mapping belongs here.
+_TONES = {"low", "medium", "high"}
 
 
-def drop_message(loss_tolerance: str, drawdown_pct: Optional[float] = None) -> str:
+def _tone(loss_tolerance: str) -> str:
+    return loss_tolerance if loss_tolerance in _TONES else "medium"
+
+
+def drop_message(loss_tolerance: str, drawdown_pct: Optional[float] = None,
+                 lang: str = "tr") -> str:
     """Calming, profile-specific message for a market downturn."""
-    return _DROP_MESSAGES.get(loss_tolerance, _DROP_MESSAGES["medium"])
+    return t(f"coach.drop.{_tone(loss_tolerance)}", lang)
 
 
-def rise_message(loss_tolerance: str) -> str:
+def rise_message(loss_tolerance: str, lang: str = "tr") -> str:
     """Grounding message for a market upswing — prevents overconfidence."""
-    return _RISE_MESSAGES.get(loss_tolerance, _RISE_MESSAGES["medium"])
+    return t(f"coach.rise.{_tone(loss_tolerance)}", lang)
 
 
-def behavior_mirror(stated_loss_tolerance: str, recent_action: str) -> Optional[str]:
+def behavior_mirror(stated_loss_tolerance: str, recent_action: str,
+                    lang: str = "tr") -> Optional[str]:
     """
     Gently hold up a mirror when stated risk tolerance and actual behavior
     diverge — e.g. profile says "I'd sell everything" but the user just
@@ -52,19 +40,11 @@ def behavior_mirror(stated_loss_tolerance: str, recent_action: str) -> Optional[
 
     recent_action: "bought_dip" | "sold_dip" | "bought_rise" | "sold_rise"
     """
-    mismatches = {
-        ("low", "bought_dip"): (
-            "Profilinde düşüşlerde tedirgin olduğunu belirtmiştin, ama düşüş "
-            "sırasında alım yaptın — bu güzel bir cesaret işareti. Bu deneyimi "
-            "not al; belki risk toleransın düşündüğünden yüksek."
-        ),
-        ("high", "sold_dip"): (
-            "Profilinde düşüşleri fırsat olarak gördüğünü belirtmiştin, ama bu "
-            "düşüşte sattın. Bu tamamen senin kararın — sadece fark etmeni "
-            "istedik, çünkü bazen an içindeki duygu profildeki niyetten farklı olabilir."
-        ),
-    }
-    return mismatches.get((stated_loss_tolerance, recent_action))
+    key = {
+        ("low", "bought_dip"): "coach.mirror.brave",
+        ("high", "sold_dip"): "coach.mirror.sold",
+    }.get((stated_loss_tolerance, recent_action))
+    return t(key, lang) if key else None
 
 
 def ai_coach_message(loss_tolerance: str, context: str) -> str:

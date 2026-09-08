@@ -14,6 +14,7 @@ TR = MarketPack(
 
     inflation_source="tcmb_evds",      # live CPI (backend/services/evds_service.py)
     housing_index_source="tcmb_evds",  # housing price index for 19 NUTS2 regions
+    regional_housing_breakdown=True,   # 81 provinces, TL/m² unit prices
     rent_index_source="none",          # no separate rent index — spread off CPI
     default_index_ticker="XU100.IS",
 
@@ -38,7 +39,7 @@ TR = MarketPack(
     # Turkish broker can reach only with overseas-market access — a caveat the
     # first-investment guide spells out.
     asset_universe=[
-        {"ticker": "XU100.IS", "name": "BIST 100 (Türkiye Hisseleri)", "category": "stocks"},
+        {"ticker": "XU100.IS", "name": "BIST 100", "category": "stocks"},
         {"ticker": "SPY", "name": "S&P 500 ETF", "category": "stocks"},
         {"ticker": "QQQ", "name": "Nasdaq 100 ETF", "category": "stocks"},
         {"ticker": "GLD", "name": "Gold ETF", "category": "gold"},

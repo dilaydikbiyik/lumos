@@ -8,6 +8,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from backend.db.database import get_db
 from backend.middleware.verify_clerk import get_current_user
 from backend.repositories import holding_repository, user_repository
+from backend.i18n import t
+from backend.middleware.language import language
 from backend.services.behavior_coach import drop_message, rise_message
 
 router = APIRouter()
@@ -15,12 +17,16 @@ logger = logging.getLogger("lumos.coach")
 
 # Honest, static facts shown in a panic moment — zero LLM cost, zero
 # alarmism. Source: common market history; contains no forecasts.
-PANIC_FACTS = [
-    "Tarihte her büyük düşüşün bir toparlanma dönemi oldu — süresi değişir, yönü genelde değişmedi.",
-    "Panik anında satanlar, düşüşü 'gerçekleşmiş zarara' çevirir. Satmadığın sürece kayıp kağıt üstündedir.",
-    "En kötü günlerde satıp en iyi günleri kaçırmak, uzun vadeli getirinin en büyük düşmanıdır — en iyi günler çoğu zaman en kötü günlerin hemen yanındadır.",
-    "Bu ekranı kapattıktan sonra hiçbir şey yapmaman da tamamen geçerli bir karardır.",
+_PANIC_FACT_KEYS = [
+    "panic.fact.recovery",
+    "panic.fact.paper_loss",
+    "panic.fact.best_days",
+    "panic.fact.do_nothing",
 ]
+
+
+def panic_facts(lang: str) -> list[str]:
+    return [t(k, lang) for k in _PANIC_FACT_KEYS]
 
 
 class MarketMoveRequest(BaseModel):
@@ -33,6 +39,7 @@ async def market_move_message(
     body: MarketMoveRequest,
     user_id: str = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
+    lang: str = Depends(language),
 ):
     """
     Profile-specific calming/grounding message for a market move — the
@@ -43,9 +50,9 @@ async def market_move_message(
     loss_tolerance = user.loss_tolerance or "medium"
 
     if body.direction == "drop":
-        message = drop_message(loss_tolerance, body.drawdown_pct)
+        message = drop_message(loss_tolerance, body.drawdown_pct, lang)
     else:
-        message = rise_message(loss_tolerance)
+        message = rise_message(loss_tolerance, lang)
 
     return {"loss_tolerance": loss_tolerance, "message": message}
 
@@ -60,6 +67,7 @@ async def panic_button(
     body: PanicRequest,
     user_id: str = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
+    lang: str = Depends(language),
 ):
     """
     Panic Button 🫨 — pressed when the market gets scary. No dark patterns:
@@ -72,19 +80,14 @@ async def panic_button(
 
     if body.resolution is not None:
         logger.info("panic_resolved user=%s resolution=%s", user_id, body.resolution)
-        closing = (
-            "Plana sadık kalmak, panik anında verilebilecek en güçlü karardır. 🕯️"
-            if body.resolution == "held"
-            else "Endişen meşru. Büyük bir karar vermeden önce 24 saat beklemek ve "
-                 "lisanslı bir danışmanla konuşmak hiçbir şey kaybettirmez."
-        )
+        closing = t("panic.held" if body.resolution == "held" else "panic.sold", lang)
         return {"message": closing}
 
     logger.info("panic_pressed user=%s loss_tolerance=%s", user_id, loss_tolerance)
     return {
         "loss_tolerance": loss_tolerance,
-        "message": drop_message(loss_tolerance),
-        "facts": PANIC_FACTS,
+        "message": drop_message(loss_tolerance, lang=lang),
+        "facts": panic_facts(lang),
     }
 
 
@@ -92,6 +95,7 @@ async def panic_button(
 async def behavior_mirror_check(
     user_id: str = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
+    lang: str = Depends(language),
 ):
     """
     Compare stated loss tolerance against actual emotion-tagged purchases —
@@ -109,10 +113,7 @@ async def behavior_mirror_check(
 
     note = None
     if user.loss_tolerance == "low" and fomo_count > plan_count:
-        note = behavior_mirror("low", "bought_dip") or (
-            "Kararların çoğu FOMO etiketli görünüyor — bu tamamen normal, ama "
-            "farkında olmak bir sonraki kararını daha bilinçli hale getirir."
-        )
+        note = behavior_mirror("low", "bought_dip", lang) or t("coach.mirror.fomo", lang)
 
     return {
         "tagged_count": len(tagged),

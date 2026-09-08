@@ -812,6 +812,16 @@ lumos/                          ← project root
 
 - [ ] Legal/tax education content generated per pack by the LLM + "general information, consult a local professional" disclaimer (education, no legal claims)
 - [x] Cultural fear map: every pack carries localized fear_options (TR/EN/DE)
+- [x] Province table gated on its own `regional_housing_breakdown` flag. A
+      national house-price index and a province-by-province breakdown are
+      different data products: Eurostat gives Germany the first but not the
+      second, so gating on the national index showed a German reader Turkish
+      provinces priced in lira. Rent-vs-buy and the listing bridge (each
+      market's own portals) now run in every market; only the price table is
+      TR-only, and the empty state says exactly why.
+- [ ] US house PRICE index still absent — Case-Shiller needs a free FRED key.
+      Until then the US pack declares `none` rather than substituting the
+      rent index, which measures a different thing.
 - [ ] Concept glossary localization, not translation: examples with local currency and local products ("an ETF is a basket — with THY, Aselsan..." vs "...Apple, Microsoft...")
 
 ### Rollout Order
@@ -1099,8 +1109,17 @@ SEC/BaFin surface. Book the lawyer before Phase 4; the answer may change scope
 - [x] Tab title and meta description follow the chosen language — index.html
       can only carry one, and it had an English title over a Turkish
       description.
-- [ ] Backend engine strings (risk factors, drift labels, summaries — 21
-      files) keyed by request language.
+- [x] Backend engine strings keyed by request language. This was the visible
+      half of the "mixed languages" report: the UI shell translated but the
+      backend still spoke Turkish, so an English reader met Turkish risk
+      factors, asset roles, drop reasons, drift verdicts, panic facts and
+      health notes. `backend/i18n.py` holds one catalogue in three languages;
+      `X-Lumos-Lang` now reaches the risk engine, portfolio engine, drift,
+      health score, behaviour coach, projections and the LLM explainer
+      (which had "Respond in TURKISH" hard-coded). The score, the weights
+      and the market are unchanged by language — pinned by tests.
+- [x] Readiness milestones return stable keys instead of Turkish sentences,
+      so the courage checklist can be translated client-side.
 - [x] Language switcher in the UI, on the landing/login page header as well
       as inside the app — deliberately a separate control from the market
       switcher, because language is a device preference and market is where

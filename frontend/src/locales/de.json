@@ -342,7 +342,14 @@
   "readiness": {
     "title": "Mut-Wert",
     "ready": "Du bist bereit für echtes Investieren",
-    "progressing": "Jeder Schritt macht dich ein Stück bereiter"
+    "progressing": "Jeder Schritt macht dich ein Stück bereiter",
+    "milestones": {
+      "risk_profile": "Du hast dein Risikoprofil erstellt",
+      "path_chosen": "Du hast deinen Anlageweg gewählt",
+      "fear_shared": "Du hast deine Angst geteilt",
+      "first_holding": "Du hast deine erste Anlage hinzugefügt",
+      "three_holdings": "Du verfolgst mindestens 3 Anlagen"
+    }
   },
   "fear": {
     "step": "Schritt 2 / 3",
@@ -453,7 +460,13 @@
     "noResults": "\"{{search}}\" nicht gefunden — du kannst alle 81 Provinzen durchsuchen.",
     "showingFirst": "Die ersten 12 Provinzen werden angezeigt — für die übrigen oben suchen.",
     "dataError": "Die Provinzdaten sind gerade nicht erreichbar — versuch es gleich noch einmal.",
-    "fetchLinks": "Links abrufen"
+    "fetchLinks": "Links abrufen",
+    "noProvinceTable": "Für den Markt <0>{{market}}</0> gibt es noch keine Wohnpreistabelle nach Regionen — wir zeigen dir die Preise eines anderen Landes nicht so, als wären es deine.",
+    "nationalIndexOnly": "Für {{market}} gibt es einen offiziellen nationalen Häuserpreisindex; er fließt in die Miet-oder-Kauf-Rechnung unten ein. Eine Aufschlüsselung nach Regionen wird nicht veröffentlicht.",
+    "noHousingIndex": "Für {{market}} ist noch keine kostenlose, schlüssellose Quelle für einen Häuserpreisindex angebunden. Wir ergänzen sie, sobald wir eine finden; bis dahin erfinden wir keine Schätzung.",
+    "listingsSites": "In diesem Markt: {{sites}}.",
+    "cityPlaceholder": "Stadt (z. B. Berlin)",
+    "areaOptional": "Viertel/Gegend (optional)"
   },
   "rvb": {
     "title": "Mieten oder kaufen?",

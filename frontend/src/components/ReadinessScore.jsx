@@ -81,8 +81,8 @@ export default function ReadinessScore() {
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-        {Object.entries(milestones).map(([label, done]) => (
-          <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13 }}>
+        {Object.entries(milestones).map(([key, done]) => (
+          <div key={key} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13 }}>
             <span style={{
               width: 16, height: 16, borderRadius: '50%', flexShrink: 0,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -92,7 +92,7 @@ export default function ReadinessScore() {
             }}>
               {done ? '✓' : ''}
             </span>
-            <span style={{ opacity: done ? 1 : 0.55 }}>{label}</span>
+            <span style={{ opacity: done ? 1 : 0.55 }}>{t(`readiness.milestones.${key}`)}</span>
           </div>
         ))}
       </div>

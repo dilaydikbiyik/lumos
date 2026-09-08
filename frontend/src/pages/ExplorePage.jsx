@@ -398,6 +398,10 @@ function RentVsBuy() {
 
 function ListingLinks() {
   const { t } = useTranslation()
+  const { pack } = useMarket()
+  // "İl / ilçe" is a Turkish administrative shape; every market gets the
+  // portals from its own pack, so the labels have to generalise too.
+  const isTR = pack.code === 'TR'
   const [form, setForm] = useState({ il: '', ilce: '', asset_type: 'arsa' })
   const [links, setLinks] = useState(null)
   const [error, setError] = useState(null)
@@ -418,11 +422,16 @@ function ListingLinks() {
       <h3 style={{ marginBottom: 4 }}>{t('explore.listingsTitle')}</h3>
       <p style={{ fontSize: 13, opacity: 0.8, marginBottom: 12 }}>
         {t('explore.listingsBody')}
+        {pack.listing_sites?.length > 0 && (
+          <> {t('explore.listingsSites', { sites: pack.listing_sites.join(', ') })}</>
+        )}
       </p>
       <form onSubmit={run} style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-        <input className="input" placeholder={t('explore.provincePlaceholder')} required style={{ flex: 2, minWidth: 120 }}
+        <input className="input" required style={{ flex: 2, minWidth: 120 }}
+               placeholder={isTR ? t('explore.provincePlaceholder') : t('explore.cityPlaceholder')}
                value={form.il} onChange={e => setForm({ ...form, il: e.target.value })} />
-        <input className="input" placeholder={t('explore.districtOptional')} style={{ flex: 2, minWidth: 120 }}
+        <input className="input" style={{ flex: 2, minWidth: 120 }}
+               placeholder={isTR ? t('explore.districtOptional') : t('explore.areaOptional')}
                value={form.ilce} onChange={e => setForm({ ...form, ilce: e.target.value })} />
         <select className="input" style={{ flex: 1, minWidth: 90 }} value={form.asset_type}
                 onChange={e => setForm({ ...form, asset_type: e.target.value })}>
@@ -450,12 +459,17 @@ export default function ExplorePage() {
   const { t } = useTranslation()
   const { getToken } = useAuth()
   const { pack } = useMarket()
+  // A national house-price index and a province-by-province table are
+  // different data products: Germany has the first (Eurostat) but not the
+  // second, so this table is its own gate. The rent-vs-buy calculator and
+  // the listing bridge below are market-aware and run everywhere.
+  const hasProvinceTable = !!pack.regional_housing_breakdown
   const [provinces, setProvinces] = useState(null)
   const [horizon, setHorizon] = useState(3)
   const [scenarioAmount, setScenarioAmount] = useState('1.000.000')
   const [search, setSearch] = useState('')
   // Loading is derived: no data yet, or data belongs to a different horizon
-  const loading = !provinces || provinces._horizon !== horizon
+  const loading = hasProvinceTable && (!provinces || provinces._horizon !== horizon)
 
   const load = useCallback(async (years) => {
     try {
@@ -468,6 +482,7 @@ export default function ExplorePage() {
   }, [getToken])
 
   useEffect(() => {
+    if (!hasProvinceTable) return
     let cancelled = false
     async function run() {
       const data = await load(horizon)
@@ -475,7 +490,7 @@ export default function ExplorePage() {
     }
     run()
     return () => { cancelled = true }
-  }, [load, horizon])
+  }, [load, horizon, hasProvinceTable])
 
   const q = search.trim().toLocaleLowerCase('tr')
   const visible = provinces?.available
@@ -483,32 +498,6 @@ export default function ExplorePage() {
         ? provinces.provinces.filter(p => p.province.toLocaleLowerCase('tr').includes(q))
         : provinces.provinces.slice(0, 12))
     : []
-
-  // Honesty gate: this whole page is TCMB (TR) data. For non-TR markets
-  // we say so plainly instead of dressing TL data up as dollars/euros.
-  if (!pack.live_housing_index) {
-    return (
-      <div className="page">
-        <header className="navbar">
-          <LumosLogo />
-          <UserButton afterSignOutUrl="/" />
-        </header>
-        <div className="page-content">
-          <h2>{t('explore.title')}</h2>
-          <div className="card" style={{ marginTop: 16, textAlign: 'center', padding: 28 }}>
-            <div style={{ fontSize: 32, marginBottom: 10 }}>🌍</div>
-            <p style={{ fontSize: 14, lineHeight: 1.7 }}>
-              <Trans i18nKey="explore.otherMarket" values={{ market: pack.name }}
-                     components={[<strong key="a" />]} />
-            </p>
-            <p style={{ fontSize: 12, opacity: 0.65, marginTop: 10 }}>
-              {t('explore.switchToTr')}
-            </p>
-          </div>
-        </div>
-      </div>
-    )
-  }
 
   return (
     <div className="page">
@@ -526,72 +515,90 @@ export default function ExplorePage() {
           </p>
         </div>
 
-        {/* Region intelligence */}
-        <div className="card" style={{ padding: 0, background: 'none', border: 'none', boxShadow: 'none' }}>
-          <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
-            {[1, 3, 5].map(y => (
-              <button key={y}
-                      className={`btn ${horizon === y ? 'btn-primary' : 'btn-ghost'}`}
-                      style={{ flex: 1 }}
-                      onClick={() => setHorizon(y)}>
-                {t('explore.lastYears', { n: y })}
-              </button>
-            ))}
-          </div>
-
-          <input
-            className="input"
-            placeholder={t('explore.searchPlaceholder')}
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            style={{ marginBottom: 12 }}
-            aria-label={t('explore.searchLabel')}
-          />
-
-          <input
-            className="input"
-            type="text"
-            inputMode="numeric"
-            placeholder={t('explore.amountPlaceholder')}
-            value={scenarioAmount}
-            onChange={e => setScenarioAmount(e.target.value)}
-            style={{ marginBottom: 12 }}
-            aria-label={t('explore.amountLabel')}
-          />
-
-          {loading && (
-            <div style={{ textAlign: 'center', padding: 24 }}>
-              <span className="spinner" style={{ width: 28, height: 28 }} />
+        {/* Per-province price table — only where that data actually exists */}
+        {hasProvinceTable ? (
+          <>
+          {/* Region intelligence */}
+          <div className="card" style={{ padding: 0, background: 'none', border: 'none', boxShadow: 'none' }}>
+            <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
+              {[1, 3, 5].map(y => (
+                <button key={y}
+                        className={`btn ${horizon === y ? 'btn-primary' : 'btn-ghost'}`}
+                        style={{ flex: 1 }}
+                        onClick={() => setHorizon(y)}>
+                  {t('explore.lastYears', { n: y })}
+                </button>
+              ))}
             </div>
-          )}
 
-          {!loading && provinces?.available && (
-            <>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                {visible.map(p => <ProvinceCard key={p.code} province={p} amount={scenarioAmount} />)}
-                {visible.length === 0 && (
-                  <p style={{ fontSize: 13, opacity: 0.7, textAlign: 'center', padding: 12 }}>
-                    {t('explore.noResults', { search })}
+            <input
+              className="input"
+              placeholder={t('explore.searchPlaceholder')}
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              style={{ marginBottom: 12 }}
+              aria-label={t('explore.searchLabel')}
+            />
+
+            <input
+              className="input"
+              type="text"
+              inputMode="numeric"
+              placeholder={t('explore.amountPlaceholder')}
+              value={scenarioAmount}
+              onChange={e => setScenarioAmount(e.target.value)}
+              style={{ marginBottom: 12 }}
+              aria-label={t('explore.amountLabel')}
+            />
+
+            {loading && (
+              <div style={{ textAlign: 'center', padding: 24 }}>
+                <span className="spinner" style={{ width: 28, height: 28 }} />
+              </div>
+            )}
+
+            {!loading && provinces?.available && (
+              <>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  {visible.map(p => <ProvinceCard key={p.code} province={p} amount={scenarioAmount} />)}
+                  {visible.length === 0 && (
+                    <p style={{ fontSize: 13, opacity: 0.7, textAlign: 'center', padding: 12 }}>
+                      {t('explore.noResults', { search })}
+                    </p>
+                  )}
+                </div>
+                {!q && (
+                  <p style={{ fontSize: 12, opacity: 0.55, marginTop: 8, textAlign: 'center' }}>
+                    {t('explore.showingFirst')}
                   </p>
                 )}
-              </div>
-              {!q && (
-                <p style={{ fontSize: 12, opacity: 0.55, marginTop: 8, textAlign: 'center' }}>
-                  {t('explore.showingFirst')}
+                <p style={{ fontSize: 12, opacity: 0.6, marginTop: 10, lineHeight: 1.5 }}>
+                  {provinces.honesty_note} (Veri: {provinces.data_through})
                 </p>
-              )}
-              <p style={{ fontSize: 12, opacity: 0.6, marginTop: 10, lineHeight: 1.5 }}>
-                {provinces.honesty_note} (Veri: {provinces.data_through})
-              </p>
-            </>
-          )}
+              </>
+            )}
 
-          {!loading && !provinces?.available && (
-            <div className="card" style={{ textAlign: 'center', padding: 24 }}>
-              <p style={{ fontSize: 14 }}>{t('explore.dataError')}</p>
-            </div>
-          )}
-        </div>
+            {!loading && !provinces?.available && (
+              <div className="card" style={{ textAlign: 'center', padding: 24 }}>
+                <p style={{ fontSize: 14 }}>{t('explore.dataError')}</p>
+              </div>
+            )}
+          </div>
+          </>
+        ) : (
+          <div className="card">
+            <div style={{ fontSize: 26, marginBottom: 8 }}>🌍</div>
+            <p style={{ fontSize: 14, lineHeight: 1.7 }}>
+              <Trans i18nKey="explore.noProvinceTable" values={{ market: pack.name }}
+                     components={[<strong key="a" />]} />
+            </p>
+            <p style={{ fontSize: 12, opacity: 0.65, marginTop: 10, lineHeight: 1.6 }}>
+              {pack.live_housing_index
+                ? t('explore.nationalIndexOnly', { market: pack.name })
+                : t('explore.noHousingIndex', { market: pack.name })}
+            </p>
+          </div>
+        )}
 
         <RentVsBuy />
         <ListingLinks />

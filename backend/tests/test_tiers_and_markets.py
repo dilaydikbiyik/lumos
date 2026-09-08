@@ -159,6 +159,44 @@ def test_all_packs_have_required_content():
         assert len(pack.fear_options) >= 3, code
 
 
+def test_province_table_is_gated_separately_from_the_national_index():
+    """
+    A national house-price index and a province-by-province breakdown are
+    different data products. Gating the province table on the national index
+    showed a German reader Turkish provinces priced in lira — Eurostat gives
+    Germany a national index but no regional breakdown.
+    """
+    tr, us, de = MARKET_PACKS["TR"], MARKET_PACKS["US"], MARKET_PACKS["DE"]
+
+    assert tr.regional_housing_breakdown is True
+    assert de.regional_housing_breakdown is False
+    assert us.regional_housing_breakdown is False
+
+    # Germany still has the national index, so rent-vs-buy works there.
+    assert de.housing_index_source != "none"
+    assert us.housing_index_source == "none"
+
+    # No pack may claim a breakdown it has no source for.
+    for code, pack in MARKET_PACKS.items():
+        if pack.regional_housing_breakdown:
+            assert pack.housing_index_source != "none", code
+
+
+def test_listing_bridge_reaches_local_portals_in_every_market():
+    """The listing bridge is the one real-estate feature that works
+    everywhere — it needs no price index, only the market's own portals."""
+    from backend.services.listing_bridge import build_listing_links
+
+    for code, pack in MARKET_PACKS.items():
+        links = build_listing_links("Berlin", "Mitte", "daire", market=code)
+        assert links, code
+        assert {link["site"] for link in links} <= {s.name for s in pack.listing_sites} | {
+            "Sahibinden", "Emlakjet"
+        }, code
+        for link in links:
+            assert link["url"].startswith("https://"), (code, link)
+
+
 def test_every_pack_carries_its_own_country_rates():
     """
     Mortgage rates and transfer taxes are facts about a country. They lived in

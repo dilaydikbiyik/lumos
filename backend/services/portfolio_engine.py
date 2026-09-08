@@ -33,6 +33,7 @@ called on the real, fetchable growth tickers.
 import json
 from pathlib import Path
 
+from backend.i18n import t as _t
 from backend.schemas.portfolio import AssetAllocation, PortfolioRecommendResponse
 from backend.services.hybrid_basket import get_reit_assets, should_include_reits
 from backend.services.volatility import compute_volatility
@@ -50,18 +51,9 @@ _BUDGET_POSITION_CAPS = [   # (budget upper bound, max positions)
 # Defensive sleeve — sized by the glide path, but REAL fetchable tickers so
 # every downstream feature (projection, time-machine, backtest, what-if) can
 # pull their history. BIL = 1-3 month T-bills (cash-like), BND = total bond.
-_CASH_ASSET = {"ticker": "BIL", "name": "Nakit / Kısa Vade", "category": "cash"}
-_BOND_ASSET = {"ticker": "BND", "name": "Tahvil Fonu (geniş tabanlı)", "category": "bond"}
-
-# Category → role in the portfolio (core of the per-asset rationale)
-_CATEGORY_ROLES = {
-    "stocks": "büyüme motoru — uzun vadeli getiri buradan gelir",
-    "gold": "dengeleyici — hisseler düşerken genellikle farklı davranır, portföyü yumuşatır",
-    "reit": "gayrimenkul penceresi — mülk almadan emlak getirisine ortaklık",
-    "bond": "sabit getirili tampon — hisse dalgalanmasını yumuşatır, düzenli faiz üretir",
-    "cash": "güvenlik yastığı — düşüşte değer kaybetmez, fırsat ve acil durum likiditesi",
-    "fund": "hazır sepet — tek kalemde çeşitlendirme",
-}
+# The defensive names are translated at build time; the ticker is the identity.
+_CASH_ASSET = {"ticker": "BIL", "name_key": "asset.cash.name", "category": "cash"}
+_BOND_ASSET = {"ticker": "BND", "name_key": "asset.bond.name", "category": "bond"}
 
 
 def _load_universe() -> list[dict]:
@@ -132,27 +124,38 @@ def _apply_max_position(weights: dict[str, float]) -> dict[str, float]:
     return w
 
 
-def _growth_rationale(category: str, vol: float, weight: float, alpha: float) -> str:
-    role = _CATEGORY_ROLES.get(category, "çeşitlendirici")
+def _role(category: str, lang: str) -> str:
+    """Category → its role in the portfolio (core of the per-asset rationale)."""
+    key = f"role.{category}"
+    return _t(key, lang) if key in _ROLE_KEYS else _t("role.default", lang)
+
+
+_ROLE_KEYS = {"role.stocks", "role.gold", "role.reit", "role.bond", "role.cash", "role.fund"}
+
+
+def _growth_rationale(category: str, vol: float, weight: float, alpha: float, lang: str) -> str:
     vol_pct = round(vol * 100)
     if alpha < 0.45:
-        tilt = f"profilin temkinli olduğu için düşük oynaklık (%{vol_pct}) ağırlığı artırdı"
+        tilt_key = "weight.tilt.cautious"
     elif alpha > 0.7:
-        tilt = f"yüksek risk iştahın oynaklığı (%{vol_pct}) getiri motoruna çevirdi"
+        tilt_key = "weight.tilt.bold"
     else:
-        tilt = f"dengeli profilinde %{vol_pct} oynaklık orta ağırlık aldı"
-    return f"Rolü: {role}. Ağırlığın gerekçesi: {tilt} → %{round(weight * 100, 1)}."
+        tilt_key = "weight.tilt.balanced"
+    return _t("weight.growth", lang,
+              role=_role(category, lang),
+              tilt=_t(tilt_key, lang, vol=vol_pct),
+              pct=round(weight * 100, 1))
 
 
-def _defensive_rationale(category: str, weight: float, defensive_target: float) -> str:
-    role = _CATEGORY_ROLES.get(category, "koruma")
-    return (
-        f"Rolü: {role}. Ağırlığın gerekçesi: risk profilin portföyün ~%{round(defensive_target * 100)}'ünü "
-        f"savunmaya (nakit/tahvil) ayırmayı gerektiriyor → %{round(weight * 100, 1)}."
-    )
+def _defensive_rationale(category: str, weight: float, defensive_target: float, lang: str) -> str:
+    return _t("weight.defensive", lang,
+              role=_role(category, lang),
+              defensive=round(defensive_target * 100),
+              pct=round(weight * 100, 1))
 
 
-def build_portfolio(risk_score: float, budget: float, market: str = "TR") -> PortfolioRecommendResponse:
+def build_portfolio(risk_score: float, budget: float, market: str = "TR",
+                    lang: str = "tr") -> PortfolioRecommendResponse:
     """
     Compute a glide-path portfolio: a risk-sized defensive sleeve (cash + bonds)
     plus a volatility-blended growth sleeve (equities + gold + REIT).
@@ -221,16 +224,11 @@ def build_portfolio(risk_score: float, budget: float, market: str = "TR") -> Por
             # names. Say which, so a dropped-but-higher-ranked asset doesn't
             # look arbitrary.
             if category_of[t] in kept_categories:
-                reason = (
-                    f"Aynı kategoriden ({category_of[t]}) bir varlık zaten seçildi — "
-                    "aynı şeyi izleyen iki fonu birlikte tutmak çeşitlendirme "
-                    "görüntüsü verir ama riski azaltmaz"
-                )
+                reason = _t("drop.same_category", lang,
+                           category=_t(f"category.{category_of[t]}", lang))
             else:
-                reason = (
-                    f"{budget:,.0f} TL bütçe için azami {cap} pozisyon hedeflendi — "
-                    "küçük bütçeyi çok parçaya bölmek pratik değil"
-                )
+                reason = _t("drop.position_cap", lang, cap=cap,
+                           budget=f"{budget:,.0f} {pack.currency_symbol}")
             dropped.append({
                 "ticker": t,
                 "weight_pct": round(growth_w[t] * 100, 1),
@@ -259,7 +257,7 @@ def build_portfolio(risk_score: float, budget: float, market: str = "TR") -> Por
         dropped.append({
             "ticker": t,
             "weight_pct": round(weights[t] * 100, 1),
-            "reason": f"%{MIN_WEIGHT_PCT} altı kırıntı pozisyon — takip yükü ve işlem maliyeti katkısını aşar",
+            "reason": _t("drop.crumb", lang, min=MIN_WEIGHT_PCT),
         })
         weights.pop(t)
 
@@ -277,14 +275,15 @@ def build_portfolio(risk_score: float, budget: float, market: str = "TR") -> Por
         asset = by_ticker[t]
         category = asset.get("category", "other")
         if t in defensive_categories:
-            explanation = _defensive_rationale(category, weight, defensive_target)
+            explanation = _defensive_rationale(category, weight, defensive_target, lang)
         else:
             vol = volatilities.get(t, 0.15)
-            explanation = _growth_rationale(category, vol, weight, alpha)
+            explanation = _growth_rationale(category, vol, weight, alpha, lang)
         allocations.append(
             AssetAllocation(
                 ticker=t,
-                name=asset.get("name", t),
+                name=(_t(asset["name_key"], lang) if "name_key" in asset
+                      else asset.get("name", t)),
                 weight=round(weight, 4),
                 category=category,
                 explanation=explanation,
@@ -309,13 +308,7 @@ def build_portfolio(risk_score: float, budget: float, market: str = "TR") -> Por
                 "alpha": round(alpha, 2),
                 "defensive_target_pct": round(defensive_target * 100, 1),
                 "growth_target_pct": round(growth_target * 100, 1),
-                "formula": (
-                    "Güvenli pay = 60 − (5,5 × risk skoru), en az %0 en fazla %60 "
-                    "(nakit + tahvil). Kalan pay büyüme varlıklarına dağıtılır: "
-                    "her varlığın ağırlığı = (1 − α) × (1 / oynaklık) + α × oynaklık. "
-                    "α risk skorunun onda biridir; yani α büyüdükçe oynak varlıklar "
-                    "daha fazla, küçüldükçe sakin varlıklar daha fazla pay alır."
-                ),
+                "formula": _t("formula.allocation", lang),
                 "position_cap": cap,
                 "max_position_pct": MAX_POSITION_PCT,
                 "min_weight_pct": MIN_WEIGHT_PCT,

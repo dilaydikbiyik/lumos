@@ -28,7 +28,7 @@ Sentence 2: What they realistically provide — income, diversification, inflati
 Sentence 3: One honest limitation or risk the user should be aware of (e.g., sensitivity to interest rate changes, liquidity during market stress, or sector concentration risk).
 
 TONE: Professional, warm, specific. Never oversell. Never guarantee returns. No jargon without explanation.
-LANGUAGE: Respond in TURKISH. The app's UI language is Turkish — even though this prompt is written in English, the reader is a Turkish beginner.
+LANGUAGE: Respond in {language}. That is the language the reader chose — even though this prompt is written in English, write the whole answer in it.
 
 DISCLAIMER: Do NOT append one. The app shows a persistent educational notice
 below this card; repeating it here (especially in two languages) reads as

@@ -16,6 +16,7 @@ from backend.schemas.planning import (
     RentVsBuyRequest,
 )
 from backend.repositories import user_repository
+from backend.middleware.language import language
 from backend.services.goal_planner import progress_and_drift, required_monthly_contribution
 from backend.services.listing_bridge import build_listing_links
 from backend.services.rent_vs_buy import compare_rent_vs_buy
@@ -125,6 +126,7 @@ async def asset_projection(
     request: Request,
     body: AssetProjectionRequest,
     user_id: str = Depends(get_current_user),
+    lang: str = Depends(language),
 ):
     """
     Future scenarios — not a forecast: the distribution of every N-year
@@ -133,7 +135,9 @@ async def asset_projection(
     """
     from backend.services.projection import project_asset
     # project_asset fetches yfinance price history (blocking HTTP)
-    return await asyncio.to_thread(project_asset, body.ticker.upper(), body.amount, body.years)
+    return await asyncio.to_thread(
+        project_asset, body.ticker.upper(), body.amount, body.years, lang
+    )
 
 
 @router.post("/projection/region")
@@ -142,10 +146,13 @@ async def region_projection(
     request: Request,
     body: RegionProjectionRequest,
     user_id: str = Depends(get_current_user),
+    lang: str = Depends(language),
 ):
     """Region scenario band — TCMB housing-index window distribution + real terms."""
     from backend.services.projection import project_region
-    return await asyncio.to_thread(project_region, body.region_code, body.amount, body.years)
+    return await asyncio.to_thread(
+        project_region, body.region_code, body.amount, body.years, lang
+    )
 
 
 @router.post("/projection/portfolio")
@@ -154,6 +161,7 @@ async def portfolio_projection(
     request: Request,
     body: PortfolioProjectionRequest,
     user_id: str = Depends(get_current_user),
+    lang: str = Depends(language),
 ):
     """
     Combined portfolio scenario band — the weighted whole-portfolio
@@ -166,7 +174,9 @@ async def portfolio_projection(
     if not 0.95 <= total <= 1.05:
         from fastapi import HTTPException
         raise HTTPException(status_code=422, detail=f"Weights must sum to ~1 (got {total:.2f}).")
-    return await asyncio.to_thread(project_portfolio, body.weights, body.amount, body.years)
+    return await asyncio.to_thread(
+        project_portfolio, body.weights, body.amount, body.years, lang
+    )
 
 
 @router.get("/province-intelligence")

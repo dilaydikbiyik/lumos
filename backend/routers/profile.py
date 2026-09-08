@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.db.database import get_db
+from backend.middleware.language import language
 from backend.middleware.verify_clerk import get_current_user
 from backend.repositories import user_repository
 from backend.schemas.user_profile import RiskProfileAnswers, RiskProfileResponse
@@ -17,12 +18,13 @@ async def save_profile(
     answers: RiskProfileAnswers,
     user_id: str = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
+    lang: str = Depends(language),
 ):
     """
     POST /profile — receive risk-profiling answers, compute risk score,
     persist to DB linked to the Clerk user ID.
     """
-    profile = compute_risk_score(answers)
+    profile = compute_risk_score(answers, lang)
     await user_repository.save_risk_profile(
         db, user_id,
         risk_score=profile.risk_score,
@@ -43,6 +45,7 @@ async def save_profile(
 async def get_profile(
     user_id: str = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
+    lang: str = Depends(language),
 ):
     """GET /profile — return the saved risk profile for the current user."""
     user = await user_repository.get_by_clerk_id(db, user_id)
@@ -61,4 +64,4 @@ async def get_profile(
         income_stability=user.income_stability,
         high_interest_debt=user.high_interest_debt,
     )
-    return compute_risk_score(answers)
+    return compute_risk_score(answers, lang)
