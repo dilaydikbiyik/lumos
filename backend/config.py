@@ -34,6 +34,12 @@ class Settings(BaseSettings):
     # TCMB EVDS — live CPI (TUFE) + housing price index (free key)
     TCMB_EVDS_API_KEY: str = ""
 
+    # FRED (St. Louis Fed) — the one US house PRICE source that is free:
+    # FHFA state-level and Case-Shiller national. Free key, no paid tier.
+    # Empty means the US pack keeps declaring no housing index rather than
+    # substituting the rent index, which measures a different thing.
+    FRED_API_KEY: str = ""
+
     # ── Observability (optional) ──
     SENTRY_DSN: str = ""          # sentry.io — leave empty to disable error monitoring
 

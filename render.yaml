@@ -38,6 +38,10 @@ services:
         sync: false
       - key: TCMB_EVDS_API_KEY
         sync: false
+      # US house price index (FHFA by state + Case-Shiller national). Free
+      # key; without it the US pack has no housing index at all.
+      - key: FRED_API_KEY
+        sync: false
       - key: FRONTEND_URL
         sync: false
       # Free-tier cross-provider fallback keys (gemini -> groq -> openrouter);
