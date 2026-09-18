@@ -7,14 +7,14 @@ import IsikTut from '../components/IsikTut'
 import useMarket from '../hooks/useMarket'
 import { Trans, useTranslation } from 'react-i18next'
 
-// EVERY amount on this page is TCMB TL/m² data — it stays pinned to
-// TRY + tr-TR regardless of the user's market (pretending to convert
-// currencies would be a lie). For non-TR markets the page shows an
-// honest "integration on the way" state instead.
-const fmt = n => new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 0 }).format(n)
+// Every amount here used to be TCMB TL/m² data, so a module-level formatter
+// pinned to tr-TR was correct. It stopped being correct the moment the US got
+// its own table: a Texas scenario rendered "1.045.283 TL". Formatting now
+// comes from the market, like everywhere else in the app.
 
 function ProvinceScenario({ province, amount }) {
   const { t } = useTranslation()
+  const { fmt, money, pack } = useMarket()
   const [band, setBand] = useState(null)
   const [links, setLinks] = useState(null)
   const [loading, setLoading] = useState(false)
@@ -65,13 +65,13 @@ function ProvinceScenario({ province, amount }) {
             <Trans i18nKey="explore.bandIntro" values={{ province: province.province }}
                    components={[<strong key="a" />]} />
           </p>
-          <div>{t('explore.worstBand')}: <strong style={{ color: 'var(--red)' }}>{fmt(band.pessimistic.value)} TL</strong>
+          <div>{t('explore.worstBand')}: <strong style={{ color: 'var(--red)' }}>{money(band.pessimistic.value)}</strong>
             {band.real_band && <span style={{ fontSize: 11, opacity: 0.7 }}> · {t('explore.real')} {band.real_band.pessimistic_pct > 0 ? '+' : ''}{band.real_band.pessimistic_pct}%</span>}
           </div>
-          <div>{t('explore.typicalBand')}: <strong style={{ color: 'var(--firefly, #F5A524)' }}>{fmt(band.typical.value)} TL</strong>
+          <div>{t('explore.typicalBand')}: <strong style={{ color: 'var(--firefly, #F5A524)' }}>{money(band.typical.value)}</strong>
             {band.real_band && <span style={{ fontSize: 11, opacity: 0.7 }}> · {t('explore.real')} {band.real_band.typical_pct > 0 ? '+' : ''}{band.real_band.typical_pct}%</span>}
           </div>
-          <div>{t('explore.bestBand')}: <strong style={{ color: 'var(--green, #3DD68C)' }}>{fmt(band.optimistic.value)} TL</strong>
+          <div>{t('explore.bestBand')}: <strong style={{ color: 'var(--green, #3DD68C)' }}>{money(band.optimistic.value)}</strong>
             {band.real_band && <span style={{ fontSize: 11, opacity: 0.7 }}> · {t('explore.real')} {band.real_band.optimistic_pct > 0 ? '+' : ''}{band.real_band.optimistic_pct}%</span>}
           </div>
           {links && (
@@ -81,10 +81,15 @@ function ProvinceScenario({ province, amount }) {
               </p>
               <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}
                    onClick={e => e.stopPropagation()}>
-                <input className="input" placeholder={t('explore.districtPlaceholder')} value={ilce}
+                {/* The example places come from the market pack: offering a
+                    Texan "e.g. Keşan" is the same category of mistake as
+                    pricing Texas in lira. */}
+                <input className="input" value={ilce}
+                       placeholder={t('explore.districtPlaceholder', { example: pack.example_district })}
                        onChange={e => setIlce(e.target.value)}
                        style={{ flex: 1, minWidth: 100, fontSize: 13 }} />
-                <input className="input" placeholder={t('explore.neighbourhoodPlaceholder')} value={detail}
+                <input className="input" value={detail}
+                       placeholder={t('explore.neighbourhoodPlaceholder', { example: pack.example_locality })}
                        onChange={e => setDetail(e.target.value)}
                        style={{ flex: 1, minWidth: 120, fontSize: 13 }} />
                 <select className="input" value={assetType}
@@ -117,7 +122,7 @@ function ProvinceScenario({ province, amount }) {
 
 function ProvinceCard({ province, amount, measure }) {
   const { t } = useTranslation()
-  const { pack } = useMarket()
+  const { fmt, unit } = useMarket()
   const realPositive = (province.real_change_pct ?? 0) > 0
   const [open, setOpen] = useState(false)
   return (
@@ -136,7 +141,7 @@ function ProvinceCard({ province, amount, measure }) {
             the two markets report the same kind of number. */}
         <div style={{ fontSize: 12, opacity: 0.7 }}>
           {measure === 'unit_price_per_m2'
-            ? `${fmt(province.price_per_m2)} ${pack.currency_symbol}/m²`
+            ? `${fmt(province.price_per_m2)} ${unit}/m²`
             : t('explore.indexOnly')}
         </div>
       </div>
@@ -156,6 +161,7 @@ function ProvinceCard({ province, amount, measure }) {
 
 function RentVsBuy() {
   const { t } = useTranslation()
+  const { fmt, money } = useMarket()
   const [form, setForm] = useState({ down_payment: '', monthly_rent: '', home_price: '', income: '', years: 10, rate: '', term: '', cash_includes_costs: false })
   const [result, setResult] = useState(null)
   const [error, setError] = useState(null)
@@ -340,7 +346,7 @@ function RentVsBuy() {
                 🏠 {t('rvb.ifBuy')} {buyWins && '✓'}
               </div>
               <div style={{ fontSize: 12, opacity: 0.75 }}>{t('rvb.netWorthAfter', { years: result.years })}</div>
-              <div style={{ fontSize: 17, fontWeight: 700 }}>{fmt(result.buy.net_worth)} TL</div>
+              <div style={{ fontSize: 17, fontWeight: 700 }}>{money(result.buy.net_worth)}</div>
               <div style={{ fontSize: 11, opacity: 0.6, marginTop: 2 }}>
                 {t('rvb.inTodaysMoney', { amount: fmt(result.buy.net_worth_real) })}
               </div>
@@ -360,7 +366,7 @@ function RentVsBuy() {
                 {t('rvb.ifRent')} {!buyWins && '✓'}
               </div>
               <div style={{ fontSize: 12, opacity: 0.75 }}>{t('rvb.netWorthAfter', { years: result.years })}</div>
-              <div style={{ fontSize: 17, fontWeight: 700 }}>{fmt(result.rent.net_worth)} TL</div>
+              <div style={{ fontSize: 17, fontWeight: 700 }}>{money(result.rent.net_worth)}</div>
               <div style={{ fontSize: 11, opacity: 0.6, marginTop: 2 }}>
                 {t('rvb.inTodaysMoney', { amount: fmt(result.rent.net_worth_real) })}
               </div>
@@ -409,6 +415,7 @@ function ListingLinks() {
   // "İl / ilçe" is a Turkish administrative shape; every market gets the
   // portals from its own pack, so the labels have to generalise too.
   const isTR = pack.code === 'TR'
+  const example = pack.example_district || ''
   const [form, setForm] = useState({ il: '', ilce: '', asset_type: 'arsa' })
   const [links, setLinks] = useState(null)
   const [error, setError] = useState(null)
@@ -435,7 +442,8 @@ function ListingLinks() {
       </p>
       <form onSubmit={run} style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
         <input className="input" required style={{ flex: 2, minWidth: 120 }}
-               placeholder={isTR ? t('explore.provincePlaceholder') : t('explore.cityPlaceholder')}
+               placeholder={isTR ? t('explore.provincePlaceholder')
+                                : t('explore.cityPlaceholder', { example })}
                value={form.il} onChange={e => setForm({ ...form, il: e.target.value })} />
         <input className="input" style={{ flex: 2, minWidth: 120 }}
                placeholder={isTR ? t('explore.districtOptional') : t('explore.areaOptional')}
@@ -563,6 +571,11 @@ export default function ExplorePage() {
             {loading && (
               <div style={{ textAlign: 'center', padding: 24 }}>
                 <span className="spinner" style={{ width: 28, height: 28 }} />
+                {/* A bare spinner over a blank page reads as "it doesn't
+                    load". Say what is being fetched and that it is once. */}
+                <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 12, lineHeight: 1.6 }}>
+                  {t(`explore.loading_${areaWord}`)}
+                </p>
               </div>
             )}
 
@@ -585,7 +598,7 @@ export default function ExplorePage() {
                   </p>
                 )}
                 <p style={{ fontSize: 12, opacity: 0.6, marginTop: 10, lineHeight: 1.5 }}>
-                  {provinces.honesty_note} (Veri: {provinces.data_through})
+                  {provinces.honesty_note} {t('explore.dataThrough', { month: provinces.data_through })}
                 </p>
               </>
             )}

@@ -37,6 +37,9 @@ DE = MarketPack(
         "https://www.handelsblatt.com/contentexport/feed/finanzen",
     ],
 
+    example_district="Neukölln",
+    example_locality="Rixdorf",
+
     listing_sites=[
         ListingSite("ImmoScout24", "https://www.immobilienscout24.de/Suche/de/{query}"),
         ListingSite("Immowelt", "https://www.immowelt.de/suche/{query}/immobilien"),

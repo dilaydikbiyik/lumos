@@ -69,6 +69,7 @@ async def lifespan(app: FastAPI):
     import logging as _logging
 
     warm_task = None
+    housing_task = None
     if settings.APP_ENV == "production":
         _warm_log = _logging.getLogger("lumos.startup")
 
@@ -86,12 +87,32 @@ async def lifespan(app: FastAPI):
                 except Exception as exc:
                     _warm_log.warning("News digest warm failed (%s): %s", path, type(exc).__name__)
 
+        async def _warm_housing_indices():
+            """
+            The US state table needs 51 FRED series. On a cold cache that is
+            51 round-trips before the page can render anything, which on a
+            free instance that also has to wake up reads as "Explore doesn't
+            load for other markets". Free and keyless work is done here once,
+            off the request path.
+            """
+            from backend.services import fred_service
+
+            if not fred_service.is_configured():
+                return
+            try:
+                states = await _asyncio.to_thread(fred_service.get_all_state_hpi)
+                _warm_log.info("US housing index warmed: %d states", len(states))
+            except Exception as exc:
+                _warm_log.warning("US housing warm failed: %s", type(exc).__name__)
+
         warm_task = _asyncio.create_task(_warm_news_digest())
+        housing_task = _asyncio.create_task(_warm_housing_indices())
 
     yield
 
-    if warm_task is not None:
-        warm_task.cancel()
+    for task in (warm_task, housing_task):
+        if task is not None:
+            task.cancel()
 
 
 app = FastAPI(

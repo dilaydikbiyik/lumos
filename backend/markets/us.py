@@ -37,6 +37,9 @@ US = MarketPack(
         "https://finance.yahoo.com/news/rssindex",
     ],
 
+    example_district="Travis County",
+    example_locality="Round Rock",
+
     listing_sites=[
         ListingSite("Zillow", "https://www.zillow.com/homes/{query}_rb/"),
         ListingSite("Realtor", "https://www.realtor.com/realestateandhomes-search/{query}"),

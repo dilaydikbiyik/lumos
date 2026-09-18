@@ -31,6 +31,8 @@ def public_markets() -> list[dict]:
             "live_inflation": p.inflation_source != "none",
             "live_housing_index": p.housing_index_source != "none",
             "regional_housing_breakdown": p.regional_housing_breakdown,
+            "example_district": p.example_district,
+            "example_locality": p.example_locality,
         }
         for p in MARKET_PACKS.values()
     ]

@@ -696,3 +696,26 @@ def test_each_market_declares_its_own_universe():
     assert "XU100.IS" in universes["TR"]
     # and no two markets offer an identical menu
     assert len({frozenset(u) for u in universes.values()}) == len(universes)
+
+
+def test_every_pack_supplies_its_own_example_places():
+    """
+    The micro-location inputs offered "e.g. Keşan" as a district on the Texas
+    card — the same category of mistake as pricing Texas in lira. Example
+    places are a country fact and belong in the pack.
+    """
+    examples = {}
+    for code, pack in MARKET_PACKS.items():
+        assert pack.example_district, code
+        assert pack.example_locality, code
+        examples[code] = (pack.example_district, pack.example_locality)
+
+    # No two markets may share an example, which is what copying looks like.
+    assert len(set(examples.values())) == len(examples), examples
+
+    # They reach the client, or the UI has nothing to show.
+    from backend.markets import public_markets
+
+    for row in public_markets():
+        assert row["example_district"], row["code"]
+        assert row["example_locality"], row["code"]

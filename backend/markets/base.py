@@ -48,6 +48,11 @@ class MarketPack:
 
     # ── Real-estate listing bridge ──
     listing_sites: list[ListingSite] = field(default_factory=list)
+    # Example place names for the micro-location inputs. A country fact like
+    # any other: the Texas card was offering "e.g. Keşan" as a district, which
+    # is the same category of mistake as pricing Texas in lira.
+    example_district: str = ""
+    example_locality: str = ""
 
     # ── Country-specific planning inputs ──
     # These were Turkish constants living in assumptions.py. A 39% mortgage

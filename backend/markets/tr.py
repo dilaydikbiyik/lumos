@@ -54,6 +54,9 @@ TR = MarketPack(
         "https://www.bloomberght.com/rss",
     ],
 
+    example_district="Lüleburgaz",
+    example_locality="Emirali",
+
     listing_sites=[
         ListingSite("Sahibinden", "https://www.sahibinden.com/arama?query_text={query}"),
         ListingSite("Emlakjet", "https://www.emlakjet.com/arama/?q={query}"),
