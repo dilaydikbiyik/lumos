@@ -115,14 +115,27 @@ class MarketPack:
 
     def say(self, field_name: str, lang: str = "en") -> str:
         """
-        A localized pack string. Falls back to English, then to whatever the
-        pack has — a market must never render blank because one translation
-        is missing.
+        A localized pack string.
+
+        Resolution order: this pack's own wording, then the shared default
+        for fields that have one, then English, then whatever the pack has.
+        A market must never render blank because one translation is missing,
+        and a new pack must not have to restate boilerplate to exist.
         """
         value = getattr(self, field_name) or {}
         if not isinstance(value, dict):
             return value
-        return value.get(lang) or value.get("en") or next(iter(value.values()), "")
+        own = value.get(lang) or value.get("en")
+        if own:
+            return own
+
+        from backend.i18n import t
+
+        key = f"market.{field_name}"
+        shared = t(key, lang)
+        if shared != key:
+            return shared
+        return next(iter(value.values()), "")
 
     def fears(self, lang: str = "en") -> dict[str, str]:
         """Fear check-in options in the reader's language, keyed by stable id."""

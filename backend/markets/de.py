@@ -157,18 +157,4 @@ DE = MarketPack(
             "tr": "Batırmaktan korkuyorum",
         },
     },
-    disclaimer={
-        "de": (
-            "Nur zu Bildungszwecken — Regeln ändern sich und jede Situation ist "
-            "anders. Bitte bestätige alles mit einer lizenzierten Fachperson vor Ort."
-        ),
-        "en": (
-            "Educational content only — rules change and individual situations "
-            "differ. Always confirm with a licensed local professional."
-        ),
-        "tr": (
-            "Yalnızca eğitim amaçlıdır — kurallar değişir ve herkesin durumu "
-            "farklıdır. Her zaman yerel lisanslı bir profesyonele doğrulat."
-        ),
-    },
 )

@@ -74,19 +74,48 @@ def _row(code: str, name: str, series: dict[str, float], quarters: int,
     }
 
 
-def _tr_areas() -> tuple[dict[str, dict], bool]:
+def _tcmb_areas() -> tuple[dict[str, dict], bool]:
+    """TCMB publishes a price LEVEL: TL per m², per province."""
     data = evds_service.get_province_unit_prices() or {}
     return ({code: {"name": e["name"], "series": e["prices"]}
              for code, e in data.items()}, True)
 
 
-def _us_areas() -> tuple[dict[str, dict], bool]:
+def _fred_areas() -> tuple[dict[str, dict], bool]:
+    """FHFA via FRED publishes an INDEX, per state — no price level."""
     data = fred_service.get_all_state_hpi()
     return ({code: {"name": e["name"], "series": e["index"]}
              for code, e in data.items()}, False)
 
 
-_SOURCES = {"TR": _tr_areas, "US": _us_areas}
+# Keyed by the source a pack DECLARES, not by its country code — the same
+# pattern inflation_service uses. A new market that declares an existing
+# source works without touching this file; one that brings a new source adds
+# a reader here and nowhere else.
+_SOURCES = {
+    "tcmb_evds": _tcmb_areas,
+    "fred": _fred_areas,
+}
+
+
+def _pack(market: str):
+    from backend.markets import get_market_pack
+
+    return get_market_pack(market)
+
+
+def _area_source(market: str):
+    """
+    The reader for this market's sub-national data, or None.
+
+    A pack must both declare a breakdown AND name a source we can read;
+    claiming one without the other would render an empty table rather than
+    the honest "not published here" card.
+    """
+    pack = _pack(market)
+    if not pack.regional_housing_breakdown:
+        return None
+    return _SOURCES.get(pack.housing_index_source)
 
 
 def rank_provinces(horizon_years: int = 3, market: str = "TR",
@@ -100,7 +129,7 @@ def rank_provinces(horizon_years: int = 3, market: str = "TR",
     quarters = horizon_years * _QUARTERS_PER_YEAR
     market = (market or "TR").upper()
 
-    source = _SOURCES.get(market)
+    source = _area_source(market)
     if source is None:
         return {"available": False, "provinces": [],
                 "note": t("province.no_breakdown", lang, market=market)}
@@ -135,8 +164,12 @@ def rank_provinces(horizon_years: int = 3, market: str = "TR",
         # level can be printed as "X per m²", an index cannot.
         "measure": "unit_price_per_m2" if price_level else "price_index",
         "data_through": latest_month,
-        "honesty_note": t(
-            "province.note_tr" if price_level else "province.note_us", lang
+        # Named for the kind of number, not the country: a new market reading
+        # an index would otherwise be handed "the US note".
+        "honesty_note": (
+            t("province.note_price_level", lang) if price_level
+            else t("province.note_index", lang,
+                   source=t(f"source.{_pack(market).housing_index_source}", lang))
         ),
         "provinces": rows,
     }
@@ -153,7 +186,7 @@ def project_province(code: str, amount: float, years: int,
     import numpy as np
 
     market = (market or "TR").upper()
-    source = _SOURCES.get(market)
+    source = _area_source(market)
     if source is None:
         return {"available": False, "reason": t("province.no_breakdown", lang, market=market)}
 

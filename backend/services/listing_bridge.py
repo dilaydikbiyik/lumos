@@ -73,12 +73,23 @@ def _tr_links(il: str, ilce: str, asset_type: str, detail: Optional[str] = None)
     ]
 
 
+# market code -> verified deep-link builder. Adding a market means adding
+# search templates to its pack; adding an entry here is an optional upgrade
+# once someone has checked the paths resolve.
+_DEEP_LINK_BUILDERS = {"TR": _tr_links}
+
+
 def build_listing_links(
     il: str, ilce: str, asset_type: str,
     market: str = "TR", detail: Optional[str] = None,
 ) -> list[dict]:
-    if (market or "TR").upper() == "TR":
-        return _tr_links(il, ilce, asset_type, detail)
+    # Hand-tuned deep URLs exist only where the paths were verified against
+    # the live sites; every other market uses its pack's search templates.
+    # Keyed by market because the URLs themselves are, but a pack without an
+    # entry here simply gets the generic path — nothing to remember.
+    builder = _DEEP_LINK_BUILDERS.get((market or "TR").upper())
+    if builder:
+        return builder(il, ilce, asset_type, detail)
 
     pack = get_market_pack(market)
     # The asset_type ids are Turkish ("arsa", "daire") because Türkiye was the

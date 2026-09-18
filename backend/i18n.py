@@ -433,6 +433,17 @@ _C: dict[str, dict[str, str]] = {
         "tr": "Bu korku çoğu yeni başlayanda var. Küçük adımlarla, sanal pratikle başlayacağız — gerçek parayla asla acele etmeyeceksin.",
         "en": "Most beginners feel this. We'll start with small steps and virtual practice — you'll never be rushed with real money.",
         "de": "Diese Angst haben die meisten Anfänger. Wir starten mit kleinen Schritten und virtueller Übung — mit echtem Geld wird nichts überstürzt."},
+    # ── market pack defaults ──
+    # The educational disclaimer is the same promise in every market, so it
+    # lives here rather than being copied into each pack in three languages —
+    # three copies of one sentence is three chances for it to drift. A pack
+    # that needs its own wording (a regulator demanding specific language)
+    # still overrides it.
+    "market.disclaimer": {
+        "tr": "Yalnızca eğitim amaçlıdır — kurallar değişir ve herkesin durumu farklıdır. Her zaman yerel lisanslı bir profesyonele doğrulat.",
+        "en": "Educational content only — rules change and individual situations differ. Always confirm with a licensed local professional.",
+        "de": "Nur zu Bildungszwecken — Regeln ändern sich und jede Situation ist anders. Bitte bestätige alles mit einer lizenzierten Fachperson."},
+
     # ── region ranking ──
     "region.real_gain": {
         "tr": "Enflasyonun ÜZERİNDE değerlendi — reel kazanç.",
@@ -460,14 +471,28 @@ _C: dict[str, dict[str, str]] = {
         "tr": "{market} pazarı için bölge bölge konut verisi yayınlanmıyor.",
         "en": "No area-by-area housing data is published for the {market} market.",
         "de": "Für den Markt {market} werden keine regionalen Wohndaten veröffentlicht."},
-    "province.note_tr": {
+    "province.note_price_level": {
         "tr": "İl ortalaması birim fiyatlardır (TCMB) — mahalle/parsel analizi değildir. Geçmiş değerlenme geleceğin garantisi değildir.",
         "en": "These are province-average unit prices (Turkish central bank) — not a neighbourhood or parcel analysis. Past appreciation guarantees nothing about the future.",
         "de": "Das sind Durchschnittspreise je Provinz (türkische Zentralbank) — keine Viertel- oder Grundstücksanalyse. Vergangene Wertsteigerung garantiert nichts für die Zukunft."},
-    "province.note_us": {
-        "tr": "FHFA eyalet konut fiyat ENDEKSİDİR (FRED) — değerlenmeyi ölçer, metrekare fiyatını değil, o yüzden burada birim fiyat göstermiyoruz. Endeks satış fiyatlarının yanında yeniden finansman değerlemelerini de içerir; Case-Shiller'ın yalnızca tekrar satışa dayanan yönteminden bu yönüyle ayrılır. Eyalet ortalamasıdır, tek bir şehir ya da mahalle değil.",
-        "en": "This is the FHFA state house price INDEX (via FRED) — it measures appreciation, not the price of a square metre, which is why no unit price is shown. The index draws on appraisals from refinancings as well as sales, which is where it differs from Case-Shiller's repeat-sales method. It is a state average, not one city or neighbourhood.",
-        "de": "Das ist der FHFA-Häuserpreis-INDEX je Bundesstaat (über FRED) — er misst die Wertentwicklung, nicht den Quadratmeterpreis; deshalb wird hier kein Einzelpreis angezeigt. Der Index stützt sich neben Verkäufen auch auf Bewertungen aus Refinanzierungen und unterscheidet sich darin von der Wiederverkaufsmethode von Case-Shiller. Es ist ein Durchschnitt je Bundesstaat, nicht einer Stadt oder eines Viertels."},
+    "province.note_index": {
+        "tr": "Bu bir fiyat ENDEKSİDİR — değerlenmeyi ölçer, metrekare fiyatını değil; o yüzden burada birim fiyat göstermiyoruz. Bölge ortalamasıdır, tek bir şehir ya da mahalle değil. Kaynak: {source}",
+        "en": "This is a price INDEX — it measures appreciation, not the price of a square metre, which is why no unit price is shown. It is an area average, not one city or neighbourhood. Source: {source}",
+        "de": "Das ist ein Preis-INDEX — er misst die Wertentwicklung, nicht den Quadratmeterpreis; deshalb wird hier kein Einzelpreis angezeigt. Es ist ein Gebietsdurchschnitt, nicht eine Stadt oder ein Viertel. Quelle: {source}"},
+    # What a specific index actually measures is a fact about that index, so
+    # it travels with the source name rather than with the country.
+    "source.fred": {
+        "tr": "FHFA eyalet konut fiyat endeksi (FRED). Endeks, satış fiyatlarının yanında yeniden finansman değerlemelerini de içerir; Case-Shiller'ın yalnızca tekrar satışa dayanan yönteminden bu yönüyle ayrılır.",
+        "en": "the FHFA state house price index (via FRED). The index draws on appraisals from refinancings as well as sales, which is where it differs from Case-Shiller's repeat-sales method.",
+        "de": "der FHFA-Häuserpreisindex je Bundesstaat (über FRED). Er stützt sich neben Verkäufen auch auf Bewertungen aus Refinanzierungen und unterscheidet sich darin von der Wiederverkaufsmethode von Case-Shiller."},
+    "source.tcmb_evds": {
+        "tr": "TCMB konut fiyat endeksi.",
+        "en": "the Turkish central bank's housing price index.",
+        "de": "der Wohnpreisindex der türkischen Zentralbank."},
+    "source.eurostat": {
+        "tr": "Eurostat konut fiyat endeksi.",
+        "en": "the Eurostat house price index.",
+        "de": "der Eurostat-Häuserpreisindex."},
     "province.no_window": {
         "tr": "{name} için {years} yıllık pencere dağılımına yetecek geçmiş yok.",
         "en": "There isn't enough history for {name} to build a distribution of {years}-year windows.",

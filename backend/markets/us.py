@@ -152,18 +152,4 @@ US = MarketPack(
             "de": "Ich habe Angst, etwas falsch zu machen",
         },
     },
-    disclaimer={
-        "en": (
-            "Educational content only — rules change and individual situations "
-            "differ. Always confirm with a licensed local professional."
-        ),
-        "tr": (
-            "Yalnızca eğitim amaçlıdır — kurallar değişir ve herkesin durumu "
-            "farklıdır. Her zaman yerel lisanslı bir profesyonele doğrulat."
-        ),
-        "de": (
-            "Nur zu Bildungszwecken — Regeln ändern sich und jede Situation ist "
-            "anders. Bitte bestätige alles mit einer lizenzierten Fachperson."
-        ),
-    },
 )

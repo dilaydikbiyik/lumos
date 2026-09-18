@@ -1247,6 +1247,40 @@ nowhere to read feedback, still-mixed languages, no confidence in the numbers.
 - [x] `.fireflies` used `inset: -20px`, making every phone screen 4px wider
       than the viewport — a horizontal rubber-band from a decorative layer.
 
+### Adding a market or a language is now a contract (2026-09-18)
+
+Every bug the US and German markets produced was the same shape: something
+true of Türkiye leaking into an answer given to someone else. Found one at a
+time, by a person opening the app and noticing — which does not scale to a
+fourth market. So the shape is enforced instead.
+
+- [x] `backend/tests/test_market_conformance.py` — parametrised over every
+      market AND every language, so adding either runs the whole suite
+      against it. Checks pack completeness, that copy is in the language the
+      reader picked, that no pack copies another's country facts, that no
+      engine prints a foreign currency, that a pack cannot claim a data
+      breakdown nothing can read, that listing searches use the market's own
+      words, and that all six language registries agree.
+- [x] It has teeth, and that is tested too: a deliberately sloppy fourth
+      market is registered in-test and the suite must refuse it. A
+      conformance suite that quietly stops catching things is worse than
+      none, because it reads as proof.
+- [x] Dispatch is by DECLARED SOURCE, never by country code —
+      `province_intelligence._SOURCES` now matches the pattern
+      `inflation_service` already used. A new market declaring an existing
+      source works with no code change.
+- [x] Honesty notes are keyed by what they describe, not by who came first:
+      `province.note_price_level` / `note_index` rather than `note_tr` /
+      `note_us`, with the source named from `source.<name>`.
+- [x] The educational disclaimer moved to the catalogue. Three copies of one
+      sentence is three chances to drift, and a new pack should not have to
+      restate boilerplate to exist.
+- [x] `transfer_cost_note` per market: the shared footnote used to assert
+      "by law half the transfer tax belongs to the seller" — Türkiye's tapu
+      harcı, false of German Grunderwerbsteuer and US transfer taxes alike.
+- [x] `docs/adding-a-market.md` and `docs/adding-a-language.md` — the recipe
+      the tests enforce.
+
 ### Phase 3 — professionalize for production
 
 - [ ] Persistent cache: diskcache → small Neon table (Render disk is
