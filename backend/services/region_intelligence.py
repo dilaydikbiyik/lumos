@@ -7,6 +7,7 @@ Deliberate honesty constraints (vision principle):
   - real (inflation-adjusted) change shown next to nominal — a region
     that "gained 40%" while inflation ran 60% actually LOST value
 """
+from backend.i18n import t
 import logging
 from typing import Optional
 
@@ -28,7 +29,7 @@ def _pct_change_over_months(index: dict[str, float], months: int) -> Optional[fl
     return round((index[latest] / index[base] - 1) * 100, 1)
 
 
-def rank_regions(horizon_years: int = 1) -> dict:
+def rank_regions(horizon_years: int = 1, lang: str = "tr") -> dict:
     """
     Rank all regions by housing-index appreciation over the horizon.
 
@@ -38,7 +39,7 @@ def rank_regions(horizon_years: int = 1) -> dict:
     months = horizon_years * 12
     data = evds_service.get_regional_housing_indices()
     if not data:
-        return {"available": False, "regions": [], "note": "Bölge verisi şu an alınamıyor."}
+        return {"available": False, "regions": [], "note": t("projection.no_region", lang)}
 
     rows = []
     latest_month = None
@@ -64,11 +65,11 @@ def rank_regions(horizon_years: int = 1) -> dict:
 
     for i, row in enumerate(rows):
         if row["real_change_pct"] > 0:
-            row["note"] = "Enflasyonun ÜZERİNDE değerlendi — reel kazanç."
+            row["note"] = t("region.real_gain", lang)
         elif row["real_change_pct"] > -10:
-            row["note"] = "Nominal artışa rağmen enflasyona yakın seyretti."
+            row["note"] = t("region.near_inflation", lang)
         else:
-            row["note"] = "Nominal artış yanıltıcı: enflasyon karşısında reel kayıp."
+            row["note"] = t("region.real_loss", lang)
         row["rank"] = i + 1
 
     return {
@@ -76,8 +77,7 @@ def rank_regions(horizon_years: int = 1) -> dict:
         "horizon_years": horizon_years,
         "data_through": latest_month,
         "honesty_note": (
-            "Bu sıralama bölge (NUTS2) seviyesindedir — mahalle/parsel analizi değildir. "
-            "Geçmiş değerlenme geleceğin garantisi değildir."
+            t("region.note", lang)
         ),
         "regions": rows,
     }

@@ -2,11 +2,11 @@ import { useEffect, useState, useCallback } from 'react'
 import FireflyMark from '../components/FireflyMark'
 import Icon from '../components/Icon'
 import { useNavigate } from 'react-router-dom'
-import LumosLogo from '../components/LumosLogo'
+import AppHeader from '../components/AppHeader'
 import CurrencyExposure from '../components/CurrencyExposure'
 import PortfolioValueChart from '../components/PortfolioValueChart'
 import DriftCard from '../components/DriftCard'
-import { UserButton, useAuth } from '@clerk/clerk-react'
+import { useAuth } from '@clerk/clerk-react'
 import api, { extractErrorMessage, setAuthToken } from '../utils/api'
 import useMarket from '../hooks/useMarket'
 import { readJSON, writeJSON, userKey } from '../utils/storage'
@@ -145,10 +145,7 @@ export default function HoldingsPage() {
 
   return (
     <div className="page">
-      <header className="navbar">
-        <LumosLogo />
-        <UserButton afterSignOutUrl="/" />
-      </header>
+      <AppHeader />
 
       <div className="page-content" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
         <div>

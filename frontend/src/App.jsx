@@ -19,6 +19,7 @@ import HoldingsPage from './pages/HoldingsPage'
 import ExplorePage from './pages/ExplorePage'
 import RecommendPage from './pages/RecommendPage'
 import DashboardPage from './pages/DashboardPage'
+import AdminPage from './pages/AdminPage'
 
 function Illumination() {
   useIllumination()
@@ -105,6 +106,7 @@ export default function App() {
           <Route path="/explore"   element={<ProtectedRoute><ExplorePage /></ProtectedRoute>} />
           <Route path="/recommend" element={<ProtectedRoute><RecommendPage /></ProtectedRoute>} />
           <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
+          <Route path="/admin"     element={<ProtectedRoute><AdminPage /></ProtectedRoute>} />
           <Route path="*"          element={<Navigate to="/" replace />} />
         </Routes>
 
@@ -116,7 +118,9 @@ export default function App() {
             page the user is on — no third floating button competing with the
             panic and advisor FABs. */}
         <SignedIn>
-          <div style={{ padding: '4px 16px 96px' }}><FeedbackButton /></div>
+          <div className="page-footer-actions" style={{ padding: '4px 16px 96px' }}>
+            <FeedbackButton />
+          </div>
         </SignedIn>
 
         <AppNav />

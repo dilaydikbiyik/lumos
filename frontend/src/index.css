@@ -189,6 +189,15 @@ body {
      double branding. (!important: LumosLogo carries inline display:flex) */
   body.has-sidebar .navbar button[aria-label="Lumos anasayfa"] { display: none !important; }
   body.has-sidebar .navbar { justify-content: flex-end; }
+
+  /* Anything that sits OUTSIDE .page still has to clear the sidebar, or it
+     centres itself against the window instead of against the content — which
+     is what made the feedback button look off-centre on desktop. */
+  body.has-sidebar .page-footer-actions { margin-left: var(--sidebar-w); }
+
+  /* The sidebar already carries the market and language selectors; a second
+     copy in the header would be clutter. */
+  .mobile-only { display: none !important; }
 }
 
 /* ── Card ────────────────────────────────────────────────────────────────── */

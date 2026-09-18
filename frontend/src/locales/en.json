@@ -4,7 +4,8 @@
     "profile": "Profile",
     "portfolio": "Portfolio",
     "holdings": "Assets",
-    "dashboard": "Dashboard"
+    "dashboard": "Dashboard",
+    "admin": "Feedback"
   },
   "common": {
     "start": "Get started",
@@ -336,18 +337,54 @@
     "label": "💡 Shine a Light"
   },
   "glossary": {
-    "volatilite": "How much the price swings up and down. High volatility = big waves; both risk and opportunity grow.",
-    "çeşitlendirme": "Not putting all your eggs in one basket. Spread across different assets, one bad day can't take everything.",
-    "etf": "A ready-made investment basket. One purchase makes you part-owner of dozens of stocks — no picking one by one.",
-    "fon": "A pooled investment professionals manage on your behalf, bought and sold through fund platforms.",
-    "reit": "A share of a real-estate company. A way to become a property investor with small amounts, without buying a flat.",
-    "temettü": "Your share of a company's profit. Think of it like rent — it pays you for as long as you hold the stock.",
-    "risk skoru": "Your 1-10 profile score. It shows how much turbulence you can stand; your portfolio is built around it.",
-    "likidite": "How fast you can turn an asset into cash. Stocks take minutes; land can take months.",
-    "amortisman": "An asset's loss of value over time. Inevitable for cars — which is why a car is an expense, not an investment.",
-    "enflasyon": "Your money losing purchasing power. At 50% inflation, 100 under the mattress behaves like 67 a year later.",
-    "reel getiri": "Your true gain after inflation. You made 45% but inflation was 60%? You actually lost.",
-    "drawdown": "The biggest peak-to-trough fall. The answer to \"how deep in the red were you on your worst day?\""
+    "volatilite": {
+      "label": "volatility",
+      "text": "How much the price swings up and down. High volatility = big waves; both risk and opportunity grow."
+    },
+    "çeşitlendirme": {
+      "label": "diversification",
+      "text": "Not putting all your eggs in one basket. Spread across different assets, one bad day can't take everything."
+    },
+    "etf": {
+      "label": "ETF",
+      "text": "A ready-made investment basket. One purchase makes you part-owner of dozens of stocks — no picking one by one."
+    },
+    "fon": {
+      "label": "fund",
+      "text": "A pooled investment professionals manage on your behalf, bought and sold through fund platforms."
+    },
+    "reit": {
+      "label": "REIT",
+      "text": "A share of a real-estate company. A way to become a property investor with small amounts, without buying a flat."
+    },
+    "temettü": {
+      "label": "dividend",
+      "text": "Your share of a company's profit. Think of it like rent — it pays you for as long as you hold the stock."
+    },
+    "risk skoru": {
+      "label": "risk score",
+      "text": "Your 1-10 profile score. It shows how much turbulence you can stand; your portfolio is built around it."
+    },
+    "likidite": {
+      "label": "liquidity",
+      "text": "How fast you can turn an asset into cash. Stocks take minutes; land can take months."
+    },
+    "amortisman": {
+      "label": "payback period",
+      "text": "An asset's loss of value over time. Inevitable for cars — which is why a car is an expense, not an investment."
+    },
+    "enflasyon": {
+      "label": "inflation",
+      "text": "Your money losing purchasing power. At 50% inflation, 100 under the mattress behaves like 67 a year later."
+    },
+    "reel getiri": {
+      "label": "real return",
+      "text": "Your true gain after inflation. You made 45% but inflation was 60%? You actually lost."
+    },
+    "drawdown": {
+      "label": "drawdown",
+      "text": "The biggest peak-to-trough fall. The answer to \"how deep in the red were you on your worst day?\""
+    }
   },
   "feedback": {
     "open": "Say something about this",
@@ -747,5 +784,24 @@
   "meta": {
     "title": "Lumos — Smart Investment Assistant",
     "description": "Fearless, learn-by-doing investing: an AI-assisted risk profile, a transparent portfolio suggestion, real estate and the stock market under one roof. For education only."
+  },
+  "admin": {
+    "title": "Admin",
+    "subtitle": "What users have reported, plus the basic usage numbers.",
+    "forbidden": "This page is for administrators only.",
+    "loadError": "The data couldn't be loaded — try again shortly.",
+    "backToDashboard": "Back to the dashboard",
+    "totalUsers": "Total users",
+    "profiledUsers": "Completed a profile",
+    "totalHoldings": "Holdings recorded",
+    "messagesToday": "AI messages today",
+    "noFeedback": "No feedback under this filter yet.",
+    "filter": {
+      "all": "All",
+      "bug": "Bug",
+      "confusing": "Didn't understand",
+      "idea": "Idea",
+      "other": "Other"
+    }
   }
 }

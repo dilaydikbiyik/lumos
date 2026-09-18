@@ -31,6 +31,12 @@ DE = MarketPack(
     rent_index_source="eurostat",      # HICP CP041, actual rentals
     default_index_ticker="^GDAXI",     # DAX
 
+    news_feeds=[
+        # Public RSS, no key.
+        "https://www.tagesschau.de/wirtschaft/index~rss2.xml",
+        "https://www.handelsblatt.com/contentexport/feed/finanzen",
+    ],
+
     listing_sites=[
         ListingSite("ImmoScout24", "https://www.immobilienscout24.de/Suche/de/{query}"),
         ListingSite("Immowelt", "https://www.immowelt.de/suche/{query}/immobilien"),

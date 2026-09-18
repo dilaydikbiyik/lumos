@@ -308,10 +308,12 @@ def test_advisor_endpoint_uses_advisor_mode_with_context(client):
 
     captured = {}
 
-    def fake_chat(messages, tier=None, mode="profiling", context="", language="tr"):
+    def fake_chat(messages, tier=None, mode="profiling", context="",
+                  language="tr", market="TR"):
         captured["mode"] = mode
         captured["context"] = context
         captured["language"] = language
+        captured["market"] = market
         return "ETF, hazır bir sepettir."
 
     original = chat_router.ai_chat
@@ -411,9 +413,11 @@ def test_chat_profiling_mode_allows_openrouter_gemini():
 
     captured = {}
 
-    def fake_dispatch(messages, system, max_tokens, tier=None, providers=None, model_filter=None):
+    def fake_dispatch(messages, system, max_tokens, tier=None, providers=None,
+                      model_filter=None, language="tr"):
         captured["providers"] = providers
         captured["model_filter"] = model_filter
+        captured["language"] = language
         return "ok"
 
     with _patch.object(ai_service, "_dispatch", fake_dispatch):
@@ -483,8 +487,10 @@ def test_language_header_selects_the_english_prompt_variant(client):
 
     captured = {}
 
-    def fake_chat(messages, tier=None, mode="profiling", context="", language="tr"):
+    def fake_chat(messages, tier=None, mode="profiling", context="",
+                  language="tr", market="TR"):
         captured["language"] = language
+        captured["market"] = market
         return "ok [PROFILE_COMPLETE]"
 
     original = chat_router.ai_chat

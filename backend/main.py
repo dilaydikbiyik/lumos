@@ -75,9 +75,13 @@ async def lifespan(app: FastAPI):
         async def _warm_news_digest():
             from backend.services.news_service import get_daily_digest
 
+            # Only the default market and language are warmed. The digest is
+            # now cached per path x market x language, and warming all 27
+            # combinations would mean 27 AI calls on every cold start to save
+            # a handful of readers a few seconds.
             for path in ("hybrid", "stocks", "real_estate"):
                 try:
-                    await _asyncio.to_thread(get_daily_digest, path)
+                    await _asyncio.to_thread(get_daily_digest, path, "TR", "tr")
                     _warm_log.info("News digest warmed: %s", path)
                 except Exception as exc:
                     _warm_log.warning("News digest warm failed (%s): %s", path, type(exc).__name__)

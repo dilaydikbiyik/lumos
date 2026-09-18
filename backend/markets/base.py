@@ -40,6 +40,12 @@ class MarketPack:
     # per-province table keys on.
     regional_housing_breakdown: bool = False
 
+    # ── Beginner news digest ──
+    # Headlines are a market fact, not a language one: a user investing in the
+    # US does not need Turkish economy headlines, whatever language they read
+    # in. Empty means the digest simply doesn't run for that market.
+    news_feeds: list[str] = field(default_factory=list)
+
     # ── Real-estate listing bridge ──
     listing_sites: list[ListingSite] = field(default_factory=list)
 

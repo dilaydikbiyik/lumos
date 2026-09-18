@@ -4,7 +4,8 @@
     "profile": "Profil",
     "portfolio": "Portfolio",
     "holdings": "Vermögen",
-    "dashboard": "Übersicht"
+    "dashboard": "Übersicht",
+    "admin": "Feedback"
   },
   "common": {
     "start": "Los geht's",
@@ -289,18 +290,54 @@
     "label": "💡 Licht drauf"
   },
   "glossary": {
-    "volatilite": "Wie stark der Preis nach oben und unten schwankt. Hohe Volatilität = große Wellen; Risiko und Chance wachsen beide.",
-    "çeşitlendirme": "Nicht alle Eier in einen Korb. Über verschiedene Anlagen verteilt kann ein schlechter Tag nicht alles mitnehmen.",
-    "etf": "Ein fertiger Anlagekorb. Ein Kauf macht dich zum Miteigentümer von Dutzenden Aktien — ohne einzeln auszuwählen.",
-    "fon": "Ein gemeinsamer Anlagetopf, den Profis für dich verwalten, kauf- und verkaufbar über Fondsplattformen.",
-    "reit": "Ein Anteil an einer Immobiliengesellschaft. So wirst du mit kleinen Beträgen Immobilieninvestor, ohne eine Wohnung zu kaufen.",
-    "temettü": "Dein Anteil am Gewinn des Unternehmens. Wie Miete — es zahlt dir, solange du die Aktie hältst.",
-    "risk skoru": "Dein Profilwert von 1 bis 10. Er zeigt, wie viel Schwankung du aushältst; dein Portfolio wird darum herum gebaut.",
-    "likidite": "Wie schnell du eine Anlage zu Geld machen kannst. Aktien in Minuten, ein Grundstück kann Monate dauern.",
-    "amortisman": "Der Wertverlust einer Sache über die Zeit. Bei Autos unvermeidlich — deshalb ist ein Auto Kosten, keine Anlage.",
-    "enflasyon": "Dein Geld verliert an Kaufkraft. Bei 50% Inflation verhalten sich 100 unter der Matratze ein Jahr später wie 67.",
-    "reel getiri": "Dein echter Gewinn nach Inflation. 45% gemacht, aber die Inflation lag bei 60%? Dann hast du verloren.",
-    "drawdown": "Der größte Rückgang vom Hoch zum Tief. Die Antwort auf \"wie tief im Minus warst du am schlimmsten Tag?\""
+    "volatilite": {
+      "label": "Volatilität",
+      "text": "Wie stark der Preis nach oben und unten schwankt. Hohe Volatilität = große Wellen; Risiko und Chance wachsen beide."
+    },
+    "çeşitlendirme": {
+      "label": "Streuung",
+      "text": "Nicht alle Eier in einen Korb. Über verschiedene Anlagen verteilt kann ein schlechter Tag nicht alles mitnehmen."
+    },
+    "etf": {
+      "label": "ETF",
+      "text": "Ein fertiger Anlagekorb. Ein Kauf macht dich zum Miteigentümer von Dutzenden Aktien — ohne einzeln auszuwählen."
+    },
+    "fon": {
+      "label": "Fonds",
+      "text": "Ein gemeinsamer Anlagetopf, den Profis für dich verwalten, kauf- und verkaufbar über Fondsplattformen."
+    },
+    "reit": {
+      "label": "REIT",
+      "text": "Ein Anteil an einer Immobiliengesellschaft. So wirst du mit kleinen Beträgen Immobilieninvestor, ohne eine Wohnung zu kaufen."
+    },
+    "temettü": {
+      "label": "Dividende",
+      "text": "Dein Anteil am Gewinn des Unternehmens. Wie Miete — es zahlt dir, solange du die Aktie hältst."
+    },
+    "risk skoru": {
+      "label": "Risikowert",
+      "text": "Dein Profilwert von 1 bis 10. Er zeigt, wie viel Schwankung du aushältst; dein Portfolio wird darum herum gebaut."
+    },
+    "likidite": {
+      "label": "Liquidität",
+      "text": "Wie schnell du eine Anlage zu Geld machen kannst. Aktien in Minuten, ein Grundstück kann Monate dauern."
+    },
+    "amortisman": {
+      "label": "Amortisation",
+      "text": "Der Wertverlust einer Sache über die Zeit. Bei Autos unvermeidlich — deshalb ist ein Auto Kosten, keine Anlage."
+    },
+    "enflasyon": {
+      "label": "Inflation",
+      "text": "Dein Geld verliert an Kaufkraft. Bei 50% Inflation verhalten sich 100 unter der Matratze ein Jahr später wie 67."
+    },
+    "reel getiri": {
+      "label": "reale Rendite",
+      "text": "Dein echter Gewinn nach Inflation. 45% gemacht, aber die Inflation lag bei 60%? Dann hast du verloren."
+    },
+    "drawdown": {
+      "label": "Drawdown",
+      "text": "Der größte Rückgang vom Hoch zum Tief. Die Antwort auf \"wie tief im Minus warst du am schlimmsten Tag?\""
+    }
   },
   "fx": {
     "fxHeavyMsg": "Dein Portfolio ist fast vollständig in Fremdwährung. Das schützt dich, wenn die Heimatwährung schwächer wird — aber Miete, Lebensmittel und ein künftiges Zuhause sind darin bepreist, und nichts gleicht eine Gegenbewegung aus. Das kann sinnvoll sein; entscheide es nur bewusst.",
@@ -747,5 +784,24 @@
   "meta": {
     "title": "Lumos — Intelligenter Anlage-Assistent",
     "description": "Angstfrei investieren und dabei lernen: KI-gestütztes Risikoprofil, transparenter Portfoliovorschlag, Immobilien und Börse unter einem Dach. Nur zu Bildungszwecken."
+  },
+  "admin": {
+    "title": "Verwaltung",
+    "subtitle": "Was Nutzerinnen und Nutzer gemeldet haben, dazu die wichtigsten Nutzungszahlen.",
+    "forbidden": "Diese Seite ist nur für Administratoren.",
+    "loadError": "Die Daten konnten nicht geladen werden — versuch es gleich noch einmal.",
+    "backToDashboard": "Zurück zur Übersicht",
+    "totalUsers": "Nutzer insgesamt",
+    "profiledUsers": "Profil abgeschlossen",
+    "totalHoldings": "Erfasste Anlagen",
+    "messagesToday": "KI-Nachrichten heute",
+    "noFeedback": "Unter diesem Filter gibt es noch kein Feedback.",
+    "filter": {
+      "all": "Alle",
+      "bug": "Fehler",
+      "confusing": "Nicht verstanden",
+      "idea": "Idee",
+      "other": "Sonstiges"
+    }
   }
 }

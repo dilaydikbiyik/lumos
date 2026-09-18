@@ -36,6 +36,12 @@ const icons = {
       <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" fill={active ? 'var(--firefly-dim)' : 'none'} />
     </svg>
   ),
+  inbox: (active) => (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={active ? 'var(--firefly)' : 'currentColor'} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M22 12h-6l-2 3h-4l-2-3H2" fill={active ? 'var(--firefly-dim)' : 'none'} />
+      <path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" />
+    </svg>
+  ),
 }
 
 // Labels are i18n KEYS — resolved at render time so a language switch
@@ -59,6 +65,7 @@ function NavSurfaces() {
   const { pathname } = useLocation()
   const { getToken, isSignedIn } = useAuth()
   const [investmentPath, setInvestmentPath] = useState(null)
+  const [isAdmin, setIsAdmin] = useState(false)
 
   // Flow 0 promise: modules adapt to the chosen path — nothing is forced
   useEffect(() => {
@@ -68,7 +75,11 @@ function NavSurfaces() {
       try {
         setAuthToken(await getToken())
         const res = await api.get('/users/me')
-        if (!cancelled) setInvestmentPath(res.data.investment_path)
+        if (cancelled) return
+        setInvestmentPath(res.data.investment_path)
+        // Hiding the link is convenience, not security — every admin
+        // endpoint checks the role server-side regardless.
+        setIsAdmin(res.data.role === 'admin')
       } catch {
         // not critical for nav — default: show everything
       }
@@ -90,6 +101,11 @@ function NavSurfaces() {
     if (item.path === '/recommend' && investmentPath === 'real_estate') return false
     return true
   })
+  // The admin entry is appended rather than filtered in, so the bottom bar
+  // keeps five items for everyone who is not an admin.
+  const sidebarItems = isAdmin
+    ? [...items, { path: '/admin', icon: 'inbox', label: 'nav.admin' }]
+    : items
 
   return (
     <>
@@ -99,7 +115,7 @@ function NavSurfaces() {
           <LumosLogo />
         </div>
         <nav style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-          {items.map(item => {
+          {sidebarItems.map(item => {
             const active = pathname === item.path
             return (
               <button

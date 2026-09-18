@@ -1,8 +1,7 @@
 import { useState } from 'react'
 import FireflyMark from '../components/FireflyMark'
-import LumosLogo from '../components/LumosLogo'
+import AppHeader from '../components/AppHeader'
 import { useNavigate } from 'react-router-dom'
-import { UserButton } from '@clerk/clerk-react'
 import api from '../utils/api'
 import { useTranslation } from 'react-i18next'
 
@@ -38,10 +37,7 @@ export default function FearCheckInPage() {
   if (reassurance) {
     return (
       <div className="page">
-        <header className="navbar">
-          <LumosLogo />
-          <UserButton afterSignOutUrl="/" />
-        </header>
+        <AppHeader />
         <div className="page-content" style={{
           maxWidth: 480, margin: '0 auto',
           display: 'flex', flexDirection: 'column', alignItems: 'center',
@@ -81,10 +77,7 @@ export default function FearCheckInPage() {
   /* ── Fear selection screen ── */
   return (
     <div className="page">
-      <header className="navbar">
-        <LumosLogo />
-        <UserButton afterSignOutUrl="/" />
-      </header>
+      <AppHeader />
 
       <div className="page-content" style={{ maxWidth: 480, margin: '0 auto' }}>
         {/* Header */}

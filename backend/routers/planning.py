@@ -94,6 +94,7 @@ async def region_intelligence(
     request: Request,
     horizon_years: int = 1,
     user_id: str = Depends(get_current_user),
+    lang: str = Depends(language),
 ):
     """
     Appreciation potential — NUTS2 regions ranked by housing-index
@@ -103,7 +104,7 @@ async def region_intelligence(
     from backend.services.region_intelligence import rank_regions
 
     horizon_years = min(max(horizon_years, 1), 3)
-    return await asyncio.to_thread(rank_regions, horizon_years)
+    return await asyncio.to_thread(rank_regions, horizon_years, lang)
 
 
 @router.post("/listing-links")

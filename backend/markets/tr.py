@@ -49,6 +49,11 @@ TR = MarketPack(
         {"ticker": "SCHH", "name": "Schwab US REIT ETF", "category": "reit"},
     ],
 
+    news_feeds=[
+        "https://www.aa.com.tr/tr/rss/default?cat=ekonomi",
+        "https://www.bloomberght.com/rss",
+    ],
+
     listing_sites=[
         ListingSite("Sahibinden", "https://www.sahibinden.com/arama?query_text={query}"),
         ListingSite("Emlakjet", "https://www.emlakjet.com/arama/?q={query}"),

@@ -21,6 +21,8 @@ Scoring logic:
 Budget is NOT included in the formula (it affects portfolio size, not risk tolerance).
 """
 
+from decimal import ROUND_HALF_UP, Decimal
+
 from backend.i18n import t
 from backend.schemas.user_profile import RiskFactor, RiskProfileAnswers, RiskProfileResponse
 from backend.services import debt_check
@@ -47,6 +49,19 @@ _INCOME_MODIFIER = {
     "variable": -0.4,
     "irregular": -1.0,
 }
+
+
+def _round_half_up(value: float, places: int = 1) -> float:
+    """
+    Round the way a reader does.
+
+    Python's round() is banker's rounding: round(9.25, 1) is 9.2, not 9.3.
+    The score card shows every contribution and invites the reader to add
+    them up, so a score that lands on an exact half printed one tenth below
+    the sum of its own parts — the clearest possible way to look wrong.
+    """
+    quantum = Decimal(1).scaleb(-places)
+    return float(Decimal(str(value)).quantize(quantum, rounding=ROUND_HALF_UP))
 
 
 def _label(score: float, lang: str) -> str:
@@ -99,7 +114,17 @@ def compute_risk_score(answers: RiskProfileAnswers, lang: str = "tr") -> RiskPro
         "goal": _GOAL_SCORES[answers.goal],
         "experience": _EXPERIENCE_SCORES[answers.experience],
     }
-    base = sum(dimension_scores[d] * _WEIGHTS[d] for d in dimension_scores)
+    # The score is computed from the SAME rounded contributions the card
+    # prints, not from the raw float sum. 2*0.25 + 9*0.30 + 7*0.25 + 1*0.20 is
+    # exactly 5.15 on paper but 5.1499999999999995 in binary floating point, so
+    # the two disagreed: the card showed parts adding to 5.15 beside a score of
+    # 5.1. Adding the published numbers is the whole promise of this card, so
+    # the published numbers are what gets added.
+    contributions = {
+        d: _round_half_up(dimension_scores[d] * _WEIGHTS[d], 2)
+        for d in dimension_scores
+    }
+    base = float(sum(Decimal(str(c)) for c in contributions.values()))
 
     # ── transparent breakdown: where every point comes from ──
     factors = [
@@ -108,7 +133,7 @@ def compute_risk_score(answers: RiskProfileAnswers, lang: str = "tr") -> RiskPro
                      name=t(f"risk.factor.{d}", lang),
                      pct=round(_WEIGHTS[d] * 100)),
             answer=_answer_label(d, getattr(answers, d), lang),
-            contribution=round(dimension_scores[d] * _WEIGHTS[d], 2),
+            contribution=contributions[d],
             explanation=t(f"risk.why.{d}", lang),
         )
         for d in dimension_scores
@@ -135,7 +160,10 @@ def compute_risk_score(answers: RiskProfileAnswers, lang: str = "tr") -> RiskPro
             explanation=t("risk.mod.income.why", lang),
         ))
 
-    score = round(min(max(base + modifier, 1.0), 10.0), 1)
+    # Decimal again on the final sum: base + modifier in binary would
+    # reintroduce exactly the drift the contributions were rounded to remove.
+    total = float(Decimal(str(base)) + Decimal(str(modifier)))
+    score = _round_half_up(min(max(total, 1.0), 10.0), 1)
     label = _label(score, lang)
 
     # Modifier context for summary

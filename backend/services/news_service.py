@@ -17,20 +17,20 @@ from backend.services.ai_service import generate_text
 
 logger = logging.getLogger("lumos.news")
 
-RSS_FEEDS = [
-    "https://www.aa.com.tr/tr/rss/default?cat=ekonomi",
-    "https://www.bloomberght.com/rss",
-]
-
 _DIGEST_TTL = 60 * 60 * 12  # refresh twice a day
+
+# The reader's language and the market's headlines are separate choices: an
+# English reader investing in Türkiye wants Turkish market news written in
+# English. Both used to be welded to Turkish.
+_LANGUAGE_NAMES = {"tr": "TURKISH", "en": "ENGLISH", "de": "GERMAN"}
 
 _DIGEST_SYSTEM = """You are a calm financial news curator for nervous first-time investors.
 From the headlines provided, pick AT MOST 3 items relevant to a beginner following the given investment path (stocks / real_estate / hybrid).
-ALL output text MUST be in TURKISH — the app's users are Turkish beginners; an English summary of a Turkish headline breaks trust.
+ALL output text MUST be in {language} — that is the language the reader chose. The headlines you are given may be in another language; translate them rather than quoting them.
 For each picked item output exactly this JSON structure, and output ONLY a JSON array:
-[{"headline": "<Turkish, rewritten in plain, calm language - no shouting, no jargon>",
-  "why_it_matters": "<1 Turkish sentence: does this affect a beginner's portfolio?>",
-  "calmness_note": "<1 Turkish sentence that prevents panic, e.g. 'Şu an bir şey yapmana gerek yok.'>"}]
+[{{"headline": "<rewritten in plain, calm language - no shouting, no jargon>",
+  "why_it_matters": "<1 sentence: does this affect a beginner's portfolio?>",
+  "calmness_note": "<1 sentence that prevents panic, e.g. 'There is nothing you need to do right now.'>"}}]
 Never use alarmist words. If nothing is relevant, output []."""
 
 
@@ -49,10 +49,12 @@ def _parse_rss(xml_text: str, limit: int = 15) -> list[dict]:
     return items
 
 
-def fetch_headlines() -> list[dict]:
-    """Collect recent headlines from all feeds; failures are non-fatal."""
+def fetch_headlines(market: str = "TR") -> list[dict]:
+    """Collect recent headlines from the market's feeds; failures are non-fatal."""
+    from backend.markets import get_market_pack
+
     headlines: list[dict] = []
-    for url in RSS_FEEDS:
+    for url in get_market_pack(market).news_feeds:
         try:
             resp = httpx.get(url, timeout=8, follow_redirects=True)
             resp.raise_for_status()
@@ -62,27 +64,31 @@ def fetch_headlines() -> list[dict]:
     return headlines
 
 
-def get_daily_digest(investment_path: str = "hybrid") -> list[dict]:
+def get_daily_digest(investment_path: str = "hybrid", market: str = "TR",
+                     lang: str = "tr") -> list[dict]:
     """
     Return up to 3 calm, beginner-framed news items for the given path.
-    Cached per day + path.
+    Cached per day + path + market + language — the same headlines rewritten
+    in another language are a different answer, so they need a different key.
     """
     import json
     import re
 
-    cache_key = f"news_digest:{date.today().isoformat()}:{investment_path}"
+    cache_key = f"news_digest:{date.today().isoformat()}:{investment_path}:{market}:{lang}"
     cached = cache_service.get(cache_key)
     if cached is not None:
         return cached
 
-    headlines = fetch_headlines()
+    headlines = fetch_headlines(market)
     if not headlines:
         return []
 
     titles = "\n".join(f"- {h['title']}" for h in headlines[:25])
     raw = generate_text(
         f"Investment path: {investment_path}\n\nHeadlines:\n{titles}",
-        system=_DIGEST_SYSTEM,
+        system=_DIGEST_SYSTEM.format(
+            language=_LANGUAGE_NAMES.get(lang, _LANGUAGE_NAMES["tr"])
+        ),
     )
     cleaned = re.sub(r"^```(?:json)?\s*|\s*```$", "", raw.strip())
     try:

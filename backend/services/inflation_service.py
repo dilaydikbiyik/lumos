@@ -154,8 +154,14 @@ def real_return_pct(nominal_return_pct: float, start_month: str, end_month: str,
 def monthly_cash_erosion(cash_amount: float, reference_month: Optional[str] = None,
                          market: str = "TR") -> dict:
     """
-    'Param eriyor mu?' — how much real purchasing power idle cash loses
+    "Is my money melting?" — how much real purchasing power idle cash loses
     per month at the most recent known inflation rate.
+
+    The loss is the purchasing power that disappears, not the price rise:
+    after a month of 3% inflation, 10,000 buys what 9,708.74 bought, so
+    291.26 of value is gone — not 300. Multiplying the balance by the
+    inflation rate overstates it, slightly but always in the same direction,
+    and the whole point of this number is that it is the honest one.
     """
     index = _get_index(market)
     if len(index) < 2:
@@ -169,7 +175,7 @@ def monthly_cash_erosion(cash_amount: float, reference_month: Optional[str] = No
     prev_month = sorted_months[idx - 1]
     curr_month = sorted_months[idx]
     monthly_pct = cpi_change_pct(prev_month, curr_month, market)
-    erosion = cash_amount * (monthly_pct / 100)
+    erosion = cash_amount - cash_amount / (1 + monthly_pct / 100)
     return {
         "monthly_inflation_pct": round(monthly_pct, 2),
         "erosion_amount": round(erosion, 2),

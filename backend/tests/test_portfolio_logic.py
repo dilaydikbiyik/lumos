@@ -177,7 +177,14 @@ def test_picker_prefers_a_new_category_over_a_higher_ranked_duplicate():
     assert _pick_diversified(ranked, universe, 3) == ["VNQ", "GLD", "SPY"]
 
 
-def test_picker_falls_back_to_duplicates_once_categories_run_out():
+def test_picker_holds_fewer_positions_rather_than_a_duplicate():
+    """
+    `slots` is a maximum, not a target. Filling a spare slot with a second
+    asset from a represented category used to pull SCHH back in beside VNQ
+    for large budgets — ~44% of an aggressive portfolio in what is
+    effectively one holding, which is precisely what the app tells users it
+    avoids and what its own drop-reason text describes.
+    """
     from backend.services.portfolio_engine import _pick_diversified
 
     universe = [
@@ -186,7 +193,19 @@ def test_picker_falls_back_to_duplicates_once_categories_run_out():
         {"ticker": "GLD", "category": "gold"},
     ]
     picked = _pick_diversified(["VNQ", "SCHH", "GLD"], universe, 3)
-    assert set(picked) == {"VNQ", "SCHH", "GLD"}
+    assert picked == ["VNQ", "GLD"]
+
+
+def test_no_recommended_portfolio_doubles_up_on_a_category():
+    """The invariant, checked end to end rather than on the picker alone."""
+    from backend.services.portfolio_engine import build_portfolio
+
+    for score in (1.0, 3.0, 5.0, 7.0, 9.0, 10.0):
+        for budget in (5_000, 50_000, 200_000, 1_000_000):
+            portfolio = build_portfolio(risk_score=score, budget=budget, market="TR")
+            growth = [a.category for a in portfolio.allocations
+                      if a.category not in ("cash", "bond")]
+            assert len(growth) == len(set(growth)), (score, budget, growth)
 
 
 def test_picker_keeps_rank_order_within_a_category():

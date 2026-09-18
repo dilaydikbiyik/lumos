@@ -2,8 +2,7 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import Icon from '../components/Icon'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { UserButton } from '@clerk/clerk-react'
-import LumosLogo from '../components/LumosLogo'
+import AppHeader from '../components/AppHeader'
 import PortfolioChart from '../components/PortfolioChart'
 import { sliceColor } from '../utils/palette'
 import ReitCard from '../components/ReitCard'
@@ -102,10 +101,7 @@ export default function RecommendPage() {
 
   return (
     <div className="page">
-      <header className="navbar">
-        <LumosLogo />
-        <UserButton afterSignOutUrl="/" />
-      </header>
+      <AppHeader />
 
       <div className="page-content" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
         {/* Header */}

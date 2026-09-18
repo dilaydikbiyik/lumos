@@ -13,6 +13,7 @@ from typing import Optional
 
 from fastapi import HTTPException
 
+from backend.i18n import t
 from backend.config import settings
 logger = logging.getLogger("lumos.ai")
 
@@ -36,13 +37,18 @@ _ADVISOR_PROMPT = _ADVISOR_PROMPTS["tr"]
 # One-shot generations (portfolio explainer etc.) must NEVER inherit the
 # interactive quiz script — a fallback to _SYSTEM_PROMPT once made the
 # "Neden Bu Portföy?" card ask quiz question 2 instead of explaining.
+# Deliberately says nothing about country or language: the caller's prompt
+# names both. Hard-coding "in Türkiye, in Turkish" here quietly overrode the
+# per-request language and market — an English reader looking at the German
+# market still got Turkish prose about Türkiye.
 _ONESHOT_SYSTEM = (
-    "You are Lumos's financial-education writer for absolute beginners in "
-    "Türkiye. Follow the user prompt exactly and return ONLY the requested "
-    "text, in Turkish unless told otherwise. Plain everyday language; explain "
-    "any finance term inline the first time it appears. Never ask the reader "
-    "questions, never run a quiz, never give buy/sell advice or predictions, "
-    "and never append legal disclaimers (the app shows a persistent notice)."
+    "You are Lumos's financial-education writer for absolute beginners. "
+    "Follow the user prompt exactly, including the language and market it "
+    "specifies, and return ONLY the requested text. Plain everyday language; "
+    "explain any finance term inline the first time it appears. Never ask the "
+    "reader questions, never run a quiz, never give buy/sell advice or "
+    "predictions, and never append legal disclaimers (the app shows a "
+    "persistent notice)."
 )
 
 # Short content hash — lets logs tie a response to the exact prompt version
@@ -392,6 +398,7 @@ def _dispatch(
     tier: Optional[str] = None,
     providers: Optional[set] = None,
     model_filter=None,
+    language: str = "tr",
 ) -> str:
     tier_name, tier_cfg = _resolve_tier(tier)
     steps = _provider_chain(tier_cfg)
@@ -465,10 +472,7 @@ def _dispatch(
     )
     raise HTTPException(
         status_code=503,
-        detail=(
-            "Yapay zeka servisine şu an ulaşılamıyor — lütfen birkaç dakika sonra tekrar dene. / "
-            "AI service is temporarily unavailable; please try again shortly."
-        ),
+        detail=t("error.ai_down", language),
     )
 
 
@@ -480,6 +484,7 @@ def chat(
     mode: str = "profiling",
     context: str = "",
     language: str = "tr",
+    market: str = "TR",
 ) -> str:
     """
     Send a conversation history to the AI provider resolved from the
@@ -492,8 +497,11 @@ def chat(
               free-form education assistant reachable from anywhere.
         context: optional "USER CONTEXT" block appended in advisor mode so
                  answers reference the user's real profile/holdings.
-        language: UI language of the requesting device ("tr"/"en") — selects
-                 the prompt variant so quiz questions arrive in that language.
+        language: UI language of the requesting device — selects the prompt
+                 variant so quiz questions arrive in that language.
+        market: which market's snapshot to attach. Independent of language:
+                an English reader investing in Türkiye needs Turkish market
+                numbers described in English.
 
     Returns:
         The assistant's text reply.
@@ -507,14 +515,14 @@ def chat(
     # — the same language/market coupling we removed elsewhere. English is the
     # safer intermediate; Turkish stays the final backstop.
     base = variants.get(language) or variants.get("en") or variants["tr"]
-    system = base + (context or "") + build_market_context()
+    system = base + (context or "") + build_market_context(market)
 
     # Generous budget: gemini-2.5-flash spends "thinking" tokens from the same
     # pool, and the final profile summary must not be truncated before the
     # [PROFILE_COMPLETE] marker.
     max_tokens = get_tier(tier)["max_tokens"] if tier else 4096
-    # The scripted 9-question quiz must follow its Turkish script exactly —
-    # weak free-tier fallback models paraphrase questions and corrupt Turkish.
+    # The scripted 9-question quiz must follow its script exactly — weak
+    # free-tier fallback models paraphrase questions and corrupt the flow.
     # Profiling therefore only accepts Gemini/Claude-class models, wherever
     # they are hosted: Google direct, Anthropic direct, or OpenRouter's
     # Gemini (a survival path when direct Gemini keys are unusable). The
@@ -528,11 +536,11 @@ def chat(
         providers = model_filter = None
     return _dispatch(
         messages, system, max_tokens=max_tokens, tier=tier,
-        providers=providers, model_filter=model_filter,
+        providers=providers, model_filter=model_filter, language=language,
     )
 
 
-def extract_profile(messages: list[dict]) -> dict:
+def extract_profile(messages: list[dict], language: str = "tr") -> dict:
     """
     Extract structured risk-profile answers from a completed profiling
     conversation. Returns a dict matching RiskProfileAnswers fields.
@@ -551,6 +559,7 @@ def extract_profile(messages: list[dict]) -> dict:
         [{"role": "user", "content": f"CONVERSATION:\n{transcript}"}],
         extract_system,
         max_tokens=512,
+        language=language,
     )
 
     # Strategy 1: strip markdown fences and try direct parse
@@ -582,7 +591,7 @@ def extract_profile(messages: list[dict]) -> dict:
     )
     raise HTTPException(
         status_code=422,
-        detail="Sohbet tamamlanmadı — lütfen tüm soruları yanıtla ve tekrar dene.",
+        detail=t("error.quiz_incomplete", language),
     )
 
 

@@ -63,13 +63,19 @@ def _load_universe() -> list[dict]:
 
 def _pick_diversified(ranked: list[str], universe: list[dict], slots: int) -> list[str]:
     """
-    Take the top `slots` assets, but never two from one category while another
-    category is still unrepresented.
+    One asset per category, best-ranked first. `slots` is a MAXIMUM, not a
+    target: when the categories run out, the portfolio simply holds fewer
+    positions.
 
     Ranking alone produced portfolios whose entire growth sleeve sat in two
     REIT ETFs tracking the same index — four slices on the chart, one real
-    exposure underneath. Order within a category is untouched, so the choice
-    stays deterministic and explainable; only redundant picks are deferred.
+    exposure underneath. Deferring the duplicate to the end of the list was
+    not enough, because a budget large enough for six slots then pulled it
+    back in: an aggressive profile ended up with VNQ and SCHH together, ~44%
+    of the portfolio in what is effectively one holding. That is the exact
+    thing the app tells users it avoids, and the reason text it shows for
+    dropping an asset says so in as many words. So a second asset from an
+    already-represented category is not filled in at all.
     """
     category_of = {a["ticker"]: a["category"] for a in universe}
     kept: list[str] = []
@@ -82,12 +88,6 @@ def _pick_diversified(ranked: list[str], universe: list[dict], slots: int) -> li
         if category not in used:
             kept.append(ticker)
             used.add(category)
-
-    for ticker in ranked:                       # then fill, best-ranked first
-        if len(kept) >= slots:
-            break
-        if ticker not in kept:
-            kept.append(ticker)
 
     return kept
 
@@ -252,6 +252,21 @@ def build_portfolio(risk_score: float, budget: float, market: str = "TR",
     # ── Dust floor first, then the concentration guard as the LAST step so no
     #    position can exceed the cap after the final re-normalisation ──
     min_w = MIN_WEIGHT_PCT / 100.0
+
+    # A dust-sized CASH or BOND position is still part of a sleeve whose size
+    # the risk score decided. Dropping it and renormalising everything spread
+    # that weight across the growth assets, so a profile told "31% stays on
+    # the safe side" quietly received 9% — the published number and the real
+    # portfolio disagreed. The weight moves to the surviving defensive
+    # position instead; only if BOTH are dust does the sleeve really vanish.
+    defensive_tickers = [t for t in defensive_categories if t in weights]
+    defensive_dust = [t for t in defensive_tickers if weights[t] < min_w]
+    survivors = [t for t in defensive_tickers if weights[t] >= min_w]
+    if defensive_dust and survivors:
+        rescued = sum(weights.pop(t) for t in defensive_dust)
+        for t in survivors:
+            weights[t] += rescued / len(survivors)
+
     dust = [t for t, w in weights.items() if w < min_w]
     for t in dust:
         dropped.append({
@@ -290,10 +305,17 @@ def build_portfolio(risk_score: float, budget: float, market: str = "TR",
             )
         )
 
-    # add the rounding remainder to the largest position → sum is exactly 1.0
+    # The rounding remainder has to land somewhere for the weights to sum to
+    # exactly 1.0 — but not on a position already at the cap, which is how a
+    # portfolio ended up publishing "max 45%" next to a 45.01% holding.
     rounding_gap = round(1.0 - sum(a.weight for a in allocations), 4)
     if allocations and abs(rounding_gap) > 0:
-        allocations[0].weight = round(allocations[0].weight + rounding_gap, 4)
+        cap = MAX_POSITION_PCT / 100.0
+        target = next(
+            (a for a in allocations if a.weight + rounding_gap <= cap + 1e-9),
+            allocations[-1],   # everything is at the cap: the smallest absorbs it
+        )
+        target.weight = round(target.weight + rounding_gap, 4)
 
     return PortfolioRecommendResponse(
         risk_score=risk_score,

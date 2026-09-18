@@ -9,6 +9,7 @@ from backend.config import settings
 from backend.db.database import get_db
 from backend.limiter import limiter
 from backend.i18n import t
+from backend.markets import get_market_pack
 from backend.middleware.language import get_language
 from backend.middleware.verify_clerk import get_current_user
 from backend.repositories import user_repository
@@ -65,31 +66,42 @@ async def chat_endpoint(
     # ai_chat uses blocking I/O (httpx sync + google-genai SDK) — run in a
     # thread pool so the async event loop stays free for other requests.
     reply = await asyncio.to_thread(
-        ai_chat, messages, user.plan, "profiling", "", get_language(request)
+        ai_chat, messages, user.plan, "profiling", "",
+        get_language(request), user.market or "TR",
     )
     return {"reply": reply}
 
 
 def _advisor_context(user) -> str:
-    """A compact 'USER CONTEXT' block so the advisor answers personally."""
+    """
+    A compact 'USER CONTEXT' block so the advisor answers personally.
+
+    English on purpose: this is instruction text for the model, not copy for
+    the reader. Written in Turkish it pulled replies into Turkish however the
+    system prompt was set, which is how an English reader ended up chatting
+    with a Turkish advisor.
+    """
     lines = []
     if user.risk_score is not None:
-        lines.append(f"- Risk skoru: {user.risk_score}/10")
+        lines.append(f"- Risk score: {user.risk_score}/10")
     if user.budget:
-        lines.append(f"- Bütçe: {user.budget:,.0f} TL")
+        currency = get_market_pack(user.market).currency
+        lines.append(f"- Budget: {user.budget:,.0f} {currency}")
     if user.time_horizon:
-        lines.append(f"- Vade tercihi: {user.time_horizon}")
+        lines.append(f"- Time horizon: {user.time_horizon}")
     if user.goal:
-        lines.append(f"- Hedef: {user.goal}")
+        lines.append(f"- Goal: {user.goal}")
     if user.experience:
-        lines.append(f"- Deneyim: {user.experience}")
+        lines.append(f"- Experience: {user.experience}")
     if user.investment_path:
-        lines.append(f"- Seçtiği yol: {user.investment_path}")
+        lines.append(f"- Chosen path: {user.investment_path}")
     if user.primary_fear:
-        lines.append(f"- Onboarding korkusu: {user.primary_fear}")
+        lines.append(f"- Fear stated at onboarding: {user.primary_fear}")
+    if user.market:
+        lines.append(f"- Market they invest in: {user.market}")
     if not lines:
-        return "\n\nUSER CONTEXT: (Kullanıcı henüz risk profilini tamamlamadı.)\n"
-    return "\n\nUSER CONTEXT (bu kullanıcının gerçek profili):\n" + "\n".join(lines) + "\n"
+        return "\n\nUSER CONTEXT: (this user has not completed a risk profile yet.)\n"
+    return "\n\nUSER CONTEXT (this user's real profile):\n" + "\n".join(lines) + "\n"
 
 
 @router.post("/advisor", response_model=ChatResponse)
@@ -118,7 +130,8 @@ async def advisor_endpoint(
     context = _advisor_context(user)
     # ai_chat is synchronous (blocking I/O) — run off the event loop
     reply = await asyncio.to_thread(
-        ai_chat, messages, user.plan, "advisor", context, get_language(request)
+        ai_chat, messages, user.plan, "advisor", context,
+        get_language(request), user.market or "TR",
     )
     return {"reply": reply}
 
@@ -136,7 +149,7 @@ async def extract_profile_endpoint(
     Validation against RiskProfileAnswers happens via the response model.
     """
     messages = [m.model_dump() for m in body.messages]
-    answers = await asyncio.to_thread(extract_profile, messages)
+    answers = await asyncio.to_thread(extract_profile, messages, get_language(request))
     try:
         return RiskProfileAnswers(**answers)
     except ValidationError:

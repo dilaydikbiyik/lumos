@@ -31,6 +31,12 @@ US = MarketPack(
     rent_index_source="bls",       # rent of primary residence
     default_index_ticker="^GSPC",
 
+    news_feeds=[
+        # Public RSS, no key. CNBC's own finance feed and Yahoo Finance.
+        "https://www.cnbc.com/id/10000664/device/rss/rss.html",
+        "https://finance.yahoo.com/news/rssindex",
+    ],
+
     listing_sites=[
         ListingSite("Zillow", "https://www.zillow.com/homes/{query}_rb/"),
         ListingSite("Realtor", "https://www.realtor.com/realestateandhomes-search/{query}"),

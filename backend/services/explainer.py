@@ -19,7 +19,8 @@ def _respond_in(lang: str) -> str:
 
 
 def explain_portfolio(portfolio: PortfolioRecommendResponse, user_profile: dict,
-                      lang: str = "tr", currency: str = "TRY") -> str:
+                      lang: str = "tr", currency: str = "TRY",
+                      market: str = "TR") -> str:
     """Generate a plain-language portfolio explanation."""
     alloc_lines = "\n".join(
         f"  - {a.name} ({a.ticker}): {a.weight * 100:.1f}%"
@@ -28,7 +29,8 @@ def explain_portfolio(portfolio: PortfolioRecommendResponse, user_profile: dict,
     profile_lines = "\n".join(f"  - {k}: {v}" for k, v in user_profile.items() if v)
     prompt = (
         f"The user has a risk score of {portfolio.risk_score}/10 "
-        f"and a budget of {portfolio.budget:,.0f} {currency}.\n"
+        f"and a budget of {portfolio.budget:,.0f} {currency}, "
+        f"investing in the {market} market.\n"
         f"Their profile:\n{profile_lines or '  (no extra profile data)'}\n\n"
         f"Their recommended portfolio allocation:\n{alloc_lines}\n\n"
         "Write a 4–5 sentence explanation for someone who has NEVER invested before:\n"

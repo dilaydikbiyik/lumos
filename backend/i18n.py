@@ -207,9 +207,9 @@ _C: dict[str, dict[str, str]] = {
 
     # ── portfolio engine: the formula ──
     "formula.allocation": {
-        "tr": "Güvenli pay = 60 − (5,5 × risk skoru), en az %0 en fazla %60 (nakit + tahvil). Kalan pay büyüme varlıklarına dağıtılır: her varlığın ağırlığı = (1 − α) × (1 / oynaklık) + α × oynaklık. α risk skorunun onda biridir; yani α büyüdükçe oynak varlıklar daha fazla, küçüldükçe sakin varlıklar daha fazla pay alır.",
-        "en": "Defensive share = 60 − (5.5 × risk score), floored at 0% and capped at 60% (cash + bonds). What's left is spread across the growth assets: each weight = (1 − α) × (1 / volatility) + α × volatility. α is one tenth of the risk score — so the larger α gets, the more the volatile assets take, and the smaller it gets, the more the calm ones do.",
-        "de": "Defensiver Anteil = 60 − (5,5 × Risikowert), mindestens 0% und höchstens 60% (Bargeld + Anleihen). Der Rest verteilt sich auf die Wachstumsanlagen: Gewicht je Anlage = (1 − α) × (1 / Volatilität) + α × Volatilität. α ist ein Zehntel des Risikowerts — je größer α, desto mehr erhalten die schwankungsreichen Anlagen, je kleiner, desto mehr die ruhigen."},
+        "tr": "Güvenli pay = 60 − (5,5 × risk skoru), en az %0 en fazla %60 (nakit + tahvil). Sonuç %10'un altına düşerse sıfıra çekilir: %3'lük bir nakit dilimi portföyü korumaz, sadece takip yükü yaratır — bu yüzden 9,1 üstü skorlarda savunma payı tamamen kapanır. Kalan pay büyüme varlıklarına dağıtılır: her varlığın ağırlığı = (1 − α) × (1 / oynaklık) + α × oynaklık. α risk skorunun onda biridir; yani α büyüdükçe oynak varlıklar daha fazla, küçüldükçe sakin varlıklar daha fazla pay alır. Hiçbir pozisyon %45'i geçemez ve %5'in altında kalan pozisyonlar elenir.",
+        "en": "Defensive share = 60 − (5.5 × risk score), floored at 0% and capped at 60% (cash + bonds). If the result falls below 10% it is set to zero: a 3% cash sleeve protects nothing and only adds something to track — so above a score of 9.1 the defensive side closes entirely. What's left is spread across the growth assets: each weight = (1 − α) × (1 / volatility) + α × volatility. α is one tenth of the risk score — so the larger α gets, the more the volatile assets take, and the smaller it gets, the more the calm ones do. No position may exceed 45%, and anything under 5% is dropped.",
+        "de": "Defensiver Anteil = 60 − (5,5 × Risikowert), mindestens 0% und höchstens 60% (Bargeld + Anleihen). Fällt das Ergebnis unter 10%, wird es auf null gesetzt: ein Barbestand von 3% schützt nichts und macht nur Arbeit — ab einem Wert über 9,1 entfällt die defensive Seite daher ganz. Der Rest verteilt sich auf die Wachstumsanlagen: Gewicht je Anlage = (1 − α) × (1 / Volatilität) + α × Volatilität. α ist ein Zehntel des Risikowerts — je größer α, desto mehr erhalten die schwankungsreichen Anlagen, je kleiner, desto mehr die ruhigen. Keine Position darf 45% überschreiten, und alles unter 5% entfällt."},
 
     # ── health score ──
     "health.none": {
@@ -371,6 +371,30 @@ _C: dict[str, dict[str, str]] = {
         "tr": "Sembol şu an doğrulanamadı.",
         "en": "The symbol couldn't be verified right now.",
         "de": "Das Symbol konnte gerade nicht überprüft werden."},
+    "error.market_data": {
+        "tr": "Piyasa verisi şu an alınamıyor — birazdan tekrar dene.",
+        "en": "Market data can't be reached right now — try again shortly.",
+        "de": "Marktdaten sind gerade nicht erreichbar — versuch es gleich noch einmal."},
+    "error.ai_unavailable": {
+        "tr": "Yapay zeka asistanı şu an yanıt veremiyor — birazdan tekrar dene.",
+        "en": "The AI assistant can't answer right now — try again shortly.",
+        "de": "Der KI-Assistent kann gerade nicht antworten — versuch es gleich noch einmal."},
+    "error.internal": {
+        "tr": "Beklenmedik bir hata oluştu — lütfen daha sonra tekrar dene.",
+        "en": "Something went wrong — please try again later.",
+        "de": "Etwas ist schiefgelaufen — bitte versuch es später noch einmal."},
+    "error.ai_down": {
+        "tr": "Yapay zeka servisine şu an ulaşılamıyor — lütfen birkaç dakika sonra tekrar dene.",
+        "en": "The AI service is unreachable right now — please try again in a few minutes.",
+        "de": "Der KI-Dienst ist gerade nicht erreichbar — bitte versuch es in ein paar Minuten noch einmal."},
+    "error.quiz_incomplete": {
+        "tr": "Sohbet tamamlanmadı — lütfen tüm soruları yanıtla ve tekrar dene.",
+        "en": "The conversation isn't finished — please answer every question and try again.",
+        "de": "Das Gespräch ist noch nicht abgeschlossen — bitte beantworte alle Fragen und versuch es erneut."},
+    "error.forbidden": {
+        "tr": "Bu işlem için yetkin yok.",
+        "en": "You don't have permission for this.",
+        "de": "Dafür fehlt dir die Berechtigung."},
     "error.no_profile": {
         "tr": "Önce risk profilini tamamla.",
         "en": "Complete your risk profile first.",
@@ -397,6 +421,24 @@ _C: dict[str, dict[str, str]] = {
         "tr": "Bu korku çoğu yeni başlayanda var. Küçük adımlarla, sanal pratikle başlayacağız — gerçek parayla asla acele etmeyeceksin.",
         "en": "Most beginners feel this. We'll start with small steps and virtual practice — you'll never be rushed with real money.",
         "de": "Diese Angst haben die meisten Anfänger. Wir starten mit kleinen Schritten und virtueller Übung — mit echtem Geld wird nichts überstürzt."},
+    # ── region ranking ──
+    "region.real_gain": {
+        "tr": "Enflasyonun ÜZERİNDE değerlendi — reel kazanç.",
+        "en": "It appreciated ABOVE inflation — a real gain.",
+        "de": "Der Wert stieg ÜBER die Inflation — ein realer Gewinn."},
+    "region.near_inflation": {
+        "tr": "Nominal artışa rağmen enflasyona yakın seyretti.",
+        "en": "Despite the nominal rise, it tracked close to inflation.",
+        "de": "Trotz nominalem Anstieg lag es nahe an der Inflation."},
+    "region.real_loss": {
+        "tr": "Nominal artış yanıltıcı: enflasyon karşısında reel kayıp.",
+        "en": "The nominal rise is misleading: a real loss against inflation.",
+        "de": "Der nominale Anstieg täuscht: real ein Verlust gegenüber der Inflation."},
+    "region.note": {
+        "tr": "Bu sıralama bölge (NUTS2) seviyesindedir — mahalle/parsel analizi değildir. Geçmiş değerlenme geleceğin garantisi değildir.",
+        "en": "This ranking is at regional (NUTS2) level — not a neighbourhood or parcel analysis. Past appreciation guarantees nothing about the future.",
+        "de": "Diese Rangfolge liegt auf Regionsebene (NUTS2) — keine Viertel- oder Grundstücksanalyse. Vergangene Wertsteigerung garantiert nichts für die Zukunft."},
+
     # ── sub-national housing breakdown ──
     "province.unavailable": {
         "tr": "Bölge verisi şu an alınamıyor.",

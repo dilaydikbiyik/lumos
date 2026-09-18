@@ -29,6 +29,9 @@ class UserRead(BaseModel):
     primary_fear: Optional[str]
     monthly_income: Optional[float] = None
     monthly_contribution: Optional[float] = None
+    # The client needs this to decide whether to offer the admin view at all;
+    # every admin endpoint still checks the role server-side.
+    role: str = "user"
 
 
 class MonthlyIncomeUpdate(BaseModel):

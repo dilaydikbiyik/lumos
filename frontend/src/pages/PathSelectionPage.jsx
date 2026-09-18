@@ -1,7 +1,6 @@
 import { useState } from 'react'
-import LumosLogo from '../components/LumosLogo'
+import AppHeader from '../components/AppHeader'
 import { useNavigate } from 'react-router-dom'
-import { UserButton } from '@clerk/clerk-react'
 import api from '../utils/api'
 import { useTranslation } from 'react-i18next'
 
@@ -32,10 +31,7 @@ export default function PathSelectionPage() {
 
   return (
     <div className="page">
-      <header className="navbar">
-        <LumosLogo />
-        <UserButton afterSignOutUrl="/" />
-      </header>
+      <AppHeader />
 
       <div className="page-content" style={{ maxWidth: 560, margin: '0 auto' }}>
         {/* Header */}

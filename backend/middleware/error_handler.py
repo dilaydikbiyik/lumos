@@ -13,6 +13,8 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
 from backend.exceptions import AIServiceError, MarketDataError
+from backend.i18n import t
+from backend.middleware.language import get_language
 from backend.middleware.request_id import request_id_var
 
 logger = logging.getLogger(__name__)
@@ -37,7 +39,7 @@ def register_error_handlers(app: FastAPI) -> None:
                      request_id_var.get(), request.method, request.url, exc)
         return _error_response(
             503, "market_data_unavailable",
-            "Piyasa verisi şu an alınamıyor — birazdan tekrar dene.",
+            t("error.market_data", get_language(request)),
         )
 
     @app.exception_handler(AIServiceError)
@@ -46,7 +48,7 @@ def register_error_handlers(app: FastAPI) -> None:
                      request_id_var.get(), request.method, request.url, exc)
         return _error_response(
             503, "ai_unavailable",
-            "Yapay zeka asistanı şu an yanıt veremiyor — birazdan tekrar dene.",
+            t("error.ai_unavailable", get_language(request)),
         )
 
     @app.exception_handler(ValueError)
@@ -59,5 +61,5 @@ def register_error_handlers(app: FastAPI) -> None:
                          request_id_var.get(), request.method, request.url)
         return _error_response(
             500, "internal_error",
-            "Beklenmedik bir hata oluştu — lütfen daha sonra tekrar dene.",
+            t("error.internal", get_language(request)),
         )

@@ -2,8 +2,8 @@ import { useEffect, useCallback } from 'react'
 import FireflyMark from '../components/FireflyMark'
 import Icon from '../components/Icon'
 import { useNavigate } from 'react-router-dom'
-import { UserButton, useAuth } from '@clerk/clerk-react'
-import LumosLogo from '../components/LumosLogo'
+import { useAuth } from '@clerk/clerk-react'
+import AppHeader from '../components/AppHeader'
 import PortfolioChart from '../components/PortfolioChart'
 import PortfolioComparison from '../components/PortfolioComparison'
 import NewsDigest from '../components/NewsDigest'
@@ -94,10 +94,7 @@ export default function DashboardPage() {
 
   return (
     <div className="page">
-      <header className="navbar">
-        <LumosLogo />
-        <UserButton afterSignOutUrl="/" />
-      </header>
+      <AppHeader />
 
       <div className="page-content" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
 

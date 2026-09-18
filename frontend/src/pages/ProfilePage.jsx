@@ -3,8 +3,8 @@ import { Trans, useTranslation } from 'react-i18next'
 import FireflyMark from '../components/FireflyMark'
 import Icon from '../components/Icon'
 import { useNavigate } from 'react-router-dom'
-import { UserButton, useAuth } from '@clerk/clerk-react'
-import LumosLogo from '../components/LumosLogo'
+import { useAuth } from '@clerk/clerk-react'
+import AppHeader from '../components/AppHeader'
 import ChatWindow from '../components/ChatWindow'
 import RiskGauge from '../components/RiskGauge'
 import DebtFirstCard from '../components/DebtFirstCard'
@@ -80,10 +80,7 @@ export default function ProfilePage() {
 
   return (
     <div className="page">
-      <header className="navbar">
-        <LumosLogo />
-        <UserButton afterSignOutUrl="/" />
-      </header>
+      <AppHeader />
 
       <div className="page-content">
         {!showResult ? (

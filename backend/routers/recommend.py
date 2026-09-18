@@ -50,7 +50,7 @@ async def recommend(
     # explain_portfolio / explain_reit_inclusion call generate_text() which is
     # synchronous blocking I/O — run in a thread so the event loop stays free.
     portfolio.plain_explanation = await asyncio.to_thread(
-        explain_portfolio, portfolio, user_profile, lang, pack.currency
+        explain_portfolio, portfolio, user_profile, lang, pack.currency, market
     )
 
     if portfolio.includes_reits:

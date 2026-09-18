@@ -27,8 +27,11 @@ def test_context_contains_prices_and_changes():
         ctx = build_market_context()
     assert "BIST 100" in ctx and "+2.0%" in ctx
     assert "S&P 500" in ctx and "-1.0%" in ctx
-    assert "%2.5" in ctx
-    assert "asla tahmine çevirme" in ctx
+    assert "2.5%" in ctx
+    # The block is instruction text for the model, so it is written in
+    # English: a Turkish block pulled replies into Turkish for every reader.
+    assert "never turn it into a forecast" in ctx
+    assert "Altın" not in ctx
 
 
 def test_context_fails_open_when_sources_down():

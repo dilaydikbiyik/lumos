@@ -1,8 +1,8 @@
 import { useEffect, useState, useCallback } from 'react'
-import { UserButton, useAuth } from '@clerk/clerk-react'
+import { useAuth } from '@clerk/clerk-react'
 import { parseTL } from '../utils/number'
 import api, { extractErrorMessage, setAuthToken } from '../utils/api'
-import LumosLogo from '../components/LumosLogo'
+import AppHeader from '../components/AppHeader'
 import IsikTut from '../components/IsikTut'
 import useMarket from '../hooks/useMarket'
 import { Trans, useTranslation } from 'react-i18next'
@@ -513,10 +513,7 @@ export default function ExplorePage() {
 
   return (
     <div className="page">
-      <header className="navbar">
-        <LumosLogo />
-        <UserButton afterSignOutUrl="/" />
-      </header>
+      <AppHeader />
 
       <div className="page-content" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
         <div>

@@ -4,7 +4,8 @@
     "profile": "Profil",
     "portfolio": "Portföy",
     "holdings": "Varlıklar",
-    "dashboard": "Panel"
+    "dashboard": "Panel",
+    "admin": "Geri Bildirim"
   },
   "common": {
     "start": "Başlayalım",
@@ -336,18 +337,54 @@
     "label": "💡 Işık Tut"
   },
   "glossary": {
-    "volatilite": "Fiyatın ne kadar inişli çıkışlı olduğu. Yüksek volatilite = büyük dalgalar; risk de fırsat da büyür.",
-    "çeşitlendirme": "Yumurtaları tek sepete koymamak. Farklı varlıklara dağıtınca tek bir kötü gün her şeyini götürmez.",
-    "etf": "Hazır yatırım sepeti. Tek alımda onlarca hisseye birden ortak olursun — tek tek seçmek zorunda kalmazsın.",
-    "fon": "Profesyonellerin senin yerine yönettiği ortak yatırım havuzu. TEFAS üzerinden alınıp satılır.",
-    "reit": "Gayrimenkul şirketi hissesi (GYO). Daire almadan, küçük tutarlarla emlak yatırımcısı olmanın yolu.",
-    "temettü": "Şirketin kârından sana düşen pay. Kira gibi düşün — hisseni tuttuğun sürece gelir getirir.",
-    "risk skoru": "1-10 arası profil puanın. Ne kadar dalgalanmaya dayanabileceğini gösterir; portföyün buna göre kurulur.",
-    "likidite": "Varlığını ne kadar hızlı nakde çevirebildiğin. Hisse dakikalar, arsa aylar sürebilir.",
-    "amortisman": "Varlığın zamanla değer kaybı. Arabalar için kaçınılmaz — bu yüzden araba yatırım değil, giderdir.",
-    "enflasyon": "Paranın alım gücünün erimesi. %50 enflasyonda yastık altındaki 100 TL, bir yıl sonra 67 TL gibi davranır.",
-    "reel getiri": "Enflasyondan arındırılmış gerçek kazanç. %45 kazandın ama enflasyon %60 ise gerçekte kaybettin.",
-    "drawdown": "Tepeden dibe en büyük düşüş. \"En kötü gününde ne kadar eksideydin?\" sorusunun cevabı."
+    "volatilite": {
+      "label": "volatilite",
+      "text": "Fiyatın ne kadar inişli çıkışlı olduğu. Yüksek volatilite = büyük dalgalar; risk de fırsat da büyür."
+    },
+    "çeşitlendirme": {
+      "label": "çeşitlendirme",
+      "text": "Yumurtaları tek sepete koymamak. Farklı varlıklara dağıtınca tek bir kötü gün her şeyini götürmez."
+    },
+    "etf": {
+      "label": "ETF",
+      "text": "Hazır yatırım sepeti. Tek alımda onlarca hisseye birden ortak olursun — tek tek seçmek zorunda kalmazsın."
+    },
+    "fon": {
+      "label": "fon",
+      "text": "Profesyonellerin senin yerine yönettiği ortak yatırım havuzu. TEFAS üzerinden alınıp satılır."
+    },
+    "reit": {
+      "label": "GYO",
+      "text": "Gayrimenkul şirketi hissesi (GYO). Daire almadan, küçük tutarlarla emlak yatırımcısı olmanın yolu."
+    },
+    "temettü": {
+      "label": "temettü",
+      "text": "Şirketin kârından sana düşen pay. Kira gibi düşün — hisseni tuttuğun sürece gelir getirir."
+    },
+    "risk skoru": {
+      "label": "risk skoru",
+      "text": "1-10 arası profil puanın. Ne kadar dalgalanmaya dayanabileceğini gösterir; portföyün buna göre kurulur."
+    },
+    "likidite": {
+      "label": "likidite",
+      "text": "Varlığını ne kadar hızlı nakde çevirebildiğin. Hisse dakikalar, arsa aylar sürebilir."
+    },
+    "amortisman": {
+      "label": "amortisman",
+      "text": "Varlığın zamanla değer kaybı. Arabalar için kaçınılmaz — bu yüzden araba yatırım değil, giderdir."
+    },
+    "enflasyon": {
+      "label": "enflasyon",
+      "text": "Paranın alım gücünün erimesi. %50 enflasyonda yastık altındaki 100 TL, bir yıl sonra 67 TL gibi davranır."
+    },
+    "reel getiri": {
+      "label": "reel getiri",
+      "text": "Enflasyondan arındırılmış gerçek kazanç. %45 kazandın ama enflasyon %60 ise gerçekte kaybettin."
+    },
+    "drawdown": {
+      "label": "drawdown",
+      "text": "Tepeden dibe en büyük düşüş. \"En kötü gününde ne kadar eksideydin?\" sorusunun cevabı."
+    }
   },
   "feedback": {
     "open": "Buna dair bir şey söyle",
@@ -747,5 +784,24 @@
   "meta": {
     "title": "Lumos — Akıllı Yatırım Asistanı",
     "description": "Korkusuz, öğrenerek yatırım: yapay zeka destekli risk profili, şeffaf portföy önerisi, emlak + borsa tek çatıda. Eğitim amaçlıdır."
+  },
+  "admin": {
+    "title": "Yönetim",
+    "subtitle": "Kullanıcıların gönderdiği geri bildirimler ve temel kullanım sayıları.",
+    "forbidden": "Bu sayfa yalnızca yöneticiler içindir.",
+    "loadError": "Veriler alınamadı — birazdan tekrar dene.",
+    "backToDashboard": "Kontrol paneline dön",
+    "totalUsers": "Toplam kullanıcı",
+    "profiledUsers": "Profili tamamlayan",
+    "totalHoldings": "Toplam varlık kaydı",
+    "messagesToday": "Bugünkü AI mesajı",
+    "noFeedback": "Bu filtrede henüz geri bildirim yok.",
+    "filter": {
+      "all": "Tümü",
+      "bug": "Hata",
+      "confusing": "Anlamadım",
+      "idea": "Fikir",
+      "other": "Diğer"
+    }
   }
 }

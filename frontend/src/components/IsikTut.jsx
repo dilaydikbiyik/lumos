@@ -10,11 +10,14 @@ import { useTranslation } from 'react-i18next'
 export default function IsikTut({ term, children }) {
   const { t, i18n } = useTranslation()
   const [open, setOpen] = useState(false)
-  // Terms act as stable identifiers across languages; the copy lives in the
-  // locale files so the tooltip follows the UI language.
+  // The term is a stable identifier, not display text: printing the key
+  // itself put "reel getiri" in the middle of an English sentence. Each
+  // entry therefore carries BOTH the word as that language writes it and
+  // the explanation behind it.
   const key = 'glossary.' + term.toLowerCase()
-  if (!i18n.exists(key)) return children || term
-  const explanation = t(key)
+  if (!i18n.exists(key + '.text')) return children || term
+  const label = t(key + '.label', { defaultValue: term })
+  const explanation = t(key + '.text')
 
   return (
     <span style={{ position: 'relative', display: 'inline-block' }}>
@@ -29,7 +32,7 @@ export default function IsikTut({ term, children }) {
           transition: 'all 0.2s ease',
         }}
       >
-        {children || term}
+        {children || label}
         <span style={{
           fontSize: '0.75em', marginLeft: 2,
           filter: open ? 'drop-shadow(0 0 6px var(--firefly))' : 'none',
