@@ -1206,11 +1206,57 @@ Turkish beginner's whole portfolio sits in USD, which is a large implicit
 currency bet. The currency-exposure card flags it after the fact. Worth
 deciding deliberately: a home-market floor, or leave the formula alone.
 
+### End-to-end audit (2026-09-18)
+
+Reported: no market selector on mobile, feedback button off-centre on desktop,
+nowhere to read feedback, still-mixed languages, no confidence in the numbers.
+
+- [x] **AppHeader** — the market/language selectors lived only in the desktop
+      sidebar, so a phone user could not change market at all. Nine pages had
+      hand-copied the same header; they now share one.
+- [x] **/admin** — GET /feedback existed from day one and nothing rendered it.
+      Every message users sent went into a table nobody opened.
+- [x] **RBAC** — roles grant named permissions (`user` / `support` / `admin`)
+      and endpoints ask for the permission, not the role name. Roles are
+      granted from inside the app; two lockout guards (no self-demotion, no
+      demoting the last admin) and every change logged with actor and target.
+- [x] **Language, the rest of it** — the glossary tooltip printed its own
+      Turkish key as display text; the news digest was welded to Turkish
+      output AND Turkish feeds (feeds now live in the pack); the advisor's
+      USER CONTEXT and market snapshot were Turkish, which pulled replies into
+      Turkish whatever the system prompt said; `_ONESHOT_SYSTEM` said "in
+      Türkiye … in Turkish"; the global error handlers, the all-providers-spent
+      503, the incomplete-quiz 422 and the RBAC refusal were Turkish literals.
+- [x] **Six calculation defects**, each found by re-deriving the answer
+      independently rather than by reading the code:
+      1. the defensive sleeve silently shrank when one leg was pruned as dust
+         (a profile told 13.2% received 9.3%);
+      2. the rounding remainder was added to the position already at the cap,
+         publishing "max 45%" beside a 45.01% holding;
+      3. the formula shown to users omitted the <10% cliff, the 45% cap and
+         the 5% floor, so it did not reproduce the portfolio it explained;
+      4. banker's rounding on the raw float sum printed a score one tenth
+         BELOW the sum of its own published parts;
+      5. cash erosion multiplied the balance by the inflation rate, which
+         overstates the real loss (300 where the truth is 291.26);
+      6. an aggressive portfolio held VNQ and SCHH together — ~44% in one
+         real exposure, the exact thing the app's own copy says it avoids.
+      `test_calculation_audit.py` pins all of it: an amortisation schedule for
+      the mortgage, a forward simulation for the goal planner, numpy for the
+      percentile bands.
+- [x] `.fireflies` used `inset: -20px`, making every phone screen 4px wider
+      than the viewport — a horizontal rubber-band from a decorative layer.
+
 ### Phase 3 — professionalize for production
 
 - [ ] Persistent cache: diskcache → small Neon table (Render disk is
       ephemeral; every deploy wipes last-known-good).
-- [ ] Code-split the bundle (i18n + Recharts are natural seams).
+- [x] Code-split the bundle. Routes behind sign-in are lazy; only the
+      reader's locale is downloaded (safe because locales.test.js proves the
+      three files carry identical keys, so the fallback never fires).
+      First load 1075 kB → ~493 kB, 326 kB → ~150 kB gzipped. index.html
+      paints an inline dark splash so the pre-render wait isn't a white
+      screen.
 - [ ] Sentry: set SENTRY_DSN in Render/Vercel (code already wired).
 - [ ] Privacy policy + terms pages (both stores require them).
 - [ ] **User:** domain → Clerk production instance (+ own Google OAuth) →
