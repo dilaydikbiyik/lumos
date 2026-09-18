@@ -28,6 +28,11 @@ DE = MarketPack(
 
     inflation_source="eurostat",       # HICP, monthly, no key
     housing_index_source="eurostat",   # prc_hpi_q — a real price index
+    # No Bundesland-level index exists in any free source (checked: Eurostat
+    # is country-only, GENESIS needs registration). The Bundesbank publishes
+    # city-size aggregates without a key, which is a real breakdown of a
+    # different shape — nested segments, not alternative places.
+    regional_housing_source="bundesbank",
     rent_index_source="eurostat",      # HICP CP041, actual rentals
     default_index_ticker="^GDAXI",     # DAX
 
@@ -37,6 +42,9 @@ DE = MarketPack(
         "https://www.handelsblatt.com/contentexport/feed/finanzen",
     ],
 
+    example_ticker="SAP.DE",
+    example_asset_name="Eigentumswohnung",
+    area_kind="segment",
     example_district="Neukölln",
     example_locality="Rixdorf",
 

@@ -17,9 +17,23 @@ async def get_by_clerk_id(db: AsyncSession, clerk_user_id: str) -> Optional[User
 
 
 async def get_or_create(db: AsyncSession, clerk_user_id: str) -> User:
+    """
+    The user row, creating it on first sight.
+
+    A new account starts in the market its language suggests — English to the
+    US, German to Germany, everything else to the reference market. Only at
+    creation: after that the two settings are independent, and this function
+    never touches the market again.
+    """
     user = await get_by_clerk_id(db, clerk_user_id)
     if user is None:
-        user = User(clerk_user_id=clerk_user_id)
+        from backend.markets import default_market_for_language
+        from backend.middleware.language import current_language
+
+        user = User(
+            clerk_user_id=clerk_user_id,
+            market=default_market_for_language(current_language()),
+        )
         db.add(user)
         await db.flush()
     return user

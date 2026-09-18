@@ -28,8 +28,8 @@
     "heroHighlight": "elindeki ışık.",
     "heroBody": "Yatırımı korkmadan öğren: her rakam enflasyondan arındırılmış, her öneri adım adım açıklanmış, kararın her zaman sende.",
     "trust": {
-      "centralBank": "TCMB resmî verisi",
-      "housing": "81 il emlak endeksi",
+      "centralBank": "Resmî enflasyon verisi",
+      "housing": "Resmî konut fiyat endeksi",
       "livePrices": "Gerçek piyasa fiyatları",
       "formula": "Formülü görünür"
     },
@@ -41,7 +41,7 @@
       },
       "realEstate": {
         "title": "Emlak ve Borsa Yan Yana",
-        "desc": "81 ilin m² fiyatı ve gerçek değerlenmesi, hisse portföyünle aynı ekranda. Kirada mı otur, ev mi al — hesabı burada."
+        "desc": "Konutun m² fiyatı ve gerçek değerlenmesi, hisse portföyünle aynı ekranda. Kirada mı otur, ev mi al — hesabı burada."
       },
       "panic": {
         "title": "Panik Anında Yanında",
@@ -249,7 +249,9 @@
     "resultIntro": "<0>{{amount}}</0>, {{target}} {{years}} yıl kalsaydı (geçmiş {{history}} yılın {{windows}} dönemine göre):",
     "bad": "Kötü dönem",
     "typical": "Tipik dönem",
-    "good": "İyi dönem"
+    "good": "İyi dönem",
+    "selectAsset": "Varlık seç",
+    "selectYears": "Vade seç"
   },
   "whatIf": {
     "title": "Ne olurdu?",
@@ -444,11 +446,11 @@
     "loading": "Varlıkların yükleniyor…",
     "emptyTitle": "Henüz varlığın yok",
     "emptyBody": "İlk ışığı birlikte yakalayalım — bir varlık ekleyerek başla.",
-    "namePlaceholder": "Ad (örn: Gölbaşı arsa, SPY ETF)",
+    "namePlaceholder": "Ad (örn: {{example}})",
     "vehicleTitle": "🚗 Araban serveti mi, gideri mi?",
     "vehicleBody": "Araç servet resmine dahil edilebilir — ama dikkatli ol: her yıl %10–20 değer kaybeder (amortisman), üstüne kasko + MTV + bakım gelir. Lumos asla araç almayı yatırım olarak önermez.",
     "vehicleTip": "Bunu eklemek istiyorsan güncel piyasa değerini \"Güncel tahmini değer\"e yaz.",
-    "tickerPlaceholder": "Sembol (örn: SPY, THYAO.IS)",
+    "tickerPlaceholder": "Sembol (örn: {{example}})",
     "amountPlaceholder": "Alış tutarı (TL)",
     "currentPlaceholder": "Güncel tahmini değer (opsiyonel)",
     "add": "Ekle",
@@ -456,10 +458,11 @@
     "remainingBudget": "Kalan Bütçe",
     "lookupCta": "Bul",
     "lookupPrice": "Güncel fiyat: {{price}} {{currency}}",
-    "lookupNotFound": "Sembol şu an doğrulanamadı — fiyat servisi geçici olarak cevap vermiyor olabilir. Tekrar deneyebilir ya da adı ve tutarı kendin yazıp devam edebilirsin. (Borsa İstanbul hisseleri sonuna \".IS\" ister: THYAO.IS gibi.)",
+    "lookupNotFound": "Sembol şu an doğrulanamadı — fiyat servisi geçici olarak cevap vermiyor olabilir. Tekrar deneyebilir ya da adı ve tutarı kendin yazıp devam edebilirsin.",
     "quantityPlaceholder": "Kaç adet aldın? (ops. — canlı takibi açar)",
     "computedNote": "{{quantity}} adet × {{price}} = {{total}} olarak dolduruldu. Farklı bir fiyattan aldıysan tutarı elle değiştirebilirsin.",
-    "lookupConverted": "≈ {{price}} {{currency}}"
+    "lookupConverted": "≈ {{price}} {{currency}}",
+    "selectType": "Varlık tipi"
   },
   "fx": {
     "title": "Kur Dağılımı",
@@ -584,7 +587,8 @@
     "howTitle": "Bu hesap neye göre yapılıyor?",
     "howBody": "Biriktirdiğin paranın boşta beklemediği, risk profiline uygun bir portföyde yılda ortalama %{{growth}} büyüdüğü varsayılıyor. Bu oran uydurma değil: canlı enflasyon (%{{inflation}}) üzerine, çeşitlendirilmiş bir portföyün uzun vadede kazandığı varsayılan reel primin eklenmesiyle bulunuyor. Süre {{months}} aya çevriliyor ve her ayki katkının kalan süre boyunca büyümesi hesaba katılıyor.",
     "howFormula": "aylık katkı = (hedef − mevcut birikimin büyümüş hâli) × r / ((1+r)^ay − 1),  r = aylık getiri",
-    "howCaveat": "Bu bir tahmin değil, bir planlama varsayımı: piyasa her yıl aynı oranda büyümez, bazı yıllar eksi kapatır. Oran daha düşük olursa aylık katkı yetmez — planı yılda bir gözden geçirmek iyi bir alışkanlıktır."
+    "howCaveat": "Bu bir tahmin değil, bir planlama varsayımı: piyasa her yıl aynı oranda büyümez, bazı yıllar eksi kapatır. Oran daha düşük olursa aylık katkı yetmez — planı yılda bir gözden geçirmek iyi bir alışkanlıktır.",
+    "selectYears": "Hedef vadesi"
   },
   "market": {
     "label": "Pazar",
@@ -684,7 +688,7 @@
     "progress": "{{seen}}/{{total}} manşet gerçeği öğrenildi · karta dokun → sıradaki",
     "headline-crash": {
       "headline": "📰 \"BORSA ÇAKILDI\"",
-      "reality": "BIST 100 büyük ihtimalle %2–4 düştü. Tarihsel olarak bu düşüşler çoğu zaman aylar içinde telafi edilir. \"Çakılmak\" manşet için cazip, yatırımcı için norm.",
+      "reality": "Endeks büyük ihtimalle %2–4 düştü. Tarihsel olarak bu düşüşler çoğu zaman aylar içinde telafi edilir. \"Çakılmak\" manşet için cazip, yatırımcı için norm.",
       "action": "Sakin kal. Bugün satmak, kaybı gerçeğe dönüştürür."
     },
     "headline-crash-global": {
@@ -723,8 +727,6 @@
     "linkError": "Link üretilemedi",
     "listingsTitle": "🔗 İlanlara Git",
     "listingsBody": "Beğendiğin bölge için filtresi hazır ilan araması — satın almayı ilan sitesinde yaparsın, sonra buraya döner \"Aldım\" dersin.",
-    "provincePlaceholder": "İl (örn: Ankara)",
-    "districtOptional": "İlçe (opsiyonel)",
     "lastYears": "Son {{n}} yıl",
     "amountPlaceholder": "Senaryo tutarı (TL)",
     "amountLabel": "Senaryo tutarı",
@@ -734,27 +736,38 @@
     "nationalIndexOnly": "{{market}} için resmî ulusal konut fiyat endeksi var ve aşağıdaki kirala-vs-satın-al hesabında kullanılıyor; bölge bölge kırılım yayınlanmıyor.",
     "noHousingIndex": "{{market}} için ücretsiz ve anahtarsız bir konut fiyat endeksi kaynağı henüz bağlı değil. Bulunca ekleyeceğiz; o zamana kadar tahmin uydurmuyoruz.",
     "listingsSites": "Bu pazarda: {{sites}}.",
-    "cityPlaceholder": "Şehir (örn: {{example}})",
-    "areaOptional": "Semt/bölge (opsiyonel)",
     "searchPlaceholder_province": "İl ara (örn: Muğla, Eskişehir…)",
     "searchPlaceholder_state": "Eyalet ara (örn: Texas, Florida…)",
     "searchLabel_province": "İl ara",
     "searchLabel_state": "Eyalet ara",
-    "noResults_province": "\"{{search}}\" bulunamadı — 81 ilin tamamında arayabilirsin.",
-    "noResults_state": "\"{{search}}\" bulunamadı — 50 eyalet ve Washington DC arasında arayabilirsin.",
+    "noResults_province": "\"{{search}}\" bulunamadı — {{count}} ilin tamamında arayabilirsin.",
+    "noResults_state": "\"{{search}}\" bulunamadı — {{count}} eyaletin tamamında arayabilirsin.",
     "showingFirst_province": "İlk 12 il gösteriliyor — diğer iller için yukarıdan ara.",
     "showingFirst_state": "İlk 12 eyalet gösteriliyor — diğerleri için yukarıdan ara.",
     "indexOnly": "Fiyat endeksi (m² fiyatı yayınlanmıyor)",
     "dataThrough": "(Veri: {{month}})",
-    "loading_province": "81 ilin fiyat verisi alınıyor…",
-    "loading_state": "50 eyalet ve Washington DC için fiyat endeksi alınıyor — ilk açılışta biraz sürebilir, sonrası hızlı."
+    "loading_province": "İl bazında fiyat verisi alınıyor…",
+    "loading_state": "Eyalet bazında fiyat endeksi alınıyor — ilk açılışta biraz sürebilir, sonrası hızlı.",
+    "areaPlaceholder": "{{area}} (örn: {{example}})",
+    "subAreaOptional": "Alt bölge (opsiyonel, örn: {{example}})",
+    "searchPlaceholder_region": "Bölge ara",
+    "searchLabel_region": "Bölge ara",
+    "noResults_region": "\"{{search}}\" bulunamadı — {{count}} bölgenin tamamında arayabilirsin.",
+    "showingFirst_region": "İlk 12 bölge gösteriliyor — diğerleri için yukarıdan ara.",
+    "loading_region": "Bölge verisi alınıyor…",
+    "selectAssetType": "Emlak tipi",
+    "searchPlaceholder_segment": "Kesit ara",
+    "searchLabel_segment": "Kesit ara",
+    "noResults_segment": "\"{{search}}\" bulunamadı — {{count}} kesit var.",
+    "showingFirst_segment": "Tüm kesitler gösteriliyor.",
+    "loading_segment": "Bundesbank konut endeksi alınıyor…"
   },
   "rvb": {
     "title": "Kirada mı otur, ev mi al?",
     "subtitle": "Aynı evi iki senaryoda karşılaştırırız: peşinat + kredi ile satın almak, ya da kirada kalıp farkı yatırmak. Ev almak her zaman kazanç değildir.",
     "cashPlaceholder": "Cebindeki toplam nakit (TL)",
     "downPaymentPlaceholder": "Peşinat / birikimin (TL)",
-    "cashIncludesCosts": "Bu rakam elimdeki tüm nakit — tapu ve komisyonu buradan düş",
+    "cashIncludesCosts": "Bu rakam elimdeki tüm nakit — vergi ve komisyonu buradan düş",
     "rentPlaceholder": "Şu anki aylık kiran (TL)",
     "homePricePlaceholder": "Evin fiyatı (opsiyonel — boşsa kiradan tahmin edilir)",
     "incomePlaceholder": "Aylık net gelirin (opsiyonel — taksit gücünü kontrol eder)",
@@ -765,7 +778,7 @@
     "ownLoanHint": "Bankandan aldığın gerçek teklifi gir. Boş bırakırsan piyasa ortalaması kullanılır.",
     "comparedHome": "Karşılaştırılan ev: <0>{{price}} TL</0> · aylık kredi taksiti ≈ <1>{{installment}} TL</1>",
     "estimatedFromRent": "(kiradan tahmin edildi)",
-    "cashBreakdown": "<0>{{cash}}</0> TL nakdinin {{costs}} TL'si tapu ve komisyona gidiyor; eve peşinat olarak <1>{{applied}} TL</1> kalıyor.",
+    "cashBreakdown": "<0>{{cash}}</0> nakdinin {{costs}} kadarı devir vergileri ve komisyona gidiyor; eve peşinat olarak <1>{{applied}}</1> kalıyor.",
     "affordabilityTight": "Taksit, gelirinin %{{pct}}'i — bankalar genelde gelirin ~%45'inin üzerindeki taksitlere kredi vermez. Bu ev bu peşinatla şu an gerçekçi olmayabilir; daha yüksek peşinat ya da daha uygun bir ev düşünebilirsin.",
     "affordabilityOk": "Taksit, gelirinin %{{pct}}'i — genel kabul gören güvenli sınır ~%45'in altında, bu plan gelirine uygun görünüyor.",
     "loanCost": "<0>Kredinin maliyeti</0> ({{rate}}%/yıl, {{term}} yıl vade)<1/>Çekilen kredi <2>{{principal}} TL</2> · vade sonunda toplam ödenen <3>{{total}} TL</3><4/>Bunun <5>{{interest}} TL</5>'si faiz — yani anaparanın <6>{{ratio}}%</6>'i kadar.",
@@ -780,8 +793,9 @@
     "rentLine": "Peşinat + fark yatırımda · ödenen kira {{rent}} TL",
     "verdictBuy": "Bu varsayımlarla <0>satın almak</0> yaklaşık <1>{{amount}} TL</1> daha avantajlı görünüyor.",
     "verdictRent": "Bu varsayımlarla <0>kirada kalıp yatırım yapmak</0> yaklaşık <1>{{amount}} TL</1> daha avantajlı görünüyor.",
-    "assumptions": "Varsayımlar: konut +%{{housing}}/yıl, portföy +%{{portfolio}}/yıl, kredi %{{rate}}/yıl ({{term}} yıl vade), enflasyon %{{inflation}}/yıl ({{asOf}} verisi). Alım masrafları dahildir: devir vergileri ve resmî harçlar %{{deed}} + emlakçı komisyonu %{{agency}} + KDV (%{{vat}}) = %{{agencyVat}}; ayrıca aidat, DASK ve bakım için yılda ev değerinin %{{upkeep}}'i. Bu oranlar mevzuat ve teamülle belirlenir, zamanla değişir. Büyük rakamlar çoğunlukla enflasyondan şişer; \"bugünkü alım gücü\" satırı gerçek değeri gösterir. Hesap, evde oturmaya devam ettiğin varsayımına dayanır; bu nedenle satış hâlinde doğabilecek vergiler ile ev sahibi olmanın parasal olmayan değeri dahil değildir — o kararın duygusal tarafı da meşrudur.",
-    "staleInflation": "⚠️ Bu pazarın enflasyon verisi {{asOf}} ayına ait — {{months}} ay geride. Kaynak (Eurostat) henüz daha yenisini yayınlamadı; hesap en güncel resmî rakamla yapıldı ama gerçek enflasyon bundan farklı olabilir."
+    "assumptions": "Varsayımlar: konut +%{{housing}}/yıl, portföy +%{{portfolio}}/yıl, kredi %{{rate}}/yıl ({{term}} yıl vade), enflasyon %{{inflation}}/yıl ({{asOf}} verisi). Alım masrafları dahildir: devir vergileri ve resmî harçlar %{{deed}} + emlakçı komisyonu %{{agency}} + KDV (%{{vat}}) = %{{agencyVat}}; ayrıca aidat, sigorta ve bakım için yılda ev değerinin %{{upkeep}}'i. Bu oranlar mevzuat ve teamülle belirlenir, zamanla değişir. Büyük rakamlar çoğunlukla enflasyondan şişer; \"bugünkü alım gücü\" satırı gerçek değeri gösterir. Hesap, evde oturmaya devam ettiğin varsayımına dayanır; bu nedenle satış hâlinde doğabilecek vergiler ile ev sahibi olmanın parasal olmayan değeri dahil değildir — o kararın duygusal tarafı da meşrudur.",
+    "staleInflation": "⚠️ Bu pazarın enflasyon verisi {{asOf}} ayına ait — {{months}} ay geride. Kaynak (Eurostat) henüz daha yenisini yayınlamadı; hesap en güncel resmî rakamla yapıldı ama gerçek enflasyon bundan farklı olabilir.",
+    "selectYears": "Projeksiyon süresi"
   },
   "meta": {
     "title": "Lumos — Akıllı Yatırım Asistanı",
@@ -821,5 +835,11 @@
       "support": "Destek",
       "admin": "Yönetici"
     }
+  },
+  "area": {
+    "province": "il",
+    "state": "eyalet",
+    "region": "bölge",
+    "segment": "Piyasa kesiti"
   }
 }

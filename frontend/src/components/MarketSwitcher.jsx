@@ -27,15 +27,19 @@ export default function MarketSwitcher({ compact = false }) {
         style={{
           background: 'var(--bg-input, rgba(255,255,255,0.05))',
           color: 'var(--text)', border: '1px solid var(--border)',
-          borderRadius: 'var(--radius-xs, 8px)', padding: '7px 10px',
-          fontFamily: 'var(--font)', fontSize: 13, cursor: 'pointer',
+          borderRadius: 'var(--radius-xs, 8px)',
+          // `compact` used to change only the label, so the control itself
+          // stayed full size and ate a third of a 375px header.
+          padding: compact ? '4px 6px' : '7px 10px',
+          fontFamily: 'var(--font)', fontSize: compact ? 12 : 13,
+          cursor: 'pointer',
           width: compact ? 'auto' : '100%',
         }}
       >
         {packs.map(p => (
           <option key={p.code} value={p.code}>
-            {FLAGS[p.code] ?? '🌍'} {p.name} ({p.currency})
-            {p.live_housing_index ? '' : ' — ' + t('market.limitedData')}
+            {FLAGS[p.code] ?? '🌍'}{compact ? ` ${p.code}` : ` ${p.name} (${p.currency})`}
+            {!compact && !p.live_housing_index ? ' — ' + t('market.limitedData') : ''}
           </option>
         ))}
       </select>

@@ -14,7 +14,7 @@ TR = MarketPack(
 
     inflation_source="tcmb_evds",      # live CPI (backend/services/evds_service.py)
     housing_index_source="tcmb_evds",  # housing price index for 19 NUTS2 regions
-    regional_housing_breakdown=True,   # 81 provinces, TL/m² unit prices
+    regional_housing_source="tcmb_evds",  # 81 provinces, TL/m² unit prices
     rent_index_source="none",          # no separate rent index — spread off CPI
     default_index_ticker="XU100.IS",
 
@@ -54,6 +54,9 @@ TR = MarketPack(
         "https://www.bloomberght.com/rss",
     ],
 
+    example_ticker="THYAO.IS",
+    example_asset_name="Gölbaşı arsa",
+    area_kind="province",
     example_district="Lüleburgaz",
     example_locality="Emirali",
 

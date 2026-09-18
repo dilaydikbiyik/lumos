@@ -28,7 +28,9 @@ export default function HoldingsPage() {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const { getToken, userId } = useAuth()
-  const { money } = useMarket()
+  // The example ticker and asset are facts about the MARKET, not the
+  // language: a Turkish reader in the US market was being shown THYAO.IS.
+  const { money, pack } = useMarket()
   const cacheKey = userKey('holdings', userId)
   // Hydrate instantly from the last snapshot so returning users never see a
   // blank/jank frame; the network refresh below replaces it in the background.
@@ -326,10 +328,12 @@ export default function HoldingsPage() {
         {showForm ? (
           <form className="card" onSubmit={addHolding} style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             <select className="input" value={form.asset_type}
+                    aria-label={t('holdings.selectType')}
                     onChange={e => setForm({ ...form, asset_type: e.target.value })}>
               {TYPE_KEYS.map(v => <option key={v} value={v}>{t('holdings.types.' + v)}</option>)}
             </select>
-            <input className="input" placeholder={t('holdings.namePlaceholder')} required
+            <input className="input" required
+                   placeholder={t('holdings.namePlaceholder', { example: pack.example_asset_name })}
                    value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
             {/* 🚗 Vehicle warning — "is your car wealth or an expense?" */}
             {isVehicle && (
@@ -353,7 +357,8 @@ export default function HoldingsPage() {
             {needsTicker && (
               <>
                 <div style={{ display: 'flex', gap: 8 }}>
-                  <input className="input" style={{ flex: 1 }} placeholder={t('holdings.tickerPlaceholder')} required
+                  <input className="input" style={{ flex: 1 }} required
+                         placeholder={t('holdings.tickerPlaceholder', { example: pack.example_ticker })}
                          value={form.ticker}
                          onChange={e => { setForm({ ...form, ticker: e.target.value }); setLookup({ state: 'idle', data: null }) }}
                          onBlur={lookupTicker}
@@ -426,6 +431,7 @@ export default function HoldingsPage() {
             <input className="input" type="number" placeholder={t('holdings.currentPlaceholder')} min="1"
                    value={form.manual_current_value} onChange={e => setForm({ ...form, manual_current_value: e.target.value })} />
             <select className="input" value={form.emotion_tag}
+                    aria-label={t('holdings.emotions.prompt')}
                     onChange={e => setForm({ ...form, emotion_tag: e.target.value })}>
               {EMOTION_VALUES.map(v => <option key={v} value={v}>{t(v ? 'holdings.emotions.' + v : 'holdings.emotions.prompt')}</option>)}
             </select>

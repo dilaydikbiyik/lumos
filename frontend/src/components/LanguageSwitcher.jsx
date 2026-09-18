@@ -24,13 +24,21 @@ export default function LanguageSwitcher({ compact = false }) {
         style={{
           background: 'var(--bg-input, rgba(255,255,255,0.05))',
           color: 'var(--text)', border: '1px solid var(--border)',
-          borderRadius: 'var(--radius-xs, 8px)', padding: '7px 10px',
-          fontFamily: 'var(--font)', fontSize: 13, cursor: 'pointer',
+          borderRadius: 'var(--radius-xs, 8px)',
+          // `compact` used to change only the label, so the control itself
+          // stayed full size and ate a third of a 375px header.
+          padding: compact ? '4px 6px' : '7px 10px',
+          fontFamily: 'var(--font)', fontSize: compact ? 12 : 13,
+          cursor: 'pointer',
           width: compact ? 'auto' : '100%',
         }}
       >
         {LANGUAGES.map(l => (
-          <option key={l.code} value={l.code}>{l.label}</option>
+          /* In a header there is room for "EN", not for "English" — the
+             options still spell it out once the picker is open. */
+          <option key={l.code} value={l.code}>
+            {compact ? l.code.toUpperCase() : l.label}
+          </option>
         ))}
       </select>
     </label>

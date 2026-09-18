@@ -28,8 +28,8 @@
     "heroHighlight": "the light in your hand.",
     "heroBody": "Learn investing without the fear: every number inflation-adjusted, every suggestion explained step by step, every decision still yours.",
     "trust": {
-      "centralBank": "Official central-bank data",
-      "housing": "Housing index, 81 provinces",
+      "centralBank": "Official inflation data",
+      "housing": "Official housing price index",
       "livePrices": "Real market prices",
       "formula": "The formula is visible"
     },
@@ -41,7 +41,7 @@
       },
       "realEstate": {
         "title": "Real Estate and Stocks, Side by Side",
-        "desc": "Price per m² and real appreciation for 81 provinces, next to your stock portfolio. Rent or buy — the math lives here."
+        "desc": "Price per m² and real appreciation for housing, next to your stock portfolio. Rent or buy — the math lives here."
       },
       "panic": {
         "title": "There When You Panic",
@@ -249,7 +249,9 @@
     "resultIntro": "If <0>{{amount}}</0> had stayed {{target}} for {{years}} years (based on {{windows}} windows across {{history}} years of history):",
     "bad": "Bad stretch",
     "typical": "Typical stretch",
-    "good": "Good stretch"
+    "good": "Good stretch",
+    "selectAsset": "Select an asset",
+    "selectYears": "Select a horizon"
   },
   "whatIf": {
     "title": "What would happen?",
@@ -444,11 +446,11 @@
     "loading": "Loading your assets…",
     "emptyTitle": "No assets yet",
     "emptyBody": "Let's catch the first light together — start by adding an asset.",
-    "namePlaceholder": "Name (e.g. plot in Gölbaşı, SPY ETF)",
+    "namePlaceholder": "Name (e.g. {{example}})",
     "vehicleTitle": "🚗 Is your car wealth, or an expense?",
     "vehicleBody": "A vehicle can be part of the wealth picture — but careful: it loses 10–20% of its value every year (depreciation), plus insurance, tax and maintenance. Lumos never suggests buying a car as an investment.",
     "vehicleTip": "If you still want to add it, put its current market value into \"Current estimated value\".",
-    "tickerPlaceholder": "Symbol (e.g. SPY, THYAO.IS)",
+    "tickerPlaceholder": "Symbol (e.g. {{example}})",
     "amountPlaceholder": "Purchase amount",
     "currentPlaceholder": "Current estimated value (optional)",
     "add": "Add",
@@ -456,10 +458,11 @@
     "remainingBudget": "Remaining Budget",
     "lookupCta": "Find",
     "lookupPrice": "Current price: {{price}} {{currency}}",
-    "lookupNotFound": "Couldn't verify that symbol right now — the price service may be temporarily unavailable. Try again, or just type the name and amount yourself. (Borsa İstanbul stocks need a \".IS\" suffix, like THYAO.IS.)",
+    "lookupNotFound": "Couldn't verify that symbol right now — the price service may be temporarily unavailable. Try again, or just type the name and amount yourself.",
     "quantityPlaceholder": "How many did you buy? (opt. — enables live tracking)",
     "computedNote": "Filled in as {{quantity}} × {{price}} = {{total}}. If you paid a different price, you can edit the amount.",
-    "lookupConverted": "≈ {{price}} {{currency}}"
+    "lookupConverted": "≈ {{price}} {{currency}}",
+    "selectType": "Asset type"
   },
   "fx": {
     "title": "Currency Split",
@@ -584,7 +587,8 @@
     "howTitle": "What is this calculation based on?",
     "howBody": "It assumes the money you save doesn't sit idle but grows in a portfolio matching your risk profile, at an average {{growth}}% a year. That rate isn't invented: it's live inflation ({{inflation}}%) plus the real premium a diversified portfolio is assumed to earn over the long run. The horizon is converted to {{months}} months, and each contribution's growth over the remaining time is counted.",
     "howFormula": "monthly = (target − grown value of current savings) × r / ((1+r)^months − 1),  r = monthly return",
-    "howCaveat": "This is a planning assumption, not a forecast: markets don't grow the same amount every year, and some years close down. If the rate turns out lower, the monthly figure won't be enough — reviewing the plan once a year is a good habit."
+    "howCaveat": "This is a planning assumption, not a forecast: markets don't grow the same amount every year, and some years close down. If the rate turns out lower, the monthly figure won't be enough — reviewing the plan once a year is a good habit.",
+    "selectYears": "Goal horizon"
   },
   "market": {
     "label": "Market",
@@ -723,8 +727,6 @@
     "linkError": "The link couldn't be generated",
     "listingsTitle": "🔗 Go to the Listings",
     "listingsBody": "A pre-filtered listing search for the area you like — you make the purchase on the listing site, then come back here and say \"I bought it\".",
-    "provincePlaceholder": "Province (e.g. Ankara)",
-    "districtOptional": "District (optional)",
     "lastYears": "Last {{n}} years",
     "amountPlaceholder": "Scenario amount",
     "amountLabel": "Scenario amount",
@@ -734,27 +736,38 @@
     "nationalIndexOnly": "{{market}} has an official national house price index and it powers the rent-vs-buy calculation below; a region-by-region breakdown isn't published.",
     "noHousingIndex": "No free, keyless house price index source is wired up for {{market}} yet. We'll add one when we find it; until then we won't invent an estimate.",
     "listingsSites": "In this market: {{sites}}.",
-    "cityPlaceholder": "City (e.g. {{example}})",
-    "areaOptional": "Area/district (optional)",
     "searchPlaceholder_province": "Search a province (e.g. Muğla, Eskişehir…)",
     "searchPlaceholder_state": "Search a state (e.g. Texas, Florida…)",
     "searchLabel_province": "Search province",
     "searchLabel_state": "Search state",
-    "noResults_province": "\"{{search}}\" not found — you can search across all 81 provinces.",
-    "noResults_state": "\"{{search}}\" not found — you can search all 50 states and Washington DC.",
+    "noResults_province": "\"{{search}}\" not found — you can search across all {{count}} provinces.",
+    "noResults_state": "\"{{search}}\" not found — you can search across all {{count}} states.",
     "showingFirst_province": "Showing the first 12 provinces — search above for the rest.",
     "showingFirst_state": "Showing the first 12 states — search above for the rest.",
     "indexOnly": "Price index (no per-m² figure is published)",
     "dataThrough": "(Data through {{month}})",
-    "loading_province": "Fetching price data for all 81 provinces…",
-    "loading_state": "Fetching the price index for 50 states and Washington DC — the first load can take a moment, after that it is quick."
+    "loading_province": "Fetching price data province by province…",
+    "loading_state": "Fetching the price index state by state — the first load can take a moment, after that it is quick.",
+    "areaPlaceholder": "{{area}} (e.g. {{example}})",
+    "subAreaOptional": "Sub-area (optional, e.g. {{example}})",
+    "searchPlaceholder_region": "Search a region",
+    "searchLabel_region": "Search region",
+    "noResults_region": "\"{{search}}\" not found — you can search across all {{count}} regions.",
+    "showingFirst_region": "Showing the first 12 regions — search above for the rest.",
+    "loading_region": "Fetching regional data…",
+    "selectAssetType": "Property type",
+    "searchPlaceholder_segment": "Search a segment",
+    "searchLabel_segment": "Search segment",
+    "noResults_segment": "\"{{search}}\" not found — there are {{count}} segments.",
+    "showingFirst_segment": "Showing every segment.",
+    "loading_segment": "Fetching the Bundesbank housing index…"
   },
   "rvb": {
     "title": "Rent, or buy?",
     "subtitle": "We compare the same home two ways: buying with a down payment plus a mortgage, or renting and investing the difference. Buying is not always the win.",
     "cashPlaceholder": "All the cash you have",
     "downPaymentPlaceholder": "Down payment / your savings",
-    "cashIncludesCosts": "This figure is all my cash — take the transfer tax and commission out of it",
+    "cashIncludesCosts": "This figure is all my cash — take the taxes and commission out of it",
     "rentPlaceholder": "Your current monthly rent",
     "homePricePlaceholder": "The home's price (optional — estimated from rent if blank)",
     "incomePlaceholder": "Your monthly net income (optional — checks affordability)",
@@ -765,7 +778,7 @@
     "ownLoanHint": "Enter the real offer from your bank. Left blank, a market average is used.",
     "comparedHome": "Home compared: <0>{{price}}</0> · monthly mortgage payment ≈ <1>{{installment}}</1>",
     "estimatedFromRent": "(estimated from the rent)",
-    "cashBreakdown": "<0>{{cash}}</0> of your cash goes {{costs}} to transfer tax and commission; <1>{{applied}}</1> is left as the down payment.",
+    "cashBreakdown": "<0>{{cash}}</0> of your cash goes {{costs}} to transfer taxes and commission; <1>{{applied}}</1> is left as the down payment.",
     "affordabilityTight": "The payment is {{pct}}% of your income — banks generally won't lend past about 45%. This home may not be realistic on this down payment right now; consider a larger deposit or a more affordable home.",
     "affordabilityOk": "The payment is {{pct}}% of your income — below the widely accepted ~45% safety line, so this plan looks affordable.",
     "loanCost": "<0>What the loan costs</0> ({{rate}}%/yr, {{term}}-year term)<1/>Borrowed <2>{{principal}}</2> · total paid over the full term <3>{{total}}</3><4/>Of which <5>{{interest}}</5> is interest — that is <6>{{ratio}}%</6> of the principal.",
@@ -781,7 +794,8 @@
     "verdictBuy": "On these assumptions <0>buying</0> looks about <1>{{amount}}</1> better.",
     "verdictRent": "On these assumptions <0>renting and investing</0> looks about <1>{{amount}}</1> better.",
     "assumptions": "Assumptions: housing +{{housing}}%/yr, portfolio +{{portfolio}}%/yr, mortgage {{rate}}%/yr ({{term}}-year term), inflation {{inflation}}%/yr (data through {{asOf}}). Purchase costs are included: transfer taxes and official fees {{deed}}% + agency commission {{agency}}% + VAT ({{vat}}%) = {{agencyVat}}%; plus {{upkeep}}% of the home's value per year for dues, insurance and upkeep. These rates are set by regulation and custom and change over time. Large figures are inflated mostly by inflation; the \"in today's money\" line shows the real value. The calculation assumes you keep living in the home, so taxes arising on a sale and the non-financial value of owning are excluded — the emotional side of that decision is legitimate too.",
-    "staleInflation": "⚠️ This market's inflation reading is for {{asOf}} — {{months}} months behind. The source (Eurostat) has not published anything more recent; the calculation uses the latest official figure, but actual inflation may differ."
+    "staleInflation": "⚠️ This market's inflation reading is for {{asOf}} — {{months}} months behind. The source (Eurostat) has not published anything more recent; the calculation uses the latest official figure, but actual inflation may differ.",
+    "selectYears": "Projection length"
   },
   "meta": {
     "title": "Lumos — Smart Investment Assistant",
@@ -821,5 +835,11 @@
       "support": "Support",
       "admin": "Admin"
     }
+  },
+  "area": {
+    "province": "province",
+    "state": "state",
+    "region": "region",
+    "segment": "Market segment"
   }
 }

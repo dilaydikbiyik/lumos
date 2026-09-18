@@ -11,7 +11,15 @@ import MarketContext from '../contexts/MarketContext'
  */
 export const FALLBACK_MARKET = {
   market: 'TR',
-  pack: { code: 'TR', currency: 'TRY', locale: 'tr-TR', live_inflation: true, live_housing_index: true },
+  // Every field a consumer may read. An absent `example_district` rendered
+  // the literal string "undefined" inside a placeholder.
+  pack: {
+    code: 'TR', name: 'Türkiye', currency: 'TRY', currency_symbol: '₺',
+    locale: 'tr-TR', live_inflation: true, live_housing_index: true,
+    regional_housing_breakdown: true, area_kind: 'province',
+    example_district: '', example_locality: '',
+    example_ticker: '', example_asset_name: '',
+  },
   packs: [],
   fmt: (n) => new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 0 }).format(n),
   money: (n) => `${new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 0 }).format(Math.round(n))} TL`,

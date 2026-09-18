@@ -168,19 +168,23 @@ def test_province_table_is_gated_separately_from_the_national_index():
     """
     tr, us, de = MARKET_PACKS["TR"], MARKET_PACKS["US"], MARKET_PACKS["DE"]
 
-    # Türkiye (TCMB, 81 provinces) and the US (FHFA via FRED, 50 states + DC)
-    # publish a sub-national breakdown. Germany does not: Eurostat's house
-    # price index is national only, and inventing regions from it would be a
-    # fabrication — so Germany keeps the national index and loses the table.
-    assert tr.regional_housing_breakdown is True
-    assert us.regional_housing_breakdown is True
-    assert de.regional_housing_breakdown is False
-    assert de.housing_index_source != "none"
+    # The national index and the sub-national table are separate sources, and
+    # they need not come from the same provider. Germany is the case that
+    # proves it: Eurostat publishes its national index and nothing regional,
+    # while the Bundesbank publishes city-size segments and no national HPI
+    # in the same shape. A single flag could not express that.
+    assert tr.housing_index_source == "tcmb_evds"
+    assert tr.regional_housing_source == "tcmb_evds"
 
-    # No pack may claim a breakdown it has no source for.
+    assert us.housing_index_source == "fred"
+    assert us.regional_housing_source == "fred"
+
+    assert de.housing_index_source == "eurostat"
+    assert de.regional_housing_source == "bundesbank"
+
+    # The derived flag still answers "is there a table at all".
     for code, pack in MARKET_PACKS.items():
-        if pack.regional_housing_breakdown:
-            assert pack.housing_index_source != "none", code
+        assert pack.regional_housing_breakdown == (pack.regional_housing_source != "none"), code
 
 
 def test_listing_bridge_reaches_local_portals_in_every_market():

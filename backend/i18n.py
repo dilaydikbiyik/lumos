@@ -462,6 +462,16 @@ _C: dict[str, dict[str, str]] = {
         "en": "This ranking is at regional (NUTS2) level — not a neighbourhood or parcel analysis. Past appreciation guarantees nothing about the future.",
         "de": "Diese Rangfolge liegt auf Regionsebene (NUTS2) — keine Viertel- oder Grundstücksanalyse. Vergangene Wertsteigerung garantiert nichts für die Zukunft."},
 
+    # ── German market segments (nested, not alternatives) ──
+    "segment.DE0007": {
+        "tr": "Yedi büyük şehir", "en": "Seven largest cities",
+        "de": "Sieben größte Städte"},
+    "segment.DE0127": {
+        "tr": "127 şehir", "en": "127 cities", "de": "127 Städte"},
+    "segment.DEK": {
+        "tr": "Tüm ilçeler (Almanya geneli)", "en": "All districts (Germany)",
+        "de": "Alle Kreise (Deutschland)"},
+
     # ── sub-national housing breakdown ──
     "province.unavailable": {
         "tr": "Bölge verisi şu an alınamıyor.",
@@ -489,6 +499,10 @@ _C: dict[str, dict[str, str]] = {
         "tr": "TCMB konut fiyat endeksi.",
         "en": "the Turkish central bank's housing price index.",
         "de": "der Wohnpreisindex der türkischen Zentralbank."},
+    "source.bundesbank": {
+        "tr": "Deutsche Bundesbank konut fiyat endeksi. Almanya'da eyalet (Bundesland) düzeyinde ücretsiz bir endeks yok; bunlar şehir büyüklüğüne göre gruplardır ve İÇ İÇEDİR — yedi büyük şehir, 127 şehrin içindedir. Yani alternatif yerler değil, aynı ülkenin farklı piyasa kesitleridir.",
+        "en": "the Deutsche Bundesbank house price index. No free index exists at Bundesland level in Germany; these are city-size groups and they are NESTED — the seven largest cities sit inside the 127. They are segments of one market, not alternative places to buy.",
+        "de": "der Häuserpreisindex der Deutschen Bundesbank. Auf Ebene der Bundesländer gibt es keinen frei verfügbaren Index; dies sind Gruppen nach Stadtgröße, und sie sind INEINANDER VERSCHACHTELT — die sieben größten Städte liegen innerhalb der 127. Es sind Segmente eines Marktes, keine alternativen Orte."},
     "source.eurostat": {
         "tr": "Eurostat konut fiyat endeksi.",
         "en": "the Eurostat house price index.",

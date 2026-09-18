@@ -64,6 +64,10 @@ def test_project_province_has_per_window_real_band():
 
 
 def test_province_endpoints(client):
+    # Say which market this is about rather than leaning on whatever the
+    # shared test user happened to be created with: a new account now starts
+    # in the market its language suggests, so the default is not a constant.
+    client.patch("/users/me/market", json={"market": "TR"})
     with patch("backend.services.province_intelligence.evds_service.get_province_unit_prices",
                side_effect=lambda: _fake_prices()):
         r1 = client.get("/planning/province-intelligence?horizon_years=5")

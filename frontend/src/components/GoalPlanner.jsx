@@ -55,6 +55,7 @@ export default function GoalPlanner() {
                value={form.target_amount} onChange={e => setForm({ ...form, target_amount: e.target.value })} />
         <div style={{ display: 'flex', gap: 8 }}>
           <select className="input" style={{ flex: 1 }} value={form.years}
+                  aria-label={t('goal.selectYears')}
                   onChange={e => setForm({ ...form, years: e.target.value })}>
             {[1, 2, 3, 5, 10].map(y => <option key={y} value={y}>{t('goal.withinYears', { n: y })}</option>)}
           </select>

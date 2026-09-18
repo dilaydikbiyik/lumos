@@ -72,6 +72,7 @@ export default function FutureScenarios({ allocations, budget }) {
 
       <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
         <select className="input" style={{ flex: 2 }} value={ticker}
+                aria-label={t('scenarios.selectAsset')}
                 onChange={e => { setTicker(e.target.value); setResult(null) }}>
           <option value={PORTFOLIO_OPTION}>{t('scenarios.wholePortfolio')}</option>
           {allocations?.map(a => (
@@ -79,6 +80,7 @@ export default function FutureScenarios({ allocations, budget }) {
           ))}
         </select>
         <select className="input" style={{ flex: 1 }} value={years}
+                aria-label={t('scenarios.selectYears')}
                 onChange={e => { setYears(Number(e.target.value)); setResult(null) }}>
           {[1, 3, 5].map(y => <option key={y} value={y}>{t('timeMachine.years', { n: y })}</option>)}
         </select>

@@ -36,8 +36,8 @@
     "heroHighlight": "das Licht in deiner Hand.",
     "heroBody": "Investieren lernen ohne Angst: jede Zahl inflationsbereinigt, jeder Vorschlag Schritt für Schritt erklärt, jede Entscheidung bleibt deine.",
     "trust": {
-      "centralBank": "Offizielle Zentralbankdaten",
-      "housing": "Immobilienpreisindex",
+      "centralBank": "Offizielle Inflationsdaten",
+      "housing": "Offizieller Wohnpreisindex",
       "livePrices": "Echte Marktpreise",
       "formula": "Die Formel ist sichtbar"
     },
@@ -49,7 +49,7 @@
       },
       "realEstate": {
         "title": "Immobilien und Aktien nebeneinander",
-        "desc": "Preise pro m² und echte Wertentwicklung direkt neben deinem Aktienportfolio. Mieten oder kaufen — die Rechnung steht hier."
+        "desc": "Quadratmeterpreise und reale Wertentwicklung von Wohnimmobilien, direkt neben deinem Aktienportfolio. Mieten oder kaufen — die Rechnung steht hier."
       },
       "panic": {
         "title": "Da, wenn du in Panik gerätst",
@@ -207,11 +207,11 @@
     "loading": "Dein Vermögen wird geladen…",
     "emptyTitle": "Noch keine Vermögenswerte",
     "emptyBody": "Fangen wir gemeinsam an — füge einen ersten Wert hinzu.",
-    "namePlaceholder": "Name (z. B. Grundstück, MSCI World ETF)",
+    "namePlaceholder": "Name (z. B. {{example}})",
     "vehicleTitle": "🚗 Ist dein Auto Vermögen oder Kosten?",
     "vehicleBody": "Ein Fahrzeug darf im Vermögensbild auftauchen — aber Vorsicht: es verliert jedes Jahr 10–20% an Wert, dazu kommen Versicherung, Steuer und Wartung. Lumos empfiehlt niemals einen Autokauf als Geldanlage.",
     "vehicleTip": "Wenn du es trotzdem aufnehmen willst, trage den aktuellen Marktwert unter \"Aktueller Schätzwert\" ein.",
-    "tickerPlaceholder": "Symbol (z. B. EUNL.DE)",
+    "tickerPlaceholder": "Symbol (z. B. {{example}})",
     "amountPlaceholder": "Kaufbetrag",
     "currentPlaceholder": "Aktueller Schätzwert (optional)",
     "add": "Hinzufügen",
@@ -221,7 +221,8 @@
     "lookupNotFound": "Das Symbol konnte gerade nicht bestätigt werden — der Kursdienst ist eventuell kurz nicht erreichbar. Versuch es erneut oder trage Name und Betrag einfach selbst ein.",
     "quantityPlaceholder": "Wie viele Stück? (opt. — aktiviert Live-Verfolgung)",
     "computedNote": "Eingetragen als {{quantity}} × {{price}} = {{total}}. Wenn du zu einem anderen Kurs gekauft hast, kannst du den Betrag ändern.",
-    "lookupConverted": "≈ {{price}} {{currency}}"
+    "lookupConverted": "≈ {{price}} {{currency}}",
+    "selectType": "Anlageart"
   },
   "goal": {
     "title": "🎯 Mein Ziel",
@@ -242,7 +243,8 @@
     "howTitle": "Worauf beruht diese Rechnung?",
     "howBody": "Sie nimmt an, dass dein Erspartes nicht ungenutzt liegt, sondern in einem zu deinem Risikoprofil passenden Portfolio im Schnitt {{growth}}% pro Jahr wächst. Diese Rate ist nicht erfunden: sie ist die Live-Inflation ({{inflation}}%) plus die reale Prämie, die ein breit gestreutes Portfolio langfristig erwarten lässt. Der Zeitraum wird in {{months}} Monate umgerechnet, und das Wachstum jedes Beitrags über die Restlaufzeit wird mitgezählt.",
     "howFormula": "monatlich = (Ziel − gewachsener Wert der Ersparnisse) × r / ((1+r)^Monate − 1),  r = monatliche Rendite",
-    "howCaveat": "Das ist eine Planungsannahme, keine Prognose: Märkte wachsen nicht jedes Jahr gleich viel, und manche Jahre schließen im Minus. Fällt die Rate niedriger aus, reicht der Monatsbetrag nicht — den Plan einmal im Jahr zu prüfen ist eine gute Gewohnheit."
+    "howCaveat": "Das ist eine Planungsannahme, keine Prognose: Märkte wachsen nicht jedes Jahr gleich viel, und manche Jahre schließen im Minus. Fällt die Rate niedriger aus, reicht der Monatsbetrag nicht — den Plan einmal im Jahr zu prüfen ist eine gute Gewohnheit.",
+    "selectYears": "Zielzeitraum"
   },
   "feedback": {
     "open": "Sag uns etwas dazu",
@@ -485,8 +487,6 @@
     "linkError": "Der Link konnte nicht erzeugt werden",
     "listingsTitle": "🔗 Zu den Inseraten",
     "listingsBody": "Eine vorgefilterte Inseratsuche für deine Wunschgegend — den Kauf tätigst du auf der Inseratseite und kommst dann hierher zurück und sagst \"Gekauft\".",
-    "provincePlaceholder": "Provinz (z. B. Ankara)",
-    "districtOptional": "Kreis (optional)",
     "lastYears": "Letzte {{n}} Jahre",
     "amountPlaceholder": "Szenariobetrag",
     "amountLabel": "Szenariobetrag",
@@ -496,27 +496,38 @@
     "nationalIndexOnly": "Für {{market}} gibt es einen offiziellen nationalen Häuserpreisindex; er fließt in die Miet-oder-Kauf-Rechnung unten ein. Eine Aufschlüsselung nach Regionen wird nicht veröffentlicht.",
     "noHousingIndex": "Für {{market}} ist noch keine kostenlose, schlüssellose Quelle für einen Häuserpreisindex angebunden. Wir ergänzen sie, sobald wir eine finden; bis dahin erfinden wir keine Schätzung.",
     "listingsSites": "In diesem Markt: {{sites}}.",
-    "cityPlaceholder": "Stadt (z. B. {{example}})",
-    "areaOptional": "Viertel/Gegend (optional)",
     "searchPlaceholder_province": "Provinz suchen (z. B. Muğla, Eskişehir…)",
     "searchPlaceholder_state": "Bundesstaat suchen (z. B. Texas, Florida…)",
     "searchLabel_province": "Provinz suchen",
     "searchLabel_state": "Bundesstaat suchen",
-    "noResults_province": "\"{{search}}\" nicht gefunden — du kannst alle 81 Provinzen durchsuchen.",
-    "noResults_state": "\"{{search}}\" nicht gefunden — du kannst alle 50 Bundesstaaten und Washington DC durchsuchen.",
+    "noResults_province": "\"{{search}}\" nicht gefunden — du kannst alle {{count}} Provinzen durchsuchen.",
+    "noResults_state": "\"{{search}}\" nicht gefunden — du kannst alle {{count}} Bundesstaaten durchsuchen.",
     "showingFirst_province": "Die ersten 12 Provinzen werden angezeigt — für die übrigen oben suchen.",
     "showingFirst_state": "Die ersten 12 Bundesstaaten werden angezeigt — für die übrigen oben suchen.",
     "indexOnly": "Preisindex (kein Quadratmeterpreis veröffentlicht)",
     "dataThrough": "(Daten bis {{month}})",
-    "loading_province": "Preisdaten für alle 81 Provinzen werden geladen…",
-    "loading_state": "Preisindex für 50 Bundesstaaten und Washington DC wird geladen — der erste Aufruf kann einen Moment dauern, danach geht es schnell."
+    "loading_province": "Preisdaten werden Provinz für Provinz geladen…",
+    "loading_state": "Preisindex wird Bundesstaat für Bundesstaat geladen — der erste Aufruf kann einen Moment dauern, danach geht es schnell.",
+    "areaPlaceholder": "{{area}} (z. B. {{example}})",
+    "subAreaOptional": "Teilgebiet (optional, z. B. {{example}})",
+    "searchPlaceholder_region": "Region suchen",
+    "searchLabel_region": "Region suchen",
+    "noResults_region": "\"{{search}}\" nicht gefunden — du kannst alle {{count}} Regionen durchsuchen.",
+    "showingFirst_region": "Die ersten 12 Regionen werden angezeigt — für die übrigen oben suchen.",
+    "loading_region": "Regionaldaten werden geladen…",
+    "selectAssetType": "Immobilienart",
+    "searchPlaceholder_segment": "Segment suchen",
+    "searchLabel_segment": "Segment suchen",
+    "noResults_segment": "\"{{search}}\" nicht gefunden — es gibt {{count}} Segmente.",
+    "showingFirst_segment": "Alle Segmente werden angezeigt.",
+    "loading_segment": "Häuserpreisindex der Bundesbank wird geladen…"
   },
   "rvb": {
     "title": "Mieten oder kaufen?",
     "subtitle": "Wir vergleichen dieselbe Immobilie auf zwei Wegen: kaufen mit Eigenkapital plus Kredit, oder mieten und die Differenz anlegen. Kaufen ist nicht immer der Gewinn.",
     "cashPlaceholder": "Dein gesamtes Bargeld",
     "downPaymentPlaceholder": "Eigenkapital / deine Ersparnisse",
-    "cashIncludesCosts": "Das ist mein gesamtes Bargeld — zieh Grunderwerbsteuer und Provision davon ab",
+    "cashIncludesCosts": "Das ist mein gesamtes Bargeld — zieh Steuern und Provision davon ab",
     "rentPlaceholder": "Deine aktuelle Monatsmiete",
     "homePricePlaceholder": "Preis der Immobilie (optional — sonst aus der Miete geschätzt)",
     "incomePlaceholder": "Dein monatliches Nettoeinkommen (optional — prüft die Tragfähigkeit)",
@@ -527,7 +538,7 @@
     "ownLoanHint": "Gib das echte Angebot deiner Bank ein. Leer gelassen wird ein Marktdurchschnitt verwendet.",
     "comparedHome": "Verglichene Immobilie: <0>{{price}}</0> · monatliche Rate ≈ <1>{{installment}}</1>",
     "estimatedFromRent": "(aus der Miete geschätzt)",
-    "cashBreakdown": "Von deinen <0>{{cash}}</0> gehen {{costs}} an Grunderwerbsteuer und Provision; als Eigenkapital bleiben <1>{{applied}}</1>.",
+    "cashBreakdown": "Von deinen <0>{{cash}}</0> gehen {{costs}} an Erwerbsteuern und Provision; als Eigenkapital bleiben <1>{{applied}}</1>.",
     "affordabilityTight": "Die Rate beträgt {{pct}}% deines Einkommens — Banken vergeben in der Regel nichts über rund 45%. Diese Immobilie ist mit diesem Eigenkapital derzeit womöglich nicht realistisch; überlege mehr Eigenkapital oder eine günstigere Immobilie.",
     "affordabilityOk": "Die Rate beträgt {{pct}}% deines Einkommens — unter der allgemein akzeptierten Grenze von rund 45%, dieser Plan wirkt tragfähig.",
     "loanCost": "<0>Was der Kredit kostet</0> ({{rate}}%/Jahr, {{term}} Jahre Laufzeit)<1/>Aufgenommen <2>{{principal}}</2> · über die gesamte Laufzeit gezahlt <3>{{total}}</3><4/>Davon sind <5>{{interest}}</5> Zinsen — also <6>{{ratio}}%</6> der Kreditsumme.",
@@ -543,7 +554,8 @@
     "verdictBuy": "Unter diesen Annahmen wirkt <0>Kaufen</0> um rund <1>{{amount}}</1> vorteilhafter.",
     "verdictRent": "Unter diesen Annahmen wirkt <0>Mieten und Anlegen</0> um rund <1>{{amount}}</1> vorteilhafter.",
     "assumptions": "Annahmen: Immobilien +{{housing}}%/Jahr, Portfolio +{{portfolio}}%/Jahr, Kredit {{rate}}%/Jahr ({{term}} Jahre Laufzeit), Inflation {{inflation}}%/Jahr (Daten bis {{asOf}}). Kaufnebenkosten sind enthalten: Erwerbsteuern und Amtsgebühren {{deed}}% + Maklerprovision {{agency}}% + MwSt. ({{vat}}%) = {{agencyVat}}%; dazu {{upkeep}}% des Immobilienwerts pro Jahr für Hausgeld, Versicherung und Instandhaltung. Diese Sätze werden durch Gesetz und Gepflogenheit bestimmt und ändern sich. Große Zahlen sind meist von der Inflation aufgebläht; die Zeile \"in heutigem Geld\" zeigt den realen Wert. Die Rechnung geht davon aus, dass du wohnen bleibst — Steuern bei einem Verkauf und der nicht-finanzielle Wert des Eigentums sind daher nicht enthalten; die emotionale Seite dieser Entscheidung ist ebenso legitim.",
-    "staleInflation": "⚠️ Der Inflationswert dieses Marktes stammt aus {{asOf}} — {{months}} Monate alt. Die Quelle (Eurostat) hat nichts Neueres veröffentlicht; die Rechnung nutzt die aktuellste offizielle Zahl, die tatsächliche Inflation kann davon abweichen."
+    "staleInflation": "⚠️ Der Inflationswert dieses Marktes stammt aus {{asOf}} — {{months}} Monate alt. Die Quelle (Eurostat) hat nichts Neueres veröffentlicht; die Rechnung nutzt die aktuellste offizielle Zahl, die tatsächliche Inflation kann davon abweichen.",
+    "selectYears": "Projektionsdauer"
   },
   "reit": {
     "title": "Immobilien anlegen: REIT-ETFs",
@@ -637,7 +649,9 @@
     "resultIntro": "Wären <0>{{amount}}</0> {{years}} Jahre lang {{target}} geblieben (auf Basis von {{windows}} Fenstern aus {{history}} Jahren Historie):",
     "bad": "Schlechte Phase",
     "typical": "Typische Phase",
-    "good": "Gute Phase"
+    "good": "Gute Phase",
+    "selectAsset": "Anlage wählen",
+    "selectYears": "Zeitraum wählen"
   },
   "whatIf": {
     "title": "Was würde passieren?",
@@ -821,5 +835,11 @@
       "support": "Support",
       "admin": "Administrator"
     }
+  },
+  "area": {
+    "province": "Provinz",
+    "state": "Bundesstaat",
+    "region": "Region",
+    "segment": "Marktsegment"
   }
 }

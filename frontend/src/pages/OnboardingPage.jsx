@@ -31,6 +31,10 @@ const FEATURES = [
   { icon: 'lifebuoy', key: 'panic' },
 ]
 
+// Long enough that a warm backend always answers first, short enough that
+// nobody watches a dead button while a sleeping one wakes up.
+const PROFILE_CHECK_TIMEOUT_MS = 2500
+
 export default function OnboardingPage() {
   const { t } = useTranslation()
   const navigate = useNavigate()
@@ -45,15 +49,33 @@ export default function OnboardingPage() {
       navigate('/dashboard')
       return
     }
+    // The button used to await this request with no pending state, so on a
+    // free instance waking from sleep it sat dead for the better part of a
+    // minute. Two changes: it says it is working, and it stops waiting.
+    setChecking(true)
     try {
-      const res = await api.get('/profile')
+      const res = await Promise.race([
+        api.get('/profile'),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('slow')), PROFILE_CHECK_TIMEOUT_MS)),
+      ])
       if (res.data?.risk_score != null) {
+        // Remember it, so the next visit short-circuits above.
+        try { localStorage.setItem(`lumos-profile-${userId}`, '1') } catch { /* fine */ }
         navigate('/dashboard')
         return
       }
-    } catch { /* can't tell — fall through to the intro */ }
+    } catch {
+      // Either the backend is cold or it genuinely cannot say. The intro is
+      // the safe destination: it is where a user with no profile belongs, and
+      // anyone who does have one can reach the dashboard from the nav.
+    } finally {
+      setChecking(false)
+    }
     navigate('/path')
   }
+  const [checking, setChecking] = useState(false)
+
   // Accepted once per device — re-prompting on every visit numbs the warning
   const [showDisclaimer, setShowDisclaimer] = useState(
     () => localStorage.getItem('lumos-disclaimer-ok') !== '1',
@@ -166,9 +188,14 @@ export default function OnboardingPage() {
           <SignedIn>
             <button
               className="btn btn-primary"
-              style={{ maxWidth: 320, width: '100%', margin: '0 auto', fontSize: 16, display: 'flex' }}
+              style={{
+                maxWidth: 320, width: '100%', margin: '0 auto', fontSize: 16,
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+              }}
               onClick={continueFromHero}
+              disabled={checking}
             >
+              {checking && <span className="spinner" style={{ width: 16, height: 16 }} />}
               {t('common.continue')}
             </button>
           </SignedIn>

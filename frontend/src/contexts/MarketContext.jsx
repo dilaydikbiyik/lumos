@@ -1,6 +1,7 @@
 import { createContext, useCallback, useEffect, useMemo, useState } from 'react'
 import { useAuth } from '@clerk/clerk-react'
 import api from '../utils/api'
+import { readJSON, writeJSON } from '../utils/storage'
 
 /**
  * Frontend side of the Market Pack architecture — currency, number
@@ -14,18 +15,36 @@ import api from '../utils/api'
  * pack's live_* flags are false.
  */
 
-// If the backend is unreachable the app still works with TR defaults
+// The shape every consumer may read. Carrying every field matters as much as
+// carrying the right values: a missing `example_district` rendered the literal
+// string "undefined" inside a placeholder.
 const TR_FALLBACK = {
   code: 'TR', name: 'Türkiye', currency: 'TRY', currency_symbol: '₺',
   locale: 'tr-TR', live_inflation: true, live_housing_index: true,
+  regional_housing_breakdown: true, area_kind: 'province',
+  example_district: '', example_locality: '',
+  example_ticker: '', example_asset_name: '',
+}
+
+// What the backend last told us. The first paint happens before /users/markets
+// answers, and before this cache existed that paint was always Türkiye — so a
+// US reader watched their dollars render as lira for a moment on every load,
+// and saw them stay that way whenever the backend was unreachable.
+const CACHE_KEY = 'lumos-market-cache'
+
+function cached() {
+  const value = readJSON(CACHE_KEY)
+  if (!value?.packs?.length || !value?.market) return null
+  return value
 }
 
 const MarketContext = createContext(null)
 
 export function MarketProvider({ children }) {
   const { isSignedIn } = useAuth()
-  const [packs, setPacks] = useState([TR_FALLBACK])
-  const [marketCode, setMarketCode] = useState('TR')
+  const remembered = cached()
+  const [packs, setPacks] = useState(remembered?.packs ?? [TR_FALLBACK])
+  const [marketCode, setMarketCode] = useState(remembered?.market ?? 'TR')
 
   useEffect(() => {
     if (!isSignedIn) return
@@ -37,10 +56,17 @@ export function MarketProvider({ children }) {
           api.get('/users/me'),
         ])
         if (cancelled) return
-        if (marketsRes.data?.markets?.length) setPacks(marketsRes.data.markets)
-        if (meRes.data?.market) setMarketCode(meRes.data.market)
+        const fetched = marketsRes.data?.markets
+        const chosen = meRes.data?.market
+        if (fetched?.length) setPacks(fetched)
+        if (chosen) setMarketCode(chosen)
+        if (fetched?.length && chosen) {
+          writeJSON(CACHE_KEY, { packs: fetched, market: chosen })
+        }
       } catch {
-        // fall through to TR defaults — formatting must never break
+        // Keep whatever we already have — formatting must never break, and
+        // the remembered market is a better guess than Türkiye for everyone
+        // who is not in it.
       }
     }
     load()
@@ -52,10 +78,11 @@ export function MarketProvider({ children }) {
     setMarketCode(code) // optimistic — the UI responds instantly
     try {
       await api.patch('/users/me/market', { market: code })
+      writeJSON(CACHE_KEY, { packs, market: code })
     } catch {
       setMarketCode(prev) // save failed — don't stay in a lying state
     }
-  }, [marketCode])
+  }, [marketCode, packs])
 
   const value = useMemo(() => {
     const pack = packs.find(p => p.code === marketCode) ?? TR_FALLBACK

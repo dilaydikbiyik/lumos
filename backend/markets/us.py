@@ -27,7 +27,7 @@ US = MarketPack(
 
     inflation_source="bls",        # CPI-U, monthly, no key
     housing_index_source="fred",   # FHFA All-Transactions HPI, quarterly
-    regional_housing_breakdown=True,  # 50 states + DC, same series family
+    regional_housing_source="fred",   # 50 states + DC, same series family
     rent_index_source="bls",       # rent of primary residence
     default_index_ticker="^GSPC",
 
@@ -37,6 +37,9 @@ US = MarketPack(
         "https://finance.yahoo.com/news/rssindex",
     ],
 
+    example_ticker="AAPL",
+    example_asset_name="Austin condo",
+    area_kind="state",
     example_district="Travis County",
     example_locality="Round Rock",
 

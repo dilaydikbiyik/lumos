@@ -95,6 +95,7 @@ def test_a_pack_declares_everything_the_app_asks_it_for(market):
     assert pack.inflation_source in {"tcmb_evds", "bls", "eurostat", "none"}
     assert pack.housing_index_source in {"tcmb_evds", "fred", "eurostat", "none"}
     assert pack.rent_index_source in {"bls", "eurostat", "none"}
+    assert pack.regional_housing_source in {"tcmb_evds", "fred", "bundesbank", "none"}
 
     assert pack.listing_sites, "no way to reach a listing in this market"
     assert pack.example_district and pack.example_locality
@@ -147,16 +148,20 @@ def test_boilerplate_is_inherited_rather_than_restated_by_every_pack():
 
 def test_a_pack_cannot_claim_a_breakdown_it_cannot_read():
     """
-    Claiming a sub-national table without a source renders an empty list
+    Claiming a sub-national table without a reader renders an empty list
     instead of the honest "not published here" card.
+
+    The regional source is named separately from the national one because
+    they need not be the same provider: Germany's national index is
+    Eurostat's, its only free regional figures are the Bundesbank's.
     """
     from backend.services.province_intelligence import _SOURCES
 
     for market, pack in MARKET_PACKS.items():
         if pack.regional_housing_breakdown:
-            assert pack.housing_index_source in _SOURCES, (
+            assert pack.regional_housing_source in _SOURCES, (
                 f"{market} claims a breakdown but nothing can read "
-                f"{pack.housing_index_source!r}")
+                f"{pack.regional_housing_source!r}")
 
 
 def test_the_investable_universe_is_reachable_and_self_consistent():
@@ -389,7 +394,7 @@ def test_an_incomplete_pack_is_rejected_by_this_very_file():
         locale="zz-ZZ", languages=["zz"],
         inflation_source="eurostat",
         housing_index_source="eurostat",
-        regional_housing_breakdown=True,        # claims a table nothing can read
+        regional_housing_source="unreadable",   # claims a table nothing can read
         default_index_ticker="^TEST",
         news_feeds=[],                          # digest would silently do nothing
         listing_sites=[ListingSite("Portal", "https://example.com/{query}")],
@@ -423,7 +428,7 @@ def test_an_incomplete_pack_is_rejected_by_this_very_file():
 
         # 4. A breakdown needs a source something can read.
         from backend.services.province_intelligence import _SOURCES
-        if pack.regional_housing_breakdown and pack.housing_index_source not in _SOURCES:
+        if pack.regional_housing_breakdown and pack.regional_housing_source not in _SOURCES:
             caught.append("unreadable breakdown")
 
         # 5. Listing searches must not carry Turkish asset words.
@@ -437,3 +442,159 @@ def test_an_incomplete_pack_is_rejected_by_this_very_file():
         "turkish listing term",
     }, caught
     assert any(c.startswith("broker_note/") for c in caught), caught
+
+
+# ── Language picks the STARTING market, and never touches it again ───────────
+
+def test_a_new_account_starts_in_the_market_its_language_suggests():
+    from backend.markets import DEFAULT_MARKET_BY_LANGUAGE, default_market_for_language
+
+    assert default_market_for_language("tr") == "TR"
+    assert default_market_for_language("en") == "US"
+    assert default_market_for_language("de") == "DE"
+
+    # A language with no obvious home market, or none at all, falls back.
+    assert default_market_for_language("fr") == "TR"
+    assert default_market_for_language(None) == "TR"
+
+    # The table may only name markets that exist.
+    for language, market in DEFAULT_MARKET_BY_LANGUAGE.items():
+        assert language in LANGUAGES, language
+        assert market in MARKETS, (language, market)
+
+
+def test_the_starting_market_is_a_default_and_not_a_coupling(client):
+    """
+    The distinction that matters: a brand-new account gets a sensible guess,
+    but from then on the two settings are independent. Switching language must
+    never move someone's money to another market.
+    """
+    import asyncio
+
+    from backend.main import app
+    from backend.middleware.verify_clerk import get_current_user
+    from backend.repositories import user_repository
+    from backend.tests.conftest import _TestSession
+
+    app.dependency_overrides[get_current_user] = lambda: "market_default_en"
+    created = client.get("/users/me", headers={"X-Lumos-Lang": "en"}).json()
+    assert created["market"] == "US"
+
+    # Reading in German afterwards must not move them to Germany.
+    again = client.get("/users/me", headers={"X-Lumos-Lang": "de"}).json()
+    assert again["market"] == "US"
+
+    # And an explicit choice survives any later language.
+    client.patch("/users/me/market", json={"market": "TR"},
+                 headers={"X-Lumos-Lang": "de"})
+    after = client.get("/users/me", headers={"X-Lumos-Lang": "en"}).json()
+    assert after["market"] == "TR"
+
+    async def _cleanup():
+        async with _TestSession() as db:
+            user = await user_repository.get_by_clerk_id(db, "market_default_en")
+            assert user is not None
+    asyncio.run(_cleanup())
+
+
+def test_a_turkish_reader_still_starts_in_turkiye(client):
+    from backend.main import app
+    from backend.middleware.verify_clerk import get_current_user
+
+    app.dependency_overrides[get_current_user] = lambda: "market_default_tr"
+    assert client.get("/users/me", headers={"X-Lumos-Lang": "tr"}).json()["market"] == "TR"
+
+    app.dependency_overrides[get_current_user] = lambda: "market_default_de"
+    assert client.get("/users/me", headers={"X-Lumos-Lang": "de"}).json()["market"] == "DE"
+
+
+# ── Sub-national data: shape, frequency and honesty ──────────────────────────
+
+def test_every_regional_source_declares_its_shape_and_frequency():
+    """
+    Two things the app cannot guess and must not assume.
+
+    FREQUENCY: the Turkish and US series are quarterly, the Bundesbank's is
+    annual. Reading a 3-year horizon as "12 observations back" turned it into
+    a 12-year one, and the number looked entirely plausible.
+
+    SHAPE: Germany's aggregates are NESTED — the seven largest cities sit
+    inside the 127 — so they can be compared but not ranked. A rank badge
+    invites "pick number one", which is nonsense for a segment of a market
+    you are already in.
+    """
+    import inspect
+    from unittest.mock import patch
+
+    from backend.services import province_intelligence as pi
+    from backend.services.province_intelligence import _SOURCES
+
+    for name, reader in _SOURCES.items():
+        assert "lang" in inspect.signature(reader).parameters, name
+
+    fake = {f"20{y:02d}-12": 100 + y for y in range(10, 26)}
+    # Every reader must return the four keys the caller relies on.
+    expected = {"areas", "price_level", "frequency", "shape"}
+    with patch.object(pi.evds_service, "get_province_unit_prices",
+                      lambda: {"X": {"name": "X", "prices": fake}}), \
+         patch.object(pi.fred_service, "get_all_state_hpi",
+                      lambda: {"X": {"name": "X", "index": fake}}), \
+         patch.object(pi.bundesbank_service, "get_segments",
+                      lambda lang="tr": {"X": {"name": "X", "index": fake}}):
+        for name, reader in _SOURCES.items():
+            read = reader("en")
+            assert set(read) == expected, (name, set(read))
+            assert read["frequency"] in ("quarterly", "annual"), name
+            assert read["shape"] in ("ranking", "comparison"), name
+
+
+def test_nested_segments_are_compared_and_never_ranked():
+    from unittest.mock import patch
+
+    from backend.services import province_intelligence as pi
+
+    fake = {f"20{y:02d}-12": 100 * (1.03 ** y) for y in range(4, 26)}
+    with patch.object(pi.bundesbank_service, "get_segments",
+                      lambda lang="tr": {
+                          "A": {"name": "Seven largest cities", "index": fake},
+                          "B": {"name": "All districts", "index": fake},
+                      }):
+        result = pi.rank_provinces(3, "DE", "en")
+
+    assert result["available"] is True
+    assert result["shape"] == "comparison"
+    assert result["frequency"] == "annual"
+    assert all(row.get("rank") is None for row in result["provinces"])
+
+
+def test_alternatives_are_ranked():
+    from unittest.mock import patch
+
+    from backend.services import province_intelligence as pi
+
+    fake = {f"20{y:02d}-{m:02d}": 100 + y * 4 + m
+            for y in range(10, 26) for m in (3, 6, 9, 12)}
+    with patch.object(pi.evds_service, "get_province_unit_prices",
+                      lambda: {"A": {"name": "A", "prices": fake},
+                               "B": {"name": "B", "prices": fake}}):
+        result = pi.rank_provinces(3, "TR", "tr")
+
+    assert result["shape"] == "ranking"
+    assert result["frequency"] == "quarterly"
+    assert [row["rank"] for row in result["provinces"]] == [1, 2]
+
+
+def test_a_horizon_means_the_same_number_of_YEARS_whatever_the_frequency():
+    """The bug this pins: 3 years read as 12 on an annual series."""
+    from unittest.mock import patch
+
+    from backend.services import province_intelligence as pi
+
+    # 3% a year, for long enough that 3 years and 12 years differ obviously.
+    annual = {f"{2004 + i}-12": 100 * (1.03 ** i) for i in range(22)}
+    with patch.object(pi.bundesbank_service, "get_segments",
+                      lambda lang="tr": {"A": {"name": "A", "index": annual}}):
+        three = pi.rank_provinces(3, "DE", "en")["provinces"][0]["nominal_change_pct"]
+
+    # (1.03 ** 3 - 1) * 100 = 9.3, not the 42.6 that twelve years would give.
+    assert three == pytest.approx(9.3, abs=0.2), three

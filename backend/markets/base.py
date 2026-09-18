@@ -33,12 +33,17 @@ class MarketPack:
     housing_index_source: str     # "tcmb_evds" | "eurostat" | "none"
     default_index_ticker: str     # yfinance ticker for the local blue-chip index
     rent_index_source: str = "none"   # "bls" | "eurostat" | "none"
-    # A NATIONAL house-price index and a province-by-province BREAKDOWN are
-    # different data products. Eurostat gives Germany the first but not the
-    # second, so gating the province table on housing_index_source showed a
-    # German reader Turkish provinces priced in lira. This flag is what the
-    # per-province table keys on.
-    regional_housing_breakdown: bool = False
+    # A NATIONAL house-price index and a SUB-NATIONAL breakdown are different
+    # data products, and they need not come from the same provider: Germany's
+    # national index is Eurostat's while its only free regional figures are
+    # the Bundesbank's. A boolean could not say that, so this names the
+    # regional source the same way housing_index_source names the national one.
+    regional_housing_source: str = "none"   # tcmb_evds | fred | bundesbank | none
+
+    @property
+    def regional_housing_breakdown(self) -> bool:
+        """Whether this market has a sub-national table at all."""
+        return self.regional_housing_source != "none"
 
     # ── Beginner news digest ──
     # Headlines are a market fact, not a language one: a user investing in the
@@ -53,6 +58,15 @@ class MarketPack:
     # is the same category of mistake as pricing Texas in lira.
     example_district: str = ""
     example_locality: str = ""
+    # A ticker and an asset a reader of THIS market would recognise, for the
+    # "add a holding" placeholders. These were written per LANGUAGE, which is
+    # the wrong axis: a Turkish reader in the US market was shown THYAO.IS.
+    example_ticker: str = ""
+    example_asset_name: str = ""
+    # What this country calls its first-level subdivision. The client holds
+    # the translations, keyed by this value, so a new market picks an existing
+    # kind rather than shipping three more words.
+    area_kind: str = "region"          # province | state | region
     # asset_type id -> the word that market's portals actually search for.
     # The ids are Turkish because Türkiye was the first market; feeding them
     # to ImmoScout24 sent a German buyer looking for "daire".

@@ -29,13 +29,17 @@ MY_MARKET = MarketPack(
     inflation_source="eurostat",       # tcmb_evds | bls | eurostat | none
     housing_index_source="eurostat",   # tcmb_evds | fred | eurostat | none
     rent_index_source="eurostat",      # bls | eurostat | none
-    regional_housing_breakdown=False,  # see step 3
+    regional_housing_source="none",    # tcmb_evds | fred | bundesbank | none
     default_index_ticker="^XXXX",      # yfinance ticker for the local index
 
     news_feeds=[...],           # public RSS; empty means no digest for this market
     listing_sites=[...],        # at least one, with a {query} template
+    listing_terms={...},        # asset_type id -> this market's search word
     example_district="...",     # a REAL place in this country
     example_locality="...",
+    example_ticker="...",       # for the "add a holding" placeholders
+    example_asset_name="...",
+    area_kind="region",         # province | state | region | segment
 
     # Planning inputs. Every one is a documented assumption shown to the
     # reader — write the comment explaining where the number comes from.
@@ -77,21 +81,50 @@ Sources are dispatched on what the pack **declares**, never on its country code
 (`inflation_service._get_index`, `province_intelligence._SOURCES`). Declaring an
 existing source wires it up with no code change.
 
-Two flags are separate on purpose:
+Two sources are named separately on purpose, and they need not be the same
+provider:
 
-- `housing_index_source` — a **national** house price index. Powers rent-vs-buy.
-- `regional_housing_breakdown` — a **sub-national table** (provinces, states).
+- `housing_index_source` — the **national** house price index. Powers rent-vs-buy.
+- `regional_housing_source` — the **sub-national** table (provinces, states,
+  segments). `"none"` means this market simply has no table, and the page says
+  so instead of showing another country's.
 
-Germany has the first and not the second; gating the table on the national index
-once showed a German reader Turkish provinces priced in lira. A pack that claims
-a breakdown must name a source `province_intelligence._SOURCES` can read, or the
-conformance test fails.
+Germany is the case that proves they must be separate: Eurostat publishes its
+national index and nothing regional, while the Bundesbank publishes city-size
+segments and no national index in the same shape. A single boolean could not
+express that, and gating the table on the national index once showed a German
+reader Turkish provinces priced in lira.
+
+A reader returns four things, because two of them cannot be guessed:
+
+```python
+{"areas": {...}, "price_level": bool, "frequency": "quarterly" | "annual",
+ "shape": "ranking" | "comparison"}
+```
+
+- `frequency` — the Turkish and US series are quarterly, the Bundesbank's is
+  annual. Reading a 3-year horizon as "12 observations back" silently turned it
+  into a 12-year one, and the number looked entirely plausible.
+- `shape` — Germany's aggregates are NESTED: the seven largest cities sit inside
+  the 127. They can be compared but not ranked, so no rank badge is attached. A
+  rank number invites "pick number one", which is meaningless for a segment of
+  a market you are already in.
+- `price_level` — TCMB publishes TL per m²; an index has no unit price, and
+  printing an empty one would imply the two markets report the same thing.
 
 If your market needs a genuinely new source, add an adapter under
 `backend/services/` following `fred_service.py`: cache tiers (fresh → stale →
 last-known-good), partial results refused rather than cached, a missing key
 reported as unavailable rather than guessed. Then add one reader to `_SOURCES`
 and one `source.<name>` entry to the catalogue so the honesty note can name it.
+
+**Check before you conclude a market has no data.** For Germany that meant
+querying Eurostat's full catalogue (no regional price dataset exists), passing
+NUTS codes to `prc_hpi_q` (accepted, returns zero observations), and trying
+GENESIS and regionalstatistik.de (both 401 for guests — free, but they need
+registration). The Bundesbank turned out to publish city-size segments without
+a key. Write down what you checked, as `bundesbank_service` does, so the next
+person does not repeat it.
 
 **Never substitute a near-enough series.** A rent index measures what it costs
 to occupy a home, not what homes sell for; the US pack declared no housing index

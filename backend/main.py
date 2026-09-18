@@ -22,6 +22,7 @@ if settings.SENTRY_DSN:
         send_default_pii=False,  # never ship user content to a third party
     )
 from backend.middleware.error_handler import register_error_handlers
+from backend.middleware.language import LanguageMiddleware
 from backend.middleware.request_id import RequestIDMiddleware
 from backend.routers import admin, backtest, chat, coach, feedback, health, holdings, news, planning, practice, profile, recommend, users
 
@@ -133,6 +134,7 @@ app.add_exception_handler(
 
 # ── Request ID (correlation) ──────────────────────────────────────────────────
 app.add_middleware(RequestIDMiddleware)
+app.add_middleware(LanguageMiddleware)
 
 # ── CORS ──────────────────────────────────────────────────────────────────────
 _dev_origins = [

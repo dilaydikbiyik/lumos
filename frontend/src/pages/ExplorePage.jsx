@@ -93,6 +93,7 @@ function ProvinceScenario({ province, amount }) {
                        onChange={e => setDetail(e.target.value)}
                        style={{ flex: 1, minWidth: 120, fontSize: 13 }} />
                 <select className="input" value={assetType}
+                        aria-label={t('explore.selectAssetType')}
                         onChange={e => setAssetType(e.target.value)}
                         style={{ flex: 0.7, minWidth: 80, fontSize: 13 }}>
                   <option value="arsa">{t('explore.land')}</option>
@@ -128,13 +129,18 @@ function ProvinceCard({ province, amount, measure }) {
   return (
     <div className="card" onClick={() => setOpen(true)}
          style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', cursor: 'pointer' }}>
-      <span style={{
-        fontSize: 13, fontWeight: 700, width: 34, height: 34, borderRadius: '50%',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        background: realPositive ? 'rgba(74,222,128,0.15)' : 'rgba(248,113,113,0.12)',
-        color: realPositive ? 'var(--green, #4ade80)' : 'var(--red)',
-        flexShrink: 0,
-      }}>{province.rank}</span>
+      {/* A rank number invites "pick number one". The backend only sends one
+          when the areas are genuine alternatives; Germany's are nested
+          segments of a single market, where ranking would be nonsense. */}
+      {province.rank != null && (
+        <span style={{
+          fontSize: 13, fontWeight: 700, width: 34, height: 34, borderRadius: '50%',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          background: realPositive ? 'rgba(74,222,128,0.15)' : 'rgba(248,113,113,0.12)',
+          color: realPositive ? 'var(--green, #4ade80)' : 'var(--red)',
+          flexShrink: 0,
+        }}>{province.rank}</span>
+      )}
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ fontWeight: 600, fontSize: 14 }}>{province.province}</div>
         {/* An index has no unit price; printing an empty one would imply
@@ -243,7 +249,8 @@ function RentVsBuy() {
           <input className="input" type="text" inputMode="numeric" placeholder={t('rvb.incomePlaceholder')}
                  value={form.income} onChange={e => setForm({ ...form, income: e.target.value })} />
         )}
-        <select className="input" value={form.years} onChange={e => setForm({ ...form, years: e.target.value })}>
+        <select className="input" value={form.years} aria-label={t('rvb.selectYears')}
+                onChange={e => setForm({ ...form, years: e.target.value })}>
           {[5, 10, 20].map(y => <option key={y} value={y}>{t('rvb.projectionYears', { n: y })}</option>)}
         </select>
         {/* Bank offers vary a lot; left blank, the market average is used. */}
@@ -429,9 +436,10 @@ function RentVsBuy() {
 function ListingLinks() {
   const { t } = useTranslation()
   const { pack } = useMarket()
-  // "İl / ilçe" is a Turkish administrative shape; every market gets the
-  // portals from its own pack, so the labels have to generalise too.
-  const isTR = pack.code === 'TR'
+  // "İl / ilçe" is a Turkish administrative shape. The pack declares what its
+  // country calls a first-level area and the locale files hold the word, so a
+  // fourth market picks an existing kind rather than needing a new branch.
+  const areaKind = pack.area_kind || 'region'
   const example = pack.example_district || ''
   const [form, setForm] = useState({ il: '', ilce: '', asset_type: 'arsa' })
   const [links, setLinks] = useState(null)
@@ -459,13 +467,15 @@ function ListingLinks() {
       </p>
       <form onSubmit={run} style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
         <input className="input" required style={{ flex: 2, minWidth: 120 }}
-               placeholder={isTR ? t('explore.provincePlaceholder')
-                                : t('explore.cityPlaceholder', { example })}
+               placeholder={t('explore.areaPlaceholder', {
+                 area: t(`area.${areaKind}`), example: pack.example_district,
+               })}
                value={form.il} onChange={e => setForm({ ...form, il: e.target.value })} />
         <input className="input" style={{ flex: 2, minWidth: 120 }}
-               placeholder={isTR ? t('explore.districtOptional') : t('explore.areaOptional')}
+               placeholder={t('explore.subAreaOptional', { example })}
                value={form.ilce} onChange={e => setForm({ ...form, ilce: e.target.value })} />
         <select className="input" style={{ flex: 1, minWidth: 90 }} value={form.asset_type}
+                aria-label={t('explore.selectAssetType')}
                 onChange={e => setForm({ ...form, asset_type: e.target.value })}>
           <option value="arsa">{t('explore.land')}</option>
           <option value="daire">{t('explore.flat')}</option>
@@ -496,8 +506,9 @@ export default function ExplorePage() {
   // second, so this table is its own gate. The rent-vs-buy calculator and
   // the listing bridge below are market-aware and run everywhere.
   const hasProvinceTable = !!pack.regional_housing_breakdown
-  // Türkiye ranks provinces, the US ranks states — the noun has to follow.
-  const areaWord = pack.code === 'US' ? 'state' : 'province'
+  // Türkiye ranks provinces, the US ranks states — the noun follows what the
+  // pack declares rather than a list of country codes.
+  const areaWord = pack.area_kind || 'region'
   const [provinces, setProvinces] = useState(null)
   const [horizon, setHorizon] = useState(3)
   const [scenarioAmount, setScenarioAmount] = useState('1.000.000')
@@ -605,7 +616,9 @@ export default function ExplorePage() {
                   ))}
                   {visible.length === 0 && (
                     <p style={{ fontSize: 13, opacity: 0.7, textAlign: 'center', padding: 12 }}>
-                      {t(`explore.noResults_${areaWord}`, { search })}
+                      {t(`explore.noResults_${areaWord}`, {
+                        search, count: provinces.provinces.length,
+                      })}
                     </p>
                   )}
                 </div>

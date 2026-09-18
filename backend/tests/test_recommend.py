@@ -28,6 +28,10 @@ def _patches():
 
 
 def test_recommend_returns_portfolio_with_explanations(client):
+    # Pin the market explicitly. A new account now starts in the one its
+    # language suggests, so "TR" is a default rather than a constant — and a
+    # test that asserts the threading should set what it asserts.
+    client.patch("/users/me/market", json={"market": "TR"})
     p_engine, p_explain, p_reit = _patches()
     with p_engine as m_engine, p_explain, p_reit:
         res = client.post("/recommend", json={"risk_score": 6.0, "budget": 100000})
