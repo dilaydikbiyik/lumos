@@ -1,10 +1,11 @@
 from typing import Literal, Optional
 
 from fastapi import APIRouter, Depends, Request
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, model_validator
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.db.database import get_db
+from backend.auth import permissions as perms
 from backend.i18n import t
 from backend.middleware.language import language
 from backend.limiter import limiter
@@ -29,9 +30,19 @@ class UserRead(BaseModel):
     primary_fear: Optional[str]
     monthly_income: Optional[float] = None
     monthly_contribution: Optional[float] = None
-    # The client needs this to decide whether to offer the admin view at all;
-    # every admin endpoint still checks the role server-side.
+    # The client needs these to decide which controls to OFFER; every
+    # privileged endpoint still checks server-side, so hiding a button is a
+    # courtesy and never the access control itself.
     role: str = "user"
+    permissions: list[str] = []
+
+    @model_validator(mode="after")
+    def _derive_permissions(self):
+        # Derived from the role, never stored: two places holding the same
+        # truth is how a revoked role keeps its powers.
+        object.__setattr__(self, "permissions",
+                           sorted(perms.permissions_for(self.role)))
+        return self
 
 
 class MonthlyIncomeUpdate(BaseModel):

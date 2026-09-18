@@ -42,6 +42,10 @@ services:
       # key; without it the US pack has no housing index at all.
       - key: FRED_API_KEY
         sync: false
+      # Comma-separated Clerk user ids promoted to admin on startup. Without
+      # it nobody can open /admin, and the feedback users send has no reader.
+      - key: ADMIN_CLERK_IDS
+        sync: false
       - key: FRONTEND_URL
         sync: false
       # Free-tier cross-provider fallback keys (gemini -> groq -> openrouter);

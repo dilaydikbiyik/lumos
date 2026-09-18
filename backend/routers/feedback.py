@@ -5,7 +5,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.db.database import get_db
 from backend.limiter import limiter
-from backend.middleware.require_role import require_role
+from backend.auth import permissions as perms
+from backend.middleware.require_role import require_permission
 from backend.middleware.verify_clerk import get_current_user
 from backend.models.feedback import Feedback
 from backend.repositories import user_repository
@@ -44,10 +45,10 @@ async def submit_feedback(
 
 @router.get("")
 async def list_feedback(
-    user_id: str = Depends(require_role("admin")),
+    user_id: str = Depends(require_permission(perms.FEEDBACK_READ)),
     db: AsyncSession = Depends(get_db),
 ):
-    """Everything users have reported, newest first — admin only."""
+    """Everything users have reported, newest first."""
     rows = (await db.execute(
         select(Feedback).order_by(Feedback.created_at.desc()).limit(200)
     )).scalars().all()

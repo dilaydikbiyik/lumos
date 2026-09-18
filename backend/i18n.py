@@ -391,6 +391,18 @@ _C: dict[str, dict[str, str]] = {
         "tr": "Sohbet tamamlanmadı — lütfen tüm soruları yanıtla ve tekrar dene.",
         "en": "The conversation isn't finished — please answer every question and try again.",
         "de": "Das Gespräch ist noch nicht abgeschlossen — bitte beantworte alle Fragen und versuch es erneut."},
+    "error.unknown_role": {
+        "tr": "Bilinmeyen rol. Geçerli roller: {roles}.",
+        "en": "Unknown role. Valid roles: {roles}.",
+        "de": "Unbekannte Rolle. Gültige Rollen: {roles}."},
+    "error.self_demote": {
+        "tr": "Kendi yönetici yetkini kaldıramazsın — geri almak için başka bir yöneticiye ihtiyacın olurdu.",
+        "en": "You can't remove your own admin access — you'd need another admin to give it back.",
+        "de": "Du kannst dir die Administratorrechte nicht selbst entziehen — du bräuchtest eine andere Administratorin, um sie zurückzugeben."},
+    "error.last_admin": {
+        "tr": "Son yönetici yetkisi kaldırılamaz; önce başka birini yönetici yap.",
+        "en": "The last admin can't be demoted; make someone else an admin first.",
+        "de": "Die letzte Administratorin kann nicht herabgestuft werden; mach zuerst jemand anderen zur Administratorin."},
     "error.forbidden": {
         "tr": "Bu işlem için yetkin yok.",
         "en": "You don't have permission for this.",

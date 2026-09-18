@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import AppHeader from '../components/AppHeader'
 import api from '../utils/api'
 import useMarket from '../hooks/useMarket'
+import UserAccessPanel from '../components/UserAccessPanel'
 
 /**
  * Admin view — where the feedback people send actually gets read.
@@ -41,23 +42,36 @@ export default function AdminPage() {
   const [feedback, setFeedback] = useState(null)
   const [filter, setFilter] = useState('all')
   const [error, setError] = useState(null)
+  // Shown only in the forbidden state, only to the person it belongs to:
+  // "you are not an admin" is useless without the id you need to grant it.
+  const [ownId, setOwnId] = useState(null)
+  // Which controls to OFFER. The server re-checks every one of them.
+  const [permissions, setPermissions] = useState([])
 
   useEffect(() => {
     let cancelled = false
     async function load() {
       try {
-        const [s, f] = await Promise.all([
+        const [s, f, me] = await Promise.all([
           api.get('/admin/stats'),
           api.get('/feedback'),
+          api.get('/users/me'),
         ])
         if (cancelled) return
         setStats(s.data)
         setFeedback(f.data)
+        setPermissions(me.data.permissions || [])
       } catch (err) {
         if (cancelled) return
         // 403 means "you are signed in but not an admin" — say that rather
         // than showing an empty page that looks broken.
         setError(err.response?.status === 403 ? 'forbidden' : 'failed')
+        if (err.response?.status === 403) {
+          try {
+            const me = await api.get('/users/me')
+            if (!cancelled) setOwnId(me.data.clerk_user_id)
+          } catch { /* the hint is a convenience, not a requirement */ }
+        }
       }
     }
     load()
@@ -98,6 +112,18 @@ export default function AdminPage() {
             <p style={{ fontSize: 14 }}>
               {error === 'forbidden' ? t('admin.forbidden') : t('admin.loadError')}
             </p>
+            {error === 'forbidden' && ownId && (
+              <>
+                <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 10, lineHeight: 1.6 }}>
+                  {t('admin.grantHint')}
+                </p>
+                <code style={{
+                  display: 'block', marginTop: 8, padding: '8px 10px', fontSize: 12,
+                  background: 'var(--bg-input)', borderRadius: 'var(--radius-xs)',
+                  border: '1px solid var(--border)', wordBreak: 'break-all',
+                }}>{ownId}</code>
+              </>
+            )}
             <button className="btn btn-ghost" style={{ marginTop: 12 }}
                     onClick={() => navigate('/dashboard')}>
               {t('admin.backToDashboard')}
@@ -112,6 +138,10 @@ export default function AdminPage() {
             <Stat label={t('admin.totalHoldings')} value={stats.total_holdings} />
             <Stat label={t('admin.messagesToday')} value={stats.ai_messages_today} />
           </div>
+        )}
+
+        {!error && permissions.includes('users:read') && (
+          <UserAccessPanel canWriteRoles={permissions.includes('roles:write')} />
         )}
 
         {!error && feedback && (

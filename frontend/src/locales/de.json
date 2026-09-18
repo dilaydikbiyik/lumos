@@ -802,6 +802,22 @@
       "confusing": "Nicht verstanden",
       "idea": "Idee",
       "other": "Sonstiges"
+    },
+    "grantHint": "Um dieses Konto zum Administrator zu machen, füge die untenstehende ID der Umgebungsvariable ADMIN_CLERK_IDS auf dem Server hinzu (mehrere durch Komma getrennt) und starte den Dienst neu.",
+    "accessTitle": "Wer darf was",
+    "accessBody": "Zugriff wird hier vergeben und entzogen. Die erste Administratorin wird über ADMIN_CLERK_IDS auf dem Server gesetzt; alles danach läuft über diesen Bildschirm.",
+    "searchUsers": "Nach E-Mail oder ID suchen",
+    "search": "Suchen",
+    "whatRolesMean": "Was bedeuten die Rollen?",
+    "noPermissions": "keine zusätzlichen Rechte",
+    "noUsers": "Keine passenden Nutzer.",
+    "noEmail": "(keine E-Mail)",
+    "roleChangeFailed": "Die Rolle konnte nicht geändert werden.",
+    "changeRoleFor": "Rolle für {{user}} ändern",
+    "role": {
+      "user": "Nutzer",
+      "support": "Support",
+      "admin": "Administrator"
     }
   }
 }

@@ -802,6 +802,22 @@
       "confusing": "Anlamadım",
       "idea": "Fikir",
       "other": "Diğer"
+    },
+    "grantHint": "Bu hesabı yönetici yapmak için aşağıdaki kimliği sunucudaki ADMIN_CLERK_IDS ortam değişkenine ekle (virgülle ayırarak birden fazla olabilir) ve servisi yeniden başlat.",
+    "accessTitle": "Kimler neye erişebilir",
+    "accessBody": "Rol vermek ve almak buradan yapılır. İlk yönetici sunucudaki ADMIN_CLERK_IDS ile tanımlanır; sonrası bu ekrandan yürür.",
+    "searchUsers": "E-posta veya kimlik ara",
+    "search": "Ara",
+    "whatRolesMean": "Roller ne anlama geliyor?",
+    "noPermissions": "ek yetki yok",
+    "noUsers": "Eşleşen kullanıcı yok.",
+    "noEmail": "(e-posta yok)",
+    "roleChangeFailed": "Rol değiştirilemedi.",
+    "changeRoleFor": "{{user}} için rolü değiştir",
+    "role": {
+      "user": "Kullanıcı",
+      "support": "Destek",
+      "admin": "Yönetici"
     }
   }
 }

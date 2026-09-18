@@ -802,6 +802,22 @@
       "confusing": "Didn't understand",
       "idea": "Idea",
       "other": "Other"
+    },
+    "grantHint": "To make this account an administrator, add the id below to the ADMIN_CLERK_IDS environment variable on the server (comma-separated for more than one) and restart the service.",
+    "accessTitle": "Who can do what",
+    "accessBody": "Granting and withdrawing access happens here. The first admin is set through ADMIN_CLERK_IDS on the server; everything after that is this screen.",
+    "searchUsers": "Search by email or id",
+    "search": "Search",
+    "whatRolesMean": "What do the roles mean?",
+    "noPermissions": "no extra permissions",
+    "noUsers": "No matching users.",
+    "noEmail": "(no email)",
+    "roleChangeFailed": "The role couldn't be changed.",
+    "changeRoleFor": "Change the role for {{user}}",
+    "role": {
+      "user": "User",
+      "support": "Support",
+      "admin": "Admin"
     }
   }
 }
