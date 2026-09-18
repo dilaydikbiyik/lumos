@@ -85,3 +85,41 @@ def test_every_market_produces_a_usable_inflation_number(market):
 
     value = assumptions.annual_inflation_pct(market)
     assert 0 < value < 200, (market, value)
+
+
+def test_a_stale_inflation_reading_is_flagged_rather_than_printed_quietly():
+    """
+    Eurostat's German HICP dataset stopped at 2025-12 while TCMB and the BLS
+    were both current. Printing "2.0%" beside a nine-month-old month and
+    saying nothing is exactly the quiet staleness this app exists to call out.
+    """
+    from datetime import date
+    from unittest.mock import patch
+
+    from backend.services import assumptions
+
+    # A release lands a few weeks after the month it measures, so one or two
+    # months behind is how the data works, not a problem.
+    with patch.object(assumptions, "inflation_as_of", lambda market="TR": "2026-08"):
+        assert assumptions.inflation_months_behind("TR", date(2026, 9, 18)) == 1
+        assert assumptions.inflation_is_stale("TR", date(2026, 9, 18)) is False
+
+    with patch.object(assumptions, "inflation_as_of", lambda market="DE": "2025-12"):
+        assert assumptions.inflation_months_behind("DE", date(2026, 9, 18)) == 9
+        assert assumptions.inflation_is_stale("DE", date(2026, 9, 18)) is True
+
+    # An unreadable or absent date must not masquerade as fresh.
+    with patch.object(assumptions, "inflation_as_of", lambda market="XX": None):
+        assert assumptions.inflation_months_behind("XX") is None
+        assert assumptions.inflation_is_stale("XX") is False
+
+
+def test_rent_vs_buy_carries_the_staleness_signal_to_the_client():
+    from backend.services.rent_vs_buy import compare_rent_vs_buy
+
+    result = compare_rent_vs_buy(down_payment=80_000, monthly_rent=1_400,
+                                 years=10, market="DE", lang="en")
+    assumptions_out = result["assumptions"]
+    assert "inflation_as_of" in assumptions_out
+    assert "inflation_months_behind" in assumptions_out
+    assert isinstance(assumptions_out["inflation_is_stale"], bool)

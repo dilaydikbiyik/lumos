@@ -401,7 +401,24 @@ function RentVsBuy() {
               agencyVat: result.assumptions.agency_commission_with_vat_pct,
               upkeep: result.assumptions.annual_upkeep_pct,
             })}
+            {/* Who bears the purchase taxes is a legal fact about ONE country,
+                so it comes from the market rather than from this shared
+                sentence — which used to assert Turkish law to German and
+                American readers alike. */}
+            {result.assumptions.transfer_cost_note && (
+              <> {result.assumptions.transfer_cost_note}</>
+            )}
           </p>
+          {/* A stale reading still drives the projection, so say so plainly
+              rather than leaving the reader to notice a date. */}
+          {result.assumptions.inflation_is_stale && (
+            <p style={{ fontSize: 12, color: 'var(--firefly)', lineHeight: 1.5, marginTop: 8 }}>
+              {t('rvb.staleInflation', {
+                months: result.assumptions.inflation_months_behind,
+                asOf: result.assumptions.inflation_as_of,
+              })}
+            </p>
+          )}
         </div>
       )}
       {error && <p style={{ color: 'var(--red)', fontSize: 13, marginTop: 10 }}>{error}</p>}

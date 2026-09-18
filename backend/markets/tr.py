@@ -62,6 +62,12 @@ TR = MarketPack(
         ListingSite("Emlakjet", "https://www.emlakjet.com/arama/?q={query}"),
     ],
 
+    transfer_cost_note={
+        "tr": "Tapu harcının tamamının alıcıya yazılması yaygın piyasa uygulamasına dayanan bir varsayımdır; kanunen yarısı satıcıya aittir ve taraflar farklı anlaşabilir.",
+        "en": "Charging the buyer the whole title deed fee is an assumption based on common market practice; by law half belongs to the seller, and the parties may agree otherwise.",
+        "de": "Dem Käufer die gesamte Grundbuchgebühr zuzurechnen ist eine Annahme aus der üblichen Marktpraxis; gesetzlich entfällt die Hälfte auf den Verkäufer, und die Parteien können es anders vereinbaren.",
+    },
+
     regulator="SPK (Sermaye Piyasası Kurulu)",
     broker_note={
         "tr": (

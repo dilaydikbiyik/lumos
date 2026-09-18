@@ -40,6 +40,8 @@ DE = MarketPack(
     example_district="Neukölln",
     example_locality="Rixdorf",
 
+    listing_terms={"arsa": "Grundstück", "daire": "Wohnung", "konut": "Haus"},
+
     listing_sites=[
         ListingSite("ImmoScout24", "https://www.immobilienscout24.de/Suche/de/{query}"),
         ListingSite("Immowelt", "https://www.immowelt.de/suche/{query}/immobilien"),
@@ -75,6 +77,12 @@ DE = MarketPack(
     ],
     cash_asset={"ticker": "XEON.DE", "name": "Xtrackers EUR Overnight Rate UCITS ETF", "category": "cash"},
     bond_asset={"ticker": "EUNA.DE", "name": "iShares Core EUR Aggregate Bond UCITS ETF", "category": "bond"},
+
+    transfer_cost_note={
+        "tr": "Bu oran tek bir vergi değil: eyalete göre %3,5–6,5 arasında değişen devir vergisi (Grunderwerbsteuer) ile noter ve tapu sicili ücretlerinin toplamıdır. Devir vergisini uygulamada alıcı öder; Berlin'de alıcı, Bavyera'da olduğundan daha fazlasını öder.",
+        "en": "This rate is not a single tax: it bundles the transfer tax (Grunderwerbsteuer), which ranges from 3.5% to 6.5% by federal state, with notary and land-registry fees. In practice the buyer pays the transfer tax; a Berlin buyer pays more than a Bavarian one.",
+        "de": "Dieser Satz ist keine einzelne Steuer: er fasst die Grunderwerbsteuer, die je nach Bundesland zwischen 3,5% und 6,5% liegt, mit Notar- und Grundbuchgebühren zusammen. In der Praxis zahlt die kaufende Seite die Grunderwerbsteuer; in Berlin mehr als in Bayern.",
+    },
 
     regulator="BaFin",
     broker_note={

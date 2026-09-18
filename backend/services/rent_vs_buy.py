@@ -50,6 +50,7 @@ def compare_rent_vs_buy(
     mortgage_term_years: int | None = None,
     down_payment_includes_costs: bool = False,
     market: str = "TR",
+    lang: str = "tr",
 ) -> dict:
     """
     Compare buying vs renting the SAME home over `years`, with an equal
@@ -219,6 +220,13 @@ def compare_rent_vs_buy(
             "annual_upkeep_pct": assumptions.annual_upkeep_pct(market),
             "market": market,
             "annual_inflation_pct": inflation_pct,
-        "inflation_as_of": assumptions.inflation_as_of(market),
+            "inflation_as_of": assumptions.inflation_as_of(market),
+            # Printing a number beside a nine-month-old month and saying
+            # nothing is the quiet staleness this app exists to call out.
+            "inflation_months_behind": assumptions.inflation_months_behind(market),
+            "inflation_is_stale": assumptions.inflation_is_stale(market),
+            # Who bears the purchase taxes is a legal fact about one country,
+            # so it comes from the pack rather than from a shared sentence.
+            "transfer_cost_note": _pack(market).say("transfer_cost_note", lang),
         },
     }

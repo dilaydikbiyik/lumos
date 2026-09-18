@@ -719,3 +719,49 @@ def test_every_pack_supplies_its_own_example_places():
     for row in public_markets():
         assert row["example_district"], row["code"]
         assert row["example_locality"], row["code"]
+
+
+def test_no_pack_asserts_another_country_s_law():
+    """
+    The rent-vs-buy footnote used to state, for every market, that "by law
+    half the transfer tax belongs to the seller". That is Türkiye's tapu
+    harcı and is false of German Grunderwerbsteuer and US transfer taxes
+    alike. A legal claim cannot be shared across jurisdictions.
+    """
+    notes = {}
+    for code, pack in MARKET_PACKS.items():
+        for lang in ("tr", "en", "de"):
+            note = pack.say("transfer_cost_note", lang)
+            assert len(note) > 60, (code, lang)
+        notes[code] = pack.say("transfer_cost_note", "en")
+
+    # Each market explains its own arrangement, not a copy of another's.
+    assert len(set(notes.values())) == len(notes)
+    assert "seller" in notes["TR"]                 # tapu harcı is legally split
+    assert "Grunderwerbsteuer" in notes["DE"]      # named correctly where it applies
+    assert "Grunderwerbsteuer" not in notes["TR"]
+    assert "closing costs" in notes["US"]
+
+
+def test_listing_searches_use_each_market_s_own_words():
+    """
+    The asset_type ids are Turkish because Türkiye was the first market.
+    Passing them straight through sent a German buyer searching ImmoScout24
+    for "daire" — zero results, with no way to tell why.
+    """
+    from backend.services.listing_bridge import build_listing_links
+
+    for market, forbidden in (("DE", "daire"), ("US", "daire")):
+        for link in build_listing_links("Berlin", "Mitte", "daire", market=market):
+            assert forbidden not in link["url"].lower(), (market, link)
+            assert "arsa" not in link["url"].lower(), (market, link)
+
+    de = build_listing_links("Berlin", "Mitte", "daire", market="DE")[0]["url"]
+    assert "Wohnung" in de.replace("%C3%BC", "ü").replace("%20", " ")
+
+    us = build_listing_links("Austin", "Travis County", "arsa", market="US")[0]["url"]
+    assert "land" in us
+
+    # Türkiye keeps its hand-tuned slugs, which ARE the Turkish words.
+    tr = build_listing_links("Kırklareli", "Lüleburgaz", "daire", market="TR")[0]["url"]
+    assert "satilik-daire" in tr

@@ -81,7 +81,12 @@ def build_listing_links(
         return _tr_links(il, ilce, asset_type, detail)
 
     pack = get_market_pack(market)
-    query = quote(" ".join(p for p in (il.strip(), ilce.strip(), detail or "", asset_type) if p))
+    # The asset_type ids are Turkish ("arsa", "daire") because Türkiye was the
+    # first market. Passing them straight into a foreign portal's search box
+    # sent a German buyer looking for "daire" on ImmoScout24 — zero results,
+    # and no way for them to tell why.
+    term = pack.listing_terms.get(asset_type, asset_type)
+    query = quote(" ".join(p for p in (il.strip(), ilce.strip(), detail or "", term) if p))
     return [
         {"site": site.name, "url": site.search_template.format(query=query)}
         for site in pack.listing_sites

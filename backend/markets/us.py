@@ -40,6 +40,8 @@ US = MarketPack(
     example_district="Travis County",
     example_locality="Round Rock",
 
+    listing_terms={"arsa": "land", "daire": "apartment", "konut": "home"},
+
     listing_sites=[
         ListingSite("Zillow", "https://www.zillow.com/homes/{query}_rb/"),
         ListingSite("Realtor", "https://www.realtor.com/realestateandhomes-search/{query}"),
@@ -72,6 +74,12 @@ US = MarketPack(
         {"ticker": "VNQ", "name": "Vanguard Real Estate ETF", "category": "reit"},
         {"ticker": "SCHH", "name": "Schwab US REIT ETF", "category": "reit"},
     ],
+
+    transfer_cost_note={
+        "tr": "Bu oran tek bir vergi değil, kapanış masraflarının toplamıdır: devir vergileri eyalete ve ilçeye göre değişir, kredi/tapu sigortası ve emanet ücretleri ise çoğu zaman daha büyük kalemdir. Bazı eyaletlerde devir vergisini geleneksel olarak satıcı öder.",
+        "en": "This rate is not a single tax but total closing costs: transfer taxes vary by state and county, and lender, title-insurance and escrow fees are usually the larger share. In some states the transfer tax is customarily paid by the seller.",
+        "de": "Dieser Satz ist keine einzelne Steuer, sondern die gesamten Abschlusskosten: Übertragungssteuern variieren je Bundesstaat und County, und Kredit-, Titelversicherungs- und Treuhandgebühren machen meist den größeren Teil aus. In manchen Bundesstaaten zahlt üblicherweise die verkaufende Seite die Übertragungssteuer.",
+    },
 
     regulator="SEC / FINRA",
     broker_note={

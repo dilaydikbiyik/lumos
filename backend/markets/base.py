@@ -53,6 +53,10 @@ class MarketPack:
     # is the same category of mistake as pricing Texas in lira.
     example_district: str = ""
     example_locality: str = ""
+    # asset_type id -> the word that market's portals actually search for.
+    # The ids are Turkish because Türkiye was the first market; feeding them
+    # to ImmoScout24 sent a German buyer looking for "daire".
+    listing_terms: dict[str, str] = field(default_factory=dict)
 
     # ── Country-specific planning inputs ──
     # These were Turkish constants living in assumptions.py. A 39% mortgage
@@ -100,6 +104,12 @@ class MarketPack:
     regulator: str = ""
     broker_note: dict[str, str] = field(default_factory=dict)
     tax_note: dict[str, str] = field(default_factory=dict)
+    # Who bears the purchase taxes, and on what basis. This was one sentence
+    # inside the shared rent-vs-buy footnote asserting that "by law half
+    # belongs to the seller" — true of Türkiye's tapu harcı and false of both
+    # German Grunderwerbsteuer and US transfer taxes. A legal claim cannot be
+    # shared across jurisdictions.
+    transfer_cost_note: dict[str, str] = field(default_factory=dict)
     fear_options: dict[str, dict[str, str]] = field(default_factory=dict)
     disclaimer: dict[str, str] = field(default_factory=dict)
 

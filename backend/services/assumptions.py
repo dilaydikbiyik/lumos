@@ -15,6 +15,8 @@ the real spreads are the only hand-set inputs and they live here, in one spot.
 """
 
 import logging
+from datetime import date
+from typing import Optional
 
 logger = logging.getLogger("lumos.assumptions")
 
@@ -90,6 +92,38 @@ def inflation_as_of(market: str = "TR") -> str | None:
         return inflation_service.index_as_of(market)
     except Exception:
         return None
+
+
+# A CPI release lands a few weeks after the month it measures, so one or two
+# months behind is simply how the data works. Beyond that the reading is old
+# enough that a reader deserves to be told rather than left to notice a date.
+STALE_INFLATION_MONTHS = 4
+
+
+def inflation_months_behind(market: str = "TR",
+                            today: Optional[date] = None) -> Optional[int]:
+    """
+    How many months old the market's inflation reading is, or None if unknown.
+
+    Eurostat's German HICP dataset stopped at 2025-12 while TCMB and the BLS
+    were both current — printing "2.0%" beside a nine-month-old month and
+    saying nothing is exactly the kind of quiet staleness this app exists to
+    call out.
+    """
+    as_of = inflation_as_of(market)
+    if not as_of:
+        return None
+    try:
+        year, month = (int(part) for part in as_of.split("-")[:2])
+    except (ValueError, TypeError):
+        return None
+    now = today or date.today()
+    return max((now.year - year) * 12 + (now.month - month), 0)
+
+
+def inflation_is_stale(market: str = "TR", today: Optional[date] = None) -> bool:
+    behind = inflation_months_behind(market, today)
+    return behind is not None and behind >= STALE_INFLATION_MONTHS
 
 
 def _apply_spread(base_pct: float, real_spread_pct: float) -> float:

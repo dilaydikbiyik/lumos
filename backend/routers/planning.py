@@ -41,6 +41,7 @@ async def rent_vs_buy(
     body: RentVsBuyRequest,
     user_id: str = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
+    lang: str = Depends(language),
 ):
     """Rent or buy? — two honest side-by-side projections of the SAME home."""
     market = await _market_of(db, user_id)
@@ -52,6 +53,7 @@ async def rent_vs_buy(
         body.mortgage_term_years,
         body.down_payment_includes_costs,
         market,
+        lang,
     )
 
 
