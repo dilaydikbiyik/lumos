@@ -19,6 +19,11 @@ class HealthResponse(BaseModel):
     # only — a health endpoint must never echo a secret, and "is it set"
     # is the whole question when a key was just added in the dashboard.
     data_sources: dict[str, bool]
+    # Whether the ADMIN_CLERK_IDS bootstrap actually took. A deployment with
+    # no admin cannot be managed from inside the app at all, and until now the
+    # only way to find that out was to sign in and be refused. A boolean, not
+    # a count or an id: "is this deployment manageable" is the whole question.
+    has_admin: bool
 
 
 @router.get("/health", response_model=HealthResponse)
@@ -27,10 +32,14 @@ async def health_check():
     Uptime monitoring endpoint — genuinely probes DB and AI provider access.
     """
     # DB connectivity check
+    has_admin = False
     db_status = "ok"
     try:
         async with async_engine.connect() as conn:
             await conn.execute(text("SELECT 1"))
+            has_admin = bool((await conn.execute(
+                text("SELECT 1 FROM users WHERE role = 'admin' LIMIT 1")
+            )).first())
     except Exception as exc:
         # Never swallow this: /health is what uptime monitoring reads, so the
         # reason the database is unreachable has to reach the logs.
@@ -54,6 +63,7 @@ async def health_check():
         "version": "1.0.0",
         "db": db_status,
         "ai": ai_status,
+        "has_admin": has_admin,
         "data_sources": {
             "tcmb_evds": bool(settings.TCMB_EVDS_API_KEY),
             "fred": bool(settings.FRED_API_KEY),

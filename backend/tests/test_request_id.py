@@ -38,6 +38,9 @@ def test_health_reports_keyed_sources_without_leaking_values(client):
     """
     body = client.get("/health").json()
     assert set(body["data_sources"]) == {"tcmb_evds", "fred"}
+    # A deployment with no admin cannot be managed from inside the app;
+    # finding that out used to require signing in and being refused.
+    assert isinstance(body["has_admin"], bool)
     assert all(isinstance(v, bool) for v in body["data_sources"].values())
 
     # No secret may appear anywhere in the payload.
