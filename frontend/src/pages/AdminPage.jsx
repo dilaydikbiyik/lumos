@@ -140,10 +140,6 @@ export default function AdminPage() {
           </div>
         )}
 
-        {!error && permissions.includes('users:read') && (
-          <UserAccessPanel canWriteRoles={permissions.includes('roles:write')} />
-        )}
-
         {!error && feedback && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
@@ -199,6 +195,10 @@ export default function AdminPage() {
           <div style={{ textAlign: 'center', padding: 24 }}>
             <span className="spinner" style={{ width: 28, height: 28 }} />
           </div>
+        )}
+
+        {!error && permissions.includes('users:read') && (
+          <UserAccessPanel canWriteRoles={permissions.includes('roles:write')} />
         )}
       </div>
     </div>

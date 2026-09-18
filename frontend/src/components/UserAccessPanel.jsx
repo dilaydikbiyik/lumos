@@ -69,9 +69,18 @@ export default function UserAccessPanel({ canWriteRoles }) {
   }
 
   return (
-    <div className="card">
-      <h3 style={{ marginBottom: 4 }}>{t('admin.accessTitle')}</h3>
-      <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 12, lineHeight: 1.6 }}>
+    <details className="card">
+      {/* Collapsed by default: this screen exists to read feedback, and a
+          list of every account pushed that off the first screenful. */}
+      <summary style={{ cursor: 'pointer', listStyle: 'revert' }}>
+        <strong style={{ fontSize: 15 }}>{t('admin.accessTitle')}</strong>
+        {users && (
+          <span style={{ fontSize: 12, color: 'var(--text-dim)', marginLeft: 8 }}>
+            ({users.length})
+          </span>
+        )}
+      </summary>
+      <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: '10px 0 12px', lineHeight: 1.6 }}>
         {t('admin.accessBody')}
       </p>
 
@@ -165,6 +174,6 @@ export default function UserAccessPanel({ canWriteRoles }) {
           )}
         </div>
       ))}
-    </div>
+    </details>
   )
 }

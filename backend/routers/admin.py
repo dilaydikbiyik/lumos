@@ -1,5 +1,6 @@
 from datetime import date
 
+import asyncio
 import logging
 
 from fastapi import APIRouter, Depends, Request
@@ -11,6 +12,7 @@ from backend.db.database import get_db
 from backend.middleware.require_role import require_permission
 from backend.models.holding import Holding
 from backend.models.user import User
+from backend.services import clerk_service
 
 router = APIRouter()
 logger = logging.getLogger("lumos.admin")
@@ -120,6 +122,21 @@ async def list_users(
         ).order_by(User.id.desc()).limit(limit)
 
     rows = (await db.execute(stmt)).scalars().all()
+
+    # Clerk owns identity, so the email column stays empty until someone asks
+    # for it. Filling the gaps here and writing them back means this costs one
+    # outbound call the first time a row is listed and nothing afterwards —
+    # and never anything on a signed-in user's own requests.
+    missing = [u.clerk_user_id for u in rows if not u.email]
+    if missing:
+        profiles = await asyncio.to_thread(clerk_service.fetch_profiles, missing)
+        for u in rows:
+            profile = profiles.get(u.clerk_user_id)
+            if profile and profile.get("email"):
+                u.email = profile["email"]
+        if profiles:
+            await db.flush()
+
     return [
         {
             "clerk_user_id": u.clerk_user_id,
