@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import FireflyMark from './components/FireflyMark'
-import { useEffect } from 'react'
+import { Suspense, lazy, useEffect } from 'react'
 import { ClerkLoading, SignedIn, SignedOut, RedirectToSignIn, useAuth } from '@clerk/clerk-react'
 import AppNav from './components/AppNav'
 import { useTranslation } from 'react-i18next'
@@ -12,14 +12,20 @@ import ErrorBoundary from './utils/errorBoundary'
 import useIllumination from './hooks/useIllumination'
 import { registerTokenGetter } from './utils/api'
 import OnboardingPage from './pages/OnboardingPage'
-import PathSelectionPage from './pages/PathSelectionPage'
-import FearCheckInPage from './pages/FearCheckInPage'
-import ProfilePage from './pages/ProfilePage'
-import HoldingsPage from './pages/HoldingsPage'
-import ExplorePage from './pages/ExplorePage'
-import RecommendPage from './pages/RecommendPage'
-import DashboardPage from './pages/DashboardPage'
-import AdminPage from './pages/AdminPage'
+
+// The landing page is what a first-time visitor loads, so it stays in the
+// main bundle. Everything behind sign-in is split: the whole app was one
+// 1.07 MB file, which meant a phone on a slow connection downloaded the
+// admin screen and every chart library before it could read the first
+// sentence. Recharts alone is most of that, and only two routes use it.
+const PathSelectionPage = lazy(() => import('./pages/PathSelectionPage'))
+const FearCheckInPage = lazy(() => import('./pages/FearCheckInPage'))
+const ProfilePage = lazy(() => import('./pages/ProfilePage'))
+const HoldingsPage = lazy(() => import('./pages/HoldingsPage'))
+const ExplorePage = lazy(() => import('./pages/ExplorePage'))
+const RecommendPage = lazy(() => import('./pages/RecommendPage'))
+const DashboardPage = lazy(() => import('./pages/DashboardPage'))
+const AdminPage = lazy(() => import('./pages/AdminPage'))
 
 function Illumination() {
   useIllumination()
@@ -78,7 +84,9 @@ function ProtectedRoute({ children }) {
   return (
     <>
       <ClerkLoading><AuthPending /></ClerkLoading>
-      <SignedIn>{children}</SignedIn>
+      {/* The same pending screen covers the chunk download, so a split route
+          never flashes a blank page between auth and render. */}
+      <SignedIn><Suspense fallback={<AuthPending />}>{children}</Suspense></SignedIn>
       <SignedOut>
         <RedirectToSignIn />
         <AuthPending />

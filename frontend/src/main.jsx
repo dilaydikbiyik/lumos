@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { ClerkProvider } from '@clerk/clerk-react'
 import App from './App.jsx'
 import './index.css'
-import './i18n'
+import { initI18n } from './i18n'
 
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
 
@@ -26,13 +26,21 @@ if ('serviceWorker' in navigator && import.meta.env.PROD) {
   })
 }
 
-createRoot(document.getElementById('root')).render(
-  <StrictMode>
-    <ClerkProvider
-      publishableKey={PUBLISHABLE_KEY || 'pk_test_placeholder'}
-      afterSignOutUrl="/"
-    >
-      <App />
-    </ClerkProvider>
-  </StrictMode>,
-)
+// The reader's locale is fetched before the first render. index.html paints
+// its own splash meanwhile, so the wait is covered rather than blank — and
+// nobody sees a frame of the wrong language.
+initI18n()
+  .catch(() => { /* render anyway: raw keys beat a white screen */ })
+  .finally(() => {
+    document.getElementById('splash')?.remove()
+    createRoot(document.getElementById('root')).render(
+      <StrictMode>
+        <ClerkProvider
+          publishableKey={PUBLISHABLE_KEY || 'pk_test_placeholder'}
+          afterSignOutUrl="/"
+        >
+          <App />
+        </ClerkProvider>
+      </StrictMode>,
+    )
+  })

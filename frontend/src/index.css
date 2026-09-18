@@ -650,7 +650,12 @@ body.illumination-3::after { opacity: 1; }
 
 .fireflies {
   position: absolute;
-  inset: -20px;
+  /* Vertical bleed only. `inset: -20px` also pushed 20px past each side,
+     which on a 375px phone made the whole page 4px wider than the viewport
+     — a decorative layer that nobody can see or touch was giving every
+     screen a horizontal rubber-band. The airspace the fireflies need is
+     above and below, so the horizontal bleed bought nothing. */
+  inset: -20px 0;
   pointer-events: none;
   overflow: visible;
 }

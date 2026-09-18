@@ -26,8 +26,37 @@
 
     <!-- Single viewport tag: mobile-first + safe-area for notched phones -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <!--
+      First paint, before any JavaScript runs. The page background used to be
+      white until React mounted, which on a phone reads as a broken load on a
+      dark app — and the app now waits for the reader's locale before its
+      first render, so that gap became visible. Inline and tiny on purpose:
+      an external file would need the very round trip this is covering.
+    -->
+    <style>
+      html, body { margin: 0; background: #0C0D14; color-scheme: dark; }
+      #splash {
+        position: fixed; inset: 0; display: flex;
+        align-items: center; justify-content: center;
+        background: #0C0D14;
+      }
+      #splash span {
+        width: 14px; height: 14px; border-radius: 50%;
+        background: #F5A524; box-shadow: 0 0 18px 4px rgba(245, 165, 36, 0.45);
+        animation: splash-pulse 1.4s ease-in-out infinite;
+      }
+      @keyframes splash-pulse {
+        0%, 100% { opacity: 0.35; transform: scale(0.85); }
+        50%      { opacity: 1;    transform: scale(1.1); }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        #splash span { animation: none; opacity: 0.9; }
+      }
+    </style>
   </head>
   <body>
+    <div id="splash" aria-hidden="true"><span></span></div>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
