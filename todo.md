@@ -1298,11 +1298,104 @@ fourth market. So the shape is enforced instead.
 
 ### Phase 4 — the stores
 
-- [ ] Capacitor packaging (iOS + Android), icons/splash from brand/.
-- [ ] Store listings: screenshots per device size, descriptions TR/EN/DE.
-- [ ] **User:** Apple Developer ($99/yr) + Play Console ($25 one-time).
-- [ ] Review-readiness: demo account for reviewers, no dev-mode Clerk,
-      finance-category compliance answers ready.
+Ordered so nothing is built twice. Steps 1–2 are blockers that cost money and
+take days of waiting; everything else can proceed in parallel once they are in
+motion. Items marked **[you]** cannot be done for you — they need a payment
+method, a legal identity, or a signature.
+
+#### 1. Accounts and identity — start these first, they gate everything
+
+- [ ] **[you]** Apple Developer Program — $99/yr. As an **individual**, the
+      seller name on the listing is your legal name; an "Organization" account
+      needs a D-U-N-S number and takes 1–2 weeks longer. Decide which before
+      paying, because changing it later means a new account.
+- [ ] **[you]** Google Play Console — $25 once. Since 2023 individual accounts
+      need **identity verification** and, for a new personal developer account,
+      **14 days of closed testing with at least 12 testers** before production
+      access. Start recruiting those 12 people early — it is the longest pole.
+- [ ] **[you]** Apple: enrol in **App Store Connect**, accept the Paid
+      Applications agreement only if you will ever charge (not needed for free).
+- [ ] Decide the bundle id once and never change it: `app.lumos.mobile` or
+      similar, reverse-DNS, identical on both stores.
+
+#### 2. Production infrastructure — the app cannot ship on dev-tier anything
+
+- [ ] **[you]** Custom domain + **Clerk production instance**. The dev instance
+      (`peaceful-drake-17.accounts.dev`) is rate-limited, shows Clerk branding,
+      and its sign-in tokens are not for real users. A production instance needs
+      your own domain and your **own Google OAuth credentials** — Clerk's shared
+      dev OAuth is explicitly not for production.
+- [ ] **[you]** Render paid tier. A free instance sleeps; a reviewer who opens
+      the app to a 50-second wait fails it as broken. This is also the single
+      biggest quality win for real users.
+- [ ] Persistent cache: diskcache → a small Neon table. Render's disk is
+      ephemeral, so every deploy currently wipes last-known-good — the tier that
+      keeps the app honest when a source is down.
+- [ ] `SENTRY_DSN` on Render and Vercel (the code is already wired). Store
+      review surfaces crashes you never see locally.
+
+#### 3. Legal pages — both stores reject without them
+
+- [ ] **Privacy policy** at a stable public URL, listing exactly what is
+      collected (Clerk identity, holdings you type, chat messages) and who
+      processes it (Clerk, Neon, Google/Groq/OpenRouter for AI, Render, Vercel).
+      Both stores link to this from the listing.
+- [ ] **Terms of use**. Apple applies its standard EULA unless you supply one.
+- [ ] **Account deletion** — Apple requires in-app deletion for any app with
+      accounts, not an email request. Needs a `DELETE /users/me` that removes
+      holdings, feedback links and the Clerk user, plus a confirm flow.
+- [ ] **Data Safety form** (Play) and **App Privacy labels** (Apple). Answer
+      them from the privacy policy, not from memory; a mismatch is a rejection.
+- [ ] **[you]** Check whether SPK/BaFin/SEC treat any of this as regulated
+      advice in the markets you list. The app is educational by design and says
+      so everywhere, but a lawyer's read is what makes that defensible — and the
+      store review asks the question directly.
+
+#### 4. Packaging
+
+- [ ] Capacitor wrap of the existing React build — no rewrite, it is the plan
+      the PWA work was building toward.
+- [ ] **Push notifications** are the reason to be in a store at all: the
+      behavioural coach's "the market dropped, here is why not to sell" only
+      works in real time, and iOS web push cannot carry it. Capacitor +
+      FCM/APNs, with a backend endpoint to register device tokens.
+- [ ] Icons and splash from `brand/` at every required size (iOS 1024 marketing
+      icon, Android adaptive icon with foreground/background layers).
+- [x] `manifest.webmanifest` hardcoded `"lang": "tr"` and a Turkish description
+      while the app ships three languages. Now English (the widest reach, and
+      the app's own fallback for any browser that is not Turkish or German)
+      with `categories: finance, education` for the install prompt.
+- [ ] Deep links / universal links so a notification opens the right screen.
+- [ ] iOS: `NSUserTrackingUsageDescription` not needed (no tracking), but
+      confirm no SDK adds an IDFA dependency.
+
+#### 5. Store listings
+
+- [ ] Screenshots per required device size: iPhone 6.7" and 6.5", iPad if you
+      claim iPad support, Android phone + 7"/10" tablet. `demo/capture.mjs` can
+      produce these — it now takes `LANG_UI`, so one run per language.
+- [ ] Descriptions, keywords and what's-new in **tr / en / de** — the same three
+      the app supports. A listing language the app does not speak is a bad
+      first impression.
+- [ ] Category: **Finance**. Both stores apply extra scrutiny here; expect to
+      justify that the app gives no advice and moves no money.
+- [ ] Age rating questionnaires. "Does your app contain financial services?" —
+      answer honestly, educational tools are fine.
+- [ ] **Demo account for reviewers** with pre-populated holdings, and its
+      credentials in the review notes. A reviewer who has to complete a
+      9-question quiz to see anything will not.
+- [ ] Review notes explaining, in one paragraph, that Lumos executes no trades
+      and holds no funds. This pre-empts the most likely rejection reason.
+
+#### 6. Before you submit
+
+- [ ] Test on a **real device**, not only the simulator — safe-area insets,
+      the keyboard covering inputs, and back-gesture behaviour are where
+      Capacitor apps break.
+- [ ] Cold-start path with the backend asleep, on a slow connection.
+- [ ] Every string in all three languages on a real phone; the switcher is in
+      the header on mobile and the sidebar on desktop.
+- [ ] Delete-account flow end to end, because a reviewer will try it.
 
 
 ### Second testing round — 20 Jul 2026 (desktop)

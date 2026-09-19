@@ -1,16 +1,41 @@
 {
   "name": "Lumos — Smart Investment Assistant",
   "short_name": "Lumos",
-  "description": "Korkmadan, öğrenerek yatırım — AI destekli risk profili ve portföy rehberi.",
+  "description": "Fearless, learn-by-doing investing: an AI-assisted risk profile and a transparent portfolio guide. For education only.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0C0D14",
   "theme_color": "#0C0D14",
-  "lang": "tr",
+  "lang": "en",
   "icons": [
-    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
-    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
-    { "src": "/app-icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/app-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "dir": "ltr",
+  "categories": [
+    "finance",
+    "education"
   ]
 }
