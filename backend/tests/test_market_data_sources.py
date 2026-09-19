@@ -73,9 +73,13 @@ def test_a_rent_index_is_never_used_as_a_house_price_index():
     assert us.housing_index_source == "fred"  # FHFA All-Transactions HPI
 
     de = get_market_pack("DE")
+    # Germany now reads rents from the Bundesbank and house prices from
+    # Eurostat — different providers, which makes the separation structural
+    # rather than a matter of calling the right function.
+    assert de.rent_index_source == "bundesbank"
     assert de.housing_index_source == "eurostat"
-    assert de.rent_index_source == "eurostat"
-    # ...but through separate readers hitting separate datasets.
+    # Eurostat's own two readers still hit separate datasets, which is what
+    # kept them honest while both came from there.
     assert eurostat_service.get_house_price_index is not eurostat_service.get_rent_index
 
 
@@ -123,3 +127,45 @@ def test_rent_vs_buy_carries_the_staleness_signal_to_the_client():
     assert "inflation_as_of" in assumptions_out
     assert "inflation_months_behind" in assumptions_out
     assert isinstance(assumptions_out["inflation_is_stale"], bool)
+
+
+def test_the_german_market_reads_its_prices_from_the_fresher_of_two_copies():
+    """
+    Eurostat and the Bundesbank publish the same harmonised index. Eurostat's
+    stopped nine months short — checked across DE, FR, IT, ES, NL and both EU
+    aggregates, so it is the publication state, not our query — while the
+    Bundesbank's is current. Same concept, fresher copy, still keyless.
+    """
+    from backend.markets import get_market_pack
+
+    de = get_market_pack("DE")
+    assert de.inflation_source == "bundesbank"
+    assert de.rent_index_source == "bundesbank"
+    # The HOUSE price index stays with Eurostat: that series is current, and
+    # the two measure different things.
+    assert de.housing_index_source == "eurostat"
+    assert de.regional_housing_source == "bundesbank"
+
+
+def test_inflation_and_rent_route_to_the_declared_source():
+    from unittest.mock import patch
+
+    from backend.services import bundesbank_service, inflation_service
+
+    fake_cpi = {"2026-07": 103.2, "2026-08": 103.4}
+    fake_rent = {"2026-07": 102.3, "2026-08": 102.5}
+    with patch.object(bundesbank_service, "get_hicp_index", lambda: fake_cpi), \
+         patch.object(bundesbank_service, "get_rent_index", lambda: fake_rent):
+        assert inflation_service._get_index("DE") == fake_cpi
+        assert inflation_service.get_rent_index("DE") == fake_rent
+
+
+def test_a_source_that_goes_dark_reports_nothing_rather_than_a_neighbour():
+    """The whole point of routing through the pack: a market whose source
+    fails must not borrow another country's prices."""
+    from unittest.mock import patch
+
+    from backend.services import bundesbank_service, inflation_service
+
+    with patch.object(bundesbank_service, "get_hicp_index", lambda: None):
+        assert inflation_service._get_index("DE") == {}

@@ -29,10 +29,10 @@ class MarketPack:
     languages: list[str]
 
     # ── Data source availability (adapters check these before wiring) ──
-    inflation_source: str         # "tcmb_evds" | "bls" | "eurostat" | "none"
+    inflation_source: str         # "tcmb_evds" | "bls" | "eurostat" | "bundesbank" | "none"
     housing_index_source: str     # "tcmb_evds" | "eurostat" | "none"
     default_index_ticker: str     # yfinance ticker for the local blue-chip index
-    rent_index_source: str = "none"   # "bls" | "eurostat" | "none"
+    rent_index_source: str = "none"   # "bls" | "eurostat" | "bundesbank" | "none"
     # A NATIONAL house-price index and a SUB-NATIONAL breakdown are different
     # data products, and they need not come from the same provider: Germany's
     # national index is Eurostat's while its only free regional figures are

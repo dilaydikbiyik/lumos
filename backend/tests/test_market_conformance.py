@@ -92,9 +92,9 @@ def test_a_pack_declares_everything_the_app_asks_it_for(market):
     assert pack.default_index_ticker
 
     # Enumerations the code branches on, so a typo cannot pass silently.
-    assert pack.inflation_source in {"tcmb_evds", "bls", "eurostat", "none"}
+    assert pack.inflation_source in {"tcmb_evds", "bls", "eurostat", "bundesbank", "none"}
     assert pack.housing_index_source in {"tcmb_evds", "fred", "eurostat", "none"}
-    assert pack.rent_index_source in {"bls", "eurostat", "none"}
+    assert pack.rent_index_source in {"bls", "eurostat", "bundesbank", "none"}
     assert pack.regional_housing_source in {"tcmb_evds", "fred", "bundesbank", "none"}
 
     assert pack.listing_sites, "no way to reach a listing in this market"

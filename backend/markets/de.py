@@ -26,14 +26,17 @@ DE = MarketPack(
     locale="de-DE",
     languages=["de", "en"],
 
-    inflation_source="eurostat",       # HICP, monthly, no key
+    # Eurostat and the Bundesbank publish the same harmonised index; the
+    # Bundesbank's is current while Eurostat's stopped nine months short —
+    # for every euro-area country, not only Germany. Same concept, fresher copy.
+    inflation_source="bundesbank",       # HICP, monthly, no key
     housing_index_source="eurostat",   # prc_hpi_q — a real price index
     # No Bundesland-level index exists in any free source (checked: Eurostat
     # is country-only, GENESIS needs registration). The Bundesbank publishes
     # city-size aggregates without a key, which is a real breakdown of a
     # different shape — nested segments, not alternative places.
     regional_housing_source="bundesbank",
-    rent_index_source="eurostat",      # HICP CP041, actual rentals
+    rent_index_source="bundesbank",    # HICP actual rentals, same lineage
     default_index_ticker="^GDAXI",     # DAX
 
     news_feeds=[

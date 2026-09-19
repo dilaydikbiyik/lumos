@@ -26,6 +26,10 @@ versus the country" — and the caller must present it as one. Ranking them
 against each other as places to buy would be nonsense.
 
 Annual, not quarterly, unlike the Turkish and US series.
+
+The same API also carries Germany's monthly harmonised consumer price index
+and its actual-rentals component — and it is nine months fresher than
+Eurostat's, which is why the German market reads inflation from here.
 """
 
 import csv
@@ -37,7 +41,8 @@ from backend.services import cache as cache_service
 
 logger = logging.getLogger("lumos.bundesbank")
 
-_BASE = "https://api.statistiken.bundesbank.de/rest/data/BBDR1"
+_PROPERTY = "https://api.statistiken.bundesbank.de/rest/data/BBDR1"
+_PRICES = "https://api.statistiken.bundesbank.de/rest/data/BBDP1"
 _TTL_SECONDS = 60 * 60 * 24
 _TIMEOUT = 30
 
@@ -67,7 +72,7 @@ def _series(geo: str) -> Optional[dict[str, float]]:
     try:
         import httpx
 
-        res = httpx.get(f"{_BASE}/A.{geo}.{_MEASURE}",
+        res = httpx.get(f"{_PROPERTY}/A.{geo}.{_MEASURE}",
                         params={"format": "csv"}, timeout=_TIMEOUT,
                         follow_redirects=True)
         res.raise_for_status()
@@ -120,3 +125,65 @@ def get_segments(lang: str = "tr") -> dict[str, dict]:
             out[geo] = {"name": fallback if name == f"segment.{geo}" else name,
                         "index": index}
     return out
+
+
+# ── Consumer prices ──────────────────────────────────────────────────────────
+# Monthly harmonised index, the same concept Eurostat publishes. Kept here
+# because the Bundesbank's copy is current while Eurostat's stopped nine
+# months short — for every euro-area country, not only Germany.
+
+_HICP_TOTAL = "M.DE.N.HVPI.C.A00000.I.A"
+_HICP_RENTS = "M.DE.N.HVPI.C.E2C041.I.A"
+
+
+def _monthly(series_key: str, cache_name: str) -> Optional[dict[str, float]]:
+    """{YYYY-MM: index} for a monthly Bundesbank series."""
+    cache_key = f"bundesbank:{cache_name}"
+    lkg_key = f"lkg:{cache_key}"
+    cached = cache_service.get(cache_key)
+    if cached is not None:
+        return cached or None
+
+    try:
+        import httpx
+
+        res = httpx.get(f"{_PRICES}/{series_key}", params={"format": "csv"},
+                        timeout=_TIMEOUT, follow_redirects=True)
+        res.raise_for_status()
+
+        out: dict[str, float] = {}
+        for row in csv.reader(io.StringIO(res.text), delimiter=";"):
+            if len(row) < 2:
+                continue
+            period, value = row[0].strip(), row[1].strip()
+            # YYYY-MM rows only; the file also carries metadata and headers.
+            if len(period) != 7 or not period[:4].isdigit() or not value:
+                continue
+            try:
+                out[period] = float(value.replace(",", "."))
+            except ValueError:
+                continue
+
+        if not out:
+            raise RuntimeError(f"Bundesbank returned no observations for {series_key}")
+
+        cache_service.set(cache_key, out, ttl=_TTL_SECONDS)
+        cache_service.set(lkg_key, out, ttl=None)
+        return out
+    except Exception as exc:
+        logger.warning("Bundesbank fetch failed for %s (%s)", series_key, type(exc).__name__)
+        fallback = cache_service.get(lkg_key)
+        if fallback:
+            logger.warning("Serving last-known-good Bundesbank data for %s", series_key)
+            return fallback
+        return None
+
+
+def get_hicp_index() -> Optional[dict[str, float]]:
+    """Germany's harmonised consumer price index, keyed by YYYY-MM."""
+    return _monthly(_HICP_TOTAL, "hicp")
+
+
+def get_rent_index() -> Optional[dict[str, float]]:
+    """Actual rentals for housing — the HICP component, not a house price."""
+    return _monthly(_HICP_RENTS, "rents")

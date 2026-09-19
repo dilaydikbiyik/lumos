@@ -4,8 +4,10 @@
 ![Python](https://img.shields.io/badge/python-3.12-blue)
 ![FastAPI](https://img.shields.io/badge/FastAPI-async-009688)
 ![React](https://img.shields.io/badge/react-19-61DAFB)
-![Tests](https://img.shields.io/badge/tests-245%20backend%20%2B%2014%20frontend-3DD68C)
+![Tests](https://img.shields.io/badge/tests-489%20backend%20%2B%2029%20frontend-3DD68C)
 ![Cost](https://img.shields.io/badge/running%20cost-%240%2Fmonth-F5A524)
+![Markets](https://img.shields.io/badge/markets-TR%20%C2%B7%20US%20%C2%B7%20DE-7C5CFF)
+![Languages](https://img.shields.io/badge/languages-tr%20%C2%B7%20en%20%C2%B7%20de-5B8EF0)
 🔗 **[Live demo →](https://lumos-sooty.vercel.app)**
 > An AI-powered investment guide built for people who have never invested — and are scared to start.
 > *"Investing looks like a dark forest. Lumos is the light in your hand."*
@@ -31,27 +33,27 @@ shows you the honest downside before the upside, and treats your fear as **data 
 
 | Onboarding | Risk profile | Portfolio |
 |---|---|---|
-| ![Karşılama](demo/screens/01-karsilama.png) | ![Risk profili](demo/screens/02-risk-profili.png) | ![Portföy](demo/screens/03-portfoy.png) |
+| ![Onboarding](demo/screens/01-karsilama.png) | ![Risk profile](demo/screens/02-risk-profili.png) | ![Portfolio](demo/screens/03-portfoy.png) |
 
 | Holdings + live chart | Dashboard | AI advisor |
 |---|---|---|
-| ![Varlıklarım](demo/screens/05-varliklarim.png) | ![Panel](demo/screens/06-panel.png) | ![Danışman](demo/screens/08-danisman.png) |
+| ![Holdings](demo/screens/05-varliklarim.png) | ![Dashboard](demo/screens/06-panel.png) | ![AI advisor](demo/screens/08-danisman.png) |
 
 | Rent vs. buy | Province price explorer | Desktop layout |
 |---|---|---|
-| ![Kirada mı otur, ev mi al](demo/screens/04-kira-vs-ev.png) | ![Emlak Keşfet](demo/screens/07-emlak-kesfet.png) | ![Desktop](demo/screens/09-desktop-panel.png) |
+| ![Rent vs. buy](demo/screens/04-kira-vs-ev.png) | ![Explore real estate](demo/screens/07-emlak-kesfet.png) | ![Desktop](demo/screens/09-desktop-panel.png) |
 
 **The screen no investing app wants to show you** — carrying card debt, the app
 says clear it first and does the arithmetic, before it will show you a portfolio:
 
 <p align="center">
-  <img src="demo/screens/11-borc-once.png" width="300" alt="Borcu önce kapat" />
+  <img src="demo/screens/11-borc-once.png" width="300" alt="Clear the debt first" />
 </p>
 
 <details>
 <summary>More: desktop portfolio view</summary>
 
-![Desktop portföy](demo/screens/10-desktop-portfoy.png)
+![Desktop portfolio](demo/screens/10-desktop-portfoy.png)
 
 </details>
 
@@ -118,10 +120,23 @@ surface, zero custody risk — and a lower trust barrier for scared beginners.
   and for **housing regions** (with the real-return companion that exposes nominal illusions)
 - Thin histories are refused outright rather than dressed up as statistics
 
-### 🏘️ Real-estate intelligence (live central-bank data)
-- **Province intelligence**: concrete TL/m² prices for all **81 provinces** (central-bank unit-price
-  series, quarterly since 2010) ranked by *real* appreciation over 1/3/5 years — plus the coarser
-  19-region NUTS2 index; every scenario band deflates each window by its own period inflation
+### 🏘️ Real-estate intelligence (live official data, per market)
+- **Sub-national housing**, from each country's own source and honest about what it is:
+  - **Türkiye** — TL/m² unit prices for all **81 provinces** (central bank, quarterly since 2010),
+    ranked by *real* appreciation, plus the coarser 19-region NUTS2 index
+  - **United States** — the FHFA house price index for **50 states and DC** (via FRED). An index,
+    not a price level, so no per-m² figure is shown: it measures appreciation and cannot answer
+    what a square metre costs
+  - **Germany** — the Bundesbank's residential index for **three city-size segments** (seven
+    largest cities / 127 cities / all districts). No Bundesland-level index exists in any free
+    source, and these segments are *nested*, so they are compared rather than ranked — a rank
+    badge would invite "pick number one" for a segment of a market you are already in
+- Frequency and shape are declared by each source rather than assumed: the Turkish and US series
+  are quarterly, the Bundesbank's annual, and reading a 3-year horizon as "12 observations back"
+  silently turned it into a 12-year one
+- Every scenario band deflates each window by **its own period's inflation**, from that market's
+  own CPI — the app's core claim was only ever true for Türkiye until inflation was routed
+  through the pack
 - **Rent vs. buy** decision tool — the same home under two strategies with an equal monthly
   housing budget, including an affordability check (the installment/income ratio is flagged past
   the ~45% banks lend against) and the honest note that homeownership has non-financial value too
@@ -282,23 +297,44 @@ comparisons — all computed by deterministic engines. The LLM extracts intent (
 Country-specific behavior lives in exactly one place — a **Market Pack**. Application code never
 hardcodes a country; it asks the user's pack:
 
-| | 🇹🇷 TR *(reference, fully wired)* | 🇺🇸 US *(skeleton)* | 🇩🇪 DE *(skeleton)* |
+| | 🇹🇷 Türkiye | 🇺🇸 United States | 🇩🇪 Deutschland |
 |---|---|---|---|
 | Currency / locale | TRY · tr-TR | USD · en-US | EUR · de-DE |
-| Inflation source | **TCMB EVDS (live)** | FRED *(roadmap)* | Destatis *(roadmap)* |
-| Housing index | **TCMB EVDS, 19 regions (live)** | Case-Shiller *(roadmap)* | Häuserpreisindex *(roadmap)* |
+| Inflation | **TCMB EVDS** | **BLS CPI-U** | **Bundesbank HICP** |
+| Rent index | — *(spread off CPI)* | **BLS, primary residence** | **Bundesbank, actual rentals** |
+| National house prices | **TCMB** | **FHFA via FRED** | **Eurostat `prc_hpi_q`** |
+| Sub-national | **81 provinces**, TL/m² | **50 states + DC**, index | **3 city-size segments**, index |
+| Mortgage assumption | 39% / 10y | 6.5% / 30y | 3.8% / 20y |
+| Purchase costs | deed fee 4% + 2% agency | closing costs | transfer tax + notary + registry |
+| Investable universe | BIST + global ETFs | SPY/QQQ/VXUS/GLD, VNQ/SCHH | **UCITS only** — EU retail cannot hold US-domiciled ETFs |
 | Listing bridge | Sahibinden, Emlakjet | Zillow, Realtor | ImmoScout24, Immowelt |
 | Regulator (edu. content) | SPK | SEC / FINRA | BaFin |
-| Local finance notes | withholding-tax basics, title-deed fees | long/short-term capital gains, 401(k)/IRA | Abgeltungsteuer 25%, Sparer-Pauschbetrag |
-| Fear check-in | localized 🇹🇷 | localized 🇺🇸 | localized 🇩🇪 |
 
-Adding a country = adding one pack module + data adapters. The TR pack is the complete reference
-implementation; unknown market codes degrade safely to it. An in-app market switcher drives
-currency and number formatting end to end — and TL-denominated data stays **pinned to TRY**
-(never dressed up as dollars), while markets without live data show an honest
-"integration on the way" state instead of masquerading foreign numbers. All tax/regulatory content is
-**educational only** and every pack carries an explicit "confirm with a licensed local professional"
-disclaimer — Lumos gives no tax or legal advice in any market.
+Every source above is live and keyless except FRED, which needs a free key.
+
+**Language and market are independent axes.** An expat in Istanbul reads English while investing in
+Türkiye; a Turk in Berlin may want the opposite. Neither setting implies the other — a new account
+starts in the market its language suggests and nothing moves it again, and the separation is
+enforced at the source level so a well-meaning `setLanguage(pack.languages[0])` cannot creep back in.
+
+**Adding a market is a contract, not a memory test.**
+[`test_market_conformance.py`](backend/tests/test_market_conformance.py) is parametrised over every
+market *and* every language, so adding either runs the whole suite against it. It checks that a pack
+declares everything the app asks for, speaks every UI language rather than its own country's, copies
+no other pack's country facts, prints no foreign currency, cannot claim a data table nothing can
+read, and sends listing searches in its own market's words. It has teeth, and that is tested too: a
+deliberately sloppy fourth market is registered in-test and the suite must refuse it.
+
+Recipes: [docs/adding-a-market.md](docs/adding-a-market.md) ·
+[docs/adding-a-language.md](docs/adding-a-language.md)
+
+**Absent beats near-enough.** The US pack declared *no* house price index for months rather than
+borrow the BLS rent series — rent measures what it costs to occupy a home, not what homes sell for,
+and substituting one for the other corrupts every buy-vs-rent verdict. Germany still has no
+Bundesland-level index because none exists freely, and the page says so instead of inventing one.
+All tax and regulatory content is **educational only**, and every pack carries an explicit
+"confirm with a licensed local professional" disclaimer — Lumos gives no tax or legal advice in any
+market.
 
 ---
 
@@ -306,9 +342,13 @@ disclaimer — Lumos gives no tax or legal advice in any market.
 
 | Source | Used for | Resilience |
 |---|---|---|
-| **TCMB EVDS** (Turkish central bank) | Live CPI, 19-region housing price indices | Daily cache; in-repo static CPI fallback; honest `available: false` when down |
+| **TCMB EVDS** (Turkish central bank) | TR: CPI, 81-province unit prices (TL/m²), 19-region NUTS2 index | Daily cache; in-repo static CPI fallback; freshest-wins against the bundled copy; honest `available: false` when down |
+| **BLS** (US Bureau of Labor Statistics) | US: CPI-U, rent of primary residence | No key; bundled static fallback + refresh script |
+| **FRED** (St. Louis Fed) | US: FHFA house price index, nationally and for 50 states + DC | Free key; 51 series fetched in parallel; a mostly-failed map is refused rather than cached |
+| **Eurostat** | DE: house price index (`prc_hpi_q`) | No key; last-known-good tier |
+| **Deutsche Bundesbank** | DE: harmonised CPI, actual rentals, and residential prices for three city-size segments | No key. Chosen over Eurostat for prices because Eurostat's HICP stopped nine months short — for every euro-area country, not only Germany |
 | **yfinance** | Prices, volatility, backtests, projections | Fresh 24h + stale 7d + last-known-good cache tiers; baseline volatilities as final resort |
-| **RSS** (AA, Bloomberg HT) | Calm news digest | Per-feed fail-open; digest hides when empty |
+| **RSS**, per market | Calm news digest — AA/Bloomberg HT (TR), CNBC/Yahoo (US), Tagesschau/Handelsblatt (DE) | Per-feed fail-open; digest hides when empty |
 | **Google Gemini** (free tier) | Advisor chat, extraction, phrasing | 4-model chain × up to 4 keys, then hands off to Groq |
 | **Groq** (free tier) | Fallback when Gemini is spent or region-blocked | gpt-oss-120b → Llama chain; quiz-eligible models only |
 | **OpenRouter** (`:free` models) | Last-resort fallback | Llama / DeepSeek / Gemma chain; corrupted replies rejected |
@@ -320,8 +360,11 @@ disclaimer — Lumos gives no tax or legal advice in any market.
 - **Prompt-injection hardening**: user messages are data, never instructions; the profile-completion
   marker can't be forged from user text; strict role/length validation on every request
 - **Per-user daily AI quotas** (DB-backed, plan-aware) + per-IP rate limiting on every AI endpoint
-- **Auth**: Clerk JWT verified server-side on every request; lightweight RBAC (user/admin) gates
-  operational stats and plan management
+- **Auth**: Clerk JWT verified server-side on every request. **RBAC** grants named permissions
+  rather than comparing a role string, so reading the feedback queue does not also confer the
+  ability to change other people's plans (`user` / `support` / `admin`). Roles are managed from
+  inside the app, with two lockout guards — an admin cannot demote themselves, and the last admin
+  cannot be demoted by anyone — and every change is logged with actor and target
 - **No execution, no custody**: architecturally incapable of moving user money
 - **Honesty guarantees are tested**: prompt-rule regression tests, a no-dark-patterns assertion on
   the Panic Button, refusal paths for thin statistical histories

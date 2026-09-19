@@ -62,6 +62,10 @@ def _get_index(market: str = "TR") -> dict[str, float]:
         from backend.services import eurostat_service
 
         return eurostat_service.get_hicp_index(market) or {}
+    if source == "bundesbank":
+        from backend.services import bundesbank_service
+
+        return bundesbank_service.get_hicp_index() or {}
     return {}
 
 
@@ -99,6 +103,10 @@ def get_rent_index(market: str = "TR") -> dict[str, float]:
         from backend.services import eurostat_service
 
         return eurostat_service.get_rent_index(market) or {}
+    if source == "bundesbank":
+        from backend.services import bundesbank_service
+
+        return bundesbank_service.get_rent_index() or {}
     return {}
 
 
