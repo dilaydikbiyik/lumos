@@ -1,9 +1,12 @@
-import { useEffect, useState, useCallback } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useAuth } from '@clerk/clerk-react'
 import { parseTL } from '../utils/number'
 import api, { extractErrorMessage, setAuthToken } from '../utils/api'
 import AppHeader from '../components/AppHeader'
 import IsikTut from '../components/IsikTut'
+import PropertyVsPortfolio from '../components/PropertyVsPortfolio'
+import PurchaseChecks from '../components/PurchaseChecks'
+import ListingEval from '../components/ListingEval'
 import useMarket from '../hooks/useMarket'
 import { Trans, useTranslation } from 'react-i18next'
 
@@ -112,7 +115,7 @@ function ProvinceScenario({ province, amount }) {
                   </a>
                 ))}
               </div>
-          {links.some(l => l.manual_filter) && (
+          {links?.some(l => l.manual_filter) && (
             <p style={{ fontSize: 11, opacity: 0.7, marginTop: 6 }}>
               {t('explore.manualFilterNote', {
                 place: links.find(l => l.manual_filter).manual_filter,
@@ -427,6 +430,17 @@ function RentVsBuy() {
               <> {result.assumptions.transfer_cost_note}</>
             )}
           </p>
+
+          {/* Fear and attachment are data here, not noise — the vision's
+              own principle. A rent-vs-buy tool that answers only in money
+              is answering a different question than the one people ask. */}
+          <div className="card" style={{ marginTop: 12, borderStyle: 'dashed' }}>
+            <strong style={{ fontSize: 14 }}>💚 {t('rvbEmotion.title')}</strong>
+            <p style={{ fontSize: 12.5, lineHeight: 1.7, whiteSpace: 'pre-line', margin: '6px 0 0', opacity: 0.88 }}>
+              {t('rvbEmotion.body')}
+            </p>
+          </div>
+
           {/* A stale reading still drives the projection, so say so plainly
               rather than leaving the reader to notice a date. */}
           {result.assumptions.inflation_is_stale && (
@@ -503,7 +517,7 @@ function ListingLinks() {
           ))}
         </div>
       )}
-          {links.some(l => l.manual_filter) && (
+          {links?.some(l => l.manual_filter) && (
             <p style={{ fontSize: 11, opacity: 0.7, marginTop: 6 }}>
               {t('explore.manualFilterNote', {
                 place: links.find(l => l.manual_filter).manual_filter,
@@ -529,6 +543,9 @@ export default function ExplorePage() {
   const areaWord = pack.area_kind || 'region'
   const [provinces, setProvinces] = useState(null)
   const [horizon, setHorizon] = useState(3)
+  // Set once the reader picks a window themselves, so the suggestion never
+  // overrides a deliberate choice.
+  const horizonTouched = useRef(false)
   const [scenarioAmount, setScenarioAmount] = useState('1.000.000')
   const [search, setSearch] = useState('')
   // Loading is derived: no data yet, or data belongs to a different horizon
@@ -549,7 +566,17 @@ export default function ExplorePage() {
     let cancelled = false
     async function run() {
       const data = await load(horizon)
-      if (!cancelled) setProvinces({ ...data, _horizon: horizon })
+      if (cancelled) return
+      setProvinces({ ...data, _horizon: horizon })
+      // Adopt the window the reader's own horizon calls for, once, on first
+      // load. A table ranked over one year and one ranked over five answer
+      // different questions, and a fixed default of three answered neither.
+      // Only if they have not chosen for themselves — their pick wins.
+      if (!horizonTouched.current && data.suggested_horizon
+          && data.suggested_horizon !== horizon) {
+        horizonTouched.current = true
+        setHorizon(data.suggested_horizon)
+      }
     }
     run()
     return () => { cancelled = true }
@@ -588,11 +615,20 @@ export default function ExplorePage() {
                 <button key={y}
                         className={`btn ${horizon === y ? 'btn-primary' : 'btn-ghost'}`}
                         style={{ flex: 1 }}
-                        onClick={() => setHorizon(y)}>
+                        onClick={() => { horizonTouched.current = true; setHorizon(y) }}>
                   {t('explore.lastYears', { n: y })}
                 </button>
               ))}
             </div>
+
+            {/* Why THIS window. A ranking is only meaningful against a
+                horizon, and a reader who does not know which one they are
+                looking at cannot tell a signal from a recent spike. */}
+            {provinces?.horizon_note && (
+              <p style={{ fontSize: 12, opacity: 0.75, lineHeight: 1.6, marginTop: -4, marginBottom: 12 }}>
+                {provinces.horizon_note}
+              </p>
+            )}
 
             <input
               className="input"
@@ -674,6 +710,21 @@ export default function ExplorePage() {
         )}
 
         <RentVsBuy />
+        {/* Placed right after the area table: the reader has just seen what a
+            region did, which is exactly when "would a portfolio have done
+            better?" occurs to them. Only offered where a regional table
+            exists — without one there is no property side to compare. */}
+        {visible.length > 0 && (
+          <PropertyVsPortfolio
+            regions={visible.map(p => ({ code: p.code, name: p.province }))}
+          />
+        )}
+        {/* Before the checklist: "is this price sane" comes first, and the
+            checks are what you do once it is. */}
+        {visible.length > 0 && (
+          <ListingEval areas={visible.map(p => ({ code: p.code, name: p.province }))} />
+        )}
+        <PurchaseChecks />
         <ListingLinks />
       </div>
     </div>

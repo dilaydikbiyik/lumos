@@ -186,3 +186,96 @@ def test_each_market_brings_its_own_entry_bar():
     assert len(set(thresholds.values())) > 1, thresholds
     for code, value in thresholds.items():
         assert value > 0, code
+
+
+def test_the_reserve_is_six_months_of_spending_not_of_income():
+    """
+    The planner was handed `monthly_income` where it asked for outgoings.
+    Someone earning 40,000 and spending 15,000 was told to keep back 240,000
+    instead of 90,000 — and every other part of the plan shrank behind it.
+    """
+    spending = split(budget=2_000_000, monthly_outgoings=15_000,
+                     risk_score=5, entry_threshold=TR_THRESHOLD)
+    earning = split(budget=2_000_000, monthly_outgoings=40_000,
+                    risk_score=5, entry_threshold=TR_THRESHOLD)
+
+    assert spending.reserve == pytest.approx(90_000)
+    assert earning.reserve == pytest.approx(240_000)
+    # And the difference goes back into the plan rather than vanishing.
+    assert spending.property_amount + spending.market_amount > \
+           earning.property_amount + earning.market_amount
+
+
+def test_the_planner_reads_outgoings_from_the_user(client):
+    """End to end: the endpoint must use the outgoings column, not income."""
+    import asyncio
+
+    from backend.repositories import user_repository
+    from backend.tests.conftest import FAKE_USER_ID, _TestSession
+
+    async def seed():
+        async with _TestSession() as db:
+            user = await user_repository.get_or_create(db, FAKE_USER_ID)
+            user.budget = 2_000_000
+            user.risk_score = 5
+            user.monthly_income = 40_000       # deliberately different
+            user.monthly_outgoings = 15_000
+            await db.commit()
+
+    asyncio.run(seed())
+
+    body = client.get("/api/v1/planning/budget-split").json()
+    assert body["reserve"] == pytest.approx(90_000), (
+        "the reserve followed income instead of outgoings"
+    )
+
+
+def test_a_reader_who_already_bought_property_gets_the_rest_replanned():
+    """
+    Without this the plan keeps telling somebody who has just bought a flat
+    to put another 40% into property — the moment a plan stops being
+    believable, and the moment they most need the rest of it replanned.
+    """
+    fresh = split(budget=1_000_000, risk_score=5, entry_threshold=TR_THRESHOLD)
+    after = split(budget=1_000_000, risk_score=5, entry_threshold=TR_THRESHOLD,
+                  committed_property=600_000)
+
+    assert fresh.property_amount > 0
+    assert after.property_amount == 0
+    assert after.market_amount > fresh.market_amount
+    assert "split.reason.already_committed" in after.reasons
+    # The reserve is untouched: it is not an investment to be reallocated.
+    assert after.reserve == fresh.reserve
+
+
+def test_a_real_estate_path_still_plans_inside_its_world_after_a_purchase():
+    """Owning one plot is not a reason to overrule the path they chose."""
+    result = split(budget=1_000_000, risk_score=5, path="real_estate",
+                   entry_threshold=TR_THRESHOLD, committed_property=600_000)
+    assert result.market_amount == 0
+    assert "split.reason.already_committed" in result.reasons
+
+
+def test_the_endpoint_counts_property_holdings_as_committed(client):
+    import asyncio
+
+    from backend.repositories import user_repository
+    from backend.tests.conftest import FAKE_USER_ID, _TestSession
+
+    async def seed():
+        async with _TestSession() as db:
+            user = await user_repository.get_or_create(db, FAKE_USER_ID)
+            user.budget = 2_000_000
+            user.risk_score = 5
+            user.monthly_outgoings = 10_000
+            await db.commit()
+
+    asyncio.run(seed())
+    client.post("/api/v1/holdings", json={
+        "asset_type": "land", "name": "plot", "purchase_amount": 900_000,
+    })
+
+    body = client.get("/api/v1/planning/budget-split").json()
+    assert body["property_amount"] == 0, "an owned plot was not counted"
+    assert any("already" in r.lower() or "zaten" in r.lower() or "bereits" in r.lower()
+               for r in body["reasons"]), body["reasons"]

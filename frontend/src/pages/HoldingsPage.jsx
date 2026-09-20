@@ -1,9 +1,10 @@
 import { useEffect, useState, useCallback } from 'react'
 import FireflyMark from '../components/FireflyMark'
 import Icon from '../components/Icon'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import AppHeader from '../components/AppHeader'
 import CurrencyExposure from '../components/CurrencyExposure'
+import FirstPurchaseEducation from '../components/FirstPurchaseEducation'
 import PortfolioValueChart from '../components/PortfolioValueChart'
 import DriftCard from '../components/DriftCard'
 import { useAuth } from '@clerk/clerk-react'
@@ -39,10 +40,16 @@ export default function HoldingsPage() {
   const [summary, setSummary] = useState(cached?.summary ?? null)
   const [health, setHealth] = useState(cached?.health ?? null)
   const [profile, setProfile] = useState(cached?.profile ?? null)
-  const [form, setForm] = useState(EMPTY_FORM)
+  // A listing the reader just evaluated can hand its details straight over,
+  // so "I bought it" does not mean retyping the area, the size and the price
+  // they were looking at a second ago. Router state, not a query string: a
+  // purchase amount does not belong in a URL or a browser history entry.
+  const prefill = useLocation().state?.prefillHolding
+  const [form, setForm] = useState(() => ({ ...EMPTY_FORM, ...(prefill || {}) }))
   // idle | loading | found | notfound — drives the symbol field's own feedback
   const [lookup, setLookup] = useState({ state: 'idle', data: null })
-  const [showForm, setShowForm] = useState(false)
+  const [showForm, setShowForm] = useState(!!prefill)
+  const [firstOfType, setFirstOfType] = useState(null)
   const [error, setError] = useState(null)
   // "Empty portfolio" and "still fetching" must never look the same
   const [loaded, setLoaded] = useState(!!cached)
@@ -128,6 +135,13 @@ export default function HoldingsPage() {
       if (form.note) body.note = form.note
       if (form.emotion_tag) body.emotion_tag = form.emotion_tag
       await api.post('/holdings', body)
+      // First time this reader has held this KIND of thing? Offer the
+      // explainer now. The same words before anyone has bought anything are
+      // one more thing to read; the moment money has actually moved, "what
+      // have I just done" is a live question.
+      if (!holdings.some(h => h.asset_type === body.asset_type)) {
+        setFirstOfType(body.asset_type)
+      }
       setForm(EMPTY_FORM)
       setLookup({ state: 'idle', data: null })
       setShowForm(false)
@@ -233,6 +247,12 @@ export default function HoldingsPage() {
         <DriftCard holdingsCount={holdings.length} />
 
         {/* Currency exposure — TL vs FX */}
+        {/* Right after the add, above the list — where the reader's eyes
+            already are, and dismissible because they may already know. */}
+        <FirstPurchaseEducation
+          assetType={firstOfType}
+          onClose={() => setFirstOfType(null)}
+        />
         <CurrencyExposure holdings={holdings} />
 
         {/* Rebuild the portfolio with the remaining budget */}

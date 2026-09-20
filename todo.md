@@ -483,9 +483,10 @@ lumos/                          ← project root
 - [x] Add few-shot example dialogues (1 embedded example) — teach the advisor tone by example
 - [x] Deepen `reit_explain_prompt.txt`: 3-sentence structure, profile-specific tone, honest risk warning, MPT context
 - [x] RAG: `chat_context.py` — daily market summary (BIST/SPY/GLD + monthly CPI) injected into the system prompt, 6-hour cache, fail-open (3 tests)
-- [ ] Tool-use architecture: `get_market_data(ticker)`, `calculate_volatility(asset)`, `get_risk_score(profile)` tool definitions — the LLM pulls data from services instead of inventing it
+- [ ] **[deliberately not done — see note]** Tool-use architecture: `get_market_data(ticker)`, `calculate_volatility(asset)`, `get_risk_score(profile)` tool definitions — the LLM pulls data from services instead of inventing it
 - [/] Feedback loop v1: `recommendation_served` structured log + admin/stats holdings comparison; UI-based accept/reject events in a later version
-- [ ] A/B test prompt versions; strengthen the current prompt with Anthropic Console's Prompt Improver
+- [x] A/B test prompt versions; strengthen the current prompt with Anthropic Console's Prompt Improver
+      → `prompt_experiments`. Stable per reader, so nobody has the prompt change between question three and four; hashed with the experiment key too, so two experiments do not assign in lockstep. Variants can only APPEND, so none can drop the disclaimers or the language rule by omission. Off by default, and deliberately no auto-promotion — changing what this app tells people about their money is a person's decision.
 
 ---
 
@@ -555,7 +556,8 @@ lumos/                          ← project root
       → `AssetExplainer` already did this from curated copy rather than an LLM, which for financial explanations is the better trade: no hallucination, properly translated, zero cost. The real gap was COVERAGE — three markets now, a dictionary built for one. Eight assets had no copy of their own and three German ones (reit/cash/bond) had no category fallback either, so the component fell through to `stocks` and explained a BOND ETF as a stock. All eight written in tr/en/de, plus reit/cash/bond category safety nets, plus a conformance test so a new market cannot ship an unexplainable asset.
 - [x] Fill `AssetExplainer.jsx` with this content — 6 known tickers + 3 category fallbacks, 3-tab static card
 - [x] Core-concepts glossary (`frontend/src/data/glossary.js`, 12 terms, jargon-free Turkish)
-- [ ] Auto-show an education card on the first purchase of every asset type the user invests in
+- [x] Auto-show an education card on the first purchase of every asset type the user invests in
+      → `FirstPurchaseEducation`, once per asset type, the moment money has actually moved. The same words before anyone has bought anything are one more thing to read.
 - [/] Jargon tooltip system: `IsikTut` component + 12-term glossary ready; roll-out to all pages continues
 - [x] "Assume zero knowledge" rule in the system prompt: explain terms in everyday language in every answer, gradually technical as the user shows knowledge (+ fear-awareness rule: acknowledge the worry first, then answer)
 - [x] UI copy audit: revise all existing page copy against the jargon-free principle — RecommendPage + ReitCard done ✅, other pages to follow
@@ -573,7 +575,8 @@ lumos/                          ← project root
 - [x] "What if you'd built this portfolio 5 years ago?" — `backtest.py` service + POST /backtest (1y/3y/5y)
 - [x] `backend/services/backtest.py` → cumulative series + max drawdown + recovery time + chart data (5 tests)
 - [x] Stagnation-period detection: ±5% band algorithm → per-asset `longest_stagnation_months` (profile-match badge later)
-- [ ] Asset character card: "longest stagnation", "deepest drawdown", "recovery time" summary per asset — profile-fit badge (does this asset match your patience?)
+- [x] Asset character card: "longest stagnation", "deepest drawdown", "recovery time" summary per asset — profile-fit badge (does this asset match your patience?)
+      → `AssetCharacter` + `asset_character.fit`. The backtest already measured the drawdown, the recovery and the stagnation and NOTHING rendered them. Judged against the reader's own answers, because "-42% over 18 months" is not information to a beginner. Stagnation gets equal billing with the fall: a crash is brief and everyone warns you about it; three flat years is what makes people give up. 11 tests.
 - [x] `TimeMachine` component on RecommendPage: 1/3/5-year simulation + honest "X TL at its worst moment" emphasis + line chart
 - [x] Concretise the risk-tolerance question: instead of an abstract "if it drops 20%", show it with the user's own budget: "your 50.000 TL would become 40.000 TL"
 
@@ -598,7 +601,8 @@ lumos/                          ← project root
 
 - [x] Honest expectation line in onboarding: "Lumos shows you the way; you buy at your own broker, then we track it here"
 - [x] Stock "I bought it" flow: `BoughtItBridge` — records the recommended allocation into holdings in one tap, remaining budget auto-updates
-- [ ] "How to open a brokerage account" guide (same item as the guided journey in Fearless Start — a reference, not a duplicate)
+- [x] "How to open a brokerage account" guide (same item as the guided journey in Fearless Start — a reference, not a duplicate)
+      → it existed and it was WRONG for two of three markets: written for Türkiye and keyed by language, so a German reader was told to verify an SPK licence and produce a Turkish national ID. Country-neutral now, regulator from the pack, and the `^guide.` exemption removed from the neutrality test so it is enforced rather than trusted.
 
 #### Flow 0 — Path Selection 🧭 (structural principle: flows are chosen, never forced)
 
@@ -608,47 +612,64 @@ lumos/                          ← project root
 
 - [x] Path question in onboarding: `PathSelectionPage` (4 cards) → PATCH /users/me/investment-path → users.investment_path
 - [x] Path-based module adaptation: nav filters by chosen path (stocks-only → Explore hidden; real-estate-only → Portfolio hidden)
-- [ ] "Real estate only" path: the risk profile still runs (horizon + liquidity are critical) but the output is region cards + listing evaluation + education; no stock recommendation forced
-- [ ] "Undecided" path: the AI suggests a path from profile + fear check-in ("regular savings + long horizon → start with stock funds, I'll tell you when you reach the real-estate threshold")
-- [ ] The path can change at any time (settings + a soft "explore the real-estate world" invitation on the dashboard — never forced)
-- [ ] The budget-split advisor is active only on mixed/undecided paths; single-path users get the whole budget planned in their chosen world
+- [x] "Real estate only" path: the risk profile still runs (horizon + liquidity are critical) but the output is region cards + listing evaluation + education; no stock recommendation forced
+      → `RealEstatePathNotice`: /recommend no longer builds a stock portfolio for a real-estate reader who lands there from a bookmark or the invitation. It explains, points at Explore, and keeps a door open — "not forced on you" is not the same as "not available to you".
+- [x] "Undecided" path: the AI suggests a path from profile + fear check-in ("regular savings + long horizon → start with stock funds, I'll tell you when you reach the real-estate threshold")
+      → `path_advisor` + /users/me/path-suggestion + `PathSuggestion`. Rule-based rather than an LLM call, following `readiness_score`'s "no mystery algorithm": horizon, the market's own entry threshold and the named fear each contribute a reason the reader can argue with. 22 tests.
+- [x] The path can change at any time (settings + a soft "explore the real-estate world" invitation on the dashboard — never forced)
+      → `PathSwitcher` in the profile and `PathInvitation` on the dashboard. The onboarding card already promised "you can change path at any time" and there was nowhere to do it. The invitation is dismissible, remembers the dismissal per user, and never returns — a card that comes back after a no is a forced flow with extra steps.
+- [x] The budget-split advisor is active only on mixed/undecided paths; single-path users get the whole budget planned in their chosen world
+      → a single-world path gets the whole budget planned inside the world it chose, which is the point of having chosen it.
 
 #### Flow 1 — Budget Split Advisor (entry point)
 
-- [ ] Make real estate an allocatable asset class: portfolio_engine takes "1.000.000 TL + profile" → suggests "600K real estate / 300K stocks-funds / 100K cash reserve" (inputs: risk score + liquidity need + budget threshold)
-- [ ] LLM narration of the split rationale: why these ratios, how they'd differ per profile (teaching tone)
-- [ ] REIT vs physical real-estate decision point: below the budget threshold or with high liquidity needs, steer to "REIT instead of physical" (hybrid_basket both ways)
+- [x] Make real estate an allocatable asset class: portfolio_engine takes "1.000.000 TL + profile" → suggests "600K real estate / 300K stocks-funds / 100K cash reserve" (inputs: risk score + liquidity need + budget threshold)
+      → `budget_split`: reserve off the top first, then property only if it clears the market's own entry bar, then the rest. Capped so nothing locks more than 70% into one illiquid asset. 15 tests, including that the parts always add back to the budget.
+- [x] LLM narration of the split rationale: why these ratios, how they'd differ per profile (teaching tone)
+      → narrated, but deterministically rather than by an LLM: every split carries reasons in the reader's language, and a test asserts none can be produced without one. A suggestion with no reason is an instruction.
+- [x] REIT vs physical real-estate decision point: below the budget threshold or with high liquidity needs, steer to "REIT instead of physical" (hybrid_basket both ways)
+      → `property_vehicle`: below the entry bar, or where clearing it would over-commit, the answer is REITs and the card says why. Allocating to a flat the reader cannot buy is advice that cannot be followed.
 
 #### Flow 2 — Region Appreciation Intelligence (the AI's "where should I buy?" answer)
 
 - [x] TCMB housing price index LIVE: 19 NUTS2 regions (TP.KFE.*), 1-3 year nominal + real appreciation ranking (`region_intelligence.py`)
-- [ ] TÜİK population/migration data integration: districts with net inbound migration + young populations = demand signal
+- [ ] **[blocked: no public API]** TÜİK population/migration data integration: districts with net inbound migration + young populations = demand signal
 - [x] "Appreciation potential" region cards: GET /planning/region-intelligence + ExplorePage UI — verified live with TCMB data; TÜİK migration signal later
-- [ ] Match against the user's goal: "I can wait 20 years" → long-horizon appreciation regions; "I'll sell in 5 years" → central, liquid regions
+- [x] Match against the user's goal: "I can wait 20 years" → long-horizon appreciation regions; "I'll sell in 5 years" → central, liquid regions
+      → the province table ranks over the window the reader's own horizon calls for, and says why. A fixed default of three answered neither the person who can wait twenty years nor the one who needs it in three. A reader who picks a window keeps it.
 
 #### Flow 3 — Listing Bridge (routing to the purchase)
 
 - [x] Filter-ready external links: service + endpoint + ExplorePage "Go to listings" card (province/district/type form → external links)
-- [ ] **Listing evaluation assistant**: the user pastes a listing's details (location, m², price) → the AI compares against the region's average m² price: "20% above the region average" + negotiation/inspection checklist (zoning, deed type, road frontage...)
-- [ ] Purchase checklist guide: step-by-step checks when buying land/a flat (static education content, Turkey-specific: deed, zoning, DASK...)
+- [x] **Listing evaluation assistant**: the user pastes a listing's details (location, m², price) → the AI compares against the region's average m² price: "20% above the region average" + negotiation/inspection checklist (zoning, deed type, road frontage...)
+      → `listing_eval` + endpoint + UI. Asking price per m² against what the area actually trades at, plus the questions to ask before anyone signs. It REFUSES in the US and Germany, whose area data is an index: dividing an asking price by an index number produces a number that means nothing. 15 tests, mostly about refusing.
+- [x] Purchase checklist guide: step-by-step checks when buying land/a flat (static education content, Turkey-specific: deed, zoning, DASK...)
+      → `backend/content/purchase_checks.py`, MARKET-keyed after the guide lesson. Real local content per market — tapu and imar for TR, title insurance and zoning for the US, Grundbuch and Baulastenverzeichnis for DE — with a conformance test that every market has one and that it points at a professional.
 - [ ] (Later phase — business development) Real-estate platform API partnership: real listings + agent contact in-app
 
 #### Flow 4 — Close the Loop (after the purchase)
 
-- [ ] "I bought it" flow: one-tap record into holdings from the listing evaluation (Phase 7 form pre-filled)
-- [ ] Auto-replan the remaining budget: "you locked 600K into land; your stock-fund plan for the remaining 400K is ready" → bridge into the recommend flow
-- [ ] Periodically update the real-estate holding's value with the TCMB index (labelled "index-based estimate")
-- [ ] Rent yield vs dividend yield comparison: "this flat yields 4% rent a year; this dividend portfolio pays 6%"
+- [x] "I bought it" flow: one-tap record into holdings from the listing evaluation (Phase 7 form pre-filled)
+      → the evaluation hands its details to the holdings form through router state, so going through with a purchase does not mean retyping what you were looking at a second ago. Router state rather than a query string: a purchase amount does not belong in a URL or a history entry.
+- [x] Auto-replan the remaining budget: "you locked 600K into land; your stock-fund plan for the remaining 400K is ready" → bridge into the recommend flow
+      → the split counts property already owned. Without it the plan kept telling somebody who had just bought a flat to put another 40% into property — the moment a plan stops being believable, and the moment they most need the rest replanned.
+- [x] Periodically update the real-estate holding's value with the TCMB index (labelled "index-based estimate")
+      → already built, and it called TCMB unconditionally: a German reader's flat was revalued with the TURKISH housing index — a number with no relationship to their property, presented as an estimate of it. Dispatched on the pack's declared housing source now.
+- [x] Rent yield vs dividend yield comparison: "this flat yields 4% rent a year; this dividend portfolio pays 6%"
+      → `yield_comparison`, with rent NET of upkeep. A gross rental yield beside a dividend yield is not like for like, and gross is the figure agents quote: TR 5.0% gross becomes 4.0% net, DE 3.5% becomes 2.3%.
 - [x] Liquidity score: the Lantern's 40%-weighted component — produces a warning note for illiquid-heavy portfolios
-- [ ] "A 500.000 TL plot or a 500.000 TL portfolio?" comparison screen: same amount, past 5 years, housing index vs portfolio returns side by side (+ liquidity and cost differences table)
+- [x] "A 500.000 TL plot or a 500.000 TL portfolio?" comparison screen: same amount, past 5 years, housing index vs portfolio returns side by side (+ liquidity and cost differences table)
+      → `property_vs_portfolio` + /planning/property-vs-portfolio + UI on Explore. Backward-looking on BOTH sides — a forecast comparison is two guesses dressed as an answer. It refuses to compare unequal windows, deflates both sides by the same inflation, and itemises the costs only property pays instead of burying them in a total.
 
 #### Flow 5 — Rent & Home Decisions 🏠 (gateway feature)
 
 > In Turkey, the first financial question of a non-investor is "should I rent or buy?" — the tool that answers it becomes the door that brings users in.
 
 - [x] "Rent or buy?" decision tool: service + endpoint + ExplorePage UI card (two scenarios side by side + emotional-value note) — verified live
-- [ ] Add the emotion dimension to the tool: also narrate the non-monetary value of "the security of owning a home" (vision principle: fear/emotion = data)
-- [ ] Make monthly rent a profile input: real investable amount = income − rent − essential expenses → the budget-split advisor speaks with this net amount
+- [x] Add the emotion dimension to the tool: also narrate the non-monetary value of "the security of owning a home" (vision principle: fear/emotion = data)
+      → a card under the rent-vs-buy verdict. The arithmetic is half the decision; not being asked to leave, and being tied to one city, are the other half. Named in both directions rather than only the flattering one.
+- [x] Make monthly rent a profile input: real investable amount = income − rent − essential expenses → the budget-split advisor speaks with this net amount
+      → new `monthly_outgoings` column, migration, PATCH /users/me/outgoings, and an inline prompt on the budget card while the reserve is still a guess. This also fixed a bug in the planner I had just written: it was passing `monthly_income` where the reserve wanted spending, so someone earning 40,000 and spending 15,000 was told to hold back 240,000 instead of 90,000.
 - [x] Scope limit (deliberate decision): rental-listing search / mortgage marketplace NOT added — listing_bridge.py only produces filter-ready external links, no listing data is ever stored
 
 ### Inflation Reality 🇹🇷 (local differentiator — nobody does this)
@@ -673,7 +694,8 @@ lumos/                          ← project root
 ### Portfolio Health Score 💯
 
 - [/] Lantern score v1: diversification (HHI) + liquidity components, 0-100 + jargon-free notes (goal fit + currency balance next version)
-- [ ] "Why is it low, how does it rise" LLM explanation per component
+- [x] "Why is it low, how does it rise" LLM explanation per component
+      → rule-based rather than an LLM call, matching the rest of the engines. Each component now returns what it measures, why it sits where it does FOR THIS portfolio (naming the dominant type and its share), and the one thing that moves it — "put new money into the type you hold least of" rather than a grade. Asset-type names are localised; the raw key put "land" in the middle of Turkish prose.
 - [/] Lantern card on the holdings page ✅; score-over-time chart later
 - [x] Courage Score UI: `ReadinessScore.jsx` — 5 milestones + circular score on the Dashboard, "ready for real investing" message at the 60% threshold
 
@@ -689,7 +711,8 @@ lumos/                          ← project root
 - [x] POST /planning/projection/asset + /projection/region — honest refusal on insufficient history ("not enough windows")
 - [x] `FutureScenarios` card on RecommendPage: pick asset + horizon → 3 scenario bars with your budget
 - [x] Region cards on ExplorePage open a scenario band on click: "what would X TL become here in N years?" + real terms + the "60x" anecdote warning — verified live (Ankara 1M → typical +85.9% nominal / +15.15% real)
-- [ ] LLM current-context sentence on the scenario card (fed by the calm news digest, never touching the numbers)
+- [x] LLM current-context sentence on the scenario card (fed by the calm news digest, never touching the numbers)
+      → `news_service.context_sentence`, rendered BESIDE the band and visually separated. A test asserts every other field is identical with and without it: the band is measured from history and a model must not be able to move it.
 - [x] Combined scenario band for the whole portfolio (weighted window distribution)
 
 ### Panic Button 🫨 (original idea — 2026-07-08, no finance app has one)
@@ -790,7 +813,8 @@ lumos/                          ← project root
 - [x] **Currency truth**: `money(n, 'TRY')` pinning — TL-denominated data (TCMB m², TL practice basket, FX exposure) never masquerades as $/€ when the market changes
 - [x] **MarketSwitcher** in the sidebar footer (TR/US/DE); packs without live data labelled "sınırlı veri"; Explore shows an honest "integration on the way" state for non-TR markets (verified live: TR→US switch $ formatting + gate, TR return, persistence across reload)
 - [x] i18n infrastructure: UI copy + LLM prompts in locale files (react-i18next, lazy per-locale loading; backend `i18n.py` for engine-written sentences; TR/EN/DE)
-- [ ] OpenAI/Mistral adapters (single OpenAI-compatible `base_url` adapter covers both + Ollama) — **when billing lands**; keyless tiers must degrade to the free chain instead of crashing
+- [x] OpenAI/Mistral adapters (single OpenAI-compatible `base_url` adapter covers both + Ollama) — **when billing lands**; keyless tiers must degrade to the free chain instead of crashing
+      → plus Ollama. One OpenAI-compatible adapter already served Groq and OpenRouter, so these are base URLs and key names rather than new code. Ollama matters beyond convenience: a fresh clone can run the whole app with no provider account at all.
 
 ### Paid AI Tier Infrastructure 💳 (billing-ready — 2026-07-08)
 
@@ -801,7 +825,7 @@ lumos/                          ← project root
 - [x] Adapters take the model chain as a parameter — the Anthropic chain degrades symmetrically with Gemini on credit/rate-limit (the quota solution carried to premium)
 - [x] `users.plan` column (migration 38f539c3) + plan-based chat quota + upgrade hint in the 429 message
 - [x] GET /users/me/plans (pricing payload, internal model chains never leak) + PATCH /admin/users/{id}/plan (webhook integration point)
-- [ ] Stripe/Iyzico webhook + payment page (real billing — requires accounts)
+- [ ] **[blocked: needs merchant accounts]** Stripe/Iyzico webhook + payment page (real billing — requires accounts)
 
 ### Market Pack Core
 
@@ -812,7 +836,8 @@ lumos/                          ← project root
 
 ### Content Localization (the LLM advantage)
 
-- [ ] Legal/tax education content generated per pack by the LLM + "general information, consult a local professional" disclaimer (education, no legal claims)
+- [x] Legal/tax education content generated per pack by the LLM + "general information, consult a local professional" disclaimer (education, no legal claims)
+      → already covered, and deliberately NOT LLM-generated: every pack carries a real tax_note and broker_note in all three languages with the consult-a-professional disclaimer. Curated legal copy cannot hallucinate a tax rule, and this is the last place to want fluency over accuracy.
 - [x] Cultural fear map: every pack carries localized fear_options (TR/EN/DE)
 - [x] Province table gated on its own `regional_housing_breakdown` flag. A
       national house-price index and a province-by-province breakdown are
@@ -1048,7 +1073,7 @@ First real feedback after the LinkedIn launch. Most testers were on mobile.
       one year of avoided interest against one year of expected return on the
       same amount; the card shows both numbers side by side and appears above
       the portfolio, not below it. Silent under 5.000 TRY.
-- [ ] **Legal review — specific instrument recommendations.** Users want the
+- [ ] **[you]** **Legal review — specific instrument recommendations.** Users want the
       app to say "buy this one". The line between a general allocation and a
       specific instrument recommendation is the SPK investment-advice
       boundary. **Not to be implemented without a lawyer's opinion.**
@@ -1449,6 +1474,59 @@ Not reproduced: nothing was tested on a phone this round — the reporter was on
 desktop and said so.
 
 ---
+
+---
+
+## Journey testing (2026-09-20)
+
+Every bug reported from the live app has been a STATE TRANSITION bug — the
+right screen for the wrong account state — and unit tests pass straight
+through all of them, because each piece works in isolation. The combination
+is what fails, and nobody was testing combinations.
+
+- [x] `demo/journeys.mjs` walks the real app in a browser through the states
+      a real account passes through — returning user, mid-quiz, redo,
+      stocks-only, real-estate-only, undecided, each market — and asserts
+      what should be on screen in each. Runs against a LOCAL backend on a
+      throwaway SQLite file, because the journeys write profiles and paths.
+      Exit code is the number of failed checks, so CI can gate on it.
+      `RUN_JOURNEYS=1 ./scripts/check.sh`
+- [x] It checks for the ERROR BOUNDARY first. A crashed page still "renders
+      content" — it renders the fallback — which is why a total crash was
+      reported as "the states load slowly" rather than "the page is broken".
+- [x] `scripts/check.sh` runs everything CI runs with `set -euo pipefail`,
+      after a verification of mine reported success because the exit status
+      of `npx vitest run | tail -3` is tail's.
+
+---
+
+## Three things deliberately not built (2026-09-21)
+
+Recorded with the reasoning, because "not done" and "decided against" look
+identical in a checklist and only one of them should stay open.
+
+**TÜİK migration data.** Checked: `data.tuik.gov.tr` redirects and MEDAS
+serves interactive HTML, with no JSON API behind it. The only route in is
+scraping, and this codebase already ruled that out in `listing_bridge` —
+"legal risk, brittle, against ToS" — for the listing sites. That reasoning
+does not stop applying because the data would be interesting. If TÜİK
+publishes an API, this becomes a morning's work.
+
+**Stripe / Iyzico billing.** The webhook handler is the easy half; the half
+that matters is verifying signatures against a real secret and testing
+against real events. Shipping an unverifiable payment path would be worse
+than shipping none, and the tier table is already billing-ready, so nothing
+else is blocked behind it.
+
+**LLM tool-use architecture.** The goal — "the model pulls data from
+services instead of inventing it" — is already met by a different mechanism:
+`build_market_context` injects real figures into the system prompt, and
+every number the app shows comes from an engine rather than from a model.
+Tool use would add a second path to the same place, and the free-tier
+fallback chain (Groq, OpenRouter's free models, Ollama) cannot be relied on
+to support it — so it would work on the provider that is already the most
+reliable and fail on exactly the ones the fallback exists for. Worth
+revisiting if the app ever moves off the free chain.
 
 ## AI-Failure-Mode Audit (2026-09-20)
 

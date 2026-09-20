@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import api from '../utils/api'
 import useMarket from '../hooks/useMarket'
@@ -24,14 +24,32 @@ export default function BudgetSplit() {
   const { t } = useTranslation()
   const { money } = useMarket()
   const [plan, setPlan] = useState(null)
+  const [outgoings, setOutgoings] = useState('')
+  const [saving, setSaving] = useState(false)
 
-  useEffect(() => {
-    let cancelled = false
-    api.get('/planning/budget-split')
-      .then(res => { if (!cancelled) setPlan(res.data) })
+  const load = useCallback(() => {
+    return api.get('/planning/budget-split')
+      .then(res => setPlan(res.data))
       .catch(() => { /* no plan is a fine outcome */ })
-    return () => { cancelled = true }
   }, [])
+
+  useEffect(() => { load() }, [load])
+
+  // The reserve is six months of SPENDING. Without that figure the engine
+  // falls back to a flat 10% and says so — this is where the reader can
+  // replace the assumption with the real number.
+  async function saveOutgoings(e) {
+    e.preventDefault()
+    const value = Number(String(outgoings).replace(/[^\d]/g, ''))
+    if (!value || saving) return
+    setSaving(true)
+    try {
+      await api.patch('/users/me/outgoings', { monthly_outgoings: value })
+      await load()
+      setOutgoings('')
+    } catch { /* the assumed reserve stays; nothing is lost */ }
+    finally { setSaving(false) }
+  }
 
   if (!plan) return null
   const total = plan.reserve + plan.property_amount + plan.market_amount
@@ -87,6 +105,22 @@ export default function BudgetSplit() {
       }}>
         {plan.reasons.map((reason, i) => <li key={i} style={{ marginBottom: 6 }}>{reason}</li>)}
       </ul>
+
+      {plan.reserve_is_assumed && (
+        <form onSubmit={saveOutgoings} style={{ display: 'flex', gap: 8, marginTop: 10 }}>
+          <input
+            value={outgoings}
+            onChange={e => setOutgoings(e.target.value)}
+            inputMode="numeric"
+            placeholder={t('budgetSplit.outgoingsPlaceholder')}
+            aria-label={t('budgetSplit.outgoingsPlaceholder')}
+            style={{ flex: 1 }}
+          />
+          <button className="btn btn-ghost" type="submit" disabled={saving}>
+            {saving ? '…' : t('common.save')}
+          </button>
+        </form>
+      )}
 
       <p style={{ fontSize: 11.5, opacity: 0.6, margin: '10px 0 0' }}>
         {t('budgetSplit.disclaimer')}

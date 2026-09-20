@@ -106,21 +106,38 @@ async def lifespan(app: FastAPI):
 
         async def _warm_housing_indices():
             """
-            The US state table needs 51 FRED series. On a cold cache that is
-            51 round-trips before the page can render anything, which on a
-            free instance that also has to wake up reads as "Explore doesn't
-            load for other markets". Free and keyless work is done here once,
-            off the request path.
-            """
-            from backend.services import fred_service
+            Warm EVERY market's regional table, not just one.
 
-            if not fred_service.is_configured():
-                return
-            try:
-                states = await _asyncio.to_thread(fred_service.get_all_state_hpi)
-                _warm_log.info("US housing index warmed: %d states", len(states))
-            except Exception as exc:
-                _warm_log.warning("US housing warm failed: %s", type(exc).__name__)
+            This used to warm the US alone, because 51 FRED series is the
+            most obviously expensive case. But the complaint from the app was
+            that the area table loads late "in the markets" — plural — and
+            Türkiye's 81 provinces and Germany's Bundesbank segments are
+            fetched on the request path exactly the same way. Measured cold:
+            TR 1.8s, DE 4.2s, and that is before a sleeping free instance has
+            finished waking up.
+
+            Driven by each pack's DECLARED regional source, so a new market
+            is warmed by existing. Failures are per-market and logged: one
+            source being down must not cost the others their warm.
+            """
+            from backend.markets import MARKET_PACKS
+            from backend.services.province_intelligence import rank_provinces
+
+            for code, pack in MARKET_PACKS.items():
+                if pack.regional_housing_source == "none":
+                    continue
+                try:
+                    result = await _asyncio.to_thread(
+                        rank_provinces, 3, code, "en"
+                    )
+                    _warm_log.info(
+                        "regional table warmed: %s (%d areas, source=%s)",
+                        code, len(result.get("provinces") or []),
+                        pack.regional_housing_source,
+                    )
+                except Exception as exc:
+                    _warm_log.warning("regional warm failed for %s: %s",
+                                      code, type(exc).__name__)
 
         warm_task = _asyncio.create_task(_warm_news_digest())
         housing_task = _asyncio.create_task(_warm_housing_indices())

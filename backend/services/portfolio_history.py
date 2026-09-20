@@ -28,7 +28,8 @@ from backend.services.market_data import fetch_price_history
 logger = logging.getLogger("lumos.portfolio_history")
 
 
-def portfolio_value_history(holdings, days: int = 30, user_currency: str = "TRY") -> dict:
+def portfolio_value_history(holdings, days: int = 30, user_currency: str = "TRY",
+                            market: str = "TR") -> dict:
     """Return {series, change_amount, change_pct, live_count, flat_count}."""
     window_start = date.today() - timedelta(days=days)
 
@@ -55,7 +56,7 @@ def portfolio_value_history(holdings, days: int = 30, user_currency: str = "TRY"
     if not idx:
         idx = [date.today()]
 
-    enrichment = enrich_holdings(holdings, user_currency)
+    enrichment = enrich_holdings(holdings, user_currency, market)
     live_ids = set()
     per_day = {d: 0.0 for d in idx}
 

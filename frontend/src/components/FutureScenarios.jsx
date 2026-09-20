@@ -112,6 +112,19 @@ export default function FutureScenarios({ allocations, budget }) {
           <p style={{ fontSize: 12, opacity: 0.6, marginTop: 8, lineHeight: 1.5 }}>
             {result.honesty_note}
           </p>
+
+          {/* What is going on right now, BESIDE the band and visually
+              separated from it. The bands are measured from history; this is
+              commentary, and the two must not read as one thing. */}
+          {result.context && (
+            <p style={{
+              fontSize: 12, lineHeight: 1.6, marginTop: 10, paddingTop: 10,
+              borderTop: '1px solid var(--border)', opacity: 0.8,
+            }}>
+              <span style={{ opacity: 0.6 }}>{t('scenarios.rightNow')} </span>
+              {result.context}
+            </p>
+          )}
         </>
       )}
     </div>

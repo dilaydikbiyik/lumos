@@ -204,7 +204,16 @@ export default function ProfilePage() {
             </button>
             <button
               className="btn btn-ghost btn-full"
-              onClick={() => setRetaking(true)}
+              onClick={() => {
+                // Drop the saved draft FIRST. The quiz restores itself from
+                // `quiz-draft` on mount, so without this "redo" reopened the
+                // half-finished conversation from last time: the reader was
+                // shown questions they had already answered, below a result
+                // that had already been computed from them.
+                removeKey(userKey('quiz-draft', userId))
+                quizStartedRef.current = false
+                setRetaking(true)
+              }}
             >
               {t('profile.retake')}
             </button>

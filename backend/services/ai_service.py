@@ -329,11 +329,50 @@ def _openrouter_chat(messages, system, max_tokens, model_chain=None) -> str:
     )
 
 
+def _openai_chat(messages, system, max_tokens, model_chain=None) -> str:
+    return _openai_compatible_chat(
+        "openai", settings.OPENAI_BASE_URL, settings.OPENAI_API_KEY,
+        messages, system, max_tokens,
+        model_chain or ["gpt-4o-mini", "gpt-4o"],
+    )
+
+
+def _mistral_chat(messages, system, max_tokens, model_chain=None) -> str:
+    return _openai_compatible_chat(
+        "mistral", settings.MISTRAL_BASE_URL, settings.MISTRAL_API_KEY,
+        messages, system, max_tokens,
+        model_chain or ["mistral-small-latest", "open-mistral-7b"],
+    )
+
+
+def _ollama_chat(messages, system, max_tokens, model_chain=None) -> str:
+    """
+    A local model, for running the whole app without any provider at all.
+
+    Ollama speaks the same dialect and ignores the key, so the one adapter
+    already covers it — the value here is that a fresh clone can be made to
+    work offline, which is the difference between "needs four API keys" and
+    "runs".
+    """
+    return _openai_compatible_chat(
+        "ollama", settings.OLLAMA_BASE_URL, settings.OLLAMA_API_KEY or "ollama",
+        messages, system, max_tokens,
+        model_chain or ["llama3.1", "qwen2.5"],
+    )
+
+
+# One OpenAI-compatible adapter already covered Groq and OpenRouter, so
+# OpenAI, Mistral and a local Ollama are base URLs and key names rather than
+# new code. Each stays dormant without its key: `_openai_compatible_chat`
+# raises _ProviderUnavailable on a missing one, and the chain moves on.
 _ADAPTERS = {
     "anthropic": _anthropic_chat,
     "gemini": _gemini_chat,
     "groq": _groq_chat,
     "openrouter": _openrouter_chat,
+    "openai": _openai_chat,
+    "mistral": _mistral_chat,
+    "ollama": _ollama_chat,
 }
 
 
@@ -508,6 +547,7 @@ def chat(
     context: str = "",
     language: str = "tr",
     market: str = "TR",
+    user_key: Optional[str] = None,
 ) -> str:
     """
     Send a conversation history to the AI provider resolved from the
@@ -525,6 +565,9 @@ def chat(
         market: which market's snapshot to attach. Independent of language:
                 an English reader investing in Türkiye needs Turkish market
                 numbers described in English.
+        user_key: stable id for prompt A/B assignment. Without it every
+                reader gets the control, because an unstable assignment
+                contaminates the comparison it exists to produce.
 
     Returns:
         The assistant's text reply.
@@ -540,6 +583,18 @@ def chat(
     base = variants.get(language) or variants.get("en") or variants["tr"]
     system = (base + (context or "") + build_market_context(market)
               + _language_directive(language))
+
+    # A/B, off unless somebody turned it on. A variant can only APPEND, so
+    # none of them can drop the disclaimers, the quiz script or the language
+    # rule by omission — and the variant travels back with the reply so a
+    # judgement can be made against real answers rather than a memory of
+    # which version was live last week.
+    from backend.services import prompt_experiments
+
+    experiment_key = "advisor_prompt" if mode == "advisor" else "system_prompt"
+    system, variant = prompt_experiments.apply(experiment_key, system, user_key)
+    if variant != prompt_experiments.CONTROL:
+        logger.info("prompt experiment %s -> %s", experiment_key, variant)
 
     # Generous budget: gemini-2.5-flash spends "thinking" tokens from the same
     # pool, and the final profile summary must not be truncated before the

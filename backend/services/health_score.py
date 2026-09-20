@@ -62,4 +62,64 @@ def compute_health(by_type: dict[str, float], lang: str = "tr") -> dict:
         "overall": overall,
         "components": {"diversification": diversification, "liquidity": liquidity},
         "notes": notes,
+        # A number with no account of itself teaches nothing. Each component
+        # says what it measures, why it sits where it does FOR THIS portfolio,
+        # and the one thing that moves it — otherwise "liquidity: 30" is just
+        # a grade, and a beginner cannot act on a grade.
+        "explanations": _explain(by_type, diversification, liquidity, lang),
     }
+
+
+def _dominant_share(by_type: dict[str, float], lang: str) -> tuple[str, int]:
+    """
+    The largest asset type and its share, which is what drags HHI down.
+
+    The name is translated: the raw key is "land", and dropping that into a
+    Turkish sentence gives "servetinin %80'i land" — an English word in the
+    middle of Turkish prose, which is the same defect the neutrality tests
+    exist to catch, just generated at runtime instead of written down.
+    """
+    total = sum(by_type.values()) or 1.0
+    key, value = max(by_type.items(), key=lambda kv: kv[1])
+    return _t(f"asset_type.{key}", lang), round(value / total * 100)
+
+
+def _explain(by_type: dict[str, float], diversification: int,
+             liquidity: int, lang: str) -> list[dict]:
+    """Per component: what it is, why this number, what raises it."""
+    total = sum(by_type.values()) or 1.0
+    top_type, top_share = _dominant_share(by_type, lang)
+    illiquid_share = round(
+        sum(v for t, v in by_type.items() if t not in _LIQUID_TYPES) / total * 100
+    )
+
+    if diversification >= 70:
+        why_div = _t("health.why.div_high", lang, type=top_type, pct=top_share)
+    elif diversification >= 40:
+        why_div = _t("health.why.div_mid", lang, type=top_type, pct=top_share)
+    else:
+        why_div = _t("health.why.div_low", lang, type=top_type, pct=top_share)
+
+    if liquidity >= 70:
+        why_liq = _t("health.why.liq_high", lang, pct=illiquid_share)
+    elif liquidity >= 30:
+        why_liq = _t("health.why.liq_mid", lang, pct=illiquid_share)
+    else:
+        why_liq = _t("health.why.liq_low", lang, pct=illiquid_share)
+
+    return [
+        {
+            "key": "diversification",
+            "score": diversification,
+            "what": _t("health.what.diversification", lang),
+            "why": why_div,
+            "how": _t("health.how.diversification", lang),
+        },
+        {
+            "key": "liquidity",
+            "score": liquidity,
+            "what": _t("health.what.liquidity", lang),
+            "why": why_liq,
+            "how": _t("health.how.liquidity", lang),
+        },
+    ]

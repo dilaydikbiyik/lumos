@@ -127,3 +127,40 @@ def test_projection_endpoint_rejects_bad_years(client):
         json={"ticker": "SPY", "amount": 100000, "years": 7},
     )
     assert res.status_code == 422
+
+
+def test_the_context_sentence_never_touches_the_numbers(client):
+    """
+    The scenario band is the distribution of an asset's own history. A model
+    that could nudge those figures would turn a measurement into a forecast,
+    which is the one thing every projection in this app refuses to be — so
+    the sentence travels BESIDE the band, in its own field.
+    """
+    from unittest.mock import patch
+
+    payload = {"ticker": "SPY", "amount": 100000, "years": 5}
+
+    with patch("backend.services.news_service.context_sentence",
+               return_value="Markets are quiet this week."):
+        with_context = client.post("/api/v1/planning/projection/asset", json=payload).json()
+    with patch("backend.services.news_service.context_sentence", return_value=None):
+        without = client.post("/api/v1/planning/projection/asset", json=payload).json()
+
+    assert with_context.get("context") == "Markets are quiet this week."
+    assert without.get("context") is None
+
+    # Every other field is identical: the sentence changed nothing.
+    numbers = lambda d: {k: v for k, v in d.items() if k != "context"}  # noqa: E731
+    assert numbers(with_context) == numbers(without)
+
+
+def test_a_failing_digest_costs_the_card_its_sentence_and_nothing_else(client):
+    from unittest.mock import patch
+
+    with patch("backend.services.news_service.context_sentence",
+               side_effect=RuntimeError("feeds down")):
+        res = client.post("/api/v1/planning/projection/asset",
+                          json={"ticker": "SPY", "amount": 100000, "years": 5})
+
+    assert res.status_code == 200
+    assert res.json().get("context") is None

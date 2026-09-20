@@ -20,7 +20,8 @@
     "value": "Wert",
     "eduFooter": "Nur zu Bildungszwecken — keine Anlageberatung.",
     "loading": "Wird geladen…",
-    "redirecting": "Du wirst zur Anmeldeseite weitergeleitet…"
+    "redirecting": "Du wirst zur Anmeldeseite weitergeleitet…",
+    "save": "Speichern"
   },
   "language": {
     "label": "Sprache"
@@ -720,7 +721,8 @@
     "typical": "Typische Phase",
     "good": "Gute Phase",
     "selectAsset": "Anlage wählen",
-    "selectYears": "Zeitraum wählen"
+    "selectYears": "Zeitraum wählen",
+    "rightNow": "Zurzeit:"
   },
   "whatIf": {
     "title": "Was würde passieren?",
@@ -745,36 +747,32 @@
   },
   "guide": {
     "title": "Leitfaden zur ersten Anlage",
-    "subtitle": "Broker → Einzahlen → Erste Order — Schritt für Schritt für die Türkei",
+    "subtitle": "Broker → Einzahlen → Erste Order, Schritt für Schritt für {{market}}",
     "prev": "← Zurück",
     "next": "Weiter →",
     "steps": {
       "1": {
         "title": "Was ist ein Broker?",
-        "body": "Um Aktien und Fonds zu kaufen und zu verkaufen, brauchst du ein Depot bei einem Broker. Das ist wie ein Bankkonto, nur fürs Anlegen. In der Türkei muss jeder tätige Broker eine Lizenz der Kapitalmarktbehörde SPK besitzen.",
-        "tip": "💡 Prüfe die Lizenz selbst in der offiziellen Liste der Aufsicht (spk.gov.tr). Wir empfehlen keinen bestimmten Broker — von keinem erhalten wir Provision."
+        "body": "Um Aktien und Fonds zu kaufen und zu verkaufen, brauchst du ein Depot. Das ist wie ein Bankkonto, nur fürs Anlegen. Wer in {{market}} legal eines anbietet, ist von {{regulator}} zugelassen — prüfe das, bevor du auch nur eine Einheit überweist, und zwar auf der Seite der Aufsicht, nicht auf der des Brokers."
       },
       "2": {
         "title": "Wie eröffne ich ein Depot?",
-        "body": "1. Geh auf die Website deines gewählten Brokers.\n2. Tippe auf „Konto eröffnen\".\n3. Gib deine Ausweisnummer, E-Mail und Telefonnummer ein.\n4. Weise deine Identität per Videoanruf oder in einer Filiale nach.\n5. Das Konto ist innerhalb von 1–3 Werktagen aktiv.",
-        "tip": "💡 Die meisten Broker ermöglichen die Eröffnung vollständig aus der Ferne über ihre App — ein Filialbesuch ist nicht nötig."
+        "body": "1. Geh auf die Seite deines Brokers.\n2. Starte die Eröffnung.\n3. Gib deine Identitätsdaten an — {{market}} hat eigene Anforderungen, meist eine Ausweis- oder Steuernummer.\n4. Weise nach, wer du bist: per Video, per Post oder in einer Filiale.\n5. Meist ist es nach wenigen Werktagen aktiv."
       },
       "3": {
         "title": "Wie zahle ich Geld ein?",
-        "body": "Überweise Geld von deinem eigenen Bankkonto auf das Depotkonto. Es ist meist am selben oder am nächsten Werktag da.",
-        "tip": "💡 Fang klein an — 500 bis 1.000 TL reichen für einen ersten Versuch völlig. Du musst nicht alles auf einmal einzahlen."
+        "body": "Überweise von einem Konto AUF DEINEN EIGENEN NAMEN. Ein Broker, der Geld von fremden Konten annimmt oder dich bittet, auf ein Privat- statt auf ein Firmenkonto zu überweisen, ist einer, von dem man weggeht."
       },
       "4": {
         "title": "Wie gebe ich die erste Order auf?",
-        "body": "1. Geh in der App zum Bereich „Order aufgeben\" oder „Kaufen\".\n2. Such die gewünschte Anlage.\n3. Gib die Menge ein (Stück / Betrag).\n4. Wähle „Market-Order\" — sie wird zum aktuellen Kurs ausgeführt.\n5. Bestätige.",
-        "tip": "💡 Wichtig: Enthält dein Portfolio ETFs von ausländischen Börsen (etwa SPY oder QQQ), werden diese nicht an der BIST gehandelt. Dein Broker muss Zugang zu Auslandsmärkten anbieten, wofür meist ein separater Antrag und eine Währungsumrechnung nötig sind. Frag vor der Depoteröffnung: „Kann ich ausländische ETFs kaufen, und wie hoch ist die Provision?\""
+        "body": "1. Suche \"Kaufen\" oder \"Order aufgeben\".\n2. Such den Wert.\n3. Gib den Betrag ein.\n4. Wähle eine Market-Order — sie wird zum aktuellen Kurs ausgeführt.\n5. Bestätigen.\n\nDie erste fühlt sich größer an, als sie ist. Halte sie klein genug, dass sie es nicht tut."
       },
       "5": {
-        "title": "Beobachten und Geduld",
-        "body": "Gewöhn dir nach dem Kauf nicht an, täglich die Kurse zu prüfen — das nährt nur die Unruhe. Einmal pro Woche genügt. Über große Bewegungen informiert dich Lumos ohnehin.",
-        "tip": "💡 Goldene Regel: Behandle das Geld so, als sähest du es 5 Jahre lang nicht. Nutze keine Mittel, die du kurzfristig brauchst."
+        "title": "Verfolgen und Geduld",
+        "body": "Gewöhn dir nach dem Kauf kein tägliches Nachsehen an — das nährt die Unruhe und ändert nichts. Einmal die Woche reicht völlig. Über die Bewegungen, auf die es ankommt, sagt Lumos dir Bescheid."
       }
-    }
+    },
+    "yourRegulator": "der Aufsicht deines Marktes"
   },
   "drift": {
     "title": "Ist dein Portfolio im Gleichgewicht?",
@@ -1083,6 +1081,66 @@
     "vehicle": {
       "physical": "Genug, um in deinem Markt etwas zu kaufen.",
       "reit": "Über Immobilienfonds — dein Budget reicht hier noch nicht für ein Objekt, für einen Fonds schon."
+    },
+    "outgoingsPlaceholder": "Deine Miete + notwendige Monatskosten"
+  },
+  "vsCompare": {
+    "title": "Grundstück oder Portfolio?",
+    "subtitle": "Derselbe Betrag, dieselben Jahre, beide Welten — wie es tatsächlich lief, nicht wie jemand es vorhersagt.",
+    "pickArea": "Gegend wählen…",
+    "area": "Gegend",
+    "amountPlaceholder": "Welchen Betrag vergleichst du?",
+    "run": "Vergleichen",
+    "property": "Immobilie hier",
+    "portfolio": "Dein Portfolio",
+    "realReturn": "{{pct}} % nach Inflation",
+    "nominal": "{{value}} auf dem Papier",
+    "entryCosts": "Der Kauf kostete {{value}}, bevor dir überhaupt etwas gehörte — Übertragungssteuer und Provision.",
+    "upkeep": "Instandhaltung im Zeitraum: {{value}}.",
+    "rent": "Erhaltene Miete im Zeitraum: {{value}}.",
+    "inflation": "Beide Seiten um {{pct}} % pro Jahr über {{years}} Jahre bereinigt.",
+    "periods": {
+      "1y": "1 Jahr",
+      "3y": "3 Jahre",
+      "5y": "5 Jahre"
     }
+  },
+  "character": {
+    "title": "Wie es sich anfühlt, jeden zu halten",
+    "subtitle": "Aus der eigenen Historie gemessen, an deinen Antworten beurteilt.",
+    "worstFall": "schlimmster Rückgang {{pct}}",
+    "flatFor": "{{months}} Monate seitwärts",
+    "backAfter": "nach {{months}} Monaten zurück",
+    "neverBack": "hat sich in diesem Zeitraum nie erholt",
+    "verdict": {
+      "comfortable": "Für dich bequem",
+      "demanding": "Verlangt dir etwas ab",
+      "mismatch": "Härter, als du sagtest",
+      "unknown": "Zu wenig Historie"
+    }
+  },
+  "purchaseChecks": {
+    "title": "Vor dem Kauf: worauf du achten musst",
+    "subtitle": "{{count}} Prüfpunkte für deinen Markt — die, die einen schlechten Kauf verhindern, nicht einen langsamen."
+  },
+  "rvbEmotion": {
+    "title": "Der Teil, der keine Zahl ist",
+    "body": "Alles oben ist Rechnen, und Rechnen ist nur die Hälfte dieser Entscheidung. Dort zu wohnen, wo es dir gehört, kauft etwas, das keine Tabelle bepreisen kann: nicht gebeten zu werden zu gehen, eine Wand streichen zu dürfen, zu wissen, was das Wohnen nächstes Jahr kostet. Wer schon einmal ausziehen musste, weil die Vermieterin verkaufen wollte, weiß genau, was das wert ist.\n\nEs gilt auch andersherum. Eine eigene Wohnung bindet dich an eine Stadt, und ein Job, den du anderswo annehmen würdest, wird zu einer viel größeren Entscheidung.\n\nLiegen die Zahlen nah beieinander, sollte dieser Teil entscheiden — und liegen sie weit auseinander, lohnt es sich zu wissen, wohin du neigst, bevor du nach Gründen suchst."
+  },
+  "firstPurchase": {
+    "title": "Dein erstes {{type}}",
+    "subtitle": "Jetzt, wo es echt ist, dreißig Sekunden wert — du siehst das nicht noch einmal."
+  },
+  "listingEval": {
+    "title": "Den Preis eines Inserats prüfen",
+    "subtitle": "Gib ein, was im Inserat steht. Wir stellen den Preis je m² dem gegenüber, was in der Gegend tatsächlich gezahlt wird.",
+    "pickArea": "In welcher Gegend?",
+    "sizePlaceholder": "Fläche in m²",
+    "pricePlaceholder": "Geforderter Preis",
+    "run": "Prüfen",
+    "thisListing": "Dieses Inserat",
+    "areaAverage": "Durchschnitt {{area}}",
+    "askThese": "Frag das, bevor jemand unterschreibt",
+    "boughtIt": "Ich habe es gekauft — eintragen"
   }
 }

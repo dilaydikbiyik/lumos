@@ -20,7 +20,8 @@
     "close": "Kapat",
     "value": "Değer",
     "loading": "Yükleniyor…",
-    "redirecting": "Giriş sayfasına yönlendiriliyorsun…"
+    "redirecting": "Giriş sayfasına yönlendiriliyorsun…",
+    "save": "Kaydet"
   },
   "onboarding": {
     "tagline": "Yatırım karanlık bir orman gibi görünür.",
@@ -317,7 +318,8 @@
     "typical": "Tipik dönem",
     "good": "İyi dönem",
     "selectAsset": "Varlık seç",
-    "selectYears": "Vade seç"
+    "selectYears": "Vade seç",
+    "rightNow": "Şu sıralar:"
   },
   "whatIf": {
     "title": "Ne olurdu?",
@@ -342,36 +344,32 @@
   },
   "guide": {
     "title": "İlk Yatırım Rehberi",
-    "subtitle": "Aracı kurum → Para yatır → İlk emir — adım adım Türkiye rehberi",
+    "subtitle": "Aracı kurum → Para yatırma → İlk emir, {{market}} için adım adım",
     "prev": "← Önceki",
     "next": "Sonraki →",
     "steps": {
       "1": {
         "title": "Aracı Kurum Nedir?",
-        "body": "Hisse senedi ve fon alıp satman için bir aracı kuruma ihtiyacın var. Banka hesabına benzer ama yatırım için. Türkiye'de faaliyet gösteren kurumların SPK lisansı olmak zorundadır.",
-        "tip": "💡 Kurumun lisanslı olduğunu SPK'nın resmî listesinden kendin doğrula (spk.gov.tr). Biz belirli bir kurum önermiyoruz — hiçbirinden komisyon almıyoruz."
+        "body": "Hisse ve fon alıp satmak için bir yatırım hesabına ihtiyacın var. Banka hesabı gibi, ama yatırım için. {{market}} içinde yasal olarak çalışan her kurum {{regulator}} tarafından lisanslanır — tek kuruş göndermeden önce bunu doğrula, hem de kurumun kendi sitesinden değil, düzenleyicinin sitesinden."
       },
       "2": {
-        "title": "Hesap Nasıl Açılır?",
-        "body": "1. Seçtiğin kurumun web sitesine git.\n2. \"Hesap Aç\" butonuna tıkla.\n3. TC Kimlik No, e-posta, telefon gir.\n4. Video görüşmesiyle veya şubede kimlik doğrula.\n5. 1–3 iş günü içinde hesabın aktif olur.",
-        "tip": "💡 Çoğu kurum için mobil uygulama üzerinden uzaktan açılış mümkün — şubeye gitme zorunluluğu yok."
+        "title": "Hesabı Nasıl Açarım?",
+        "body": "1. Seçtiğin kurumun sitesine git.\n2. Hesap açılışını başlat.\n3. Kimlik bilgilerini ver — {{market}} kendi şartını isteyecek, genelde bir kimlik ya da vergi numarası.\n4. Kim olduğunu doğrula: görüntülü görüşme, posta ya da şube.\n5. Genelde birkaç iş günü içinde açılır."
       },
       "3": {
-        "title": "Para Nasıl Yatırılır?",
-        "body": "EFT veya havale ile kendi banka hesabından aracı kurum hesabına para gönderirsin. Genellikle aynı gün ya da 1 iş günü içinde görünür.",
-        "tip": "💡 Küçük başla — ilk deneme için 500–1000 TL yeterli. Hepsini tek seferde yatırmak zorunda değilsin."
+        "title": "Parayı Nasıl Yatırırım?",
+        "body": "KENDİ ADINA olan bir banka hesabından gönder. Başkasının hesabından para kabul eden ya da parayı kurumsal bir hesap yerine şahsi bir hesaba göndermeni isteyen bir kurumdan uzak dur."
       },
       "4": {
-        "title": "İlk Emir Nasıl Verilir?",
-        "body": "1. Uygulamada \"Emir Ver\" veya \"Al\" bölümüne git.\n2. Almak istediğin varlığı ara.\n3. Miktar gir (kaç lot / TL).\n4. \"Piyasa Emri\" seç — anlık fiyattan alınır.\n5. Onayla.",
-        "tip": "💡 Önemli: Portföyünde yurtdışı borsalarda işlem gören ETF'ler varsa (SPY, QQQ gibi), bunlar BIST'te işlem görmez. Bunun için aracı kurumunun yurtdışı piyasa hizmeti vermesi gerekir; genellikle ayrı bir başvuru ve döviz dönüşümü gerektirir. Hesap açmadan önce \"yurtdışı ETF alabiliyor muyum, komisyonu ne?\" diye sor."
+        "title": "İlk Emri Nasıl Veririm?",
+        "body": "1. \"Al\" ya da \"Emir ver\" bölümünü bul.\n2. Varlığı ara.\n3. Tutarı gir.\n4. Piyasa emrini seç — güncel fiyattan gerçekleşir.\n5. Onayla.\n\nİlki olduğundan daha büyük bir an gibi hissettirecek. Hissettirmeyecek kadar küçük tut."
       },
       "5": {
         "title": "Takip ve Sabır",
-        "body": "Aldıktan sonra günlük fiyat değişimlerine bakma alışkanlığı edinme — bu kaygıyı artırır. Haftada bir bakman yeterli. Lumos zaten büyük değişimlerde seni bilgilendirir.",
-        "tip": "💡 Altın kural: Almayı düşündüğün parayı 5 yıl görmeyecekmişsin gibi davran. Kısa vadeli ihtiyaçların için kullanma."
+        "body": "Aldıktan sonra her gün bakma alışkanlığı edinme — kaygıyı besler, hiçbir şeyi değiştirmez. Haftada bir fazlasıyla yeter. Gerçekten önemli hareketleri Lumos sana söyler."
       }
-    }
+    },
+    "yourRegulator": "pazarının düzenleyici kurumu"
   },
   "advisor": {
     "greeting": "Lumos Danışman.\n\nYatırım ve bu uygulamayla ilgili aklına takılan her şeyi kendi cümlelerinle yazabilirsin — hazır sorulardan seçmek zorunda değilsin. Kavramları açıklarım, portföyündeki bir kararın nedenini anlatırım, bir haberi yorumlarım.\n\nTek sınır: belirli bir hisse/fon için \"al\" ya da \"sat\" demem ve piyasanın yönünü tahmin etmem — bunlar kimsenin dürüstçe bilemeyeceği şeyler. Bunun dışında sorabileceğin şey sınırlı değil.",
@@ -1083,6 +1081,66 @@
     "vehicle": {
       "physical": "Senin pazarında bir yer almaya yetiyor.",
       "reit": "Gayrimenkul fonları üzerinden — bütçen burada henüz bir yer almaya yetmiyor, bir fon ise yetiyor."
+    },
+    "outgoingsPlaceholder": "Kiran + zorunlu aylık giderlerin"
+  },
+  "vsCompare": {
+    "title": "Arsa mı, portföy mü?",
+    "subtitle": "Aynı tutar, aynı yıllar, iki dünya — tahmin edilen değil, gerçekte ne olduğu.",
+    "pickArea": "Bir bölge seç…",
+    "area": "Bölge",
+    "amountPlaceholder": "Hangi tutarı karşılaştırıyorsun?",
+    "run": "Karşılaştır",
+    "property": "Buradaki gayrimenkul",
+    "portfolio": "Senin portföyün",
+    "realReturn": "Enflasyondan arındırılmış %{{pct}}",
+    "nominal": "kâğıt üstünde {{value}}",
+    "entryCosts": "Daha elinde bir şey olmadan alım {{value}} tuttu — devir vergisi ve komisyon.",
+    "upkeep": "Dönem boyunca bakım: {{value}}.",
+    "rent": "Dönem boyunca alınan kira: {{value}}.",
+    "inflation": "İki taraf da {{years}} yıl boyunca yılda %{{pct}} enflasyondan arındırıldı.",
+    "periods": {
+      "1y": "1 yıl",
+      "3y": "3 yıl",
+      "5y": "5 yıl"
     }
+  },
+  "character": {
+    "title": "Hangisiyle yaşamak nasıl",
+    "subtitle": "Kendi geçmişinden ölçüldü, senin verdiğin cevaplara göre değerlendirildi.",
+    "worstFall": "en kötü düşüş {{pct}}",
+    "flatFor": "{{months}} ay yerinde saydı",
+    "backAfter": "{{months}} ayda geri geldi",
+    "neverBack": "bu dönemde hiç toparlamadı",
+    "verdict": {
+      "comfortable": "Senin için rahat",
+      "demanding": "Senden bir şey istiyor",
+      "mismatch": "İstediğini söylediğinden daha zor",
+      "unknown": "Yeterli geçmiş yok"
+    }
+  },
+  "purchaseChecks": {
+    "title": "Almadan önce: neye bakmalı",
+    "subtitle": "Senin pazarın için {{count}} kontrol — yavaş bir alımı değil, kötü bir alımı engelleyenler."
+  },
+  "rvbEmotion": {
+    "title": "Sayı olmayan kısım",
+    "body": "Yukarıdakilerin hepsi aritmetik, ve aritmetik bu kararın yalnızca yarısı. Oturduğun yerin senin olması, tabloya sığmayan bir şey satın alır: çıkman istenmemesi, duvarı boyayabilmen, seneye konut masrafının ne olacağını bilmen. Ev sahibi satmaya karar verdiği için taşınmak zorunda kalmış biri bunun değerini tam olarak bilir.\n\nTersi de geçerli. Ev seni bir şehre bağlar; başka bir yerde kabul edeceğin bir iş, çok daha büyük bir karara dönüşür.\n\nSayılar birbirine yakınsa kararı verecek olan bu kısımdır — uzaksa da, gerekçe aramaya başlamadan önce içinden hangi tarafa meylettiğini bilmek işe yarar."
+  },
+  "firstPurchase": {
+    "title": "İlk {{type}} alımın",
+    "subtitle": "Artık gerçek olduğuna göre otuz saniyeye değer — bunu bir daha görmeyeceksin."
+  },
+  "listingEval": {
+    "title": "İlanın fiyatını kontrol et",
+    "subtitle": "İlanda yazanı gir. Metrekare fiyatını, bölgenin gerçekte ne ettiğiyle karşılaştıralım.",
+    "pickArea": "Hangi bölgede?",
+    "sizePlaceholder": "Metrekare",
+    "pricePlaceholder": "İstenen fiyat",
+    "run": "Kontrol et",
+    "thisListing": "Bu ilan",
+    "areaAverage": "{{area}} ortalaması",
+    "askThese": "İmzadan önce bunları sor",
+    "boughtIt": "Bunu aldım — kaydet"
   }
 }

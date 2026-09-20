@@ -29,6 +29,7 @@ class UserRead(BaseModel):
     market: str = "TR"
     primary_fear: Optional[str]
     monthly_income: Optional[float] = None
+    monthly_outgoings: Optional[float] = None
     monthly_contribution: Optional[float] = None
     # The client needs these to decide which controls to OFFER; every
     # privileged endpoint still checks server-side, so hiding a button is a
@@ -47,6 +48,11 @@ class UserRead(BaseModel):
 
 class MonthlyIncomeUpdate(BaseModel):
     monthly_income: float
+
+
+class MonthlyOutgoingsUpdate(BaseModel):
+    """Rent plus essential monthly costs — not the same number as income."""
+    monthly_outgoings: float
 
 
 class InvestmentPathUpdate(BaseModel):
@@ -86,6 +92,24 @@ async def update_monthly_income(
     """PATCH /users/me/income — save the user's monthly net income once so
     affordability checks never have to re-ask for it."""
     return await user_repository.set_monthly_income(db, user_id, body.monthly_income)
+
+
+@router.patch("/me/outgoings", response_model=UserRead)
+async def update_monthly_outgoings(
+    body: MonthlyOutgoingsUpdate,
+    user_id: str = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    PATCH /users/me/outgoings — rent plus essential monthly costs.
+
+    Separate from income on purpose. The emergency reserve is six months of
+    what someone SPENDS, and the budget planner was being handed income in
+    its place: a reader earning 40,000 and spending 15,000 was told to hold
+    back 240,000 instead of 90,000, which shrank every other part of the plan
+    behind it.
+    """
+    return await user_repository.set_monthly_outgoings(db, user_id, body.monthly_outgoings)
 
 
 @router.patch("/me/fear-check-in")

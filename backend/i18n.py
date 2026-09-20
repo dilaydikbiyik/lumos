@@ -551,6 +551,10 @@ _C: dict[str, dict[str, str]] = {
         "tr": "Henüz bir yön önerecek kadar bilgi yok. Profilini tamamlarsan buraya gerçek bir öneri gelir; o zamana kadar iki dünyayı da görmen en iyisi.",
         "en": "There isn't enough yet to suggest a direction. Finish your profile and a real suggestion appears here; until then, seeing both worlds is the better default.",
         "de": "Es reicht noch nicht, um eine Richtung vorzuschlagen. Vervollständige dein Profil, dann erscheint hier ein echter Vorschlag; bis dahin ist es besser, beide Welten zu sehen."},
+    "split.reason.already_committed": {
+        "tr": "Gayrimenkule zaten pay ayırmışsın, o yüzden soru artık \"ne kadar gayrimenkul\" değil, \"kalanla ne olacak\". Aşağıdaki plan kalan için.",
+        "en": "You already have money in property, so the question is no longer \"how much property\" but \"what happens to the rest\". The plan below is for the rest.",
+        "de": "Du hast bereits Geld in Immobilien, die Frage ist also nicht mehr \"wie viel Immobilien\", sondern \"was wird aus dem Rest\". Der Plan unten gilt für den Rest."},
     "split.reason.no_budget": {
         "tr": "Planlanacak bir tutar yok. Bütçeni girdiğinde burada gerçek bir dağılım belirir.",
         "en": "There is no amount to plan yet. Enter your budget and a real split appears here.",
@@ -587,6 +591,198 @@ _C: dict[str, dict[str, str]] = {
         "tr": "Dağılım risk skorunla şekillendi. Düşük skor gayrimenkule doğru eğilir — daha çok kazandırdığı için değil, kötü bir yılda satmadan tutmanın en kolay olduğu varlık olduğu için.",
         "en": "The split is shaped by your risk score. A lower score leans toward property — not because it returns more, but because it is the asset people find easiest to hold through a bad year without selling.",
         "de": "Die Aufteilung richtet sich nach deinem Risikowert. Ein niedrigerer Wert neigt zu Immobilien — nicht weil sie mehr abwerfen, sondern weil sie sich in einem schlechten Jahr am leichtesten halten lassen, ohne zu verkaufen."},
+    "asset_type.cash": {
+        "tr": "Nakit",
+        "en": "Cash",
+        "de": "Bargeld"},
+    "asset_type.crypto": {
+        "tr": "Kripto",
+        "en": "Crypto",
+        "de": "Krypto"},
+    "asset_type.etf": {
+        "tr": "ETF",
+        "en": "ETF",
+        "de": "ETF"},
+    "asset_type.fund": {
+        "tr": "Fon",
+        "en": "Fund",
+        "de": "Fonds"},
+    "asset_type.gold": {
+        "tr": "Altın",
+        "en": "Gold",
+        "de": "Gold"},
+    "asset_type.land": {
+        "tr": "Arsa",
+        "en": "Land",
+        "de": "Grundstück"},
+    "asset_type.other": {
+        "tr": "Diğer",
+        "en": "Other",
+        "de": "Sonstiges"},
+    "asset_type.real_estate": {
+        "tr": "Konut",
+        "en": "Home",
+        "de": "Wohnung"},
+    "asset_type.stock": {
+        "tr": "Hisse",
+        "en": "Stock",
+        "de": "Aktie"},
+    "asset_type.vehicle": {
+        "tr": "Araç",
+        "en": "Vehicle",
+        "de": "Fahrzeug"},
+    "region.horizon.short": {
+        "tr": "Vaden kısa olduğu için tablo son bir yıllık değişime göre sıralandı. Kısa vadede önemli olan bölgenin on yıllık hikâyesi değil, şu an ne yaptığı.",
+        "en": "Your horizon is short, so the table is ranked over the last year. Over a short window what matters is what an area is doing now, not its ten-year story.",
+        "de": "Dein Horizont ist kurz, daher ist die Tabelle nach dem letzten Jahr sortiert. Kurzfristig zählt, was eine Gegend jetzt tut, nicht ihre Zehnjahresgeschichte."},
+    "region.horizon.medium": {
+        "tr": "Vadene göre tablo {years} yıllık değişime göre sıralandı — tek bir yılın gürültüsünü dışarıda bırakacak, ama bugünle ilgisini koruyacak kadar uzun bir pencere.",
+        "en": "For your horizon the table is ranked over {years} years — long enough to leave a single year's noise out, short enough to still describe today.",
+        "de": "Für deinen Horizont ist die Tabelle über {years} Jahre sortiert — lang genug, um das Rauschen eines einzelnen Jahres auszulassen, kurz genug, um die Gegenwart zu beschreiben."},
+    "region.horizon.long": {
+        "tr": "Uzun vadeli olduğun için tablo {years} yıllık değişime göre sıralandı. Bekleyebiliyorsan, geçen çeyrekte kimin yükseldiği senin sorunun değil.",
+        "en": "You're long-horizon, so the table is ranked over {years} years. If you can wait, who rose last quarter is not your question.",
+        "de": "Du denkst langfristig, daher ist die Tabelle über {years} Jahre sortiert. Wer im letzten Quartal gestiegen ist, ist nicht deine Frage, wenn du warten kannst."},
+    "region.horizon.unknown": {
+        "tr": "Vadeni bilmediğimiz için tablo {years} yıllık değişime göre sıralandı. Profilini tamamlarsan bu pencere sana göre ayarlanır.",
+        "en": "We don't know your horizon yet, so the table is ranked over {years} years. Finish your profile and this window adjusts to you.",
+        "de": "Wir kennen deinen Horizont noch nicht, daher ist die Tabelle über {years} Jahre sortiert. Vervollständige dein Profil, dann passt sich dieses Fenster an."},
+    "character.unknown": {
+        "tr": "Bu varlık için yeterli geçmiş yok, o yüzden karakteri hakkında bir şey söylemiyoruz.",
+        "en": "There isn't enough history for this asset, so we aren't saying anything about its character.",
+        "de": "Für diesen Wert gibt es zu wenig Historie, daher sagen wir nichts über seinen Charakter."},
+    "character.too_deep": {
+        "tr": "Bu varlık geçmişte %{drawdown} düştü. Sen %{limit} civarına kadar dayanabileceğini söylemiştin — bu ondan derin. Kötü olduğu anlamına gelmez; o düşüşte satmayacağından emin olman gerekir.",
+        "en": "This asset has fallen {drawdown}% in the past. You said you could sit through about {limit}% — this goes deeper. That doesn't make it bad; it means you need to be sure you wouldn't sell in that fall.",
+        "de": "Dieser Wert ist in der Vergangenheit um {drawdown} % gefallen. Du sagtest, du hältst etwa {limit} % aus — das geht tiefer. Das macht ihn nicht schlecht; du musst nur sicher sein, in diesem Sturz nicht zu verkaufen."},
+    "character.slow_recovery": {
+        "tr": "Eski seviyesine dönmesi {months} ay sürdü. Senin vaden yaklaşık {years} yıl — paraya o dönüş gerçekleşmeden ihtiyacın olabilir, kâğıt üstündeki zararı gerçek zarara çeviren şey budur.",
+        "en": "It took {months} months to get back to where it was. Your horizon is about {years} years — you could need the money before that recovery happens, and that is what turns a paper loss into a real one.",
+        "de": "Es dauerte {months} Monate, bis er sein altes Niveau wieder erreichte. Dein Horizont liegt bei etwa {years} Jahren — du könntest das Geld vorher brauchen, und genau das macht aus einem Buchverlust einen echten."},
+    "character.long_flat": {
+        "tr": "Bir dönem {months} ay boyunca hiçbir yere gitmedi. Çöküşler korkutucu ama kısadır; insanları asıl bıraktıran, grafikte felaket gibi görünmeyen bu düz uzun dönemlerdir.",
+        "en": "It once went nowhere for {months} months. Crashes are frightening but brief; it is these long flat stretches — which look like nothing on a chart — that actually make people give up.",
+        "de": "Er bewegte sich einmal {months} Monate lang nicht. Abstürze sind beängstigend, aber kurz; es sind diese langen flachen Phasen, die auf keinem Chart nach etwas aussehen, an denen Leute tatsächlich aufgeben."},
+    "character.notable_fall": {
+        "tr": "Geçmişte %{drawdown} düştüğü oldu. Vadene uyuyor, ama böyle bir dönemde ne hissedeceğini şimdiden bilmen iyi olur.",
+        "en": "It has fallen {drawdown}% before. That fits your horizon, but it is worth knowing now how you would feel during a stretch like that.",
+        "de": "Er ist schon einmal um {drawdown} % gefallen. Das passt zu deinem Horizont, aber es lohnt sich, jetzt zu wissen, wie du dich in so einer Phase fühlen würdest."},
+    "character.steady": {
+        "tr": "En kötü düşüşü %{drawdown} olmuş. Senin verdiğin cevaplara göre bu, taşıması rahat bir varlık.",
+        "en": "Its worst fall was {drawdown}%. Going by your own answers, this is a comfortable one to hold.",
+        "de": "Sein schlimmster Rückgang lag bei {drawdown} %. Nach deinen eigenen Angaben lässt sich dieser Wert bequem halten."},
+    "listing.need_numbers": {
+        "tr": "Karşılaştırmak için metrekare ve istenen fiyat gerekiyor.",
+        "en": "A size in m² and an asking price are needed to compare anything.",
+        "de": "Für einen Vergleich braucht es die Fläche in m² und den geforderten Preis."},
+    "listing.index_only": {
+        "tr": "Bu pazarın verisi bir ENDEKS — fiyatların nasıl hareket ettiğini söyler, ne olduğunu değil. Bir istenen fiyatı endeks sayısına bölmek bir sayı üretir ama o sayı hiçbir şey ifade etmez, o yüzden burada bir yargıda bulunmuyoruz.",
+        "en": "This market's data is an INDEX — it says how prices moved, not what they are. Dividing an asking price by an index number produces a number that means nothing, so we are not going to give you a verdict here.",
+        "de": "Die Daten dieses Marktes sind ein INDEX — sie sagen, wie sich Preise bewegt haben, nicht wie hoch sie sind. Einen Angebotspreis durch eine Indexzahl zu teilen ergibt eine Zahl, die nichts bedeutet; deshalb gibt es hier kein Urteil."},
+    "listing.verdict.below": {
+        "tr": "{area} ortalamasının %{pct} ALTINDA. Ucuz olmasının bir sebebi vardır — neden olduğunu bulana kadar iyi haber sayma.",
+        "en": "{pct}% BELOW the {area} average. There is usually a reason something is cheap — don't treat it as good news until you know what it is.",
+        "de": "{pct} % UNTER dem Durchschnitt von {area}. Billig hat meist einen Grund — halte es nicht für eine gute Nachricht, bevor du ihn kennst."},
+    "listing.verdict.fair": {
+        "tr": "{area} ortalamasının etrafında, farkı %{pct}. Bu aralık pazarlık payı değil, sokaktan sokağa değişen normal fark.",
+        "en": "Around the {area} average, {pct}% apart. That range isn't negotiating room, it's the ordinary difference between one street and the next.",
+        "de": "Etwa im Durchschnitt von {area}, {pct} % Abstand. Diese Spanne ist kein Verhandlungsspielraum, sondern der normale Unterschied von Straße zu Straße."},
+    "listing.verdict.above": {
+        "tr": "{area} ortalamasının %{pct} ÜSTÜNDE. Konum, kat, yaş ya da manzara bunu açıklayabilir — satıcıya neyin açıkladığını sor.",
+        "en": "{pct}% ABOVE the {area} average. Location, floor, age or a view can explain that — ask the seller which one does.",
+        "de": "{pct} % ÜBER dem Durchschnitt von {area}. Lage, Stockwerk, Alter oder Aussicht können das erklären — frag den Verkäufer, was davon."},
+    "listing.verdict.well_above": {
+        "tr": "{area} ortalamasının %{pct} ÜSTÜNDE. Bu kadar fark somut bir gerekçe ister; ikna edici bir cevap alamıyorsan fiyat o gerekçeyi değil, satıcının beklentisini yansıtıyor olabilir.",
+        "en": "{pct}% ABOVE the {area} average. A gap that size needs a concrete reason; if you can't get a convincing one, the price may reflect the seller's hopes rather than the property.",
+        "de": "{pct} % ÜBER dem Durchschnitt von {area}. Ein solcher Abstand braucht einen konkreten Grund; bekommst du keinen überzeugenden, spiegelt der Preis eher die Hoffnung des Verkäufers als die Immobilie."},
+    "listing.caveat": {
+        "tr": "Karşılaştırma {area} GENELİNİN ortalamasıyla yapıldı. Sahildeki daire de ring yolundaki daire de aynı ortalamanın içinde — bu sayı bir başlangıç noktası, bir değerleme değil.",
+        "en": "Compared against the average for {area} AS A WHOLE. A flat by the water and a flat by the ring road are both in that average — this is a starting point, not a valuation.",
+        "de": "Verglichen mit dem Durchschnitt von {area} INSGESAMT. Eine Wohnung am Wasser und eine an der Ringstraße stecken beide in diesem Durchschnitt — das ist ein Ausgangspunkt, keine Bewertung."},
+    "listing.question.deed": {
+        "tr": "Tapu kaydını gördün mü — malik kim, hisseli mi, ipotek ya da şerh var mı?",
+        "en": "Have you seen the ownership record — who owns it, is it shared, are there liens or charges?",
+        "de": "Hast du den Grundbuchauszug gesehen — wem gehört es, geteilt, Lasten oder Grundschulden?"},
+    "listing.question.zoning": {
+        "tr": "İmar durumu ne? Üzerine ne yapılabileceğini satıcı değil, belediye söyler.",
+        "en": "What does the zoning allow? The planning office answers that, not the seller.",
+        "de": "Was erlaubt der Bebauungsplan? Das beantwortet das Bauamt, nicht der Verkäufer."},
+    "listing.question.access": {
+        "tr": "Yola cephesi ve yasal erişimi var mı? Elektrik, su, kanalizasyon getirilebiliyor mu?",
+        "en": "Does it have road frontage and legal access? Can power, water and drainage actually be brought to it?",
+        "de": "Hat es Straßenfront und rechtlichen Zugang? Lassen sich Strom, Wasser und Abwasser überhaupt anschließen?"},
+    "listing.question.debts": {
+        "tr": "Üzerinde birikmiş aidat, vergi ya da borç var mı? Borç taşınmazla birlikte gelir.",
+        "en": "Are there unpaid dues, taxes or debts on it? Those come with the property.",
+        "de": "Gibt es offene Hausgelder, Steuern oder Schulden? Die kommen mit der Immobilie."},
+    "listing.question.survey": {
+        "tr": "Sınırlar arazide gördüğünle aynı mı? Ölçüm yaptırdın mı?",
+        "en": "Do the boundaries match what you saw on the ground? Have you had it surveyed?",
+        "de": "Stimmen die Grenzen mit dem überein, was du vor Ort gesehen hast? Wurde vermessen?"},
+    "listing.question.why_selling": {
+        "tr": "Neden satılıyor ve ne kadardır ilanda? Uzun süredir duruyorsa sebebini öğren.",
+        "en": "Why is it being sold, and how long has it been listed? If it has sat a long time, find out why.",
+        "de": "Warum wird verkauft, und wie lange steht es schon im Angebot? Steht es lange, finde heraus warum."},
+    "compare.no_region": {
+        "tr": "Bu bölge için fiyat endeksi yok, o yüzden karşılaştıracak bir taraf da yok.",
+        "en": "There is no price index for this area, so there is no side to compare against.",
+        "de": "Für diese Gegend gibt es keinen Preisindex, also auch keine Seite zum Vergleichen."},
+    "compare.short_history": {
+        "tr": "Bu bölgenin verisi {years} yıl geriye gitmiyor; yalnızca {covered} yıl var. Farklı uzunlukta iki dönemi yan yana koymak karşılaştırma değil, yanıltma olur.",
+        "en": "This area's data doesn't reach back {years} years — only {covered}. Setting two different-length periods side by side would not be a comparison, it would be misleading.",
+        "de": "Die Daten dieser Gegend reichen keine {years} Jahre zurück, nur {covered}. Zwei unterschiedlich lange Zeiträume nebeneinanderzustellen wäre kein Vergleich, sondern irreführend."},
+    "compare.no_portfolio": {
+        "tr": "Portföy tarafının geçmişi şu anda okunamadı. Tek taraflı bir karşılaştırma göstermektense hiç göstermemek daha doğru.",
+        "en": "The portfolio side's history could not be read right now. Better to show nothing than a one-sided comparison.",
+        "de": "Die Historie der Portfolioseite ließ sich gerade nicht lesen. Besser nichts zeigen als einen einseitigen Vergleich."},
+    "compare.note": {
+        "tr": "Bu bir tahmin değil: aynı tutarın aynı dönemde iki tarafta da gerçekte ne yaptığı. Gayrimenkul tarafına yalnızca onun ödediği masraflar (devir vergisi, komisyon, yıllık bakım) yüklendi ve aldığı kira eklendi. Geçmiş, gelecek için söz vermez.",
+        "en": "Not a forecast: what the same amount actually did on both sides over the same period. The property side is charged only the costs it alone pays (transfer tax, commission, yearly upkeep) and credited the rent it earned. The past promises nothing about the future.",
+        "de": "Keine Prognose: was derselbe Betrag auf beiden Seiten im selben Zeitraum tatsächlich getan hat. Der Immobilienseite werden nur die Kosten angelastet, die allein sie trägt (Grunderwerbsteuer, Provision, jährliche Instandhaltung), und die erzielte Miete gutgeschrieben. Die Vergangenheit verspricht nichts über die Zukunft."},
+    "compare.yield_note": {
+        "tr": "Kira getirisi burada bakım ve aidat düşülmüş hâliyle (yılda %{upkeep}). Emlakçıların söylediği brüt rakam bu değildir — temettüyle karşılaştırılacak olan net rakamdır.",
+        "en": "The rental yield here is NET of upkeep ({upkeep}% a year). That is not the gross figure agents quote — the net one is what compares like for like with a dividend.",
+        "de": "Die Mietrendite ist hier NETTO nach Instandhaltung ({upkeep} % pro Jahr). Das ist nicht die Bruttozahl, die Makler nennen — die Nettozahl ist die, die sich mit einer Dividende vergleichen lässt."},
+    "health.what.diversification": {
+        "tr": "Servetinin kaç farklı varlık türüne yayıldığını ölçer. Tek bir tür ne kadar ağır basarsa puan o kadar düşer.",
+        "en": "Measures how far your wealth is spread across different asset types. The more one type dominates, the lower it goes.",
+        "de": "Misst, wie weit dein Vermögen über verschiedene Anlagearten verteilt ist. Je stärker eine Art dominiert, desto niedriger."},
+    "health.what.liquidity": {
+        "tr": "Servetinin ne kadarını kısa sürede nakde çevirebileceğini ölçer. Arsa ve konut aylar alabilir; hisse ve fon günler.",
+        "en": "Measures how much of your wealth could realistically become cash quickly. Land and housing can take months; stocks and funds take days.",
+        "de": "Misst, wie viel deines Vermögens sich realistisch schnell zu Bargeld machen lässt. Grundstücke und Wohnungen können Monate dauern, Aktien und Fonds Tage."},
+    "health.why.div_low": {
+        "tr": "Servetinin %{pct} kadarı tek bir türde ({type}). O tür kötü bir dönem geçirirse portföyünün tamamı aynı anda etkilenir.",
+        "en": "About {pct}% of your wealth sits in a single type ({type}). If that type has a bad stretch, your whole portfolio has one at the same time.",
+        "de": "Rund {pct} % deines Vermögens liegen in einer einzigen Art ({type}). Läuft es dort schlecht, trifft es dein gesamtes Portfolio gleichzeitig."},
+    "health.why.div_mid": {
+        "tr": "Dağılmış ama hâlâ {type} ağırlıkta (%{pct}). Fena değil; tek bir kötü haberin seni ne kadar etkileyeceğini belirleyen şey bu oran.",
+        "en": "Spread out, but still weighted toward {type} ({pct}%). Not bad — that share is what decides how much a single piece of bad news costs you.",
+        "de": "Verteilt, aber weiterhin mit Schwerpunkt auf {type} ({pct} %). Nicht schlecht — dieser Anteil entscheidet, wie viel dich eine einzelne schlechte Nachricht kostet."},
+    "health.why.div_high": {
+        "tr": "Hiçbir tür ezici çoğunlukta değil; en büyüğü {type} ve %{pct}. Bir varlık kötü giderken diğerleri dengeleyebilir.",
+        "en": "No type overwhelms the rest — the largest is {type} at {pct}%. When one asset has a bad year, the others can steady it.",
+        "de": "Keine Art überwiegt — die größte ist {type} mit {pct} %. Läuft eine schlecht, können die anderen ausgleichen."},
+    "health.why.liq_low": {
+        "tr": "Servetinin %{pct} kadarı hızlıca satılamayan türde. Acil bir masraf çıkarsa elinde çevirecek pek bir şey olmayabilir.",
+        "en": "About {pct}% of your wealth is in things that cannot be sold quickly. If an urgent expense lands, there may be little you can turn to.",
+        "de": "Rund {pct} % deines Vermögens stecken in schwer verkäuflichen Dingen. Kommt eine dringende Ausgabe, bleibt womöglich wenig übrig."},
+    "health.why.liq_mid": {
+        "tr": "Servetinin %{pct} kadarı yavaş satılan türde. Dengeli sayılır, ama acil durum parasının bunun dışında durması gerekir.",
+        "en": "About {pct}% of your wealth is slow to sell. That is a reasonable balance, as long as your emergency money sits outside it.",
+        "de": "Rund {pct} % deines Vermögens sind langsam verkäuflich. Das ist eine vernünftige Balance, solange dein Notgroschen außerhalb liegt."},
+    "health.why.liq_high": {
+        "tr": "Yavaş satılan kısım yalnızca %{pct}. İhtiyacın olduğunda paraya erişebilirsin.",
+        "en": "Only {pct}% is slow to sell. You can reach your money when you need it.",
+        "de": "Nur {pct} % sind langsam verkäuflich. Du kommst an dein Geld, wenn du es brauchst."},
+    "health.how.diversification": {
+        "tr": "Yükseltmek için: en küçük payı olan türe ekleme yap, en büyük olanı büyütmek yerine. Mevcut bir şeyi satmak gerekmiyor — yeni para nereye gidiyorsa oran oradan değişir.",
+        "en": "To raise it: put new money into the type you hold least of, rather than growing the biggest one. Nothing has to be sold — where the next contribution goes is what moves this.",
+        "de": "So steigt er: Neues Geld in die Art stecken, von der du am wenigsten hast, statt die größte weiter auszubauen. Nichts muss verkauft werden — entscheidend ist, wohin der nächste Beitrag geht."},
+    "health.how.liquidity": {
+        "tr": "Yükseltmek için: bir sonraki birikimi hızlı satılabilir bir şeyde tut. Gayrimenkulünü satman gerekmiyor; yanına nakit ya da fon biriktirmek de aynı işi görür.",
+        "en": "To raise it: keep the next of your savings in something quick to sell. You do not have to sell property — building cash or funds beside it does the same job.",
+        "de": "So steigt sie: Halte den nächsten Teil deiner Ersparnisse in etwas schnell Verkäuflichem. Du musst keine Immobilie verkaufen — daneben Bargeld oder Fonds aufzubauen wirkt genauso."},
     "account.confirmMismatch": {
         "tr": "Hesap silme onayı eşleşmedi. İşlem yapılmadı.",
         "en": "The deletion confirmation didn't match. Nothing was deleted.",

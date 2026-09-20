@@ -232,3 +232,54 @@ def test_an_unknown_listing_currency_leaves_the_holding_unvalued():
                side_effect=AssertionError("should not be called")):
         assert ticker_currency("SPY") == "USD"
         assert ticker_currency("THYAO.IS") == "TRY"
+
+
+def test_property_is_revalued_with_its_own_markets_index():
+    """
+    `_real_estate_values` called TCMB unconditionally, so a German reader's
+    flat was revalued with the TURKISH housing index — a number with no
+    relationship to their property, shown as an estimate of it.
+
+    The dispatch is on the pack's declared housing source, like inflation and
+    the regional tables.
+    """
+    from unittest.mock import patch
+
+    from backend.services import holdings_valuation
+
+    calls = []
+
+    def _spy(market):
+        calls.append(market)
+        return {"2020-01": 100.0, "2026-01": 150.0}
+
+    with patch.object(holdings_valuation, "_national_housing_index", side_effect=_spy):
+        for market in ("TR", "US", "DE"):
+            calls.clear()
+            holdings_valuation._real_estate_values([_land_holding()], market)
+            assert calls == [market], market
+
+
+def test_a_market_without_a_housing_index_leaves_property_at_its_purchase_price():
+    """
+    Better a holding that says "purchase price" than one revalued with
+    somebody else's index.
+    """
+    from unittest.mock import patch
+
+    from backend.services import holdings_valuation
+
+    with patch.object(holdings_valuation, "_national_housing_index", return_value={}):
+        result = holdings_valuation._real_estate_values([_land_holding()], "ZZ")
+    assert result == {}
+
+
+def _land_holding():
+    from datetime import date
+    from types import SimpleNamespace
+
+    return SimpleNamespace(
+        id=1, asset_type="land", purchase_date=date(2020, 1, 15),
+        purchase_amount=500_000.0, ticker=None, quantity=None,
+        manual_current_value=None, currency="TRY",
+    )

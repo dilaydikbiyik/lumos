@@ -40,9 +40,6 @@ function ProgressiveDetails({ holdingsSummary, portfolio }) {
         </button>
       ) : (
         <>
-          <PathSuggestion />
-          <BudgetSplit />
-          <PathInvitation />
           <PortfolioComparison />
           <GoalPlanner />
           <button
@@ -235,6 +232,15 @@ export default function DashboardPage() {
 
         {/* ── Headline-language education ── */}
         <HeadlineEducation />
+
+        {/* Primary planning content, deliberately NOT inside the details
+            drawer below: that drawer is collapsed by default AND hidden
+            entirely until the user owns a holding, so a new account —
+            exactly who this is for — would never have seen any of it. Each
+            card hides itself when it has nothing to say. */}
+        <PathSuggestion />
+        <BudgetSplit />
+        <PathInvitation />
 
         {/* ── Progressive details toggle ── */}
         <ProgressiveDetails holdingsSummary={holdingsSummary} portfolio={portfolio} />

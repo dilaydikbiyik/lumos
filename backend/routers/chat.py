@@ -67,7 +67,7 @@ async def chat_endpoint(
     # thread pool so the async event loop stays free for other requests.
     reply = await asyncio.to_thread(
         ai_chat, messages, user.plan, "profiling", "",
-        get_language(request), user.market or "TR",
+        get_language(request), user.market or "TR", user_id,
     )
     return {"reply": reply}
 
@@ -131,7 +131,7 @@ async def advisor_endpoint(
     # ai_chat is synchronous (blocking I/O) — run off the event loop
     reply = await asyncio.to_thread(
         ai_chat, messages, user.plan, "advisor", context,
-        get_language(request), user.market or "TR",
+        get_language(request), user.market or "TR", user_id,
     )
     return {"reply": reply}
 

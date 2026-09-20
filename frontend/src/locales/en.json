@@ -20,7 +20,8 @@
     "close": "Close",
     "value": "Value",
     "loading": "Loading…",
-    "redirecting": "Redirecting you to the sign-in page…"
+    "redirecting": "Redirecting you to the sign-in page…",
+    "save": "Save"
   },
   "onboarding": {
     "tagline": "Investing looks like a dark forest.",
@@ -317,7 +318,8 @@
     "typical": "Typical stretch",
     "good": "Good stretch",
     "selectAsset": "Select an asset",
-    "selectYears": "Select a horizon"
+    "selectYears": "Select a horizon",
+    "rightNow": "Right now:"
   },
   "whatIf": {
     "title": "What would happen?",
@@ -342,36 +344,32 @@
   },
   "guide": {
     "title": "First Investment Guide",
-    "subtitle": "Broker → Deposit → First order — a step-by-step guide for Türkiye",
+    "subtitle": "Broker → Deposit → First order, step by step for {{market}}",
     "prev": "← Previous",
     "next": "Next →",
     "steps": {
       "1": {
         "title": "What Is a Broker?",
-        "body": "To buy and sell stocks and funds you need a brokerage account. It's like a bank account, but for investing. In Türkiye every operating broker must hold an SPK (Capital Markets Board) licence.",
-        "tip": "💡 Verify the licence yourself on the regulator's official list (spk.gov.tr). We recommend no particular broker — we take commission from none of them."
+        "body": "To buy and sell stocks and funds you need a brokerage account. It's like a bank account, but for investing. Anyone operating one legally in {{market}} is licensed by {{regulator}} — check that before you send a single unit of currency, and check it on the regulator's own site rather than the broker's."
       },
       "2": {
         "title": "How Do I Open an Account?",
-        "body": "1. Go to your chosen broker's website.\n2. Tap \"Open Account\".\n3. Enter your national ID number, email and phone.\n4. Verify your identity by video call or at a branch.\n5. The account activates within 1–3 business days.",
-        "tip": "💡 Most brokers support fully remote opening through their mobile app — no branch visit required."
+        "body": "1. Go to your chosen broker's site.\n2. Start the account opening.\n3. Give your identity details — {{market}} will have its own requirement, usually a national identity number or tax number.\n4. Verify who you are, by video call, by post or in a branch.\n5. It is usually live within a few business days."
       },
       "3": {
         "title": "How Do I Deposit Money?",
-        "body": "Send money from your own bank account to the brokerage account by wire transfer. It usually shows up the same day or within 1 business day.",
-        "tip": "💡 Start small — 500–1,000 TL is plenty for a first try. You don't have to deposit everything at once."
+        "body": "Transfer from a bank account in YOUR OWN NAME. A broker that accepts money from someone else's account, or asks you to send it to a personal account rather than a corporate one, is a broker to walk away from."
       },
       "4": {
         "title": "How Do I Place the First Order?",
-        "body": "1. Go to the \"Place Order\" or \"Buy\" section in the app.\n2. Search for the asset you want.\n3. Enter the amount (lots / currency).\n4. Choose \"Market Order\" — it fills at the current price.\n5. Confirm.",
-        "tip": "💡 Important: if your portfolio includes ETFs listed on foreign exchanges (like SPY or QQQ), they don't trade on BIST. Your broker must offer overseas-market access, which usually needs a separate application and currency conversion. Before opening an account, ask: \"can I buy foreign ETFs, and what's the commission?\""
+        "body": "1. Find \"Buy\" or \"Place order\".\n2. Search for the asset.\n3. Enter the amount.\n4. Choose a market order — it fills at the current price.\n5. Confirm.\n\nThe first one will feel like a bigger moment than it is. Keep it small enough that it does not."
       },
       "5": {
         "title": "Tracking and Patience",
-        "body": "After buying, don't build a habit of checking prices daily — it feeds anxiety. Once a week is enough. Lumos will let you know about big moves anyway.",
-        "tip": "💡 Golden rule: treat the money as if you won't see it for 5 years. Don't use funds you'll need short-term."
+        "body": "After buying, don't build a habit of checking daily — it feeds anxiety and changes nothing. Once a week is plenty. Lumos will tell you about the moves that actually matter."
       }
-    }
+    },
+    "yourRegulator": "your market's regulator"
   },
   "advisor": {
     "greeting": "Lumos Advisor.\n\nAsk anything on your mind about investing or this app, in your own words — you're not limited to the canned questions. I explain concepts, walk you through the reasoning behind a portfolio decision, and put news in context.\n\nOne boundary: I won't say \"buy\" or \"sell\" for any specific stock or fund, and I won't predict where the market is going — nobody can honestly know those. Beyond that, nothing is off limits.",
@@ -1083,6 +1081,66 @@
     "vehicle": {
       "physical": "Enough to buy a place in your market.",
       "reit": "Through property funds — your budget cannot buy a place here yet, and a fund can."
+    },
+    "outgoingsPlaceholder": "Your rent + essential monthly costs"
+  },
+  "vsCompare": {
+    "title": "A plot, or a portfolio?",
+    "subtitle": "The same amount, the same years, both worlds — as it actually went, not as anyone predicts it will go.",
+    "pickArea": "Pick an area…",
+    "area": "Area",
+    "amountPlaceholder": "How much are you comparing?",
+    "run": "Compare",
+    "property": "Property here",
+    "portfolio": "Your portfolio",
+    "realReturn": "{{pct}}% after inflation",
+    "nominal": "{{value}} on paper",
+    "entryCosts": "Buying cost {{value}} before you owned anything — transfer tax and commission.",
+    "upkeep": "Upkeep over the period: {{value}}.",
+    "rent": "Rent received over the period: {{value}}.",
+    "inflation": "Both sides deflated by {{pct}}% a year over {{years}} years.",
+    "periods": {
+      "1y": "1 year",
+      "3y": "3 years",
+      "5y": "5 years"
     }
+  },
+  "character": {
+    "title": "What each one is like to live with",
+    "subtitle": "Measured from its own history, judged against the answers you gave.",
+    "worstFall": "worst fall {{pct}}",
+    "flatFor": "flat for {{months}} months",
+    "backAfter": "back after {{months}} months",
+    "neverBack": "never recovered in this window",
+    "verdict": {
+      "comfortable": "Comfortable for you",
+      "demanding": "Asks something of you",
+      "mismatch": "Harder than you said you want",
+      "unknown": "Not enough history"
+    }
+  },
+  "purchaseChecks": {
+    "title": "Before you buy: what to check",
+    "subtitle": "{{count}} checks for your market — the ones that stop a bad purchase, not a slow one."
+  },
+  "rvbEmotion": {
+    "title": "The part that isn't a number",
+    "body": "Everything above is arithmetic, and arithmetic is only half of this decision. Owning where you live buys something a spreadsheet cannot price: not being asked to leave, being allowed to paint a wall, knowing what next year's housing costs are. People who have moved because a landlord decided to sell know exactly what that is worth.\n\nIt cuts the other way too. A home ties you to one city, and a job you would otherwise take somewhere else becomes a much bigger decision.\n\nIf the numbers are close, this is the part that should settle it — and if the numbers are far apart, it is worth knowing which way you are leaning before you look for reasons."
+  },
+  "firstPurchase": {
+    "title": "Your first {{type}}",
+    "subtitle": "Worth thirty seconds now that it is real — you won't see this again."
+  },
+  "listingEval": {
+    "title": "Check a listing's price",
+    "subtitle": "Paste what the listing says. We'll set its price per m² against what the area actually trades at.",
+    "pickArea": "Which area is it in?",
+    "sizePlaceholder": "Size in m²",
+    "pricePlaceholder": "Asking price",
+    "run": "Check it",
+    "thisListing": "This listing",
+    "areaAverage": "{{area}} average",
+    "askThese": "Ask these before anyone signs",
+    "boughtIt": "I bought this — record it"
   }
 }

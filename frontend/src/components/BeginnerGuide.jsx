@@ -1,10 +1,23 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import api from '../utils/api'
+import useMarket from '../hooks/useMarket'
 
 /**
- * BeginnerGuide — the guided first-investment journey.
- * Turkey-specific, step-by-step brokerage walkthrough.
- * Static content — no LLM dependency, always available.
+ * The guided first-investment journey: broker, deposit, first order.
+ *
+ * The steps were written for Türkiye and keyed by LANGUAGE, so a German
+ * reader in the German market was told to check an SPK licence and hand over
+ * a Turkish national ID number. That is the language/market confusion this
+ * codebase is built to prevent, in the most consequential place it could
+ * happen — telling somebody where to open a real account with real money.
+ *
+ * The steps are country-neutral now. The facts that differ by country — who
+ * licenses a broker, what that market's own guidance says — come from the
+ * pack, and the pack is the only thing that has to change for a new market.
+ *
+ * Static content still: no LLM, always available, nothing to hallucinate
+ * about a regulated process.
  */
 
 const STEPS = [
@@ -17,8 +30,25 @@ const STEPS = [
 
 export default function BeginnerGuide({ defaultExpanded = false }) {
   const { t } = useTranslation()
+  const { pack } = useMarket()
   const [expanded, setExpanded] = useState(defaultExpanded)
   const [activeStep, setActiveStep] = useState(0)
+  const [detail, setDetail] = useState(null)
+
+  useEffect(() => {
+    let cancelled = false
+    api.get('/users/markets/pack')
+      .then(res => { if (!cancelled) setDetail(res.data) })
+      .catch(() => { /* the neutral steps still read correctly without it */ })
+    return () => { cancelled = true }
+  }, [])
+
+  // Named so a missing pack degrades to a readable sentence rather than an
+  // empty gap where a regulator's name should be.
+  const facts = {
+    market: detail?.name || pack?.name || '',
+    regulator: detail?.regulator || t('guide.yourRegulator'),
+  }
 
   return (
     <div className="card" style={{ border: '1px solid var(--firefly-dim)' }}>
@@ -37,7 +67,7 @@ export default function BeginnerGuide({ defaultExpanded = false }) {
             {t('guide.title')}
           </p>
           <p style={{ fontSize: 11, color: 'var(--text-dim)', marginTop: 2 }}>
-            {t('guide.subtitle')}
+            {t('guide.subtitle', facts)}
           </p>
         </div>
         <span style={{
@@ -74,20 +104,20 @@ export default function BeginnerGuide({ defaultExpanded = false }) {
             background: 'var(--bg)', border: '1px solid var(--border)',
           }}>
             <p style={{ fontSize: 14, fontWeight: 700, marginBottom: 10 }}>
-              {STEPS[activeStep].emoji} {t(`guide.steps.${STEPS[activeStep].id}.title`)}
+              {STEPS[activeStep].emoji} {t(`guide.steps.${STEPS[activeStep].id}.title`, facts)}
             </p>
             <p style={{
               fontSize: 13, color: 'var(--text-muted)',
               lineHeight: 1.7, whiteSpace: 'pre-line', marginBottom: 12,
             }}>
-              {t(`guide.steps.${STEPS[activeStep].id}.body`)}
+              {t(`guide.steps.${STEPS[activeStep].id}.body`, facts)}
             </p>
             <div style={{
               fontSize: 12, lineHeight: 1.6, padding: '8px 12px',
               background: 'var(--firefly-dim)', borderRadius: 'var(--radius-xs)',
               color: 'var(--text)',
             }}>
-              {t(`guide.steps.${STEPS[activeStep].id}.tip`)}
+              {t(`guide.steps.${STEPS[activeStep].id}.tip`, facts)}
             </div>
           </div>
 

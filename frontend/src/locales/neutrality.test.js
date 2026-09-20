@@ -53,10 +53,17 @@ const COUNTRY_TERMS = {
 }
 
 // Keys that may name a country, because they are explicitly about one: the
-// per-ticker explainers, the Türkiye-specific broker guide, the glossary.
+// per-ticker explainers (a German UCITS fund exists to satisfy EU rules and
+// cannot be described without saying so), the daily tips, the glossary.
+//
+// `^guide.` USED to be exempt, described here as "the Türkiye-specific
+// broker guide". It was not Türkiye-specific by design, it was Türkiye-only
+// by accident: keyed by language, so a German reader in the German market
+// was told to verify an SPK licence and hand over a Turkish national ID.
+// The steps are country-neutral now and the market's own facts come from
+// its pack, so the exemption is gone and this is enforced.
 const COUNTRY_SCOPED = new RegExp([
   '^explainer\\.byTicker',
-  '^guide\\.',
   '^dailyTip\\.tips\\.',
   '^glossary\\.',
   '^reit\\.',

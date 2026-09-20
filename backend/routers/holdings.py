@@ -90,7 +90,8 @@ async def list_holdings(
     user = await user_repository.get_or_create(db, user_id)
     holdings = await holding_repository.list_for_user(db, user.id)
     # enrich_holdings calls yfinance (sync HTTP) — run in thread pool
-    enrichment = await asyncio.to_thread(enrich_holdings, holdings, _currency_of(user))
+    enrichment = await asyncio.to_thread(enrich_holdings, holdings, _currency_of(user),
+                                         user.market or "TR")
     return [_serialize(h, enrichment) for h in holdings]
 
 
@@ -158,7 +159,8 @@ async def value_history(
     days = max(7, min(days, 365))
     user = await user_repository.get_or_create(db, user_id)
     holdings = await holding_repository.list_for_user(db, user.id)
-    return await asyncio.to_thread(portfolio_value_history, holdings, days, _currency_of(user))
+    return await asyncio.to_thread(portfolio_value_history, holdings, days,
+                                   _currency_of(user), user.market or "TR")
 
 
 @router.get("/drift")
@@ -182,7 +184,8 @@ async def portfolio_drift(
     if not holdings:
         return {"available": False, "reason": t("drift.none", lang)}
 
-    enrichment = await asyncio.to_thread(enrich_holdings, holdings, _currency_of(user))
+    enrichment = await asyncio.to_thread(enrich_holdings, holdings, _currency_of(user),
+                                         user.market or "TR")
     values = {h.id: current_value(h, enrichment) for h in holdings}
     # The market picks the investable universe, so the drift target has to be
     # built against the user's own market — comparing a German portfolio to a
@@ -207,7 +210,8 @@ async def health_score(
 
     user = await user_repository.get_or_create(db, user_id)
     holdings = await holding_repository.list_for_user(db, user.id)
-    enrichment = await asyncio.to_thread(enrich_holdings, holdings, _currency_of(user))
+    enrichment = await asyncio.to_thread(enrich_holdings, holdings, _currency_of(user),
+                                         user.market or "TR")
     by_type: dict[str, float] = {}
     for h in holdings:
         by_type[h.asset_type] = by_type.get(h.asset_type, 0.0) + current_value(h, enrichment)
@@ -228,7 +232,8 @@ async def portfolio_summary(
     user = await user_repository.get_or_create(db, user_id)
     holdings = await holding_repository.list_for_user(db, user.id)
 
-    enrichment = await asyncio.to_thread(enrich_holdings, holdings, _currency_of(user))
+    enrichment = await asyncio.to_thread(enrich_holdings, holdings, _currency_of(user),
+                                         user.market or "TR")
     total_invested = sum(h.purchase_amount for h in holdings)
     total_value = sum(current_value(h, enrichment) for h in holdings)
     by_type: dict[str, float] = {}

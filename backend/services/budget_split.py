@@ -54,6 +54,9 @@ class BudgetSplit:
     market_amount: float
     property_vehicle: str          # physical | reit | none
     reasons: list[str] = field(default_factory=list)
+    # True when no outgoings figure was known, so the reserve is a flat
+    # 10% placeholder. The UI offers to replace it with the real number.
+    reserve_is_assumed: bool = False
 
     @property
     def total(self) -> float:
@@ -70,6 +73,7 @@ class BudgetSplit:
             "property_pct": round(self.property_amount / total * 100, 1),
             "market_pct": round(self.market_amount / total * 100, 1),
             "reasons": self.reasons,
+            "reserve_is_assumed": self.reserve_is_assumed,
         }
 
 
@@ -77,6 +81,7 @@ def split(*, budget: float,
           risk_score: Optional[float] = None,
           monthly_outgoings: Optional[float] = None,
           entry_threshold: Optional[float] = None,
+          committed_property: float = 0.0,
           path: str = "hybrid") -> BudgetSplit:
     """
     Divide `budget` three ways, with the reasoning that produced it.
@@ -84,13 +89,20 @@ def split(*, budget: float,
     `entry_threshold` is the market's realistic minimum for buying property
     and comes from the caller's pack — "enough to buy a flat" is a fact about
     a country, not a constant.
+
+    `committed_property` is what the reader has ALREADY put into property.
+    Without it the plan keeps telling somebody who has just bought a flat to
+    put another 40% into property, which is the moment a plan stops being
+    believable — and the moment they most need the rest of it replanned.
     """
     reasons: list[str] = []
     budget = max(float(budget or 0), 0.0)
+    committed_property = max(float(committed_property or 0), 0.0)
     if budget <= 0:
         return BudgetSplit(0.0, 0.0, 0.0, "none", ["split.reason.no_budget"])
 
     # ── 1. The reserve, off the top ──────────────────────────────────────
+    assumed = False
     if monthly_outgoings and monthly_outgoings > 0:
         reserve = min(monthly_outgoings * RESERVE_MONTHS, budget * 0.5)
         reasons.append("split.reason.reserve_from_outgoings")
@@ -99,19 +111,27 @@ def split(*, budget: float,
         # better than implying it was calculated.
         reserve = budget * 0.10
         reasons.append("split.reason.reserve_assumed")
+        assumed = True
 
     investable = budget - reserve
+
+    # Already in property? Then the question is no longer "how much property"
+    # but "what happens to the rest", and the answer is the market side.
+    if committed_property > 0:
+        reasons.append("split.reason.already_committed")
+        if path != "real_estate":
+            return BudgetSplit(reserve, 0.0, investable, "none", reasons, assumed)
 
     # A single-world path plans everything inside the world that was chosen.
     if path == "stocks":
         reasons.append("split.reason.path_stocks")
-        return BudgetSplit(reserve, 0.0, investable, "none", reasons)
+        return BudgetSplit(reserve, 0.0, investable, "none", reasons, assumed)
     if path == "real_estate":
         reasons.append("split.reason.path_real_estate")
         vehicle = "physical" if entry_threshold and investable >= entry_threshold else "reit"
         if vehicle == "reit":
             reasons.append("split.reason.below_entry_reit")
-        return BudgetSplit(reserve, investable, 0.0, vehicle, reasons)
+        return BudgetSplit(reserve, investable, 0.0, vehicle, reasons, assumed)
 
     # ── 2. Can property actually be bought here? ─────────────────────────
     if not entry_threshold or investable < entry_threshold:
@@ -121,7 +141,7 @@ def split(*, budget: float,
         reit_share = 0.15 if risk_score is None else min(0.25, 0.10 + risk_score / 100)
         property_amount = investable * reit_share
         return BudgetSplit(reserve, property_amount,
-                           investable - property_amount, "reit", reasons)
+                           investable - property_amount, "reit", reasons, assumed)
 
     # ── 3. Both are genuinely open ───────────────────────────────────────
     # A lower risk score leans toward property: it moves less, it is not
@@ -143,8 +163,8 @@ def split(*, budget: float,
             reit_share = 0.20
             property_amount = investable * reit_share
             return BudgetSplit(reserve, property_amount,
-                               investable - property_amount, "reit", reasons)
+                               investable - property_amount, "reit", reasons, assumed)
 
     reasons.append("split.reason.risk_shaped")
     return BudgetSplit(reserve, property_amount,
-                       investable - property_amount, "physical", reasons)
+                       investable - property_amount, "physical", reasons, assumed)

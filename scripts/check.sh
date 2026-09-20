@@ -37,4 +37,15 @@ step "vitest"
 step "build"
 (cd frontend && npm run build)
 
+# Journeys need a running app and a Clerk secret, so they are opt-in rather
+# than part of every run. They are the ones that catch state-transition bugs —
+# the right screen for the wrong account state — which every bug reported from
+# the app so far has been.
+if [ -n "${RUN_JOURNEYS:-}" ]; then
+  step "journeys"
+  node demo/journeys.mjs
+else
+  printf '\n\033[2m(skipping journeys — set RUN_JOURNEYS=1 with a local app + backend)\033[0m\n'
+fi
+
 printf '\n\033[32mAll checks passed.\033[0m\n'

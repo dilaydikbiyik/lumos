@@ -743,3 +743,73 @@ def test_the_three_locales_carry_the_same_explainer_entries():
             extra = entries[lang][group] - reference
             assert not missing, f"{lang} is missing explainer.{group}: {sorted(missing)}"
             assert not extra, f"{lang} has explainer.{group} nobody else has: {sorted(extra)}"
+
+
+def test_every_market_with_a_regional_table_gets_warmed():
+    """
+    The startup warm used to cover the US alone, because 51 FRED series is
+    the most obviously expensive case. The complaint from the app was that
+    the area table loads late "in the markets" — plural: Türkiye's provinces
+    and Germany's segments were fetched on the request path the same way
+    (measured cold: TR 1.8s, DE 4.2s, before a sleeping instance wakes).
+
+    This pins the CONTRACT rather than the implementation: the warm must be
+    driven by each pack's declared regional source, so a new market is warmed
+    by existing rather than by someone remembering to add it.
+    """
+    import inspect
+
+    from backend import main
+
+    source = inspect.getsource(main)
+    warm = source[source.index("async def _warm_housing_indices"):]
+    warm = warm[:warm.index("warm_task = ")]
+
+    assert "MARKET_PACKS" in warm, (
+        "the warm must iterate the packs, not name one market"
+    )
+    assert "regional_housing_source" in warm, (
+        "the warm must be driven by the declared source, like every other "
+        "market-aware dispatch in the app"
+    )
+    # And it must not have gone back to naming a single market.
+    assert "fred_service.get_all_state_hpi" not in warm
+
+
+@pytest.mark.parametrize("market", MARKETS)
+def test_every_market_has_a_purchase_checklist(market):
+    """
+    These are the checks that stop somebody buying a plot they cannot build
+    on. A market that ships without one leaves its readers with the previous
+    market's advice or nothing — and the broker guide already proved which
+    of those happens by default.
+    """
+    from backend.content import purchase_checks
+
+    checks = purchase_checks.for_market(market, "en")
+    assert checks, f"{market} has no purchase checklist"
+    assert len(checks) >= 5, f"{market} checklist is too thin: {len(checks)}"
+    for item in checks:
+        assert item.get("title") and item.get("body"), (market, item)
+        assert len(item["body"]) > 60, (market, item["title"])
+
+
+@pytest.mark.parametrize("market", MARKETS)
+def test_a_purchase_checklist_points_at_a_professional(market):
+    """
+    Educational content, not legal advice — and the last word has to say so
+    rather than leaving a reader to treat a checklist as sufficient.
+    """
+    from backend.content import purchase_checks
+
+    checks = purchase_checks.for_market(market, "en")
+    last = " ".join(f"{c['title']} {c['body']}" for c in checks[-2:]).lower()
+    assert any(word in last for word in
+               ("lawyer", "attorney", "avukat", "anwalt", "notar",
+                "legal advice", "hukuki", "rechtsberatung")), market
+
+
+def test_an_unknown_market_gets_nothing_rather_than_another_countrys_checklist():
+    from backend.content import purchase_checks
+
+    assert purchase_checks.for_market("ZZ", "en") is None

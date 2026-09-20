@@ -9,6 +9,7 @@ costs a handful of AI calls daily.
 import logging
 import xml.etree.ElementTree as ET
 from datetime import date
+from typing import Optional
 
 import httpx
 
@@ -98,3 +99,35 @@ def get_daily_digest(investment_path: str = "hybrid", market: str = "TR",
     digest = digest[:3]
     cache_service.set(cache_key, digest, ttl=_DIGEST_TTL)
     return digest
+
+
+def context_sentence(investment_path: str = "hybrid", market: str = "TR",
+                     lang: str = "tr") -> Optional[str]:
+    """
+    One calm sentence about what is going on right now, for the scenario card.
+
+    Strictly SEPARATE from the numbers. The scenario band is the distribution
+    of an asset's own history and must stay that way — a model that could
+    nudge the figures would turn a measurement into a forecast, which is the
+    one thing every projection in this app refuses to be.
+
+    So this reads the digest that already exists and returns prose beside the
+    band, never into it. It returns None rather than filler: a card with no
+    sentence is fine, a card with an invented one is not.
+    """
+    try:
+        digest = get_daily_digest(investment_path, market, lang)
+    except Exception as exc:
+        logger.warning("context sentence unavailable (%s)", type(exc).__name__)
+        return None
+
+    if not digest:
+        return None
+
+    # The digest is already calm, already in the reader's language, and
+    # already cached for the day — one more model call here would buy nothing
+    # except another thing to go wrong.
+    first = digest[0]
+    if isinstance(first, dict):
+        return first.get("takeaway") or first.get("summary") or first.get("headline")
+    return str(first) if first else None

@@ -179,8 +179,43 @@ def _exchange_values(holdings, user_currency: str = "TRY") -> dict[int, dict]:
     return out
 
 
-def _real_estate_values(holdings) -> dict[int, dict]:
-    """Estimated current value for real estate/land via the national KFE index ratio."""
+def _national_housing_index(market: str) -> dict[str, float]:
+    """
+    The national house-price index for a market, keyed YYYY-MM.
+
+    Dispatched on the pack's DECLARED source, the same way inflation and the
+    regional tables are. It used to call TCMB unconditionally, so a German
+    reader's flat was revalued with the TURKISH housing index — a number
+    with no relationship to their property, presented as an estimate of it.
+    """
+    from backend.markets import get_market_pack
+
+    pack = get_market_pack(market)
+    source = pack.housing_index_source
+
+    if source == "tcmb_evds":
+        return evds_service.fetch_series(
+            NATIONAL_KFE_SERIES,
+            start="01-01-2010",
+            end=date.today().strftime("%d-%m-%Y"),
+        ) or {}
+    if source == "fred":
+        from backend.services import fred_service
+
+        return fred_service.get_national_hpi() or {}
+    if source == "eurostat":
+        from backend.services import eurostat_service
+
+        return eurostat_service.get_house_price_index(market) or {}
+    return {}
+
+
+def _real_estate_values(holdings, market: str = "TR") -> dict[int, dict]:
+    """
+    Estimated current value for real estate/land, via the market's OWN
+    national house-price index. Labelled `source: "index"` so the caller can
+    say it is an estimate rather than a price anyone quoted.
+    """
     re_holdings = [
         h for h in holdings
         if h.asset_type in REAL_ESTATE_TYPES and h.purchase_date is not None
@@ -189,14 +224,10 @@ def _real_estate_values(holdings) -> dict[int, dict]:
         return {}
 
     try:
-        earliest = min(h.purchase_date for h in re_holdings)
-        index = evds_service.fetch_series(
-            NATIONAL_KFE_SERIES,
-            start=earliest.strftime("01-%m-%Y"),
-            end=date.today().strftime("%d-%m-%Y"),
-        )
+        index = _national_housing_index(market)
     except Exception as exc:
-        logger.warning("index valuation skipped — EVDS unavailable: %s", exc)
+        logger.warning("index valuation skipped for %s — source unavailable: %s",
+                       market, type(exc).__name__)
         return {}
 
     if not index:
@@ -221,11 +252,15 @@ def _real_estate_values(holdings) -> dict[int, dict]:
             "value": est,
             "source": "index",
             "change_pct": round((ratio - 1) * 100, 1),
+            # Which index produced this, so the UI can name it rather than
+            # presenting an estimate as if someone had valued the property.
+            "index_market": market,
         }
     return out
 
 
-def enrich_holdings(holdings, user_currency: str = "TRY") -> dict[int, dict]:
+def enrich_holdings(holdings, user_currency: str = "TRY",
+                    market: str = "TR") -> dict[int, dict]:
     """
     Map of holding.id -> {"value", "source", "change_pct"}.
     Priority: manual > live/index > purchase (absent entries mean purchase).
@@ -235,7 +270,7 @@ def enrich_holdings(holdings, user_currency: str = "TRY") -> dict[int, dict]:
     """
     enrichment: dict[int, dict] = {}
     enrichment.update(_exchange_values(holdings, user_currency))
-    enrichment.update(_real_estate_values(holdings))
+    enrichment.update(_real_estate_values(holdings, market))
 
     # manual overrides everything
     for h in holdings:

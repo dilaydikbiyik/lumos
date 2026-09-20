@@ -20,6 +20,17 @@ class Settings(BaseSettings):
 
     # Free failover providers — when Gemini's free quota is spent the free tier
     # falls to these (each has its own independent free tier). No card required.
+    # OpenAI-compatible providers. One adapter serves all of them, so these
+    # are base URLs and key names rather than new code paths. Each stays
+    # dormant without its key.
+    OPENAI_API_KEY: str = ""      # https://platform.openai.com/api-keys
+    OPENAI_BASE_URL: str = "https://api.openai.com/v1"
+    MISTRAL_API_KEY: str = ""     # https://console.mistral.ai/api-keys
+    MISTRAL_BASE_URL: str = "https://api.mistral.ai/v1"
+    # Local models: no key, no account, no network. Lets a fresh clone run the
+    # whole app without any provider at all.
+    OLLAMA_API_KEY: str = ""
+    OLLAMA_BASE_URL: str = "http://localhost:11434/v1"
     GROQ_API_KEY: str = ""        # https://console.groq.com/keys — free, very fast (Llama)
     OPENROUTER_API_KEY: str = ""  # https://openrouter.ai/keys — free `:free` models
 

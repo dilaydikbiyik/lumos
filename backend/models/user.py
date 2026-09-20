@@ -34,6 +34,11 @@ class User(Base):
     # Asked once (e.g. in the rent-vs-buy affordability check), reused by any
     # tool that needs an income reality-check — never re-asked
     monthly_income: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
+    # Rent plus essential monthly costs. Deliberately separate from income:
+    # the emergency reserve is six months of what you SPEND, and using income
+    # in its place told someone who earns 40,000 and spends 15,000 to hold
+    # back 240,000 instead of 90,000.
+    monthly_outgoings: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
     # Quiz Q1 captures whether the budget is one-time or monthly — the
     # monthly plan amount lives here (null = one-time investor)
     monthly_contribution: Mapped[Optional[float]] = mapped_column(Float, nullable=True)

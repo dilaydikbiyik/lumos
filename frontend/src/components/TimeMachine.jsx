@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 import api from '../utils/api'
 import IsikTut from './IsikTut'
+import AssetCharacter from './AssetCharacter'
 import useMarket from '../hooks/useMarket'
 import { Trans, useTranslation } from 'react-i18next'
 
@@ -108,6 +109,10 @@ export default function TimeMachine({ allocations, budget }) {
                 })
               : t('timeMachine.calmRide')}
           </p>
+
+          {/* The per-asset character numbers were computed, returned, and
+              rendered nowhere. This is the page they belong on. */}
+          <AssetCharacter perAsset={result.per_asset} />
         </>
       )}
     </div>

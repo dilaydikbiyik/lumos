@@ -96,6 +96,16 @@ async def set_monthly_income(db: AsyncSession, clerk_user_id: str, income: float
     return user
 
 
+async def set_monthly_outgoings(db: AsyncSession, clerk_user_id: str,
+                                 outgoings: float) -> User:
+    """Rent plus essential costs — what the emergency reserve is measured in."""
+    user = await get_or_create(db, clerk_user_id)
+    user.monthly_outgoings = outgoings
+    await db.commit()
+    await db.refresh(user)
+    return user
+
+
 async def set_primary_fear(db: AsyncSession, clerk_user_id: str, fear: str) -> User:
     user = await get_or_create(db, clerk_user_id)
     user.primary_fear = fear

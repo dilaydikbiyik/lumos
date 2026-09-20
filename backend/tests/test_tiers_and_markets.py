@@ -328,7 +328,7 @@ def test_advisor_endpoint_uses_advisor_mode_with_context(client):
     captured = {}
 
     def fake_chat(messages, tier=None, mode="profiling", context="",
-                  language="tr", market="TR"):
+                  language="tr", market="TR", *_, **__):
         captured["mode"] = mode
         captured["context"] = context
         captured["language"] = language
@@ -510,7 +510,7 @@ def test_language_header_selects_the_english_prompt_variant(client):
     captured = {}
 
     def fake_chat(messages, tier=None, mode="profiling", context="",
-                  language="tr", market="TR"):
+                  language="tr", market="TR", *_, **__):
         captured["language"] = language
         captured["market"] = market
         return "ok [PROFILE_COMPLETE]"
@@ -787,3 +787,36 @@ def test_listing_searches_use_each_market_s_own_words():
     # Türkiye keeps its hand-tuned slugs, which ARE the Turkish words.
     tr = build_listing_links("Kırklareli", "Lüleburgaz", "daire", market="TR")[0]["url"]
     assert "satilik-daire" in tr
+
+
+def test_openai_compatible_providers_need_no_new_adapter_code():
+    """
+    One adapter already spoke the OpenAI dialect for Groq and OpenRouter, so
+    OpenAI, Mistral and a local Ollama are a base URL and a key name each.
+    Ollama matters beyond convenience: it lets a fresh clone run the whole
+    app with no provider account at all.
+    """
+    from backend.services import ai_service
+
+    for provider in ("openai", "mistral", "ollama"):
+        assert provider in ai_service._ADAPTERS, provider
+
+
+@pytest.mark.real_dispatch
+def test_a_provider_without_a_key_steps_aside_rather_than_erroring():
+    """
+    A dormant provider must not break the chain — otherwise adding one to the
+    config would take the app down for everyone who has not configured it.
+    """
+    from unittest.mock import patch as _patch
+
+    from backend.services import ai_service
+    from backend.services.ai_service import _ProviderUnavailable
+
+    with _patch.object(ai_service.settings, "OPENAI_API_KEY", ""), \
+         _patch.object(ai_service.settings, "MISTRAL_API_KEY", ""):
+        for name in ("openai", "mistral"):
+            with pytest.raises(_ProviderUnavailable):
+                ai_service._ADAPTERS[name](
+                    [{"role": "user", "content": "hi"}], "sys", 100
+                )
