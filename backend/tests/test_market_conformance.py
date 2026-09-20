@@ -646,3 +646,100 @@ def test_a_horizon_means_the_same_number_of_YEARS_whatever_the_frequency():
 
     # (1.03 ** 3 - 1) * 100 = 9.3, not the 42.6 that twelve years would give.
     assert three == pytest.approx(9.3, abs=0.2), three
+
+
+# ── Education coverage ──────────────────────────────────────────────────────
+# Every asset the app can RECOMMEND must be explainable, in every language.
+# This lives here rather than in the frontend suite because the question spans
+# both halves: the packs are Python, the copy is JSON, and neither side can
+# answer it alone. It is the same contract as the rest of this file — adding a
+# market is a checklist, not a memory test.
+
+_LOCALES = ("tr", "en", "de")
+_EXPLAINER_TABS = ("type", "what", "why", "risk")
+
+
+def _locale(lang: str) -> dict:
+    import json
+    from pathlib import Path
+
+    root = Path(__file__).resolve().parents[2]
+    return json.loads((root / "frontend" / "src" / "locales" / f"{lang}.json").read_text())
+
+
+def _explainer(lang: str) -> dict:
+    return _locale(lang).get("explainer", {})
+
+
+def _pack_assets(pack):
+    assets = list(pack.asset_universe) + list(pack.reit_assets)
+    for extra in (pack.cash_asset, pack.bond_asset):
+        if extra:
+            assets.append(extra)
+    return assets
+
+
+@pytest.mark.parametrize("market", MARKETS)
+def test_every_recommendable_asset_can_be_explained(market):
+    """
+    A user can tap any allocation to ask "what is this?". If neither the
+    ticker nor its category has copy, the card falls back to `stocks` — and a
+    German BOND ETF was being explained as a stock. The right shape of card
+    with the wrong content in it is worse than no card.
+    """
+    pack = get_market_pack(market)
+    assets = _pack_assets(pack)
+    if not assets:
+        pytest.skip(f"{market} uses the shared default universe")
+
+    for lang in _LOCALES:
+        explainer = _explainer(lang)
+        by_ticker = explainer.get("byTicker", {})
+        by_category = explainer.get("byCategory", {})
+
+        for asset in assets:
+            ticker = asset.get("ticker") or ""
+            key = ticker.replace(".", "_")
+            category = asset.get("category", "stocks")
+            covered = key in by_ticker or category in by_category
+            assert covered, (
+                f"{market}/{lang}: {ticker} ({category}) has neither its own "
+                f"explainer nor a '{category}' category fallback"
+            )
+
+
+@pytest.mark.parametrize("lang", _LOCALES)
+def test_every_explainer_entry_is_complete(lang):
+    """
+    A card renders four fields. A missing one leaves a blank tab, which reads
+    as a broken app rather than as missing copy.
+    """
+    explainer = _explainer(lang)
+    for group in ("byTicker", "byCategory"):
+        for name, entry in explainer.get(group, {}).items():
+            for tab in _EXPLAINER_TABS:
+                value = entry.get(tab)
+                assert isinstance(value, str) and value.strip(), (
+                    f"{lang}: explainer.{group}.{name}.{tab} is missing or empty"
+                )
+
+
+def test_the_three_locales_carry_the_same_explainer_entries():
+    """
+    Copy added in one language only means a reader of another silently gets
+    the generic category card instead of the specific one.
+    """
+    entries = {
+        lang: {
+            group: set(_explainer(lang).get(group, {}))
+            for group in ("byTicker", "byCategory")
+        }
+        for lang in _LOCALES
+    }
+    for group in ("byTicker", "byCategory"):
+        reference = entries["en"][group]
+        for lang in _LOCALES:
+            missing = reference - entries[lang][group]
+            extra = entries[lang][group] - reference
+            assert not missing, f"{lang} is missing explainer.{group}: {sorted(missing)}"
+            assert not extra, f"{lang} has explainer.{group} nobody else has: {sorted(extra)}"

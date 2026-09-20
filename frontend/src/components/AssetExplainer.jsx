@@ -18,12 +18,28 @@ const ASSET_META = {
   'GLD':      { icon: '🥇', color: 'var(--firefly)' },
   'VNQ':      { icon: '🏢', color: 'var(--accent-2)' },
   'SCHH':     { icon: '🏠', color: 'var(--green)' },
+  'VXUS':     { icon: '🌍', color: 'var(--accent-2)' },
+  // The German UCITS universe. EU retail cannot hold US-domiciled ETFs, so
+  // these are the only funds a German reader is ever shown.
+  'EXS1.DE':  { icon: '🇩🇪', color: 'var(--accent)' },
+  'IUSA.DE':  { icon: '🇺🇸', color: 'var(--accent-2)' },
+  'EUNL.DE':  { icon: '🌍', color: 'var(--accent-2)' },
+  '4GLD.DE':  { icon: '🥇', color: 'var(--firefly)' },
+  'IQQP.DE':  { icon: '🏢', color: 'var(--green)' },
+  'XEON.DE':  { icon: '💶', color: 'var(--text-dim)' },
+  'EUNA.DE':  { icon: '🏛️', color: 'var(--text-dim)' },
 }
 
+// A category with no entry here fell through to 'stocks', so a German BOND
+// ETF was explained as a stock — the right shape of card with the wrong
+// content in it, which is worse than no card at all.
 const CATEGORY_META = {
   stocks: { icon: '📈', color: 'var(--accent)' },
   gold:   { icon: '🥇', color: 'var(--firefly)' },
   fund:   { icon: '🧺', color: 'var(--accent)' },
+  reit:   { icon: '🏢', color: 'var(--green)' },
+  cash:   { icon: '💵', color: 'var(--text-dim)' },
+  bond:   { icon: '🏛️', color: 'var(--text-dim)' },
 }
 
 export default function AssetExplainer({ allocation, onClose, color }) {

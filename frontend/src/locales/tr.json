@@ -203,6 +203,54 @@
         "what": "Schwab US REIT ETF — konut ağırlıklı Amerikan gayrimenkul sepeti.",
         "why": "VNQ'ya benzer ama daha konut ağırlıklı. Emlak piyasasına hisse kolaylığında ortak olursun.",
         "risk": "REIT ETF'leri hisse gibi dalgalanır. Ama gerçek mülk alıp satma derdi yok, anında nakde çevirebilirsin."
+      },
+      "VXUS": {
+        "type": "Uluslararası Hisse ETF'i",
+        "what": "Vanguard Total International Stock — ABD HARİÇ tüm gelişmiş ve gelişmekte olan piyasalardaki şirketler.",
+        "why": "Portföyünün tek bir ülkeye oynanmış bir bahis olmasını engeller. ABD geride kaldığında dünyanın geri kalanı çoğu zaman kalmaz.",
+        "risk": "Kur hareketleri iki yönlü çalışır ve gelişmekte olan piyasalar gelişmişlerden daha sert oynar."
+      },
+      "EXS1_DE": {
+        "type": "Alman Hisse ETF'i (DAX)",
+        "what": "iShares Core DAX — Almanya'nın borsaya kote en büyük 40 şirketi: SAP, Siemens, Allianz ve diğerleri.",
+        "why": "Kendi ülke piyasan, tek alımda, kazandığın ve harcadığın para biriminde.",
+        "risk": "Tek ülkede kırk şirket, ağırlıklı olarak sanayi ve ihracat. Almanya'da bir daralma hepsini aynı anda vurur."
+      },
+      "IUSA_DE": {
+        "type": "ABD Hisse ETF'i (UCITS)",
+        "what": "iShares S&P 500 UCITS — en büyük 500 ABD şirketi; AB'deki yatırımcıların alabildiği bir fon yapısında.",
+        "why": "Ünlü ABD endeks fonlarıyla aynı içerik, ama senin için yasal olan bir sarmalda. AB kuralları ABD merkezli ETF'leri bireysel yatırımcıya kapatıyor.",
+        "risk": "Tek ülke ve kazanmadığın bir para birimi: dolar düşerse endeks yükselse bile getirin erir."
+      },
+      "EUNL_DE": {
+        "type": "Dünya Hisse ETF'i (UCITS)",
+        "what": "iShares Core MSCI World — 23 gelişmiş ülkede yaklaşık 1.500 büyük şirket, tek fonda.",
+        "why": "Hangi ülkenin kazanacağını tahmin etmeyi bırakmanın en basit yolu. Tek bir hisse fonu tutacaksan, genelde aday budur.",
+        "risk": "\"Dünya\" adı yanıltıcı: yaklaşık %70'i ABD ve gelişmekte olan piyasalardan hiç içermiyor."
+      },
+      "4GLD_DE": {
+        "type": "Altın (Xetra-Gold)",
+        "what": "Xetra-Gold — Frankfurt'ta bir kasada tutulan fiziksel altınla teminatlandırılmış, prensipte teslimatını talep edebileceğin bir menkul kıymet.",
+        "why": "Hisseler düşerken altın çoğu zaman düşmez. Motor değil, denge ağırlığı.",
+        "risk": "Faiz de temettü de ödemez. Uzun dönemler boyunca her şey hareket ederken o olduğu yerde durabilir."
+      },
+      "IQQP_DE": {
+        "type": "Avrupa Gayrimenkul ETF'i (UCITS)",
+        "what": "iShares European Property Yield — Avrupa genelinde borsaya kote gayrimenkul şirketleri; kira gelirlerini dağıtıyorlar.",
+        "why": "Euro cinsinden gayrimenkul; kredi, noter ya da daha eline geçmeden %7 alım masrafı olmadan.",
+        "risk": "Borsaya kote gayrimenkul, çöküşte tam da istemediğin anda borsayla birlikte düşer. Faiz artışı onu iki kere vurur."
+      },
+      "XEON_DE": {
+        "type": "Euro Para Piyasası ETF'i",
+        "what": "Xtrackers Overnight Rate Swap — euro gecelik faizini takip eder. Bir fonun \"getiri sağlayan nakit\"e en çok yaklaştığı hâli.",
+        "why": "Portföyün sakin kısmının beklediği yer. Bir günde erişilebilir ve borsaya hiç maruz değil.",
+        "risk": "Merkez bankasının faizini izler. O faiz enflasyonun altındayken sessizce alım gücü kaybedersin."
+      },
+      "EUNA_DE": {
+        "type": "Euro Devlet Tahvili ETF'i (UCITS)",
+        "what": "iShares Core Euro Government Bond — euro bölgesi devletlerine verilen borçlar, tek fonda.",
+        "why": "Hisselerin klasik karşı ağırlığı: panikte hisseler düşerken insanların onun yerine aldığı şey devlet tahvilidir.",
+        "risk": "2022 bu karşı ağırlığın işlemeyebileceğini gösterdi — faizler hızla artarken hisse ve tahvil birlikte düştü. Uzun vadeli tahviller en sert düşer."
       }
     },
     "byCategory": {
@@ -223,6 +271,24 @@
         "what": "Profesyonellerin senin adına yönettiği ortak yatırım havuzu. Fon platformları üzerinden alınıp satılır.",
         "why": "Tek tek hisse seçmek zorunda kalmazsın. Uzmanlar senin için en iyi karışımı yönetir.",
         "risk": "Fon yönetim ücreti kesilir. Ve fonun performansı, yöneticinin kararlarına bağlıdır."
+      },
+      "reit": {
+        "type": "Gayrimenkul Fonu (GYO)",
+        "what": "Kira getiren mülklerden oluşan bir sepet — ofisler, depolar, konutlar. Borsadan bir dilimini alabilirsin.",
+        "why": "Daire fiyatına ihtiyaç duymadan, tapu işiyle uğraşmadan gayrimenkulde yer almak. Kira, temettü olarak geliyor.",
+        "risk": "Faizler yükselince mülk değerleri baskılanır. Bir de kendi dairen gibi \"elle tutulur\" değil."
+      },
+      "cash": {
+        "type": "Nakit / Para Piyasası",
+        "what": "Çok kısa vadeli, çok güvenli araçlarda bekleyen para. Portföyünün oynamayan kısmı.",
+        "why": "Rahat uyumanı sağlayan şey. Acil durumda, en kötü anda hisse satmak yerine bunu harcarsın.",
+        "risk": "Nominalde en güvenli, reelde yavaş bir kayıp: enflasyona çoğu zaman yetişemez."
+      },
+      "bond": {
+        "type": "Tahvil Fonu",
+        "what": "Devletlere ve büyük şirketlere verilen borçlardan oluşan bir sepet. Sana faiz öder, vade sonunda anaparayı geri verir.",
+        "why": "Genelde hisselerden daha az oynar, çoğu zaman da ters yönde — portföyün tümündeki dalgalanmayı yumuşatır.",
+        "risk": "Faizler yükseldiğinde mevcut tahvillerin fiyatı düşer. Uzun vadede hisseden daha düşük getirir; zaten amacı bu."
       }
     }
   },
@@ -953,5 +1019,11 @@
     "deleting": "Siliniyor…",
     "failed": "Hesap silinemedi. Hiçbir şey değişmedi.",
     "partial": "Verilerin silindi, ancak girişin kaldırılamadı. Lütfen destekle iletişime geç."
+  },
+  "glossaryPage": {
+    "title": "Sade bir dille terimler",
+    "subtitle": "Uygulamanın kullandığı her terim, başka terim kullanmadan anlatıldı. Birini bilmemek normal — bu sayfa tam da onun için.",
+    "search": "Terim ara…",
+    "noMatch": "“{{query}}” ile eşleşen bir şey yok. Danışmana sor, sana açıklasın."
   }
 }

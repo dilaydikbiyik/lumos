@@ -14,6 +14,7 @@ import WhatIfAssistant from '../components/WhatIfAssistant'
 import PracticeMode from '../components/PracticeMode'
 import BoughtItBridge from '../components/BoughtItBridge'
 import BeginnerGuide from '../components/BeginnerGuide'
+import Glossary from '../components/Glossary'
 import usePortfolio from '../hooks/usePortfolio'
 import useMarket from '../hooks/useMarket'
 
@@ -166,6 +167,10 @@ export default function RecommendPage() {
           onToggle={() => setLayer(layer === 'howto' ? null : 'howto')}
         >
           <BeginnerGuide />
+          {/* The glossary lives beside the how-to, because "I don't know what
+              that word means" and "I don't know how to do this" are the same
+              moment for a beginner. */}
+          <Glossary />
         </Layer>
 
         {/* The execution bridge is the page's primary action once someone has

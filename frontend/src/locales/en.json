@@ -203,6 +203,54 @@
         "what": "Schwab US REIT ETF — a housing-weighted American real-estate basket.",
         "why": "Similar to VNQ but more housing-weighted. Property-market exposure with stock-like convenience.",
         "risk": "REIT ETFs swing like stocks. But there's no buying-and-selling-property hassle, and you can cash out instantly."
+      },
+      "VXUS": {
+        "type": "International Stock ETF",
+        "what": "Vanguard Total International Stock — companies in every developed and emerging market EXCEPT the United States.",
+        "why": "Stops your portfolio from being a bet on one country. When the US lags, the rest of the world often does not.",
+        "risk": "Currency moves cut both ways, and emerging markets swing harder than developed ones."
+      },
+      "EXS1_DE": {
+        "type": "German Stock ETF (DAX)",
+        "what": "iShares Core DAX — the 40 largest listed companies in Germany: SAP, Siemens, Allianz and the rest.",
+        "why": "Your home market, in one purchase, priced in the currency you earn and spend in.",
+        "risk": "Forty companies in one country, heavy on industry and exports. A German downturn hits all of it at once."
+      },
+      "IUSA_DE": {
+        "type": "US Stock ETF (UCITS)",
+        "what": "iShares S&P 500 UCITS — the 500 largest US companies, in a fund that EU investors are allowed to buy.",
+        "why": "The same exposure as the famous US index funds, in a wrapper that is legal for you. EU rules bar US-domiciled ETFs from retail investors.",
+        "risk": "One country, and one currency you do not earn in: a falling dollar eats returns even when the index rises."
+      },
+      "EUNL_DE": {
+        "type": "World Stock ETF (UCITS)",
+        "what": "iShares Core MSCI World — roughly 1,500 large companies across 23 developed countries, in one fund.",
+        "why": "The simplest way to stop guessing which country wins. If you hold one stock fund, this is the usual candidate.",
+        "risk": "\"World\" is misleading: it is about 70% United States, and it holds no emerging markets at all."
+      },
+      "4GLD_DE": {
+        "type": "Gold (Xetra-Gold)",
+        "what": "Xetra-Gold — a security backed by physical gold held in a Frankfurt vault, which you can in principle demand delivery of.",
+        "why": "When stocks fall, gold often does not. It is the ballast rather than the engine.",
+        "risk": "It pays no interest and no dividend. Over long stretches it can simply sit still while everything else moves."
+      },
+      "IQQP_DE": {
+        "type": "European Property ETF (UCITS)",
+        "what": "iShares European Property Yield — listed property companies across Europe, paying out their rental income.",
+        "why": "Property exposure in euros, without a mortgage, a notary, or 7% in purchase costs before you own anything.",
+        "risk": "Listed property moves with the stock market in a crash, exactly when you hoped it would not. Rate rises hurt it twice."
+      },
+      "XEON_DE": {
+        "type": "Euro Money Market ETF",
+        "what": "Xtrackers Overnight Rate Swap — tracks the euro overnight rate. As close to \"cash that earns something\" as a fund gets.",
+        "why": "Where the calm part of the portfolio waits. Reachable in a day, and not exposed to the stock market at all.",
+        "risk": "It follows the central bank's rate. When that rate is below inflation, you are losing purchasing power quietly."
+      },
+      "EUNA_DE": {
+        "type": "Euro Government Bond ETF (UCITS)",
+        "what": "iShares Core Euro Government Bond — loans to euro-area governments, held in one fund.",
+        "why": "The traditional counterweight to stocks: when shares fall in a panic, government bonds are what people buy instead.",
+        "risk": "2022 showed the counterweight can fail — stocks and bonds fell together when rates rose fast. Longer bonds fall hardest."
       }
     },
     "byCategory": {
@@ -223,6 +271,24 @@
         "what": "A pooled investment managed by professionals on your behalf, bought and sold through fund platforms.",
         "why": "No need to pick individual stocks — experts manage the mix for you.",
         "risk": "Management fees are deducted, and performance depends on the manager's decisions."
+      },
+      "reit": {
+        "type": "Real Estate Fund (REIT)",
+        "what": "A basket of income-producing property — offices, warehouses, housing — that you can buy a slice of on an exchange.",
+        "why": "Real-estate exposure without needing the price of a flat, and without a title deed to manage. The rent arrives as dividends.",
+        "risk": "Rising interest rates weigh on property values. And it is not \"touchable\" the way a flat you own is."
+      },
+      "cash": {
+        "type": "Cash / Money Market",
+        "what": "Money parked in very short-term, very safe instruments. It is the part of your portfolio that does not move.",
+        "why": "It is what lets you sleep, and what you spend in an emergency instead of selling stocks at the worst possible moment.",
+        "risk": "The safest thing in nominal terms, and a slow loss in real terms: it rarely keeps pace with inflation."
+      },
+      "bond": {
+        "type": "Bond Fund",
+        "what": "A basket of loans to governments and large companies. They pay you interest and return the principal at the end.",
+        "why": "It usually moves less than stocks, and often in the other direction, which softens the whole portfolio's swings.",
+        "risk": "When interest rates rise, existing bonds fall in price. Lower long-run return than stocks, by design."
       }
     }
   },
@@ -953,5 +1019,11 @@
     "deleting": "Deleting…",
     "failed": "The account could not be deleted. Nothing was changed.",
     "partial": "Your data was deleted, but your login could not be removed. Please contact support."
+  },
+  "glossaryPage": {
+    "title": "Jargon, in plain words",
+    "subtitle": "Every term this app uses, explained without more jargon. Not knowing one is normal — that is what this page is for.",
+    "search": "Search a term…",
+    "noMatch": "Nothing matches “{{query}}”. Ask the advisor and it will explain it."
   }
 }

@@ -605,6 +605,54 @@
         "what": "Schwab US REIT ETF — ein amerikanischer Immobilienkorb mit Schwerpunkt Wohnen.",
         "why": "Ähnlich wie VNQ, aber stärker auf Wohnimmobilien gewichtet. Immobilienmarkt mit der Bequemlichkeit einer Aktie.",
         "risk": "REIT-ETFs schwanken wie Aktien. Dafür entfällt der Aufwand von Kauf und Verkauf einer Immobilie, und du kommst sofort an dein Geld."
+      },
+      "VXUS": {
+        "type": "Internationaler Aktien-ETF",
+        "what": "Vanguard Total International Stock — Unternehmen aus allen entwickelten und Schwellenmärkten AUSSER den USA.",
+        "why": "Verhindert, dass dein Portfolio eine Wette auf ein einziges Land ist. Wenn die USA zurückliegen, tut es der Rest der Welt oft nicht.",
+        "risk": "Wechselkurse wirken in beide Richtungen, und Schwellenmärkte schwanken stärker als entwickelte."
+      },
+      "EXS1_DE": {
+        "type": "Deutscher Aktien-ETF (DAX)",
+        "what": "iShares Core DAX — die 40 größten börsennotierten Unternehmen Deutschlands: SAP, Siemens, Allianz und die übrigen.",
+        "why": "Dein Heimatmarkt, in einem Kauf, in der Währung, in der du verdienst und ausgibst.",
+        "risk": "Vierzig Unternehmen in einem Land, stark industrie- und exportlastig. Ein deutscher Abschwung trifft alles auf einmal."
+      },
+      "IUSA_DE": {
+        "type": "US-Aktien-ETF (UCITS)",
+        "what": "iShares S&P 500 UCITS — die 500 größten US-Unternehmen, in einem Fonds, den EU-Anleger kaufen dürfen.",
+        "why": "Dieselbe Abdeckung wie die bekannten US-Indexfonds, nur in einer für dich zulässigen Hülle. EU-Regeln verwehren Privatanlegern US-domizilierte ETFs.",
+        "risk": "Ein Land und eine Währung, in der du nicht verdienst: ein fallender Dollar frisst Rendite, auch wenn der Index steigt."
+      },
+      "EUNL_DE": {
+        "type": "Welt-Aktien-ETF (UCITS)",
+        "what": "iShares Core MSCI World — rund 1.500 große Unternehmen aus 23 Industrieländern in einem Fonds.",
+        "why": "Der einfachste Weg, nicht mehr raten zu müssen, welches Land gewinnt. Wer einen einzigen Aktienfonds hält, hält meist diesen.",
+        "risk": "\"Welt\" führt in die Irre: rund 70 % USA, und Schwellenländer sind gar nicht enthalten."
+      },
+      "4GLD_DE": {
+        "type": "Gold (Xetra-Gold)",
+        "what": "Xetra-Gold — ein Wertpapier, das mit physischem Gold in einem Frankfurter Tresor hinterlegt ist und dessen Lieferung du grundsätzlich verlangen kannst.",
+        "why": "Wenn Aktien fallen, tut Gold es oft nicht. Es ist der Ballast, nicht der Motor.",
+        "risk": "Es zahlt weder Zinsen noch Dividende. Über lange Strecken kann es einfach stillstehen, während sich alles andere bewegt."
+      },
+      "IQQP_DE": {
+        "type": "Europäischer Immobilien-ETF (UCITS)",
+        "what": "iShares European Property Yield — börsennotierte Immobilienunternehmen in ganz Europa, die ihre Mieteinnahmen ausschütten.",
+        "why": "Immobilien in Euro — ohne Kredit, ohne Notar und ohne 7 % Kaufnebenkosten, bevor dir überhaupt etwas gehört.",
+        "risk": "Börsennotierte Immobilien fallen im Crash mit dem Aktienmarkt, genau dann, wenn du es nicht wolltest. Zinsanstiege treffen sie doppelt."
+      },
+      "XEON_DE": {
+        "type": "Euro-Geldmarkt-ETF",
+        "what": "Xtrackers Overnight Rate Swap — bildet den Euro-Tagesgeldsatz ab. So nah an \"Bargeld, das etwas abwirft\", wie ein Fonds kommt.",
+        "why": "Hier wartet der ruhige Teil des Portfolios. Binnen eines Tages verfügbar und dem Aktienmarkt überhaupt nicht ausgesetzt.",
+        "risk": "Er folgt dem Leitzins. Liegt der unter der Inflation, verlierst du still an Kaufkraft."
+      },
+      "EUNA_DE": {
+        "type": "Euro-Staatsanleihen-ETF (UCITS)",
+        "what": "iShares Core Euro Government Bond — Kredite an Staaten des Euroraums, gebündelt in einem Fonds.",
+        "why": "Das klassische Gegengewicht zu Aktien: Fallen die Kurse in einer Panik, kaufen die Leute stattdessen Staatsanleihen.",
+        "risk": "2022 zeigte, dass dieses Gegengewicht versagen kann — bei schnell steigenden Zinsen fielen Aktien und Anleihen gemeinsam. Lang laufende Anleihen am stärksten."
       }
     },
     "byCategory": {
@@ -625,6 +673,24 @@
         "what": "Eine gebündelte Anlage, die Profis für dich verwalten; gekauft und verkauft über Fondsplattformen.",
         "why": "Du musst keine Einzelaktien auswählen — Fachleute stellen die Mischung für dich zusammen.",
         "risk": "Verwaltungsgebühren werden abgezogen, und die Wertentwicklung hängt von den Entscheidungen des Managements ab."
+      },
+      "reit": {
+        "type": "Immobilienfonds (REIT)",
+        "what": "Ein Korb ertragbringender Immobilien — Büros, Lager, Wohnungen — von dem du an der Börse einen Anteil kaufen kannst.",
+        "why": "Immobilien im Depot, ohne den Preis einer Wohnung aufbringen oder einen Grundbucheintrag verwalten zu müssen. Die Miete kommt als Dividende.",
+        "risk": "Steigende Zinsen drücken auf die Immobilienwerte. Und er ist nicht \"anfassbar\" wie eine eigene Wohnung."
+      },
+      "cash": {
+        "type": "Bargeld / Geldmarkt",
+        "what": "Geld, das in sehr kurzfristigen, sehr sicheren Instrumenten liegt. Der Teil des Portfolios, der sich nicht bewegt.",
+        "why": "Der Teil, der dich ruhig schlafen lässt — und den du im Notfall ausgibst, statt im schlechtesten Moment Aktien zu verkaufen.",
+        "risk": "Nominal das Sicherste, real ein langsamer Verlust: mit der Inflation hält er selten Schritt."
+      },
+      "bond": {
+        "type": "Anleihefonds",
+        "what": "Ein Korb aus Krediten an Staaten und große Unternehmen. Sie zahlen dir Zinsen und am Ende das Kapital zurück.",
+        "why": "Er schwankt meist weniger als Aktien und oft in die andere Richtung — das dämpft die Ausschläge des ganzen Portfolios.",
+        "risk": "Steigen die Zinsen, fallen die Kurse bestehender Anleihen. Langfristig weniger Rendite als Aktien — das ist so gewollt."
       }
     }
   },
@@ -953,5 +1019,11 @@
     "deleting": "Wird gelöscht…",
     "failed": "Das Konto konnte nicht gelöscht werden. Es wurde nichts geändert.",
     "partial": "Deine Daten wurden gelöscht, dein Login konnte jedoch nicht entfernt werden. Bitte wende dich an den Support."
+  },
+  "glossaryPage": {
+    "title": "Fachbegriffe, einfach gesagt",
+    "subtitle": "Jeder Begriff, den diese App verwendet — erklärt ohne weitere Fachbegriffe. Einen nicht zu kennen ist normal; genau dafür gibt es diese Seite.",
+    "search": "Begriff suchen…",
+    "noMatch": "Nichts passt zu „{{query}}“. Frag den Berater, er erklärt es dir."
   }
 }

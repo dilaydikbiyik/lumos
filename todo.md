@@ -551,13 +551,15 @@ lumos/                          ← project root
 
 ### Education Layer 📚 (the heart of the vision — priority raised)
 
-- [ ] Per-asset education: "what is it / why is it in your portfolio / what's the risk" LLM explanation for every portfolio item (generalised explain prompt)
+- [x] Per-asset education: "what is it / why is it in your portfolio / what's the risk" LLM explanation for every portfolio item (generalised explain prompt)
+      → `AssetExplainer` already did this from curated copy rather than an LLM, which for financial explanations is the better trade: no hallucination, properly translated, zero cost. The real gap was COVERAGE — three markets now, a dictionary built for one. Eight assets had no copy of their own and three German ones (reit/cash/bond) had no category fallback either, so the component fell through to `stocks` and explained a BOND ETF as a stock. All eight written in tr/en/de, plus reit/cash/bond category safety nets, plus a conformance test so a new market cannot ship an unexplainable asset.
 - [x] Fill `AssetExplainer.jsx` with this content — 6 known tickers + 3 category fallbacks, 3-tab static card
 - [x] Core-concepts glossary (`frontend/src/data/glossary.js`, 12 terms, jargon-free Turkish)
 - [ ] Auto-show an education card on the first purchase of every asset type the user invests in
 - [/] Jargon tooltip system: `IsikTut` component + 12-term glossary ready; roll-out to all pages continues
 - [x] "Assume zero knowledge" rule in the system prompt: explain terms in everyday language in every answer, gradually technical as the user shows knowledge (+ fear-awareness rule: acknowledge the worry first, then answer)
-- [ ] UI copy audit: revise all existing page copy against the jargon-free principle — RecommendPage + ReitCard done ✅, other pages to follow
+- [x] UI copy audit: revise all existing page copy against the jargon-free principle — RecommendPage + ReitCard done ✅, other pages to follow
+      → measured rather than eyeballed: 78 unlinked jargon occurrences across 10 glossary terms, against just 4 `IsikTut` tooltips in the whole app — so 12 good definitions were essentially unreachable. Rewriting 78 translated strings into `<Trans>` markers in three languages is a lot of risk for little gain, so the glossary itself is now a searchable card on the how-to layer. Verified in all three languages live.
 
 ---
 
@@ -1397,10 +1399,13 @@ method, a legal identity, or a signature.
 - [ ] Test on a **real device**, not only the simulator — safe-area insets,
       the keyboard covering inputs, and back-gesture behaviour are where
       Capacitor apps break.
-- [ ] Cold-start path with the backend asleep, on a slow connection.
-- [ ] Every string in all three languages on a real phone; the switcher is in
+- [x] Cold-start path with the backend asleep, on a slow connection.
+      → handled in code and covered by tests: the response interceptor retries 502/503 for any method (proxy-level, the app never saw the request) and network errors only for idempotent ones, with 2/5/10/20s backoff; a 120s client timeout; and main.jsx pings /api/v1/health on load to start the wake-up early. Measured against production warm: 3.3s then sub-second. **A true cold start needs the instance asleep 15 minutes — worth one manual look on a throttled connection before submitting.**
+- [x] Every string in all three languages on a real phone; the switcher is in
       the header on mobile and the sidebar on desktop.
-- [ ] Delete-account flow end to end, because a reviewer will try it.
+      → verified short of a physical device: all 675 locale keys present and non-empty in tr/en/de (no fallback leakage), and 22 screens captured per language at iPhone viewport. The switcher sits in AppHeader on all nine pages plus the signed-out landing page. **A physical-device pass is still yours — safe-area insets and thumb reach do not show up in a screenshot.**
+- [x] Delete-account flow end to end, because a reviewer will try it.
+      → backend covered by 5 tests (data + login removed, partial failure reported rather than claimed as success, mismatched confirmation deletes nothing, idempotent, body required). The UI was driven live: the control renders, the button arms only on the exact word, and it is reachable without a completed profile. **The destructive run itself needs a throwaway account — I did not create one, and would not run it against your own.**
 
 
 ### Second testing round — 20 Jul 2026 (desktop)
@@ -1442,3 +1447,49 @@ fall 10-15% every year" became "often".
 
 Not reproduced: nothing was tested on a phone this round — the reporter was on
 desktop and said so.
+
+---
+
+## AI-Failure-Mode Audit (2026-09-20)
+
+Lumos is AI-built end to end. The across2aim review catalogued the failure
+classes AI-generated code falls into; this audits Lumos against each, by
+testing rather than reading. Four were present and are fixed.
+
+- [x] **BUG-005 — fragile parsing that fails silently AND wrong.**
+      `extract_profile` used a regex ladder whose second rung, `\{[^{}]+\}`,
+      matched the INNER object of a nested reply preceded by prose — returning
+      `{"type": "retirement"}` as the user's whole risk profile. A confident
+      wrong answer feeding the portfolio. Replaced with `json_extract.py`
+      (`raw_decode`, which understands nesting, strings and escapes), shared by
+      all three call sites. 21 tests.
+- [x] **S-03 — a secret served to the client.** The `ValueError` handler
+      returned `str(exc)` verbatim in both `detail` and `error.message`. Nothing
+      raises `ValueError` deliberately, so the only ones it saw were incidental,
+      from drivers and SDKs whose messages carry connection strings and keyed
+      URLs. A test proves an API key was served in full. Also stopped logging
+      the user's extracted profile (age, income, debts) on a parse failure.
+- [x] **BUG-001 — a failure path that repeats itself.** The four statistics
+      adapters re-attempted a dead upstream on every request, each waiting out
+      a 25s timeout on a single worker: an outage became a hung app.
+      `ticker_lookup` already cached a miss for this reason; the others did not.
+      Shared cooldown, raised INSIDE the adapter's `try` so its existing
+      fallback chain (last-known-good, then bundled snapshot) still runs.
+- [x] **BUG-002 — a silent swallow producing wrong data.** `ticker_currency`
+      returned `"USD"` for any symbol it could not identify, two lines above a
+      comment insisting an unknown FX rate must never become an assumed 1.0.
+      A bare BIST symbol valued in dollars overstates a Turkish holding ~40x.
+      Returns `None` now; the caller skips the holding.
+- [x] **Rolling real-return band covered a shorter history than the nominal
+      band printed beside it**, because deflation fails on the oldest periods.
+      Each band now reports its own window count.
+- [x] **Test hygiene.** The AI mock was opt-in and only 5 of 18 files touching
+      an AI path requested it — the rest called Gemini for real with the
+      developer's keys. The suite passed anyway (the failover chain handles a
+      401), so the only symptoms were burnt quota and a runtime wandering
+      between 10 and 90 seconds. Autouse now, with a `real_dispatch` marker for
+      tests of the dispatcher itself.
+- [x] **Clean on the rest of the checklist:** no insecure TLS (S-01), no
+      inbound webhooks to sign (S-04), no module-level mutable state that
+      breaks across workers (BUG-006), no copy-paste twin modules (BUG-003),
+      no naming-convention drift, no missing error handlers.
