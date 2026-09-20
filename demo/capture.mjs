@@ -20,8 +20,7 @@ const { chromium, devices } = req('playwright')
 const ffmpeg = req('ffmpeg-static')
 
 const APP = 'https://lumos-sooty.vercel.app'
-// Versioned, like the app itself — the unprefixed mount is deprecated.
-const API = 'https://lumos-api-yowm.onrender.com/api/v1'
+const API_HOST = 'https://lumos-api-yowm.onrender.com'
 const PORTAL = 'https://peaceful-drake-17.accounts.dev'
 const CLERK = 'https://api.clerk.com/v1'
 const SECRET = process.env.CLERK_SECRET_KEY
@@ -208,6 +207,20 @@ async function shootCard(page, path, heading, name, { settle = 6000, anchor = nu
     console.log(`\u2713 ${name}`)
   } catch (e) { console.log(`  … ${name} skipped:`, e.message.slice(0, 90)) }
 }
+
+// The API is versioned, but this script runs against whatever is DEPLOYED,
+// which is not necessarily what is in the working tree. Hardcoding /api/v1
+// here meant a capture run before the backend shipped would 404 — and since
+// the only caller is wrapped in a try/catch, the failure showed up as one
+// quietly missing screenshot rather than an error. Ask the server instead.
+const API = await (async () => {
+  try {
+    const res = await fetch(`${API_HOST}/api/v1/health`)
+    if (res.ok) return `${API_HOST}/api/v1`
+  } catch { /* fall through to the legacy mount */ }
+  console.log('  … backend has no /api/v1 yet, using the legacy paths')
+  return API_HOST
+})()
 
 const browser = await chromium.launch()
 

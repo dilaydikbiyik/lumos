@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useAuth, useClerk } from '@clerk/clerk-react'
 import { Link } from 'react-router-dom'
 import api from '../utils/api'
+import { confirmationMatches } from '../utils/confirmation'
 
 /**
  * In-app account deletion.
@@ -17,7 +18,7 @@ import api from '../utils/api'
  * be undone — there is no soft delete and no archived copy to restore from.
  */
 export default function DeleteAccount() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const { userId } = useAuth()
   const { signOut } = useClerk()
   const [open, setOpen] = useState(false)
@@ -26,7 +27,7 @@ export default function DeleteAccount() {
   const [error, setError] = useState(null)
 
   const phrase = t('account.confirmWord')
-  const armed = typed.trim().toLocaleUpperCase() === phrase.toLocaleUpperCase()
+  const armed = confirmationMatches(typed, phrase, i18n.language)
 
   async function remove() {
     setBusy(true)
@@ -99,7 +100,16 @@ export default function DeleteAccount() {
             </button>
             <button
               className="btn btn-primary"
-              style={{ flex: 1, background: 'var(--red, #f87171)', borderColor: 'var(--red, #f87171)' }}
+              // A destructive button that looks clickable while it is not is a
+              // small cruelty: the user presses it, nothing happens, and they
+              // cannot tell whether it failed or they mistyped.
+              style={{
+                flex: 1,
+                background: 'var(--red, #f87171)',
+                borderColor: 'var(--red, #f87171)',
+                opacity: armed && !busy ? 1 : 0.45,
+                cursor: armed && !busy ? 'pointer' : 'not-allowed',
+              }}
               onClick={remove}
               disabled={!armed || busy}
             >

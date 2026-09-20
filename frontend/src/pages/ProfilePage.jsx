@@ -207,10 +207,15 @@ export default function ProfilePage() {
             >
               {t('profile.retake')}
             </button>
-
-            <DeleteAccount />
           </div>
         )}
+
+        {/* OUTSIDE the result block on purpose. It was inside, which meant an
+            account that signed up but never finished the quiz — or one part
+            way through retaking it — had no way to delete itself. Apple
+            requires deletion to be reachable for any account that can be
+            created, not only for a completed one. */}
+        <DeleteAccount />
       </div>
     </div>
   )

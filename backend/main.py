@@ -66,6 +66,22 @@ async def lifespan(app: FastAPI):
     # a deploy. In tests and local dev there is no such visitor, and firing it
     # everywhere spent a live LLM call on every app start — including inside
     # CI, where it also broke a test that asserts the model is never called.
+    # Drop expired rows from the durable cache. They are dead weight the
+    # moment they expire, and nothing else removes them — without this the
+    # table grows for the life of the deployment. Cheap (one indexed DELETE),
+    # synchronous-but-fast, and a failure is logged rather than fatal.
+    try:
+        from backend.services import cache_store
+
+        if cache_store.is_enabled():
+            import logging as _sweep_logging
+
+            removed = cache_store.sweep()
+            _sweep_logging.getLogger("lumos.startup").info(
+                "durable cache: swept %s expired rows", removed)
+    except Exception:  # never let cache maintenance stop the app booting
+        pass
+
     import asyncio as _asyncio
     import logging as _logging
 

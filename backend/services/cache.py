@@ -21,7 +21,7 @@ past so the second read is local again.
 
 import logging
 from pathlib import Path
-from typing import Any, Optional
+from typing import Optional
 
 import diskcache
 
@@ -74,11 +74,3 @@ def clear():
     # Deliberately NOT clearing the durable tier: `clear()` is a local
     # maintenance action, and wiping every instance's shared last-known-good
     # data is not what any caller of it means.
-
-
-def stats() -> dict[str, Any]:
-    """What each tier holds — for /health and for answering 'is it warm?'."""
-    return {
-        "local_entries": len(_cache),
-        "durable_enabled": cache_store.is_enabled(),
-    }
