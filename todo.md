@@ -419,9 +419,9 @@ lumos/                          ← project root
 
 - [x] `demo/demo_script.md` → 3-minute scene-by-scene demo script (with filming notes)
   - Full flow: sign-up → onboarding → chat → risk profile → portfolio → dashboard
-- [ ] Record the screen capture (Loom / OBS / QuickTime)
+- [x] Record the screen capture — scripted with Playwright (`demo/capture.mjs`), so the gallery can be regenerated rather than re-filmed; captured in all three UI languages
 - [x] `docs/case_study.md` → problem, product decisions, 4 technical challenges + solutions, learnings
-- [ ] Upload the demo video to the GitHub repo
+- [x] Upload the demo video to the GitHub repo (`demo/video/<lang>/lumos-demo.{mp4,gif}`)
 - [ ] Share on LinkedIn
 
 > 💡 AWS migration becomes meaningful only after this phase ships the MVP. Not before.
@@ -534,7 +534,7 @@ lumos/                          ← project root
 - [x] Deepen the health check: `/health` genuinely probes DB connectivity and AI provider access (`{"db": "ok", "ai": "ok"}`)
 - [x] Python 3.9 → 3.12 migration: venv rebuilt, Dockerfile+CI moved to 3.12, `datetime.utcnow` deprecations fixed (Optional→| None conversion is cosmetic, gradual)
 - [x] pre-commit config: ruff + ruff-format + basic hygiene hooks (`pip install pre-commit && pre-commit install`)
-- [ ] Rotate the leaked Anthropic API key (Console → API Keys)
+- [ ] **[you]** Rotate the Anthropic API key in the Console. The repo itself is clean — a scan of every tracked file and of the full history finds only the `sk-ant-...` placeholder in the first commit's `.env.example`, no real key — so this is a console action, not a code change.
 
 ### Mobile Strategy 📱 (decision: 3 tiers — 2026-06-28)
 
@@ -787,7 +787,7 @@ lumos/                          ← project root
 - [x] **MarketContext + useMarket**: locale number formatting and currency flow from the user's Market Pack; 14 hardcoded 'tr-TR' formatters removed
 - [x] **Currency truth**: `money(n, 'TRY')` pinning — TL-denominated data (TCMB m², TL practice basket, FX exposure) never masquerades as $/€ when the market changes
 - [x] **MarketSwitcher** in the sidebar footer (TR/US/DE); packs without live data labelled "sınırlı veri"; Explore shows an honest "integration on the way" state for non-TR markets (verified live: TR→US switch $ formatting + gate, TR return, persistence across reload)
-- [ ] i18n infrastructure: UI copy + LLM prompts in locale files (react-i18next + language parameter in prompt templates) — **after deploy, separate sprint**
+- [x] i18n infrastructure: UI copy + LLM prompts in locale files (react-i18next, lazy per-locale loading; backend `i18n.py` for engine-written sentences; TR/EN/DE)
 - [ ] OpenAI/Mistral adapters (single OpenAI-compatible `base_url` adapter covers both + Ollama) — **when billing lands**; keyless tiers must degrade to the free chain instead of crashing
 
 ### Paid AI Tier Infrastructure 💳 (billing-ready — 2026-07-08)
@@ -806,7 +806,7 @@ lumos/                          ← project root
 - [x] `backend/markets/` structure: `base.py` (frozen dataclass) + `tr.py` (reference, fully wired) + `us.py`/`de.py` (researched skeletons) + registry (unknown code → safe TR fallback)
 - [x] Pack contents: currency/locale, data-source declarations (TR live, US: FRED / DE: Destatis roadmap), listing bridges (Zillow/Realtor, ImmoScout24/Immowelt), regulator + local tax/brokerage education notes (US: 401k/IRA + capital-gains holding periods; DE: Abgeltungsteuer + Sparer-Pauschbetrag) — all with a "consult a local professional" disclaimer
 - [x] `users.market` column + PATCH /users/me/market + GET /users/markets ✅; listing_bridge pack-aware ✅; frontend MarketContext/Switcher ✅ (2026-07-11) — full pack-routing of inflation/index services comes with the US/DE adapters
-- [ ] i18n infrastructure (same item as above — after deploy)
+- [x] i18n infrastructure (same item as above) — done; language and market are independent axes, enforced by `independence.test.js`
 
 ### Content Localization (the LLM advantage)
 
@@ -832,13 +832,13 @@ lumos/                          ← project root
       "price index" instead of an invented unit price. The honesty note says
       FHFA draws on refinance appraisals as well as sales, which is where it
       differs from Case-Shiller's repeat-sales method.
-- [ ] Concept glossary localization, not translation: examples with local currency and local products ("an ETF is a basket — with THY, Aselsan..." vs "...Apple, Microsoft...")
+- [x] Concept glossary localization, not translation: examples with local currency and local products ("an ETF is a basket — with THY, Aselsan..." vs "...Apple, Microsoft...")
 
 ### Rollout Order
 
-- [ ] Finish the TR pack completely as the reference implementation (MVP = TR)
-- [ ] Choose the second pack by data (US general market vs DE expat segment) — POST-MVP
-- [ ] Hardcode audit: verify every TL/CPI/Sahibinden reference in the codebase has moved to a pack reference (frontend format layer done 2026-07-11; backend service routing pending)
+- [x] Finish the TR pack completely as the reference implementation (MVP = TR)
+- [x] Choose the second pack by data — both shipped: US (FHFA via FRED, 50 states + DC) and DE (Bundesbank, UCITS-only universe)
+- [x] Hardcode audit: every TL/CPI/Sahibinden reference now resolves through a pack. Enforced rather than audited once — `test_market_conformance.py` runs market × language, `independence.test.js` fails any source file that welds the two axes together, and `neutrality.test.js` rejects country-specific wording in shared copy.
 
 ## Phase 9 — Brand & Original UI Identity ✨ the "Light" Design Language
 
@@ -972,7 +972,7 @@ The real bug was **synchronous blocking I/O inside async FastAPI route handlers*
 
 - [x] Verify advisor response on production after deploy (Render cold-start + new asyncio wrapper)
 - [ ] Add `GROQ_API_KEY` + `OPENROUTER_API_KEY` to Render env if not already set
-- [ ] Optionally: code-split the JS bundle (currently 846 kB / 253 kB gzip — within acceptable range for now)
+- [x] Code-split the JS bundle — 21 chunks, split per route and per locale; the entry chunk is now 218 kB / 69 kB gzip and a language's copy only downloads when it is chosen
 
 ---
 
@@ -1003,11 +1003,12 @@ Rate limit eklendi: `list_holdings:30/min`, `health:20/min`, `summary:20/min`.
 - `LumosLogo.jsx`: `alignItems: flex-end` + `marginBottom` → `alignItems: center` + `marginTop: 0.55em`
 - Ateşböceği simgesi artık "L" harfinin cap-height merkeziyle hizalı
 
-### Hâlâ açık
+### Still open
 
-- [ ] `GROQ_API_KEY` + `OPENROUTER_API_KEY` Render env'e ekle
-- [ ] Kendi Clerk kullanıcı ID'ni `ADMIN_CLERK_IDS`'e ekle (Render env paneli)
-- [ ] JS bundle code-split (isteğe bağlı, 253 kB gzip kabul edilebilir)
+Tracked in the **Still open** list above — this section used to carry a second,
+Turkish copy of the same three items, which meant ticking anything twice and
+drifting whenever it wasn't. `ADMIN_CLERK_IDS` and the bundle code-split are
+both done; the provider keys remain the only open item.
 
 ---
 
@@ -1134,7 +1135,7 @@ SEC/BaFin surface. Book the lawyer before Phase 4; the answer may change scope
       as inside the app — deliberately a separate control from the market
       switcher, because language is a device preference and market is where
       you invest.
-- [ ] Number/date formatting per locale everywhere (`useMarket` fmt vs i18n).
+- [x] Number/date formatting per locale everywhere. `utils/format.js` now owns percent and date rendering: percent PLACEMENT is a language property (tr `%25`, en `25%`, de `25 %`) and seven components had the Turkish form hardcoded, so an English reader saw `%60`; `PortfolioValueChart` was also formatting dates with the BROWSER's locale. A test fails on any `%{` literal reappearing in source.
 
 ### Phase 2 — US + DE market packs (real data) — DONE
 
@@ -1283,7 +1284,7 @@ fourth market. So the shape is enforced instead.
 
 ### Phase 3 — professionalize for production
 
-- [ ] Persistent cache: diskcache → small Neon table (Render disk is
+- [x] Persistent cache: diskcache → small Neon table (Render disk is — done. `cache_store.py` mirrors every cached value into a `cache_entries` table through a SYNC psycopg engine (the data adapters are sync and run in thread pools). Reads fall back to it and warm the local tier on the way past. It matters for the `ttl=None` last-known-good tier, which exists for provider outages and was being discarded on every deploy. Entirely optional — no Postgres means no durable tier and identical behaviour — and hard-disabled under pytest, because a developer's .env holds the production URL. `/health` now reports `durable_cache`.
       ephemeral; every deploy wipes last-known-good).
 - [x] Code-split the bundle. Routes behind sign-in are lazy; only the
       reader's locale is downloaded (safe because locales.test.js proves the
@@ -1292,7 +1293,7 @@ fourth market. So the shape is enforced instead.
       paints an inline dark splash so the pre-render wait isn't a white
       screen.
 - [ ] Sentry: set SENTRY_DSN in Render/Vercel (code already wired).
-- [ ] Privacy policy + terms pages (both stores require them).
+- [x] Privacy policy + terms pages (both stores require them). — done, see Legal pages
 - [ ] **User:** domain → Clerk production instance (+ own Google OAuth) →
       Render paid tier (see docs/production-readiness.md).
 
@@ -1315,7 +1316,7 @@ method, a legal identity, or a signature.
       access. Start recruiting those 12 people early — it is the longest pole.
 - [ ] **[you]** Apple: enrol in **App Store Connect**, accept the Paid
       Applications agreement only if you will ever charge (not needed for free).
-- [ ] Decide the bundle id once and never change it: `app.lumos.mobile` or
+- [x] Decide the bundle id once and never change it: `app.lumos.mobile` or — `app.lumos.mobile`, recorded in `docs/store-submission.md`
       similar, reverse-DNS, identical on both stores.
 
 #### 2. Production infrastructure — the app cannot ship on dev-tier anything
@@ -1328,7 +1329,7 @@ method, a legal identity, or a signature.
 - [ ] **[you]** Render paid tier. A free instance sleeps; a reviewer who opens
       the app to a 50-second wait fails it as broken. This is also the single
       biggest quality win for real users.
-- [ ] Persistent cache: diskcache → a small Neon table. Render's disk is
+- [x] Persistent cache: diskcache → a small Neon table. Render's disk is — done. `cache_store.py` mirrors every cached value into a `cache_entries` table through a SYNC psycopg engine (the data adapters are sync and run in thread pools). Reads fall back to it and warm the local tier on the way past. It matters for the `ttl=None` last-known-good tier, which exists for provider outages and was being discarded on every deploy. Entirely optional — no Postgres means no durable tier and identical behaviour — and hard-disabled under pytest, because a developer's .env holds the production URL. `/health` now reports `durable_cache`.
       ephemeral, so every deploy currently wipes last-known-good — the tier that
       keeps the app honest when a source is down.
 - [ ] `SENTRY_DSN` on Render and Vercel (the code is already wired). Store
@@ -1336,15 +1337,15 @@ method, a legal identity, or a signature.
 
 #### 3. Legal pages — both stores reject without them
 
-- [ ] **Privacy policy** at a stable public URL, listing exactly what is
+- [x] **Privacy policy** at a stable public URL, listing exactly what is — `/privacy`, public (no auth), in tr/en/de, listing every field actually stored
       collected (Clerk identity, holdings you type, chat messages) and who
       processes it (Clerk, Neon, Google/Groq/OpenRouter for AI, Render, Vercel).
       Both stores link to this from the listing.
-- [ ] **Terms of use**. Apple applies its standard EULA unless you supply one.
-- [ ] **Account deletion** — Apple requires in-app deletion for any app with
+- [x] **Terms of use**. Apple applies its standard EULA unless you supply one. — `/terms`, public, in tr/en/de; states plainly that Lumos is unlicensed education
+- [x] **Account deletion** — Apple requires in-app deletion for any app with — Profile → Delete my account: erases rows, feedback and the Clerk login; 5 tests cover the partial-failure and idempotence cases
       accounts, not an email request. Needs a `DELETE /users/me` that removes
       holdings, feedback links and the Clerk user, plus a confirm flow.
-- [ ] **Data Safety form** (Play) and **App Privacy labels** (Apple). Answer
+- [x] **Data Safety form** (Play) and **App Privacy labels** (Apple). Answer — answered per data type in `docs/store-submission.md`, one table serving both forms
       them from the privacy policy, not from memory; a mismatch is a rejection.
 - [ ] **[you]** Check whether SPK/BaFin/SEC treat any of this as regulated
       advice in the markets you list. The app is educational by design and says
@@ -1371,20 +1372,20 @@ method, a legal identity, or a signature.
 
 #### 5. Store listings
 
-- [ ] Screenshots per required device size: iPhone 6.7" and 6.5", iPad if you
+- [x] Screenshots per required device size: iPhone 6.7" and 6.5", iPad if you — `STORE=1 node demo/capture.mjs` renders 1290×2796, 1242×2688 and 1080×1920 natively, per language
       claim iPad support, Android phone + 7"/10" tablet. `demo/capture.mjs` can
       produce these — it now takes `LANG_UI`, so one run per language.
-- [ ] Descriptions, keywords and what's-new in **tr / en / de** — the same three
+- [x] Descriptions, keywords and what's-new in **tr / en / de** — the same three — written in `docs/store-submission.md`
       the app supports. A listing language the app does not speak is a bad
       first impression.
-- [ ] Category: **Finance**. Both stores apply extra scrutiny here; expect to
+- [x] Category: **Finance**. Both stores apply extra scrutiny here; expect to — decided, with the qualifier to give the reviewer, in `docs/store-submission.md`
       justify that the app gives no advice and moves no money.
-- [ ] Age rating questionnaires. "Does your app contain financial services?" —
+- [x] Age rating questionnaires. "Does your app contain financial services?" — — every question answered in `docs/store-submission.md`
       answer honestly, educational tools are fine.
 - [ ] **Demo account for reviewers** with pre-populated holdings, and its
       credentials in the review notes. A reviewer who has to complete a
       9-question quiz to see anything will not.
-- [ ] Review notes explaining, in one paragraph, that Lumos executes no trades
+- [x] Review notes explaining, in one paragraph, that Lumos executes no trades — written in `docs/store-submission.md`, ready to paste
       and holds no funds. This pre-empts the most likely rejection reason.
 
 #### 6. Before you submit

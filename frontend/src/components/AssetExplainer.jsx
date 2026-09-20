@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { percentFromWeight } from '../utils/format'
 
 /**
  * "What is it / why is it in your portfolio / what's the risk" card for
@@ -81,7 +82,7 @@ export default function AssetExplainer({ allocation, onClose, color }) {
             <span>{t(`${base}.type`)}</span>
             <span>·</span>
             <span style={{ color: accent, fontWeight: 600 }}>
-              %{(allocation.weight * 100).toFixed(0)}
+              {percentFromWeight(allocation.weight)}
             </span>
           </div>
         </div>

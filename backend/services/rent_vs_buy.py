@@ -211,6 +211,10 @@ def compare_rent_vs_buy(
             "portfolio_annual_growth_pct": portfolio_annual_growth_pct,
             "rent_annual_growth_pct": rent_annual_growth_pct,
             "mortgage_annual_rate_pct": mortgage_annual_rate_pct,
+            # Whether that rate is today's published average or the pack's
+            # documented assumption. "A rate" and "the rate" are different
+            # claims and the footnote should not blur them.
+            "mortgage_rate_is_live": assumptions.mortgage_rate_is_live(market),
             "mortgage_term_years": mortgage_term_years,
             "gross_rental_yield_pct": round(assumptions.gross_rental_yield(market) * 100, 1),
             "title_deed_fee_pct": assumptions.transfer_tax_pct(market),

@@ -28,6 +28,10 @@ alembic==1.15.2
 
 # ── Caching ───────────────────────────────────────────────────────────────────
 diskcache==5.6.3
+psycopg[binary]==3.2.3   # SYNC Postgres driver for the durable cache tier.
+                         # The cache is called from sync data adapters inside
+                         # thread pools; asyncpg cannot serve them without
+                         # rewriting every adapter. Ships wheels, no build.
 
 # ── Observability (optional, enabled via SENTRY_DSN) ────────────────────────
 sentry-sdk[fastapi]==2.19.2

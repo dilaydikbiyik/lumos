@@ -24,6 +24,21 @@ class HealthResponse(BaseModel):
     # only way to find that out was to sign in and be refused. A boolean, not
     # a count or an id: "is this deployment manageable" is the whole question.
     has_admin: bool
+    # Whether the cache's durable tier is live. The last-known-good data that
+    # carries the app through a provider outage lives on an EPHEMERAL disk
+    # unless this is true, so "is the fallback actually going to be there"
+    # is a question worth being able to answer without reading logs.
+    durable_cache: bool
+
+
+def _durable_cache_enabled() -> bool:
+    """Never let a cache probe be the reason /health fails."""
+    try:
+        from backend.services import cache_store
+
+        return cache_store.is_enabled()
+    except Exception:
+        return False
 
 
 @router.get("/health", response_model=HealthResponse)
@@ -64,6 +79,7 @@ async def health_check():
         "db": db_status,
         "ai": ai_status,
         "has_admin": has_admin,
+        "durable_cache": _durable_cache_enabled(),
         "data_sources": {
             "tcmb_evds": bool(settings.TCMB_EVDS_API_KEY),
             "fred": bool(settings.FRED_API_KEY),

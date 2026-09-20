@@ -8,6 +8,7 @@ import AppHeader from '../components/AppHeader'
 import ChatWindow from '../components/ChatWindow'
 import RiskGauge from '../components/RiskGauge'
 import DebtFirstCard from '../components/DebtFirstCard'
+import DeleteAccount from '../components/DeleteAccount'
 import usePortfolio from '../hooks/usePortfolio'
 import useMarket from '../hooks/useMarket'
 import { readJSON, writeJSON, removeKey, userKey } from '../utils/storage'
@@ -206,6 +207,8 @@ export default function ProfilePage() {
             >
               {t('profile.retake')}
             </button>
+
+            <DeleteAccount />
           </div>
         )}
       </div>

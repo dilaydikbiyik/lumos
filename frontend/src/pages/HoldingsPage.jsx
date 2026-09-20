@@ -332,9 +332,6 @@ export default function HoldingsPage() {
                     onChange={e => setForm({ ...form, asset_type: e.target.value })}>
               {TYPE_KEYS.map(v => <option key={v} value={v}>{t('holdings.types.' + v)}</option>)}
             </select>
-            <input className="input" required
-                   placeholder={t('holdings.namePlaceholder', { example: pack.example_asset_name })}
-                   value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
             {/* 🚗 Vehicle warning — "is your car wealth or an expense?" */}
             {isVehicle && (
               <div style={{
@@ -417,6 +414,14 @@ export default function HoldingsPage() {
                        }} />
               </>
             )}
+            {/* The name comes AFTER the symbol on purpose. It used to come
+                first, so by the time the lookup resolved the field was
+                already filled and the code correctly refused to overwrite
+                it — which meant every stock was typed out by hand even
+                though the app could have filled it. */}
+            <input className="input" required
+                   placeholder={t('holdings.namePlaceholder', { example: pack.example_asset_name })}
+                   value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
             <input className="input" type="number" placeholder={t('holdings.amountPlaceholder')} required min="1"
                    value={form.purchase_amount} onChange={e => setForm({ ...form, purchase_amount: e.target.value })} />
             {computedAmount != null && (

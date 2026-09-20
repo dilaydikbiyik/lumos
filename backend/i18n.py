@@ -515,6 +515,18 @@ _C: dict[str, dict[str, str]] = {
         "tr": "Bu bir tahmin DEĞİL: {name} ortalamasının kendi geçmişindeki tüm {years} yıllık dönemlerin dağılımı. Reel bant, her dönemin kendi enflasyonundan arındırılmıştır.",
         "en": "This is NOT a forecast: it's the distribution of every {years}-year period in {name}'s own history. The real band deflates each period by its own inflation.",
         "de": "Das ist KEINE Prognose: es ist die Verteilung aller {years}-Jahres-Zeiträume aus der eigenen Historie von {name}. Die reale Spanne bereinigt jeden Zeitraum um seine eigene Inflation."},
+    "account.confirmMismatch": {
+        "tr": "Hesap silme onayı eşleşmedi. İşlem yapılmadı.",
+        "en": "The deletion confirmation didn't match. Nothing was deleted.",
+        "de": "Die Löschbestätigung stimmte nicht. Es wurde nichts gelöscht."},
+    "account.deleted": {
+        "tr": "Hesabın ve tüm verilerin silindi. Seni ağırlamak güzeldi.",
+        "en": "Your account and all of your data have been deleted. It was good to have you here.",
+        "de": "Dein Konto und alle deine Daten wurden gelöscht. Schön, dass du da warst."},
+    "account.deletedDataOnly": {
+        "tr": "Verilerin silindi, ancak giriş hesabın şu anda kaldırılamadı. Destekle iletişime geçersen kalanını da silelim.",
+        "en": "Your data has been deleted, but your login could not be removed just now. Contact support and we'll finish the job.",
+        "de": "Deine Daten wurden gelöscht, dein Login konnte jedoch gerade nicht entfernt werden. Melde dich beim Support, dann erledigen wir den Rest."},
 }
 
 

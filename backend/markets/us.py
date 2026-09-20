@@ -51,7 +51,8 @@ US = MarketPack(
     ],
 
     # ── Planning inputs (US reality) ──
-    mortgage_rate_pct=6.5,
+    mortgage_rate_source="fred",       # Freddie Mac 30-yr fixed, weekly
+    mortgage_rate_pct=6.5,            # used only if FRED is unreachable
     mortgage_term_years=30,
     # Closing costs rather than a single deed tax: transfer taxes vary by
     # state and county, and lender/title/escrow fees are the larger share.

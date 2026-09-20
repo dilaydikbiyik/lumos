@@ -793,9 +793,11 @@
     "rentLine": "Peşinat + fark yatırımda · ödenen kira {{rent}} TL",
     "verdictBuy": "Bu varsayımlarla <0>satın almak</0> yaklaşık <1>{{amount}} TL</1> daha avantajlı görünüyor.",
     "verdictRent": "Bu varsayımlarla <0>kirada kalıp yatırım yapmak</0> yaklaşık <1>{{amount}} TL</1> daha avantajlı görünüyor.",
-    "assumptions": "Varsayımlar: konut +%{{housing}}/yıl, portföy +%{{portfolio}}/yıl, kredi %{{rate}}/yıl ({{term}} yıl vade), enflasyon %{{inflation}}/yıl ({{asOf}} verisi). Alım masrafları dahildir: devir vergileri ve resmî harçlar %{{deed}} + emlakçı komisyonu %{{agency}} + KDV (%{{vat}}) = %{{agencyVat}}; ayrıca aidat, sigorta ve bakım için yılda ev değerinin %{{upkeep}}'i. Bu oranlar mevzuat ve teamülle belirlenir, zamanla değişir. Büyük rakamlar çoğunlukla enflasyondan şişer; \"bugünkü alım gücü\" satırı gerçek değeri gösterir. Hesap, evde oturmaya devam ettiğin varsayımına dayanır; bu nedenle satış hâlinde doğabilecek vergiler ile ev sahibi olmanın parasal olmayan değeri dahil değildir — o kararın duygusal tarafı da meşrudur.",
+    "assumptions": "Varsayımlar: konut +%{{housing}}/yıl, portföy +%{{portfolio}}/yıl, kredi %{{rate}}/yıl {{rateSource}} ({{term}} yıl vade), enflasyon %{{inflation}}/yıl ({{asOf}} verisi). Alım masrafları dahildir: devir vergileri ve resmî harçlar %{{deed}} + emlakçı komisyonu %{{agency}} + KDV (%{{vat}}) = %{{agencyVat}}; ayrıca aidat, sigorta ve bakım için yılda ev değerinin %{{upkeep}}'i. Bu oranlar mevzuat ve teamülle belirlenir, zamanla değişir. Büyük rakamlar çoğunlukla enflasyondan şişer; \"bugünkü alım gücü\" satırı gerçek değeri gösterir. Hesap, evde oturmaya devam ettiğin varsayımına dayanır; bu nedenle satış hâlinde doğabilecek vergiler ile ev sahibi olmanın parasal olmayan değeri dahil değildir — o kararın duygusal tarafı da meşrudur.",
     "staleInflation": "⚠️ Bu pazarın enflasyon verisi {{asOf}} ayına ait — {{months}} ay geride. Kaynak (Eurostat) henüz daha yenisini yayınlamadı; hesap en güncel resmî rakamla yapıldı ama gerçek enflasyon bundan farklı olabilir.",
-    "selectYears": "Projeksiyon süresi"
+    "selectYears": "Projeksiyon süresi",
+    "rateLive": "(bugünkü yayımlanan ortalama)",
+    "rateAssumed": "(varsayım)"
   },
   "meta": {
     "title": "Lumos — Akıllı Yatırım Asistanı",
@@ -841,5 +843,115 @@
     "state": "eyalet",
     "region": "bölge",
     "segment": "Piyasa kesiti"
+  },
+  "legal": {
+    "updated": "Son güncelleme: {{date}}",
+    "updatedDate": "20 Eylül 2026",
+    "backHome": "Lumos'a dön",
+    "contact": "Buradaki her şeyle ilgili sorular için: dilaydikbiyik@gmail.com.",
+    "privacy": {
+      "title": "Gizlilik Politikası",
+      "sections": [
+        {
+          "h": "Kısa hâli",
+          "p": "Lumos, paranla ilgili anlattıklarını saklar; böylece yarın da aynı cevabı verebilir. Verini satmaz, reklam göstermez, seni başka sitelerde takip etmez. Her şeyi uygulamanın içinden silebilirsin ve bu silme gerçektir."
+        },
+        {
+          "h": "Lumos senin hakkında neleri saklıyor",
+          "p": "Giriş kimliğin — e-posta adresin ve adın — kimlik doğrulama sağlayıcımız Clerk'te tutulur; e-postan hesapları birbirinden ayırabilmek için bizim veritabanımıza da kopyalanır.\n\nRisk profilin: başlangıçta verdiğin cevaplar — yaş, aylık gelir, birikim oranı, yatırım vadesi, kayıp toleransı, deneyim, hedef, gelir istikrarı ve bildirdiğin yüksek faizli borç — ve bunlardan hesaplanan risk skoru.\n\nVarlıkların: eklediğin her varlık için tür, ad, sembol, alış tarihi ve tutarı, para birimi, adet, elle girdiğin güncel değer, notun ve isteğe bağlı duygu etiketi.\n\nTercihlerin: seçtiğin pazar, seçtiğin dil, yatırım yolun ve yoklamada işaretlediğin korku.\n\nGeri bildirim kutusuna yazdıkların ve o sırada hangi sayfada olduğun."
+        },
+        {
+          "h": "Lumos'un asla toplamadıkları",
+          "p": "Kart bilgisi, banka şifresi, TC kimlik numarası veya aracı kurum girişi yok — uygulama bunları hiç istemez, sen de asla girmemelisin. Reklam kimliği, üçüncü taraf takip pikseli, siteler arası profilleme yok. Lumos gerçek bir yatırım hesabını göremez ve ona dokunamaz; girdiğin her şey senin yazdığın bir kayıttır, paranla kurulmuş bir bağlantı değil."
+        },
+        {
+          "h": "Verin fiziksel olarak nerede duruyor",
+          "p": "Veritabanı Neon tarafından Frankfurt, Almanya'da (eu-central-1) barındırılıyor. Uygulama sunucusu Render'da, Oregon, ABD'de çalışıyor; yani verin AB'de saklanırken ABD'de de işleniyor. Web arayüzü Vercel üzerinden sunuluyor. Kimlik doğrulamayı Clerk yapıyor."
+        },
+        {
+          "h": "Yapay zekâ modellerine ne gönderiliyor",
+          "p": "Danışmanı kullandığında mesajın bir yapay zekâ sağlayıcısına — duruma göre Google Gemini, Groq veya OpenRouter — mantıklı cevap verebilmek için gereken profil ve portföy parçalarıyla birlikte gönderilir. Adın ve e-posta adresin gönderilmez. Bu sağlayıcılar isteği kendi koşullarına göre işler; Lumos onların ücretsiz katmanlarını kullanır ve ücretsiz katmanlar çoğunlukla sağlayıcıya gönderilen içeriği hizmetlerini geliştirmek için kullanma hakkı tanır. Danışmanı herkese açık bir sohbet gibi düşün: üçüncü bir tarafın elinde olmasını istemeyeceğin hiçbir şeyi oraya yapıştırma."
+        },
+        {
+          "h": "Hata izleme",
+          "p": "Hata izleme açıksa, bir çökmenin teknik ayrıntıları — hata, kodun izlediği yol, istek kimliği — Sentry'ye iletilir. Kişisel bilgi gönderimi kapalı yapılandırılmıştır; profil cevapların ve varlıkların hata raporlarına eklenmez."
+        },
+        {
+          "h": "Tarayıcında ne tutuluyor",
+          "p": "Lumos seçtiğin dili ve pazarı, bir de pazar listesinin önbelleğini tarayıcında tutar; böylece uygulama bıraktığın gibi açılır. Clerk, oturumunu açık tutmak için gereken çerezleri kullanır. Reklam veya analitik çerezi yoktur."
+        },
+        {
+          "h": "Ne kadar süre saklanıyor",
+          "p": "Verin, hesabın var olduğu sürece saklanır. Piyasa verisi önbellekleri teknikdir ve kişisel bilgi içermez. Hesabını sildiğinde verin de gider — sonrasında bir saklama süresi yoktur, geri yüklenmeyi bekleyen bir arşiv kopyası da yoktur."
+        },
+        {
+          "h": "Hesabını silmek",
+          "p": "Profil → Hesabımı sil. Profilini, her varlığını ve gönderdiğin her geri bildirimi veritabanımızdan kaldırır, ardından Clerk'teki girişini siler; böylece hesaba bir daha girilemez. Anında gerçekleşir ve geri alınamaz. Giriş kaydının silinmesi herhangi bir nedenle başarısız olursa, uygulama başarıyla tamamlanmış gibi davranmaz, sana durumu söyler."
+        },
+        {
+          "h": "Haklarin",
+          "p": "Lumos'un senin hakkında tuttuğu her şeyi uygulamanın içinde görebilirsin — hepsi bu kadar, gizli bir profil yok. Düzenleyerek düzeltebilir, yukarıdaki silme ile tamamen kaldırabilirsin. Türkiye'de KVKK, AB veya Birleşik Krallık'taysan GDPR kapsamındaki erişim, düzeltme, silme, kısıtlama, taşınabilirlik ve itiraz hakların geçerlidir; ilgili kurula şikâyette bulunabilirsin. Uygulamanın kendi başına yapamadığı her şey için: dilaydikbiyik@gmail.com."
+        },
+        {
+          "h": "Çocuklar",
+          "p": "Lumos 18 yaşından küçükler için tasarlanmamıştır ve çocuklara yönelik değildir."
+        },
+        {
+          "h": "Değişiklikler",
+          "p": "Bu politika, nelerin toplandığını veya kimin aldığını etkileyecek şekilde değişirse yukarıdaki tarih değişir ve değişiklik uygulamanın sürüm notlarına işlenir."
+        }
+      ]
+    },
+    "terms": {
+      "title": "Kullanım Koşulları",
+      "sections": [
+        {
+          "h": "Lumos nedir",
+          "p": "Lumos, yatırıma yeni başlayanlar için bir eğitim aracıdır. Kavramları anlatır, resmî verinin ne söylediğini gösterir ve kararları — sahte parayla dahil — gerçek para işin içine girmeden önce prova etmene izin verir."
+        },
+        {
+          "h": "Lumos ne değildir",
+          "p": "Yatırım danışmanlığı, finansal danışmanlık, vergi danışmanlığı veya hukuki danışmanlık değildir ve lisanslı bir profesyonelin yerini tutmaz. Lumos; SPK, SEC, FINRA, BaFin veya başka bir finansal otorite tarafından yetkilendirilmiş ya da denetlenmiş değildir. Uygulamadaki hiçbir şey belirli bir menkul kıymeti, fonu veya gayrimenkulü alma ya da satma tavsiyesi değildir. Lumos işlem gerçekleştiremez, paranı tutamaz, başka bir yerdeki hesabına erişemez."
+        },
+        {
+          "h": "Sayılar hakkında",
+          "p": "Rakamlar resmî kaynaklardan — TCMB, ABD Çalışma İstatistikleri Bürosu, St. Louis Fed, Eurostat ve Deutsche Bundesbank — ve piyasa veri sağlayıcılarından gelir. Gecikebilir, revize edilebilir veya büsbütün erişilemez olabilir; uygulama sana eski bir veri gösterdiğinde bunu söyler.\n\nProjeksiyonlar tahmin değildir. Açıkça belirtilmiş varsayımlara uygulanan aritmetiktir ve varsayımlar tam da onlara itiraz edebilesin diye her sonucun altında yazılıdır. Tapu harcı, emlakçı komisyonu, KDV ve bakım oranları mevzuat ve teamülle belirlenir ve değişir; herhangi bir çıktıyı karar olarak görmeden önce güncel kurallarla doğrula."
+        },
+        {
+          "h": "Geçmiş performans",
+          "p": "Uygulamadaki her tarihsel rakam, olmuş bitmiş olanı anlatır. Bundan sonra ne olacağını göstermez. Yatırım yaparken para kaybedebilirsin, hem de beklediğinden fazlasını."
+        },
+        {
+          "h": "Senin sorumluluğun",
+          "p": "Verdiğin kararlar senindir. Yazdıklarının doğruluğu — gelirin, varlıkların, borcun — geri dönen cevabın ne kadar işe yarayacağını belirler ve Lumos'un bunların hiçbirini doğrulama imkânı yoktur."
+        },
+        {
+          "h": "Hesabın",
+          "p": "Girişini güvende tut ve paylaşma. Lumos'u hukuka uygun kullan: servisi kırma, aşırı yükleme veya tersine mühendislik girişimi yok, veri kazıma yok ve lisanslı bir hizmetmiş gibi başkalarına danışmanlık vermek için kullanmak yok. Ücretsiz yapay zekâ katmanı günlük mesaj sınırına tabidir. Servise saldırmak veya onu suistimal etmek için kullanılan hesapları askıya alabiliriz."
+        },
+        {
+          "h": "Erişilebilirlik",
+          "p": "Lumos olduğu gibi sunulur; erişilebilirlik veya kesintisiz çalışma garantisi verilmez. Başarısız olabilen ya da koşullarını değiştirebilen üçüncü taraf veri ve yapay zekâ sağlayıcılarına bağımlıdır; özellikler değişebilir veya kaldırılabilir."
+        },
+        {
+          "h": "Sorumluluğun sınırı",
+          "p": "Hukukun izin verdiği ölçüde, Lumos ve yazarı; uygulamanın kullanımından veya gösterdiği herhangi bir şeye güvenilmesinden doğan yatırım zararlarından, kâr kayıplarından ya da dolaylı zararlardan sorumlu değildir. Buradaki hiçbir ifade, hukuken sınırlanamayacak sorumluluğu sınırlamaz."
+        },
+        {
+          "h": "Değişiklikler ve iletişim",
+          "p": "Bu koşullar değişebilir; yukarıdaki tarih en son ne zaman değiştiğini gösterir. Değişiklikten sonra Lumos'u kullanmaya devam etmen, koşulları kabul ettiğin anlamına gelir. Sorular: dilaydikbiyik@gmail.com."
+        }
+      ]
+    }
+  },
+  "account": {
+    "deleteTitle": "Hesabımı sil",
+    "confirmWord": "SİL",
+    "deleteBody": "Profilin, tüm varlıkların ve gönderdiğin tüm geri bildirimler silinir, ardından girişin kaldırılır. Anında gerçekleşir ve geri alınamaz — geri yüklenecek bir yedek yok.",
+    "confirmPrompt": "Onaylamak için {{word}} yaz",
+    "deleteConfirm": "Kalıcı olarak sil",
+    "deleting": "Siliniyor…",
+    "failed": "Hesap silinemedi. Hiçbir şey değişmedi.",
+    "partial": "Verilerin silindi, ancak girişin kaldırılamadı. Lütfen destekle iletişime geç."
   }
 }

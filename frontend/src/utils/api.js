@@ -96,6 +96,48 @@ api.interceptors.response.use(
 )
 
 /**
+ * Coalesce identical GETs that are in flight at the same time.
+ *
+ * The dashboard mounts six components that each fetch what they need, and two
+ * of those needs overlap: /holdings/summary is wanted by the page and by the
+ * allocation comparison, /users/me/readiness by the courage score and by the
+ * background illumination. Every visit therefore made two requests nobody
+ * asked for — and on a free instance waking from sleep that is the difference
+ * between slow and "the page doesn't load".
+ *
+ * Coalescing rather than caching on purpose: a second call gets the SAME
+ * response as the first, but a later call still goes to the network. Nothing
+ * becomes stale, and no component has to know another exists.
+ *
+ * GET only. Two identical POSTs are two intentions, not one.
+ */
+const inFlight = new Map()
+
+function coalesceKey(config) {
+  const params = config.params ? JSON.stringify(config.params) : ''
+  return `${config.url}?${params}`
+}
+
+const rawGet = api.get.bind(api)
+api.get = (url, config = {}) => {
+  // An explicit signal means the caller intends to control this request.
+  if (config.signal) return rawGet(url, config)
+
+  const key = coalesceKey({ url, params: config.params })
+  const existing = inFlight.get(key)
+  if (existing) return existing
+
+  const promise = rawGet(url, config).finally(() => inFlight.delete(key))
+  inFlight.set(key, promise)
+  return promise
+}
+
+/** Exported for tests. */
+export function inFlightCount() {
+  return inFlight.size
+}
+
+/**
  * FastAPI error 'detail' is a string for our own HTTPExceptions, but
  * Pydantic validation errors (422) return an array of objects — render
  * either safely instead of letting React print "[object Object]".

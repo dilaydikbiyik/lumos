@@ -793,9 +793,11 @@
     "rentLine": "Deposit + difference invested · rent paid {{rent}}",
     "verdictBuy": "On these assumptions <0>buying</0> looks about <1>{{amount}}</1> better.",
     "verdictRent": "On these assumptions <0>renting and investing</0> looks about <1>{{amount}}</1> better.",
-    "assumptions": "Assumptions: housing +{{housing}}%/yr, portfolio +{{portfolio}}%/yr, mortgage {{rate}}%/yr ({{term}}-year term), inflation {{inflation}}%/yr (data through {{asOf}}). Purchase costs are included: transfer taxes and official fees {{deed}}% + agency commission {{agency}}% + VAT ({{vat}}%) = {{agencyVat}}%; plus {{upkeep}}% of the home's value per year for dues, insurance and upkeep. These rates are set by regulation and custom and change over time. Large figures are inflated mostly by inflation; the \"in today's money\" line shows the real value. The calculation assumes you keep living in the home, so taxes arising on a sale and the non-financial value of owning are excluded — the emotional side of that decision is legitimate too.",
+    "assumptions": "Assumptions: housing +{{housing}}%/yr, portfolio +{{portfolio}}%/yr, mortgage {{rate}}%/yr {{rateSource}} ({{term}}-year term), inflation {{inflation}}%/yr (data through {{asOf}}). Purchase costs are included: transfer taxes and official fees {{deed}}% + agency commission {{agency}}% + VAT ({{vat}}%) = {{agencyVat}}%; plus {{upkeep}}% of the home's value per year for dues, insurance and upkeep. These rates are set by regulation and custom and change over time. Large figures are inflated mostly by inflation; the \"in today's money\" line shows the real value. The calculation assumes you keep living in the home, so taxes arising on a sale and the non-financial value of owning are excluded — the emotional side of that decision is legitimate too.",
     "staleInflation": "⚠️ This market's inflation reading is for {{asOf}} — {{months}} months behind. The source (Eurostat) has not published anything more recent; the calculation uses the latest official figure, but actual inflation may differ.",
-    "selectYears": "Projection length"
+    "selectYears": "Projection length",
+    "rateLive": "(today's published average)",
+    "rateAssumed": "(assumed)"
   },
   "meta": {
     "title": "Lumos — Smart Investment Assistant",
@@ -841,5 +843,115 @@
     "state": "state",
     "region": "region",
     "segment": "Market segment"
+  },
+  "legal": {
+    "updated": "Last updated: {{date}}",
+    "updatedDate": "20 September 2026",
+    "backHome": "Back to Lumos",
+    "contact": "Questions about any of this: dilaydikbiyik@gmail.com.",
+    "privacy": {
+      "title": "Privacy Policy",
+      "sections": [
+        {
+          "h": "The short version",
+          "p": "Lumos stores what you tell it about your money so it can give you the same answer tomorrow. It does not sell your data, does not run advertising, and does not track you across other sites. You can delete everything from inside the app, and the deletion is real."
+        },
+        {
+          "h": "What Lumos stores about you",
+          "p": "Your sign-in identity — email address and name — is held by Clerk, our authentication provider, and your email is copied into our database so the app can tell accounts apart.\n\nYour risk profile: the answers you give during onboarding — age, monthly income, savings rate, investment horizon, loss tolerance, experience, goal, income stability, and any high-interest debt you report — plus the risk score derived from them.\n\nYour holdings: for each asset you add, its type, name, ticker, purchase date and amount, currency, quantity, any current value you enter by hand, your note, and the optional emotion tag.\n\nYour choices: chosen market, chosen language, investment path, and the fear you picked at check-in.\n\nAnything you write in the feedback box, together with the page you were on."
+        },
+        {
+          "h": "What Lumos never collects",
+          "p": "No payment card details, bank credentials, national identity numbers or brokerage logins — the app never asks for them, and you should never enter them. No advertising identifiers, no third-party tracking pixels, no cross-site profiling. Lumos cannot see or touch any real brokerage account; everything you enter is a record you typed, not a connection to your money."
+        },
+        {
+          "h": "Where your data physically lives",
+          "p": "The database is hosted by Neon in Frankfurt, Germany (eu-central-1). The application server runs on Render in Oregon, United States, which means your data is processed in the United States as well as stored in the EU. The web app is served by Vercel. Authentication is handled by Clerk."
+        },
+        {
+          "h": "What is sent to the AI models",
+          "p": "When you use the advisor, your message is sent to an AI provider — Google Gemini, Groq or OpenRouter, depending on availability — together with the parts of your profile and portfolio needed to answer sensibly. Your name and email address are not included. These providers process the request under their own terms; Lumos uses their free tiers, and free tiers commonly permit the provider to use submitted content to improve their services. Treat the advisor as a public conversation: do not paste anything into it you would not want a third party to hold."
+        },
+        {
+          "h": "Error monitoring",
+          "p": "If error monitoring is enabled, Sentry receives technical details of a crash — the error, the code path, the request id. It is configured with personal information disabled, so your profile answers and holdings are not attached to error reports."
+        },
+        {
+          "h": "What is kept in your browser",
+          "p": "Lumos stores your chosen language and market, and a cached copy of the market list, in your browser so the app opens the way you left it. Clerk sets the cookies needed to keep you signed in. There are no advertising or analytics cookies."
+        },
+        {
+          "h": "How long it is kept",
+          "p": "Your data is kept for as long as your account exists. Market data caches are technical and hold no personal information. Delete your account and the data goes with it — there is no retention period afterwards, and no archived copy waiting to be restored."
+        },
+        {
+          "h": "Deleting your account",
+          "p": "Profile → Delete my account. It removes your profile, every holding, and every piece of feedback you submitted from our database, and then deletes your login from Clerk so the account cannot be signed into again. It is immediate and cannot be undone. If the login removal fails for any reason, the app tells you so rather than claiming success."
+        },
+        {
+          "h": "Your rights",
+          "p": "You can see everything Lumos holds about you inside the app — that is all of it; there is no hidden profile. You can correct it by editing it, and you can erase it with the deletion above. If you are in the EU or UK, the GDPR rights of access, rectification, erasure, restriction, portability and objection apply, and you may complain to your national data protection authority. Email dilaydikbiyik@gmail.com for anything the app itself cannot do."
+        },
+        {
+          "h": "Children",
+          "p": "Lumos is not intended for anyone under 18 and is not directed at children."
+        },
+        {
+          "h": "Changes",
+          "p": "If this policy changes in a way that affects what is collected or who receives it, the date at the top changes and the change is noted in the app's release notes."
+        }
+      ]
+    },
+    "terms": {
+      "title": "Terms of Use",
+      "sections": [
+        {
+          "h": "What Lumos is",
+          "p": "Lumos is an educational tool for people who are new to investing. It explains concepts, shows what official data says, and lets you rehearse decisions — including with play money — before any real money is involved."
+        },
+        {
+          "h": "What Lumos is not",
+          "p": "It is not investment advice, financial advice, tax advice or legal advice, and it is not a substitute for a licensed professional. Lumos is not authorised or regulated by the SPK, the SEC, FINRA, BaFin or any other financial authority. Nothing in the app is a recommendation to buy or sell any particular security, fund or property. Lumos cannot execute a trade, hold your money, or access any account you hold elsewhere."
+        },
+        {
+          "h": "About the numbers",
+          "p": "Figures come from official sources — the Turkish central bank, the US Bureau of Labor Statistics, the St. Louis Fed, Eurostat and the Deutsche Bundesbank — and from market data providers. They can be delayed, revised or simply unavailable, and the app says so when it is showing you something old.\n\nProjections are not forecasts. They are arithmetic applied to stated assumptions, and the assumptions are printed underneath every result precisely so you can disagree with them. Transfer taxes, agency commission, VAT and upkeep rates are set by regulation and custom and they change; verify them against the current rules before treating any output as a decision."
+        },
+        {
+          "h": "Past performance",
+          "p": "Every historical figure in the app describes what already happened. It does not indicate what will happen next. You can lose money investing, including more than you expected to."
+        },
+        {
+          "h": "Your responsibility",
+          "p": "Decisions you make are yours. The accuracy of what you type — your income, your holdings, your debt — determines the usefulness of what comes back, and Lumos has no way to verify any of it."
+        },
+        {
+          "h": "Your account",
+          "p": "Keep your sign-in secure and do not share it. Use Lumos lawfully: no attempts to break, overload or reverse the service, no scraping, and no using it to advise other people as though it were a licensed service. The free AI tier is subject to a daily message limit. We may suspend an account that is being used to attack or abuse the service."
+        },
+        {
+          "h": "Availability",
+          "p": "Lumos is provided as-is, with no guarantee of availability or of uninterrupted operation. It depends on third-party data and AI providers that can fail or change their terms; features may change or be withdrawn."
+        },
+        {
+          "h": "Limitation of liability",
+          "p": "To the extent the law allows, Lumos and its author are not liable for investment losses, lost profits, or any indirect or consequential loss arising from use of the app or from reliance on anything it displays. Nothing here limits liability that cannot lawfully be limited."
+        },
+        {
+          "h": "Changes and contact",
+          "p": "These terms may change; the date at the top shows when they last did. Continuing to use Lumos after a change means you accept it. Questions: dilaydikbiyik@gmail.com."
+        }
+      ]
+    }
+  },
+  "account": {
+    "deleteTitle": "Delete my account",
+    "confirmWord": "DELETE",
+    "deleteBody": "This removes your profile, every holding and every piece of feedback you sent, then deletes your login. It happens immediately and cannot be undone — there is no backup to restore from.",
+    "confirmPrompt": "Type {{word}} to confirm",
+    "deleteConfirm": "Delete permanently",
+    "deleting": "Deleting…",
+    "failed": "The account could not be deleted. Nothing was changed.",
+    "partial": "Your data was deleted, but your login could not be removed. Please contact support."
   }
 }

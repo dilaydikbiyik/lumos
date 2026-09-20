@@ -59,14 +59,20 @@ DE = MarketPack(
     ],
 
     # ── Planning inputs (German reality, not Turkish) ──
-    mortgage_rate_pct=3.8,
+    mortgage_rate_source="bundesbank",  # MFI effective rate, new housing loans
+    mortgage_rate_pct=3.8,             # used only if the Bundesbank is unreachable
     mortgage_term_years=20,
-    # Grunderwerbsteuer varies by Bundesland (3.5%–6.5%); notary and land
-    # registry add roughly 1.5–2%. This is a mid-range national assumption
-    # and the UI says so — a Berlin buyer pays more than a Bavarian one.
-    transfer_tax_pct=8.0,
-    # Maklerprovision has been split between buyer and seller since 2020.
-    agency_commission_pct=3.57,
+    # Grunderwerbsteuer varies by Bundesland (3.5% in Bayern to 6.5% in NRW,
+    # Brandenburg and others), so a national figure can only be a midpoint:
+    # 5.0% for the tax, plus roughly 1.5% notary and 0.5% land registry, both
+    # of which are fee-schedule driven rather than negotiable. A Bavarian
+    # buyer pays visibly less than a Berlin one, and the UI says so.
+    transfer_tax_pct=7.0,
+    # Maklerprovision, NET of VAT — the engine adds vat_pct on top, and
+    # 3.0% + 19% is the 3.57% a German buyer sees quoted. Storing the gross
+    # figure here billed the VAT twice. Split between buyer and seller
+    # since the 2020 Gesetz, so this is the buyer's half.
+    agency_commission_pct=3.0,
     vat_pct=19.0,
     annual_upkeep_pct=1.2,
     gross_rental_yield=0.035,

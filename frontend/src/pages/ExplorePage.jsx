@@ -399,6 +399,10 @@ function RentVsBuy() {
               housing: result.assumptions.housing_annual_growth_pct,
               portfolio: result.assumptions.portfolio_annual_growth_pct,
               rate: result.assumptions.mortgage_annual_rate_pct,
+              // A rate read from Freddie Mac today and a rate we assumed are
+              // different claims; the footnote should not let them look alike.
+              rateSource: t(result.assumptions.mortgage_rate_is_live
+                ? 'rvb.rateLive' : 'rvb.rateAssumed'),
               term: result.assumptions.mortgage_term_years,
               inflation: result.assumptions.annual_inflation_pct,
               asOf: result.assumptions.inflation_as_of || '—',

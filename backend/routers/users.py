@@ -213,6 +213,56 @@ async def update_market(
     return await user_repository.set_market(db, user_id, code)
 
 
+class AccountDeletion(BaseModel):
+    """
+    A typed confirmation rather than a bare DELETE.
+
+    The client must echo the user's own id back. It is not a security control
+    — the token already proves who is calling — it is a guard against a stray
+    request, a double-tapped button or a replayed call erasing an account
+    that nobody meant to erase.
+    """
+    confirm_user_id: str
+
+
+@router.delete("/me")
+@limiter.limit("3/hour")
+async def delete_me(
+    request: Request,
+    body: AccountDeletion,
+    user_id: str = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+    lang: str = Depends(language),
+):
+    """
+    Erase the account: our rows first, then the Clerk login.
+
+    Apple requires deletion to be reachable from inside the app for anything
+    that lets you create an account, and "email us and we will get to it" does
+    not qualify. Order matters — if Clerk went first and our delete then
+    failed, the rows would be orphaned with no login left that could ever ask
+    for them again.
+    """
+    from fastapi import HTTPException
+
+    from backend.services import clerk_service
+
+    if body.confirm_user_id != user_id:
+        raise HTTPException(status_code=400, detail=t("account.confirmMismatch", lang))
+
+    await user_repository.delete_account(db, user_id)
+    identity_removed = clerk_service.delete_user(user_id)
+
+    # Say which half happened. Reporting a clean deletion when the login is
+    # still alive is the one failure the user would discover by themselves.
+    return {
+        "data_deleted": True,
+        "identity_deleted": identity_removed,
+        "message": t("account.deleted" if identity_removed
+                     else "account.deletedDataOnly", lang),
+    }
+
+
 @router.get("/me/plans")
 async def list_plans(user_id: str = Depends(get_current_user)):
     """AI plan tiers — pricing page payload (billing-ready)."""

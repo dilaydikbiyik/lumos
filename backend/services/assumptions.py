@@ -185,8 +185,49 @@ def rent_growth_pct(market: str = "TR") -> float:
     return _apply_spread(annual_inflation_pct(market), pack.rent_real_spread_pct)
 
 
+_MORTGAGE_READERS = {
+    "fred": lambda: __import__(
+        "backend.services.fred_service", fromlist=["x"]).get_mortgage_rate_pct(),
+    "bundesbank": lambda: __import__(
+        "backend.services.bundesbank_service", fromlist=["x"]).get_mortgage_rate_pct(),
+}
+
+
 def mortgage_rate_pct(market: str = "TR") -> float:
-    return _pack(market).mortgage_rate_pct
+    """
+    The rate a buyer in this market is actually quoted.
+
+    Read live where a free source publishes it — Freddie Mac's 30-year fixed
+    for the US, the Bundesbank's effective rate on new housing loans for
+    Germany. Türkiye has no keyless series we could find, so it keeps the
+    documented pack constant, which the UI shows as an assumption either way.
+    A source that goes quiet falls back to the same constant rather than to
+    another country's rate.
+    """
+    pack = _pack(market)
+    reader = _MORTGAGE_READERS.get(pack.mortgage_rate_source)
+    if reader:
+        try:
+            live = reader()
+            if live and 0 < live < 100:
+                return round(live, 2)
+        except Exception as exc:
+            logger.warning("live mortgage rate failed for %s (%s)",
+                           market, type(exc).__name__)
+    return pack.mortgage_rate_pct
+
+
+def mortgage_rate_is_live(market: str = "TR") -> bool:
+    """Whether the rate above came from a source rather than the constant."""
+    pack = _pack(market)
+    reader = _MORTGAGE_READERS.get(pack.mortgage_rate_source)
+    if not reader:
+        return False
+    try:
+        live = reader()
+        return bool(live and 0 < live < 100)
+    except Exception:
+        return False
 
 
 def mortgage_term_years(market: str = "TR") -> int:

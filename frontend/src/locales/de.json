@@ -553,9 +553,11 @@
     "rentLine": "Eigenkapital + Differenz angelegt · gezahlte Miete {{rent}}",
     "verdictBuy": "Unter diesen Annahmen wirkt <0>Kaufen</0> um rund <1>{{amount}}</1> vorteilhafter.",
     "verdictRent": "Unter diesen Annahmen wirkt <0>Mieten und Anlegen</0> um rund <1>{{amount}}</1> vorteilhafter.",
-    "assumptions": "Annahmen: Immobilien +{{housing}}%/Jahr, Portfolio +{{portfolio}}%/Jahr, Kredit {{rate}}%/Jahr ({{term}} Jahre Laufzeit), Inflation {{inflation}}%/Jahr (Daten bis {{asOf}}). Kaufnebenkosten sind enthalten: Erwerbsteuern und Amtsgebühren {{deed}}% + Maklerprovision {{agency}}% + MwSt. ({{vat}}%) = {{agencyVat}}%; dazu {{upkeep}}% des Immobilienwerts pro Jahr für Hausgeld, Versicherung und Instandhaltung. Diese Sätze werden durch Gesetz und Gepflogenheit bestimmt und ändern sich. Große Zahlen sind meist von der Inflation aufgebläht; die Zeile \"in heutigem Geld\" zeigt den realen Wert. Die Rechnung geht davon aus, dass du wohnen bleibst — Steuern bei einem Verkauf und der nicht-finanzielle Wert des Eigentums sind daher nicht enthalten; die emotionale Seite dieser Entscheidung ist ebenso legitim.",
+    "assumptions": "Annahmen: Immobilien +{{housing}}%/Jahr, Portfolio +{{portfolio}}%/Jahr, Kredit {{rate}}%/Jahr {{rateSource}} ({{term}} Jahre Laufzeit), Inflation {{inflation}}%/Jahr (Daten bis {{asOf}}). Kaufnebenkosten sind enthalten: Erwerbsteuern und Amtsgebühren {{deed}}% + Maklerprovision {{agency}}% + MwSt. ({{vat}}%) = {{agencyVat}}%; dazu {{upkeep}}% des Immobilienwerts pro Jahr für Hausgeld, Versicherung und Instandhaltung. Diese Sätze werden durch Gesetz und Gepflogenheit bestimmt und ändern sich. Große Zahlen sind meist von der Inflation aufgebläht; die Zeile \"in heutigem Geld\" zeigt den realen Wert. Die Rechnung geht davon aus, dass du wohnen bleibst — Steuern bei einem Verkauf und der nicht-finanzielle Wert des Eigentums sind daher nicht enthalten; die emotionale Seite dieser Entscheidung ist ebenso legitim.",
     "staleInflation": "⚠️ Der Inflationswert dieses Marktes stammt aus {{asOf}} — {{months}} Monate alt. Die Quelle (Eurostat) hat nichts Neueres veröffentlicht; die Rechnung nutzt die aktuellste offizielle Zahl, die tatsächliche Inflation kann davon abweichen.",
-    "selectYears": "Projektionsdauer"
+    "selectYears": "Projektionsdauer",
+    "rateLive": "(aktueller veröffentlichter Durchschnitt)",
+    "rateAssumed": "(Annahme)"
   },
   "reit": {
     "title": "Immobilien anlegen: REIT-ETFs",
@@ -841,5 +843,115 @@
     "state": "Bundesstaat",
     "region": "Region",
     "segment": "Marktsegment"
+  },
+  "legal": {
+    "updated": "Zuletzt aktualisiert: {{date}}",
+    "updatedDate": "20. September 2026",
+    "backHome": "Zurück zu Lumos",
+    "contact": "Fragen zu all dem: dilaydikbiyik@gmail.com.",
+    "privacy": {
+      "title": "Datenschutzerklärung",
+      "sections": [
+        {
+          "h": "Die kurze Fassung",
+          "p": "Lumos speichert, was du über dein Geld erzählst, damit es dir morgen dieselbe Antwort geben kann. Es verkauft deine Daten nicht, zeigt keine Werbung und verfolgt dich nicht über andere Seiten hinweg. Du kannst alles aus der App heraus löschen, und diese Löschung ist echt."
+        },
+        {
+          "h": "Was Lumos über dich speichert",
+          "p": "Deine Anmeldeidentität — E-Mail-Adresse und Name — liegt bei Clerk, unserem Authentifizierungsdienst; deine E-Mail-Adresse wird zusätzlich in unsere Datenbank kopiert, damit die App Konten unterscheiden kann.\n\nDein Risikoprofil: die Antworten aus dem Einstieg — Alter, monatliches Einkommen, Sparquote, Anlagehorizont, Verlusttoleranz, Erfahrung, Ziel, Einkommensstabilität und angegebene hochverzinste Schulden — sowie der daraus berechnete Risikowert.\n\nDeine Positionen: je Position Art, Name, Kürzel, Kaufdatum und -betrag, Währung, Stückzahl, ein selbst eingetragener aktueller Wert, deine Notiz und das optionale Gefühls-Label.\n\nDeine Einstellungen: gewählter Markt, gewählte Sprache, Anlageweg und die beim Check-in gewählte Sorge.\n\nAlles, was du ins Feedback-Feld schreibst, zusammen mit der Seite, auf der du warst."
+        },
+        {
+          "h": "Was Lumos nie erhebt",
+          "p": "Keine Kartendaten, Bankzugänge, Ausweisnummern oder Broker-Logins — die App fragt nie danach, und du solltest sie nie eingeben. Keine Werbe-IDs, keine Tracking-Pixel Dritter, kein seitenübergreifendes Profiling. Lumos kann kein echtes Depot sehen oder anfassen; alles, was du einträgst, ist ein von dir getippter Eintrag, keine Verbindung zu deinem Geld."
+        },
+        {
+          "h": "Wo deine Daten physisch liegen",
+          "p": "Die Datenbank wird von Neon in Frankfurt am Main (eu-central-1) betrieben. Der Anwendungsserver läuft bei Render in Oregon, USA — deine Daten werden also in den USA verarbeitet und in der EU gespeichert. Die Weboberfläche liefert Vercel aus. Die Authentifizierung übernimmt Clerk."
+        },
+        {
+          "h": "Was an die KI-Modelle geht",
+          "p": "Wenn du den Berater nutzt, geht deine Nachricht an einen KI-Anbieter — je nach Verfügbarkeit Google Gemini, Groq oder OpenRouter — zusammen mit den Teilen deines Profils und Portfolios, die für eine sinnvolle Antwort nötig sind. Name und E-Mail-Adresse sind nicht dabei. Diese Anbieter verarbeiten die Anfrage nach ihren eigenen Bedingungen; Lumos nutzt ihre kostenlosen Kontingente, und kostenlose Kontingente erlauben dem Anbieter üblicherweise, eingereichte Inhalte zur Verbesserung seiner Dienste zu verwenden. Behandle den Berater wie ein öffentliches Gespräch: füge dort nichts ein, was ein Dritter nicht haben soll."
+        },
+        {
+          "h": "Fehlerüberwachung",
+          "p": "Ist die Fehlerüberwachung aktiv, erhält Sentry die technischen Details eines Absturzes — Fehler, Codepfad, Request-ID. Die Übermittlung personenbezogener Daten ist abgeschaltet; deine Profilantworten und Positionen hängen nicht an Fehlerberichten."
+        },
+        {
+          "h": "Was im Browser bleibt",
+          "p": "Lumos speichert deine Sprache, deinen Markt und eine zwischengespeicherte Marktliste in deinem Browser, damit die App so aufgeht, wie du sie verlassen hast. Clerk setzt die Cookies, die deine Anmeldung aufrechterhalten. Werbe- oder Analyse-Cookies gibt es nicht."
+        },
+        {
+          "h": "Wie lange gespeichert wird",
+          "p": "Deine Daten bleiben, solange dein Konto besteht. Marktdaten-Caches sind technisch und enthalten keine personenbezogenen Daten. Löschst du dein Konto, gehen die Daten mit — danach gibt es keine Aufbewahrungsfrist und keine archivierte Kopie, die auf Wiederherstellung wartet."
+        },
+        {
+          "h": "Konto löschen",
+          "p": "Profil → Mein Konto löschen. Das entfernt dein Profil, jede Position und jedes abgeschickte Feedback aus unserer Datenbank und löscht anschließend deinen Login bei Clerk, sodass das Konto nicht erneut betreten werden kann. Es wirkt sofort und ist nicht rückgängig zu machen. Scheitert die Löschung des Logins aus irgendeinem Grund, sagt die App es dir, statt Erfolg zu melden."
+        },
+        {
+          "h": "Deine Rechte",
+          "p": "Du siehst alles, was Lumos über dich hält, in der App — mehr ist es nicht, ein verstecktes Profil gibt es nicht. Du kannst es durch Bearbeiten berichtigen und mit der Löschung oben vollständig entfernen. In der EU und im Vereinigten Königreich gelten die DSGVO-Rechte auf Auskunft, Berichtigung, Löschung, Einschränkung, Datenübertragbarkeit und Widerspruch; du kannst dich bei deiner Aufsichtsbehörde beschweren. Für alles, was die App nicht selbst kann: dilaydikbiyik@gmail.com."
+        },
+        {
+          "h": "Kinder",
+          "p": "Lumos ist nicht für Personen unter 18 Jahren gedacht und richtet sich nicht an Kinder."
+        },
+        {
+          "h": "Änderungen",
+          "p": "Ändert sich diese Erklärung so, dass es betrifft, was erhoben wird oder wer es erhält, ändert sich das Datum oben, und die Änderung wird in den Release Notes der App vermerkt."
+        }
+      ]
+    },
+    "terms": {
+      "title": "Nutzungsbedingungen",
+      "sections": [
+        {
+          "h": "Was Lumos ist",
+          "p": "Lumos ist ein Lernwerkzeug für Menschen, die mit dem Investieren beginnen. Es erklärt Begriffe, zeigt, was offizielle Daten sagen, und lässt dich Entscheidungen proben — auch mit Spielgeld — bevor echtes Geld im Spiel ist."
+        },
+        {
+          "h": "Was Lumos nicht ist",
+          "p": "Es ist keine Anlageberatung, keine Finanz-, Steuer- oder Rechtsberatung und ersetzt keine zugelassene Fachperson. Lumos ist nicht von der BaFin, der SPK, der SEC, der FINRA oder einer anderen Finanzaufsicht zugelassen oder beaufsichtigt. Nichts in der App ist eine Empfehlung, ein bestimmtes Wertpapier, einen Fonds oder eine Immobilie zu kaufen oder zu verkaufen. Lumos kann keine Order ausführen, kein Geld halten und auf kein Konto anderswo zugreifen."
+        },
+        {
+          "h": "Zu den Zahlen",
+          "p": "Die Zahlen stammen aus offiziellen Quellen — der türkischen Zentralbank, dem US Bureau of Labor Statistics, der St. Louis Fed, Eurostat und der Deutschen Bundesbank — sowie von Marktdatenanbietern. Sie können verzögert, revidiert oder schlicht nicht verfügbar sein; die App sagt es, wenn sie dir etwas Altes zeigt.\n\nProjektionen sind keine Prognosen. Sie sind Arithmetik auf ausgewiesenen Annahmen, und die Annahmen stehen unter jedem Ergebnis, gerade damit du ihnen widersprechen kannst. Grunderwerbsteuer, Maklerprovision, Umsatzsteuer und Instandhaltungssätze sind durch Regulierung und Gepflogenheit gesetzt und ändern sich; prüfe sie gegen die aktuellen Regeln, bevor du ein Ergebnis als Entscheidung behandelst."
+        },
+        {
+          "h": "Vergangene Wertentwicklung",
+          "p": "Jede historische Zahl in der App beschreibt, was bereits geschehen ist. Sie sagt nichts darüber, was als Nächstes passiert. Beim Investieren kannst du Geld verlieren, auch mehr als erwartet."
+        },
+        {
+          "h": "Deine Verantwortung",
+          "p": "Deine Entscheidungen sind deine. Wie brauchbar die Antwort ist, hängt davon ab, wie richtig deine Eingaben sind — Einkommen, Positionen, Schulden — und Lumos hat keine Möglichkeit, davon irgendetwas zu überprüfen."
+        },
+        {
+          "h": "Dein Konto",
+          "p": "Halte deinen Zugang sicher und teile ihn nicht. Nutze Lumos rechtmäßig: keine Versuche, den Dienst zu brechen, zu überlasten oder zurückzuentwickeln, kein Scraping, und keine Nutzung, um andere zu beraten, als wäre dies ein zugelassener Dienst. Die kostenlose KI-Stufe hat ein tägliches Nachrichtenlimit. Konten, die den Dienst angreifen oder missbrauchen, können gesperrt werden."
+        },
+        {
+          "h": "Verfügbarkeit",
+          "p": "Lumos wird wie besehen bereitgestellt, ohne Zusicherung von Verfügbarkeit oder unterbrechungsfreiem Betrieb. Es hängt von Daten- und KI-Anbietern Dritter ab, die ausfallen oder ihre Bedingungen ändern können; Funktionen können sich ändern oder entfallen."
+        },
+        {
+          "h": "Haftungsbeschränkung",
+          "p": "Soweit gesetzlich zulässig, haften Lumos und sein Autor nicht für Anlageverluste, entgangenen Gewinn oder mittelbare Schäden aus der Nutzung der App oder aus dem Vertrauen auf das, was sie anzeigt. Eine Haftung, die gesetzlich nicht beschränkt werden kann, bleibt unberührt."
+        },
+        {
+          "h": "Änderungen und Kontakt",
+          "p": "Diese Bedingungen können sich ändern; das Datum oben zeigt, wann zuletzt. Nutzt du Lumos nach einer Änderung weiter, akzeptierst du sie. Fragen: dilaydikbiyik@gmail.com."
+        }
+      ]
+    }
+  },
+  "account": {
+    "deleteTitle": "Mein Konto löschen",
+    "confirmWord": "LÖSCHEN",
+    "deleteBody": "Das entfernt dein Profil, jede Position und jedes gesendete Feedback und löscht anschließend deinen Login. Es wirkt sofort und ist nicht rückgängig zu machen — es gibt keine Sicherung zum Wiederherstellen.",
+    "confirmPrompt": "Tippe {{word}} zur Bestätigung",
+    "deleteConfirm": "Endgültig löschen",
+    "deleting": "Wird gelöscht…",
+    "failed": "Das Konto konnte nicht gelöscht werden. Es wurde nichts geändert.",
+    "partial": "Deine Daten wurden gelöscht, dein Login konnte jedoch nicht entfernt werden. Bitte wende dich an den Support."
   }
 }

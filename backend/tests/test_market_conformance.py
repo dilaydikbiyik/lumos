@@ -20,6 +20,8 @@ naming only its own country's facts.
 
 import re
 
+from unittest import mock
+
 import pytest
 
 from backend.auth import permissions as perms  # noqa: F401  (import-time sanity)
@@ -283,6 +285,52 @@ def test_a_declared_source_produces_a_plausible_number(market):
     assert 0 <= pack.transfer_tax_pct < 30
     assert 0 <= pack.vat_pct < 50
     assert 0 < pack.gross_rental_yield < 0.5
+
+    # agency_commission_pct is stored NET; the engine adds VAT. Germany held
+    # the gross 3.57% here, so VAT was billed twice and every German buy-side
+    # total carried a cost no buyer is charged. The invariant that catches it:
+    # the gross must be exactly net + VAT, and must stay inside the band a
+    # real buyer's agent charges anywhere we operate.
+    gross = assumptions.agency_commission_with_vat_pct(market)
+    expected = pack.agency_commission_pct * (1 + pack.vat_pct / 100)
+    assert gross == pytest.approx(expected, abs=0.01), (market, gross, expected)
+    assert 0 <= gross <= 6, (market, gross)
+
+
+@pytest.mark.parametrize("market", MARKETS)
+def test_the_mortgage_rate_is_read_live_or_falls_back_to_its_own_market(market):
+    """
+    The rate is the single input that decides a rent-vs-buy verdict, so a
+    pack must declare a source we can actually dispatch on, and a source that
+    goes quiet must fall back to THIS market's documented constant — never to
+    another country's rate and never to None, which would crash the engine.
+    """
+    pack = get_market_pack(market)
+    assert pack.mortgage_rate_source in {"fred", "bundesbank", "none"}, \
+        (market, pack.mortgage_rate_source)
+
+    rate = assumptions.mortgage_rate_pct(market)
+    assert isinstance(rate, float) and 0 < rate < 100, (market, rate)
+
+    # A market with no source can only ever be its constant, and must not
+    # claim to be live.
+    if pack.mortgage_rate_source == "none":
+        assert rate == pack.mortgage_rate_pct
+        assert assumptions.mortgage_rate_is_live(market) is False
+
+    # With the source stubbed silent, every market lands on its own constant.
+    with mock.patch.dict(assumptions._MORTGAGE_READERS,
+                         {key: (lambda: None) for key in assumptions._MORTGAGE_READERS}):
+        assert assumptions.mortgage_rate_pct(market) == pack.mortgage_rate_pct
+        assert assumptions.mortgage_rate_is_live(market) is False
+
+    # A source that raises is the same story: fall back, don't propagate.
+    def boom():
+        raise RuntimeError("source down")
+
+    with mock.patch.dict(assumptions._MORTGAGE_READERS,
+                         {key: boom for key in assumptions._MORTGAGE_READERS}):
+        assert assumptions.mortgage_rate_pct(market) == pack.mortgage_rate_pct
 
 
 @pytest.mark.parametrize("market", MARKETS)

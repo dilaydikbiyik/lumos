@@ -77,6 +77,11 @@ class MarketPack:
     # rate and a 4% deed fee are facts about Türkiye, not about the world;
     # applying them to a German buyer produced a confident, nonsensical
     # answer. Every rate below is a documented ASSUMPTION shown to the user.
+    # Where the mortgage rate comes from, and the value to use when that
+    # source is silent. A rate constant goes stale in the direction that
+    # flips a rent-vs-buy verdict, so it is read live where a free source
+    # exists and falls back to the documented assumption where none does.
+    mortgage_rate_source: str = "none"   # fred | bundesbank | none
     mortgage_rate_pct: float = 39.0
     mortgage_term_years: int = 10
     # Buyer-side transfer tax / duty on a property purchase.

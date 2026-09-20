@@ -135,6 +135,12 @@ def get_segments(lang: str = "tr") -> dict[str, dict]:
 _HICP_TOTAL = "M.DE.N.HVPI.C.A00000.I.A"
 _HICP_RENTS = "M.DE.N.HVPI.C.E2C041.I.A"
 
+# Effective rate on NEW housing loans to households — the number a German
+# buyer is actually quoted. Lives in the MFI interest-rate flow, not the
+# price one, so it needs its own base URL.
+_RATES = "https://api.statistiken.bundesbank.de/rest/data/BBIM1"
+_MORTGAGE_SERIES = "M.DE.B.A2C.A.R.A.2250.EUR.N"
+
 
 def _monthly(series_key: str, cache_name: str) -> Optional[dict[str, float]]:
     """{YYYY-MM: index} for a monthly Bundesbank series."""
@@ -147,7 +153,8 @@ def _monthly(series_key: str, cache_name: str) -> Optional[dict[str, float]]:
     try:
         import httpx
 
-        res = httpx.get(f"{_PRICES}/{series_key}", params={"format": "csv"},
+        base = _RATES if series_key == _MORTGAGE_SERIES else _PRICES
+        res = httpx.get(f"{base}/{series_key}", params={"format": "csv"},
                         timeout=_TIMEOUT, follow_redirects=True)
         res.raise_for_status()
 
@@ -187,3 +194,11 @@ def get_hicp_index() -> Optional[dict[str, float]]:
 def get_rent_index() -> Optional[dict[str, float]]:
     """Actual rentals for housing — the HICP component, not a house price."""
     return _monthly(_HICP_RENTS, "rents")
+
+
+def get_mortgage_rate_pct() -> Optional[float]:
+    """The latest effective rate on new housing loans, or None."""
+    series = _monthly(_MORTGAGE_SERIES, "mortgage")
+    if not series:
+        return None
+    return series[max(series)]

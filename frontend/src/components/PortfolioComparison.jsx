@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next'
 import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '@clerk/clerk-react'
 import api, { setAuthToken } from '../utils/api'
+import { percent } from '../utils/format'
 
 /**
  * Actual vs recommended portfolio comparison.
@@ -119,7 +120,7 @@ export default function PortfolioComparison() {
             </div>
             {/* Dual bar: actual on top, target below */}
             <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
-              <span style={{ fontSize: 10, color: 'var(--text-dim)', width: 32 }}>%{item.actual}</span>
+              <span style={{ fontSize: 10, color: 'var(--text-dim)', width: 38 }}>{percent(item.actual)}</span>
               <div style={{ flex: 1, height: 6, background: 'var(--bg)', borderRadius: 3, overflow: 'hidden' }}>
                 <div style={{
                   width: `${Math.min(item.actual, 100)}%`,
@@ -130,7 +131,7 @@ export default function PortfolioComparison() {
               </div>
             </div>
             <div style={{ display: 'flex', gap: 4, alignItems: 'center', marginTop: 2 }}>
-              <span style={{ fontSize: 10, color: 'var(--text-dim)', width: 32 }}>%{item.target}</span>
+              <span style={{ fontSize: 10, color: 'var(--text-dim)', width: 38 }}>{percent(item.target)}</span>
               <div style={{ flex: 1, height: 4, background: 'var(--bg)', borderRadius: 2, overflow: 'hidden' }}>
                 <div style={{
                   width: `${Math.min(item.target, 100)}%`,

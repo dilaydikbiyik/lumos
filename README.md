@@ -28,36 +28,74 @@ shows you the honest downside before the upside, and treats your fear as **data 
 ## Screenshots
 
 <p align="center">
-  <img src="demo/video/lumos-demo.gif" width="300" alt="Lumos demo — mobile tour" />
+  <img src="demo/video/en/lumos-demo.gif" width="300" alt="Lumos demo — mobile tour" />
 </p>
+
+The English UI below. The same build also ships Turkish and German, and the
+gallery is captured separately in each — see [all three](#the-same-app-in-three-languages).
 
 | Onboarding | Risk profile | Portfolio |
 |---|---|---|
-| ![Onboarding](demo/screens/01-karsilama.png) | ![Risk profile](demo/screens/02-risk-profili.png) | ![Portfolio](demo/screens/03-portfoy.png) |
+| ![Onboarding](demo/screens/en/01-karsilama.png) | ![Risk profile](demo/screens/en/02-risk-profili.png) | ![Portfolio](demo/screens/en/03-portfoy.png) |
 
 | Holdings + live chart | Dashboard | AI advisor |
 |---|---|---|
-| ![Holdings](demo/screens/05-varliklarim.png) | ![Dashboard](demo/screens/06-panel.png) | ![AI advisor](demo/screens/08-danisman.png) |
+| ![Holdings](demo/screens/en/05-varliklarim.png) | ![Dashboard](demo/screens/en/06-panel.png) | ![AI advisor](demo/screens/en/08-danisman.png) |
 
-| Rent vs. buy | Province price explorer | Desktop layout |
+| Rent vs. buy | Region price explorer | Currency split |
 |---|---|---|
-| ![Rent vs. buy](demo/screens/04-kira-vs-ev.png) | ![Explore real estate](demo/screens/07-emlak-kesfet.png) | ![Desktop](demo/screens/09-desktop-panel.png) |
+| ![Rent vs. buy](demo/screens/en/04-kira-vs-ev.png) | ![Explore real estate](demo/screens/en/07-emlak-kesfet.png) | ![Currency split](demo/screens/en/19-kur-dagilimi.png) |
+
+**Three markets, one UI language.** Market and language are independent axes:
+this is the *same English build*, pricing the US in dollars off FHFA state data
+and Germany in euros off the Bundesbank.
+
+| 🇺🇸 United States | 🇩🇪 Deutschland |
+|---|---|
+| ![US market](demo/screens/en/12-pazar-abd.png) | ![German market](demo/screens/en/12-pazar-almanya.png) |
+
+**Rehearse before you risk anything.** Play money, the worst stretch of an
+asset's own history, and a scenario the app refuses to call a forecast:
+
+| Play money | Time machine | Future scenarios |
+|---|---|---|
+| ![Practice mode](demo/screens/en/14-sahte-para.png) | ![Time machine](demo/screens/en/15-zaman-makinesi.png) | ![Scenarios](demo/screens/en/16-senaryolar.png) |
+
+| Why this split? | What would happen? | Goal planner |
+|---|---|---|
+| ![Why this split](demo/screens/en/13-neden-bu-dagilim.png) | ![What if](demo/screens/en/17-ne-olurdu.png) | ![Goal](demo/screens/en/18-hedef.png) |
 
 **The screen no investing app wants to show you** — carrying card debt, the app
 says clear it first and does the arithmetic, before it will show you a portfolio:
 
 <p align="center">
-  <img src="demo/screens/11-borc-once.png" width="300" alt="Clear the debt first" />
+  <img src="demo/screens/en/11-borc-once.png" width="300" alt="Clear the debt first" />
 </p>
 
 <details>
-<summary>More: desktop portfolio view</summary>
+<summary>Desktop layouts</summary>
 
-![Desktop portfolio](demo/screens/10-desktop-portfoy.png)
+| Dashboard | Portfolio |
+|---|---|
+| ![Desktop dashboard](demo/screens/en/09-desktop-panel.png) | ![Desktop portfolio](demo/screens/en/10-desktop-portfoy.png) |
+
+| Real-estate explorer | Rent vs. buy |
+|---|---|
+| ![Desktop explore](demo/screens/en/20-desktop-emlak.png) | ![Desktop rent vs buy](demo/screens/en/21-desktop-kira-vs-ev.png) |
 
 </details>
 
-> Full demo video: [demo/video/lumos-demo.mp4](demo/video/lumos-demo.mp4)
+### The same app in three languages
+
+Captured from the same production build, one run per language — not mockups.
+
+| 🇹🇷 Türkçe | 🇬🇧 English | 🇩🇪 Deutsch |
+|---|---|---|
+| ![TR](demo/screens/tr/03-portfoy.png) | ![EN](demo/screens/en/03-portfoy.png) | ![DE](demo/screens/de/03-portfoy.png) |
+| ![TR](demo/screens/tr/04-kira-vs-ev.png) | ![EN](demo/screens/en/04-kira-vs-ev.png) | ![DE](demo/screens/de/04-kira-vs-ev.png) |
+
+> Full demo video: [en](demo/video/en/lumos-demo.mp4) · [tr](demo/video/tr/lumos-demo.mp4) · [de](demo/video/de/lumos-demo.mp4)
+> Regenerate the whole gallery with `node demo/capture.mjs` (see [demo/](demo/)).
 
 ---
 
@@ -304,13 +342,26 @@ hardcodes a country; it asks the user's pack:
 | Rent index | — *(spread off CPI)* | **BLS, primary residence** | **Bundesbank, actual rentals** |
 | National house prices | **TCMB** | **FHFA via FRED** | **Eurostat `prc_hpi_q`** |
 | Sub-national | **81 provinces**, TL/m² | **50 states + DC**, index | **3 city-size segments**, index |
-| Mortgage assumption | 39% / 10y | 6.5% / 30y | 3.8% / 20y |
-| Purchase costs | deed fee 4% + 2% agency | closing costs | transfer tax + notary + registry |
+| Mortgage rate | 39% *(assumed)* / 10y | **live** Freddie Mac 30-yr fixed / 30y | **live** Bundesbank effective rate / 20y |
+| Purchase costs | deed fee 4% + 2% agency +VAT | closing costs 2.5% + 2.5% agency | transfer tax + notary + registry 7% + 3% agency +VAT |
 | Investable universe | BIST + global ETFs | SPY/QQQ/VXUS/GLD, VNQ/SCHH | **UCITS only** — EU retail cannot hold US-domiciled ETFs |
 | Listing bridge | Sahibinden, Emlakjet | Zillow, Realtor | ImmoScout24, Immowelt |
 | Regulator (edu. content) | SPK | SEC / FINRA | BaFin |
 
 Every source above is live and keyless except FRED, which needs a free key.
+
+**Which numbers are measured, and which are assumed.** Inflation, house-price growth and rent
+growth are read live from the sources above for all three markets. The mortgage rate — the single
+input that decides a rent-vs-buy verdict — is read live wherever a free source publishes it
+(Freddie Mac for the US, the Bundesbank for Germany); Türkiye has no keyless series, so it keeps a
+documented constant. A source that goes quiet falls back to *its own market's* constant, never to
+another country's rate, and the footnote under every result says which of the two you are looking
+at rather than letting an assumption pass for a measurement.
+
+Transfer taxes, agency commission, VAT and upkeep are set by regulation or custom rather than by a
+market, so they are constants held in the pack, shown to the user as assumptions, and covered by a
+conformance test — one of which exists because Germany's commission was stored VAT-inclusive while
+the engine added VAT on top, inventing about €2,700 of cost on a €400k home.
 
 **Language and market are independent axes.** An expat in Istanbul reads English while investing in
 Türkiye; a Turk in Berlin may want the opposite. Neither setting implies the other — a new account
@@ -344,9 +395,9 @@ market.
 |---|---|---|
 | **TCMB EVDS** (Turkish central bank) | TR: CPI, 81-province unit prices (TL/m²), 19-region NUTS2 index | Daily cache; in-repo static CPI fallback; freshest-wins against the bundled copy; honest `available: false` when down |
 | **BLS** (US Bureau of Labor Statistics) | US: CPI-U, rent of primary residence | No key; bundled static fallback + refresh script |
-| **FRED** (St. Louis Fed) | US: FHFA house price index, nationally and for 50 states + DC | Free key; 51 series fetched in parallel; a mostly-failed map is refused rather than cached |
+| **FRED** (St. Louis Fed) | US: FHFA house price index, nationally and for 50 states + DC; Freddie Mac 30-year fixed mortgage average | Free key; 51 series fetched in parallel; a mostly-failed map is refused rather than cached |
 | **Eurostat** | DE: house price index (`prc_hpi_q`) | No key; last-known-good tier |
-| **Deutsche Bundesbank** | DE: harmonised CPI, actual rentals, and residential prices for three city-size segments | No key. Chosen over Eurostat for prices because Eurostat's HICP stopped nine months short — for every euro-area country, not only Germany |
+| **Deutsche Bundesbank** | DE: harmonised CPI, actual rentals, residential prices for three city-size segments, and the MFI effective rate on new housing loans | No key. Chosen over Eurostat for prices because Eurostat's HICP stopped nine months short — for every euro-area country, not only Germany |
 | **yfinance** | Prices, volatility, backtests, projections | Fresh 24h + stale 7d + last-known-good cache tiers; baseline volatilities as final resort |
 | **RSS**, per market | Calm news digest — AA/Bloomberg HT (TR), CNBC/Yahoo (US), Tagesschau/Handelsblatt (DE) | Per-feed fail-open; digest hides when empty |
 | **Google Gemini** (free tier) | Advisor chat, extraction, phrasing | 4-model chain × up to 4 keys, then hands off to Groq |

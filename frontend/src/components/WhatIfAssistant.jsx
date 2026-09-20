@@ -2,6 +2,7 @@ import { useState } from 'react'
 import api, { extractErrorMessage } from '../utils/api'
 import useMarket from '../hooks/useMarket'
 import { useTranslation } from 'react-i18next'
+import { percent } from '../utils/format'
 
 const SUGGESTION_KEYS = ['whatIf.sug1', 'whatIf.sug2', 'whatIf.sug3']
 
@@ -83,7 +84,7 @@ export default function WhatIfAssistant({ riskScore, budget }) {
               {result.diff.allocation_changes.slice(0, 4).map(c => (
                 <div key={c.ticker} style={{ display: 'flex', justifyContent: 'space-between', padding: '3px 0' }}>
                   <span>{c.ticker}</span>
-                  <span>%{c.before_pct} → %{c.after_pct}</span>
+                  <span>{percent(c.before_pct)} → {percent(c.after_pct)}</span>
                 </div>
               ))}
             </div>

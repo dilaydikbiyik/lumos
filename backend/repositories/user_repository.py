@@ -112,3 +112,34 @@ async def consume_quota(db: AsyncSession, clerk_user_id: str, daily_limit: int) 
     user.quota_used += 1
     await db.flush()
     return True
+
+
+async def delete_account(db: AsyncSession, clerk_user_id: str) -> bool:
+    """
+    Erase every row this user owns. False when there was nothing to erase.
+
+    Holdings cascade from the users row, but feedback is deliberately
+    ON DELETE SET NULL so that aggregate insight survives a departure — and
+    a free-text message is exactly where someone's name or situation ends up,
+    so an erasure request has to take the message with it rather than keep an
+    "anonymous" row that still reads like the person who wrote it.
+    """
+    from sqlalchemy import delete as sql_delete
+
+    from backend.models.feedback import Feedback
+    from backend.models.holding import Holding
+
+    user = await get_by_clerk_id(db, clerk_user_id)
+    if not user:
+        return False
+
+    # Deleted here rather than left to ON DELETE CASCADE. The cascade is real
+    # on Postgres, but it is a property of the schema rather than of this
+    # function, and SQLite does not enforce foreign keys unless the pragma is
+    # on — so the behaviour differed between production and the tests meant to
+    # guarantee it. An erasure is too important to depend on a pragma.
+    await db.execute(sql_delete(Holding).where(Holding.user_id == user.id))
+    await db.execute(sql_delete(Feedback).where(Feedback.user_id == user.id))
+    await db.delete(user)
+    await db.commit()
+    return True

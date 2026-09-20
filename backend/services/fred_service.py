@@ -41,6 +41,10 @@ _TIMEOUT = 25
 _MAX_PARALLEL = 8
 
 NATIONAL_SERIES = "USSTHPI"
+# Freddie Mac's 30-year fixed average, weekly. The rate that decides every
+# rent-vs-buy verdict was a constant in the pack; constants about interest
+# rates go stale in the direction that flips the answer.
+MORTGAGE_SERIES = "MORTGAGE30US"
 
 # 50 states + DC. The series id is the postal code + "STHPI".
 STATES: dict[str, str] = {
@@ -183,3 +187,11 @@ def get_all_state_hpi(since: str = "2000-01-01") -> dict[str, dict]:
         logger.warning("FRED state map incomplete (%d/%d) — not cached",
                        len(out), len(STATES))
     return out
+
+
+def get_mortgage_rate_pct() -> Optional[float]:
+    """The latest 30-year fixed average, or None when unreadable."""
+    series = _observations(MORTGAGE_SERIES, since="2020-01-01")
+    if not series:
+        return None
+    return series[max(series)]

@@ -1,5 +1,6 @@
 import useMarket from '../hooks/useMarket'
 import { Trans, useTranslation } from 'react-i18next'
+import { percentFromWeight } from '../utils/format'
 
 /**
  * "Why this allocation?" — the engine's deterministic rationale.
@@ -89,7 +90,7 @@ export default function AllocationRationale({ portfolio }) {
               borderRadius: 8, fontSize: 12, fontWeight: 700,
               background: 'var(--firefly-dim)', color: 'var(--firefly, #F5A524)',
             }}>
-              %{Math.round(a.weight * 100)}
+              {percentFromWeight(a.weight)}
             </span>
             <div style={{ fontSize: 13, lineHeight: 1.5 }}>
               <strong>{a.name}</strong>

@@ -56,6 +56,23 @@ def client():
 
 
 @pytest.fixture(autouse=True)
+def _reset_rate_limiter():
+    """
+    Every test starts with a fresh rate-limit budget.
+
+    slowapi keys on the client address, and TestClient presents the same one
+    to every test in the run. Without this, the fourth test to touch a limited
+    endpoint gets a 429 and fails for a reason that has nothing to do with
+    what it was checking — and, worse, the failure moves when tests are
+    reordered.
+    """
+    from backend.limiter import limiter
+
+    limiter.reset()
+    yield
+
+
+@pytest.fixture(autouse=True)
 def _no_network_chat_context():
     """Chat RAG context never hits real market data in tests."""
     with patch("backend.services.chat_context.build_market_context", return_value=""):

@@ -26,6 +26,7 @@ const ExplorePage = lazy(() => import('./pages/ExplorePage'))
 const RecommendPage = lazy(() => import('./pages/RecommendPage'))
 const DashboardPage = lazy(() => import('./pages/DashboardPage'))
 const AdminPage = lazy(() => import('./pages/AdminPage'))
+const LegalPage = lazy(() => import('./pages/LegalPage'))
 
 function Illumination() {
   useIllumination()
@@ -115,6 +116,11 @@ export default function App() {
           <Route path="/recommend" element={<ProtectedRoute><RecommendPage /></ProtectedRoute>} />
           <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
           <Route path="/admin"     element={<ProtectedRoute><AdminPage /></ProtectedRoute>} />
+          {/* Public on purpose: both app stores fetch these from a
+              signed-out crawler during review, and a policy you must log in
+              to read has not actually been published. */}
+          <Route path="/privacy"   element={<LegalPage doc="privacy" />} />
+          <Route path="/terms"     element={<LegalPage doc="terms" />} />
           <Route path="*"          element={<Navigate to="/" replace />} />
         </Routes>
 

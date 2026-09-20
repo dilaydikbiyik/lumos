@@ -16,6 +16,7 @@ import useMarket from '../hooks/useMarket'
 import api, { setAuthToken } from '../utils/api'
 import { useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
+import { percent } from '../utils/format'
 
 /** Progressive UI: minimal view for new users, deepens via "Show More" */
 function ProgressiveDetails({ holdingsSummary, portfolio }) {
@@ -205,7 +206,7 @@ export default function DashboardPage() {
                     return (
                       <span key={type} style={{ fontSize: 11, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 4 }}>
                         <span style={{ width: 7, height: 7, borderRadius: '50%', background: colors[i % colors.length], display: 'inline-block' }} />
-                        {t('holdings.types.' + type, { defaultValue: type })} %{pct}
+                        {t('holdings.types.' + type, { defaultValue: type })} {percent(pct)}
                       </span>
                     )
                   })}

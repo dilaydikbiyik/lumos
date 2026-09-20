@@ -35,3 +35,62 @@ describe('cold-start retry decision', () => {
     }
   })
 })
+
+describe('in-flight GET coalescing', () => {
+  it('two simultaneous identical GETs make one request', async () => {
+    const api = (await import('./api')).default
+    let calls = 0
+    // Patch the adapter rather than api.get, so the coalescing layer is
+    // exactly what is under test.
+    api.defaults.adapter = async (config) => {
+      calls += 1
+      await new Promise(r => setTimeout(r, 20))
+      return { data: { ok: true }, status: 200, statusText: 'OK', headers: {}, config }
+    }
+
+    const [a, b] = await Promise.all([
+      api.get('/holdings/summary'),
+      api.get('/holdings/summary'),
+    ])
+    expect(calls).toBe(1)
+    expect(a).toBe(b)   // the same promise resolved once
+
+    // A later call is a new request: this coalesces, it does not cache.
+    await api.get('/holdings/summary')
+    expect(calls).toBe(2)
+  })
+
+  it('different params are different requests', async () => {
+    const api = (await import('./api')).default
+    let calls = 0
+    api.defaults.adapter = async (config) => {
+      calls += 1
+      await new Promise(r => setTimeout(r, 20))
+      return { data: {}, status: 200, statusText: 'OK', headers: {}, config }
+    }
+
+    await Promise.all([
+      api.get('/holdings/history', { params: { days: 30 } }),
+      api.get('/holdings/history', { params: { days: 90 } }),
+    ])
+    expect(calls).toBe(2)
+  })
+
+  it('a failed request is not left behind to poison the next one', async () => {
+    const api = (await import('./api')).default
+    const { inFlightCount } = await import('./api')
+    let calls = 0
+    // A 400 is a definitive answer, so the retry layer leaves it alone — the
+    // point here is the coalescing map, not the backoff.
+    api.defaults.adapter = async (config) => {
+      calls += 1
+      throw Object.assign(new Error('boom'), {
+        config, response: { status: 400, data: {}, headers: {}, config },
+      })
+    }
+
+    await Promise.allSettled([api.get('/nope'), api.get('/nope')])
+    expect(calls).toBe(1)
+    expect(inFlightCount()).toBe(0)
+  })
+})

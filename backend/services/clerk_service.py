@@ -91,3 +91,39 @@ def fetch_profiles(clerk_ids: Iterable[str]) -> dict[str, dict]:
         return out
 
     return out
+
+
+def delete_user(clerk_user_id: str) -> bool:
+    """
+    Delete the Clerk account itself. True when Clerk no longer has the user.
+
+    Deleting our rows is only half of an account deletion: leaving the login
+    alive means the user signs back in, gets a fresh empty profile, and quite
+    reasonably concludes nothing was deleted. Apple requires the whole thing
+    behind one in-app action, and so does anyone reading the privacy policy.
+
+    A 404 counts as success — the account is gone, which is what was asked
+    for, and retrying a delete must not fail just because it worked already.
+    """
+    if not is_configured():
+        logger.error("Clerk delete requested without a configured secret key")
+        return False
+
+    try:
+        import httpx
+
+        res = httpx.delete(
+            f"{_BASE}/{clerk_user_id}",
+            headers={"Authorization": f"Bearer {settings.CLERK_SECRET_KEY}"},
+            timeout=_TIMEOUT,
+        )
+        if res.status_code == 404:
+            return True
+        res.raise_for_status()
+        return True
+    except Exception as exc:
+        # Deliberately NOT swallowed into a success: the caller must be able
+        # to tell the user their login still exists.
+        logger.error("Clerk delete failed for %s (%s)",
+                     clerk_user_id, type(exc).__name__)
+        return False

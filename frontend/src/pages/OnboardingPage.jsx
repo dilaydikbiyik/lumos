@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '@clerk/clerk-react'
 import api from '../utils/api'
 import LumosLogo from '../components/LumosLogo'
@@ -241,6 +241,17 @@ export default function OnboardingPage() {
           <Icon name="warning" size={14} />{' '}
           <Trans i18nKey="onboarding.disclaimerLine" components={[<strong key="s" />]} />
         </div>
+
+        {/* Both stores fetch these from the signed-out landing page during
+            review, and someone deciding whether to sign up at all should be
+            able to read them before handing over anything. */}
+        <nav style={{
+          display: 'flex', justifyContent: 'center', gap: '1.25rem',
+          marginTop: 18, fontSize: 12, flexWrap: 'wrap',
+        }}>
+          <Link to="/privacy" style={{ color: 'var(--text-dim)' }}>{t('legal.privacy.title')}</Link>
+          <Link to="/terms" style={{ color: 'var(--text-dim)' }}>{t('legal.terms.title')}</Link>
+        </nav>
       </div>
 
       {showDisclaimer && <DisclaimerModal onAccept={acceptDisclaimer} />}

@@ -76,24 +76,13 @@ export default function DailyTip() {
         position: 'relative', overflow: 'hidden', cursor: 'pointer',
       }}
     >
-      {/* Kapat */}
-      <button
-        onClick={(e) => { e.stopPropagation(); markSeen(tip.id); setDismissed(true) }}
-        style={{
-          position: 'absolute', top: 10, right: 12,
-          background: 'none', border: 'none', color: 'var(--text-dim)',
-          cursor: 'pointer', fontSize: 16, padding: '2px 6px',
-        }}
-        aria-label={t('common.close')}
-      >
-        ✕
-      </button>
-
-      {/* Header — right padding keeps the counter clear of the absolutely
-          positioned close button, which used to sit on top of it. */}
+      {/* Header. The close button used to be absolutely positioned with a
+          right padding on this row to clear it — which only worked until the
+          padding and the button's real width disagreed, and then the counter
+          sat underneath the ✕. Putting it in the flex row means the layout
+          cannot overlap at any width or font size. */}
       <div style={{
-        display: 'flex', alignItems: 'center', gap: 8,
-        marginBottom: 10, paddingRight: 28,
+        display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10,
       }}>
         <span style={{
           fontSize: 11, fontWeight: 700, color: 'var(--firefly)',
@@ -107,6 +96,17 @@ export default function DailyTip() {
         }}>
           {progress}/{total}
         </span>
+        <button
+          onClick={(e) => { e.stopPropagation(); markSeen(tip.id); setDismissed(true) }}
+          style={{
+            background: 'none', border: 'none', color: 'var(--text-dim)',
+            cursor: 'pointer', fontSize: 16, lineHeight: 1,
+            padding: 0, marginLeft: 2, flexShrink: 0,
+          }}
+          aria-label={t('common.close')}
+        >
+          ✕
+        </button>
       </div>
 
       {/* Content */}

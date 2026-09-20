@@ -5,6 +5,7 @@ import api from '../utils/api'
 import useMarket from '../hooks/useMarket'
 import { readJSON, writeJSON, userKey } from '../utils/storage'
 import { useTranslation } from 'react-i18next'
+import { percent, shortDate } from '../utils/format'
 
 const RANGES = [
   { days: 30, label: 'chart.m1' },
@@ -69,7 +70,7 @@ export default function PortfolioValueChart({ holdingsCount }) {
               {money(data.series[data.series.length - 1].value)}
             </span>
             <span className="num" style={{ fontSize: 'var(--t-small)', fontWeight: 700, color }}>
-              {up ? '▲' : '▼'} {money(Math.abs(data.change_amount))} (%{Math.abs(data.change_pct)})
+              {up ? '▲' : '▼'} {money(Math.abs(data.change_amount))} ({percent(Math.abs(data.change_pct))})
             </span>
           </div>
           <ResponsiveContainer width="100%" height={160}>
@@ -88,7 +89,7 @@ export default function PortfolioValueChart({ holdingsCount }) {
                   borderRadius: 8, fontSize: 12,
                 }}
                 formatter={v => [money(v), t('common.value')]}
-                labelFormatter={d => new Date(d).toLocaleDateString()}
+                labelFormatter={d => shortDate(d)}
               />
               <Area type="monotone" dataKey="value" stroke={color} strokeWidth={2}
                     fill="url(#pvFill)" animationDuration={500} />
