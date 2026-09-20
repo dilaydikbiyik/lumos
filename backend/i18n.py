@@ -519,6 +519,74 @@ _C: dict[str, dict[str, str]] = {
         "tr": "Bu bir tahmin DEĞİL: {name} ortalamasının kendi geçmişindeki tüm {years} yıllık dönemlerin dağılımı. Reel bant, her dönemin kendi enflasyonundan arındırılmıştır.",
         "en": "This is NOT a forecast: it's the distribution of every {years}-year period in {name}'s own history. The real band deflates each period by its own inflation.",
         "de": "Das ist KEINE Prognose: es ist die Verteilung aller {years}-Jahres-Zeiträume aus der eigenen Historie von {name}. Die reale Spanne bereinigt jeden Zeitraum um seine eigene Inflation."},
+    "path.reason.short_horizon": {
+        "tr": "Vaden kısa. Gayrimenkulde alım masrafları peşin ödenir ve kendini amorti etmesi yıllar alır — bu sürede satmak zorunda kalırsan o masraf cebinden çıkar.",
+        "en": "Your horizon is short. Property's purchase costs are paid up front and take years to amortise — if you have to sell inside that window, you absorb them.",
+        "de": "Dein Horizont ist kurz. Die Kaufnebenkosten einer Immobilie fallen sofort an und brauchen Jahre, um sich zu amortisieren — musst du vorher verkaufen, trägst du sie selbst."},
+    "path.reason.medium_horizon": {
+        "tr": "Vaden orta uzunlukta. Gayrimenkul için biraz erken, ama birikimini enflasyona karşı çalıştırmak için fazlasıyla yeterli.",
+        "en": "Your horizon is medium. A little early for property, and more than long enough to put your savings to work against inflation.",
+        "de": "Dein Horizont ist mittel. Für eine Immobilie etwas früh, für das Arbeiten gegen die Inflation mehr als lang genug."},
+    "path.reason.long_horizon": {
+        "tr": "Vaden uzun. Gayrimenkulün en büyük dezavantajı olan \"paraya çevirememek\" senin için daha az bağlayıcı; iki dünyayı birden düşünebilirsin.",
+        "en": "Your horizon is long. Property's biggest drawback — not being able to turn it back into money quickly — binds you less, so both worlds are open.",
+        "de": "Dein Horizont ist lang. Der größte Nachteil von Immobilien — sie nicht schnell wieder zu Geld machen zu können — bindet dich weniger; beide Welten stehen offen."},
+    "path.reason.below_entry": {
+        "tr": "Bütçen bu pazarda fiziksel gayrimenkule girmek için gereken eşiğin altında. Bu bir eksiklik değil, sadece bir sıralama sorusu: gayrimenkule maruz kalmak istiyorsan GYO'lar küçük tutarlarla da mümkün.",
+        "en": "Your budget is below this market's entry bar for physical property. That is not a shortcoming, it is a question of order: if you want property exposure meanwhile, REITs work at small amounts.",
+        "de": "Dein Budget liegt unter der Einstiegsschwelle für physische Immobilien in diesem Markt. Das ist kein Mangel, sondern eine Frage der Reihenfolge: Für Immobilien-Exposure in der Zwischenzeit funktionieren REITs auch mit kleinen Beträgen."},
+    "path.reason.above_entry": {
+        "tr": "Bütçen bu pazarda fiziksel gayrimenkul için gereken eşiğin üzerinde, yani gerçekten bir seçenek.",
+        "en": "Your budget is above this market's entry bar for physical property, so it is genuinely an option.",
+        "de": "Dein Budget liegt über der Einstiegsschwelle für physische Immobilien in diesem Markt — es ist also tatsächlich eine Option."},
+    "path.reason.fear_complexity": {
+        "tr": "\"Anlamıyorum\" dedin. Gayrimenkul tarafı noterler, devir vergileri ve resmî süreçlerle dolu — öğrenmeye başlamak için daha zor bir yer. Diğer tarafta tek bir alımla başlayıp ilerleyebilirsin.",
+        "en": "You said you don't understand it. The property side is full of notaries, transfer taxes and official procedure — a harder place to start learning. The other side lets you begin with a single purchase.",
+        "de": "Du hast gesagt, du verstehst es nicht. Die Immobilienseite steckt voller Notare, Grunderwerbsteuer und Formalitäten — ein schwierigerer Ort zum Anfangen. Auf der anderen Seite reicht ein einziger Kauf zum Start."},
+    "path.reason.fear_inflation": {
+        "tr": "\"Param eriyor\" dedin. İnsanların enflasyona karşı ilk uzandığı şey çoğu zaman gayrimenkul oluyor — ama vaden buna henüz uygun değil, ve erimeyi durdurmanın tek yolu o değil.",
+        "en": "You said your money is melting. Property is often the first thing people reach for against inflation — but your horizon doesn't fit it yet, and it isn't the only way to stop the melting.",
+        "de": "Du hast gesagt, dein Geld schmilzt dahin. Immobilien sind oft das Erste, wonach man gegen Inflation greift — aber dein Horizont passt noch nicht dazu, und es ist nicht der einzige Weg."},
+    "path.reason.no_signal": {
+        "tr": "Henüz bir yön önerecek kadar bilgi yok. Profilini tamamlarsan buraya gerçek bir öneri gelir; o zamana kadar iki dünyayı da görmen en iyisi.",
+        "en": "There isn't enough yet to suggest a direction. Finish your profile and a real suggestion appears here; until then, seeing both worlds is the better default.",
+        "de": "Es reicht noch nicht, um eine Richtung vorzuschlagen. Vervollständige dein Profil, dann erscheint hier ein echter Vorschlag; bis dahin ist es besser, beide Welten zu sehen."},
+    "split.reason.no_budget": {
+        "tr": "Planlanacak bir tutar yok. Bütçeni girdiğinde burada gerçek bir dağılım belirir.",
+        "en": "There is no amount to plan yet. Enter your budget and a real split appears here.",
+        "de": "Es gibt noch keinen Betrag zu planen. Trag dein Budget ein, dann erscheint hier eine echte Aufteilung."},
+    "split.reason.reserve_from_outgoings": {
+        "tr": "Önce {months} aylık gideri kenara ayırdık. Bu bir yatırım değil; kötü bir ayın, en kötü fiyattan satmak zorunda kalmaya dönüşmesini engelleyen şey.",
+        "en": "We set aside {months} months of outgoings first. It is not an investment; it is what stops a bad month turning into a forced sale at the worst price.",
+        "de": "Zuerst haben wir {months} Monatsausgaben zurückgelegt. Das ist keine Anlage, sondern das, was verhindert, dass ein schlechter Monat zum Notverkauf zum schlechtesten Preis wird."},
+    "split.reason.reserve_assumed": {
+        "tr": "Aylık giderini bilmediğimiz için rezerv olarak %10 varsaydık. Giderini girersen bu rakam tahmin olmaktan çıkar.",
+        "en": "We assumed 10% as a reserve because we don't know your monthly outgoings. Enter them and this figure stops being a guess.",
+        "de": "Wir haben 10 % als Reserve angenommen, weil wir deine monatlichen Ausgaben nicht kennen. Trag sie ein, dann ist diese Zahl keine Schätzung mehr."},
+    "split.reason.path_stocks": {
+        "tr": "Hisse yolunu seçtin, bu yüzden rezervden sonra kalan her şey piyasa tarafında planlandı.",
+        "en": "You chose the stocks path, so everything after the reserve is planned on the market side.",
+        "de": "Du hast den Aktienweg gewählt, also wird alles nach der Reserve auf der Marktseite geplant."},
+    "split.reason.path_real_estate": {
+        "tr": "Emlak yolunu seçtin, bu yüzden rezervden sonra kalan her şey gayrimenkul tarafında planlandı.",
+        "en": "You chose the real-estate path, so everything after the reserve is planned on the property side.",
+        "de": "Du hast den Immobilienweg gewählt, also wird alles nach der Reserve auf der Immobilienseite geplant."},
+    "split.reason.below_entry_reit": {
+        "tr": "Bu tutar bu pazarda fiziksel gayrimenkul almaya yetmiyor. Alamayacağın bir şeye pay ayırmak işe yaramaz bir tavsiye olurdu; onun yerine gayrimenkule GYO üzerinden yer verdik.",
+        "en": "This amount cannot buy physical property in this market. Allocating to something you cannot buy would be advice you can't act on, so the property exposure goes through REITs instead.",
+        "de": "Mit diesem Betrag lässt sich in diesem Markt keine physische Immobilie kaufen. Etwas zuzuteilen, das du nicht kaufen kannst, wäre ein Rat, dem du nicht folgen kannst — die Immobilienquote läuft daher über REITs."},
+    "split.reason.rounded_to_entry": {
+        "tr": "Gayrimenkul payını, bu pazarda gerçekten alım yapılabilecek eşiğe yuvarladık. Eşiğin hemen altında kalan bir pay hiçbir şey satın almaz.",
+        "en": "We rounded the property share up to what actually buys something in this market. A share that lands just under the threshold buys nothing at all.",
+        "de": "Wir haben den Immobilienanteil auf das aufgerundet, womit sich in diesem Markt tatsächlich etwas kaufen lässt. Ein Anteil knapp unter der Schwelle kauft gar nichts."},
+    "split.reason.entry_would_overcommit": {
+        "tr": "Ama o eşiğe ulaşmak birikiminin çok büyük bir kısmını tek ve satması zor bir varlığa kilitlerdi. Seni on yıl yerinden kıpırdayamaz hâle getiren bir plan iyi bir plan değil, iyi savunulmuş bir tuzaktır.",
+        "en": "But reaching that threshold would lock too much of your savings into a single asset that is hard to sell. A plan that leaves you unable to move for a decade is not a good plan, it is a well-argued trap.",
+        "de": "Diese Schwelle zu erreichen würde jedoch zu viel deines Ersparten in einem einzigen, schwer verkäuflichen Vermögenswert binden. Ein Plan, der dich ein Jahrzehnt bewegungsunfähig macht, ist kein guter Plan, sondern eine gut begründete Falle."},
+    "split.reason.risk_shaped": {
+        "tr": "Dağılım risk skorunla şekillendi. Düşük skor gayrimenkule doğru eğilir — daha çok kazandırdığı için değil, kötü bir yılda satmadan tutmanın en kolay olduğu varlık olduğu için.",
+        "en": "The split is shaped by your risk score. A lower score leans toward property — not because it returns more, but because it is the asset people find easiest to hold through a bad year without selling.",
+        "de": "Die Aufteilung richtet sich nach deinem Risikowert. Ein niedrigerer Wert neigt zu Immobilien — nicht weil sie mehr abwerfen, sondern weil sie sich in einem schlechten Jahr am leichtesten halten lassen, ohne zu verkaufen."},
     "account.confirmMismatch": {
         "tr": "Hesap silme onayı eşleşmedi. İşlem yapılmadı.",
         "en": "The deletion confirmation didn't match. Nothing was deleted.",

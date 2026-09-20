@@ -826,7 +826,8 @@
     "searchLabel_segment": "Kesit ara",
     "noResults_segment": "\"{{search}}\" bulunamadı — {{count}} kesit var.",
     "showingFirst_segment": "Tüm kesitler gösteriliyor.",
-    "loading_segment": "Bundesbank konut endeksi alınıyor…"
+    "loading_segment": "Bundesbank konut endeksi alınıyor…",
+    "manualFilterNote": "Bağlantı ilçeye kadar filtreliyor. {{place}} sitenin kendi adreslerinin indiği seviyenin altında — oraya gidince sitenin filtresinden seçmen gerekiyor."
   },
   "rvb": {
     "title": "Kirada mı otur, ev mi al?",
@@ -1043,6 +1044,45 @@
       "title": "Birikimi büyütmenin tek yolu gayrimenkul değil",
       "body": "Başlangıçta emlağı seçtin. Ev almaya daha varsa, o arada biriktirdiğin paranın erimesini engellemenin bir yolu var.",
       "cta": "Göster"
+    }
+  },
+  "pathSuggestion": {
+    "title": "Nereden başlamalı",
+    "confident": "Anlattıklarına bakınca başlamak için uygun yer {{path}} görünüyor.",
+    "tentative": "Henüz elimizde pek bir şey yok, bu yüzden bu bir başlangıç tahmini: {{path}}.",
+    "threshold": "Senin pazarında fiziksel gayrimenkul gerçekçi olarak yaklaşık {{amount}} birikimle başlıyor.",
+    "apply": "{{path}} ile başla",
+    "applying": "Kaydediliyor…",
+    "note": "Bu bir öneri, hüküm değil. Başka bir şey seçebilir, sonra da değiştirebilirsin.",
+    "failed": "Kaydedilemedi. Yolun değişmedi."
+  },
+  "realEstatePath": {
+    "title": "Emlak yolunu seçmiştin",
+    "body": "Bu sayfa hisse ve fon portföyü kuruyor — yani senin istediğin şey değil ve ısrar etmeyecek. Aradığın her şey keşfet tarafında: kendi bölgende fiyatlar gerçekte ne yapmış, senin sayılarınla kira mı ev mi kazanıyor ve bir ilanı nasıl okursun.",
+    "toExplore": "Emlağa git",
+    "showAnyway": "Yine de portföyü göster",
+    "changePath": "Yolunu istediğin zaman profilinden değiştirebilirsin."
+  },
+  "budgetSplit": {
+    "title": "Bütçen nereye gidiyor",
+    "subtitle": "{{total}} için bir plan; önemli olan sırayla kuruldu.",
+    "disclaimer": "Bir sohbetin başlangıç noktası; belirli bir şeyi almanı söyleyen bir tavsiye değil.",
+    "parts": {
+      "reserve": {
+        "label": "Kenara ayrılan",
+        "hint": "Yatırılmıyor. Acil durumda, en kötü anda satmak yerine bunu harcarsın."
+      },
+      "property": {
+        "label": "Gayrimenkul"
+      },
+      "market": {
+        "label": "Hisse ve fonlar",
+        "hint": "Portföy sayfasında risk skoruna göre şekilleniyor."
+      }
+    },
+    "vehicle": {
+      "physical": "Senin pazarında bir yer almaya yetiyor.",
+      "reit": "Gayrimenkul fonları üzerinden — bütçen burada henüz bir yer almaya yetmiyor, bir fon ise yetiyor."
     }
   }
 }

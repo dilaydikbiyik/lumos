@@ -478,6 +478,29 @@ def _dispatch(
 
 # ── Public API (unchanged signatures) ─────────────────────────────────────────
 
+# The language rule lives near the TOP of each prompt file, and everything
+# appended after it — chat context, the market snapshot — pushes it further
+# from where the model is actually reading. Over a long conversation, and
+# especially on a weak free-tier fallback model, that is when replies start
+# drifting back to Turkish in an English session. Reported from the app: the
+# quiz answered three questions in English and then said "hadi başlayalım".
+#
+# Restating it as the LAST thing in the system prompt is the cheapest fix
+# that works, because a final instruction is the one models weight most.
+_LANGUAGE_NAMES = {"tr": "Turkish", "en": "English", "de": "German"}
+
+
+def _language_directive(language: str) -> str:
+    name = _LANGUAGE_NAMES.get(language, "English")
+    return (
+        f"\n\n---\nFINAL INSTRUCTION, OVERRIDES EVERYTHING ABOVE — LANGUAGE: "
+        f"Write every word of your reply in {name}. This includes greetings, "
+        f"button-like phrases, encouragement and any closing line. Do not mix "
+        f"in another language even for a single word, whatever language the "
+        f"data above happens to be written in."
+    )
+
+
 def chat(
     messages: list[dict],
     tier: Optional[str] = None,
@@ -515,7 +538,8 @@ def chat(
     # — the same language/market coupling we removed elsewhere. English is the
     # safer intermediate; Turkish stays the final backstop.
     base = variants.get(language) or variants.get("en") or variants["tr"]
-    system = base + (context or "") + build_market_context(market)
+    system = (base + (context or "") + build_market_context(market)
+              + _language_directive(language))
 
     # Generous budget: gemini-2.5-flash spends "thinking" tokens from the same
     # pool, and the final profile summary must not be truncated before the

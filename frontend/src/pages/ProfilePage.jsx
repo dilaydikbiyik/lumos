@@ -9,6 +9,7 @@ import ChatWindow from '../components/ChatWindow'
 import RiskGauge from '../components/RiskGauge'
 import DebtFirstCard from '../components/DebtFirstCard'
 import DeleteAccount from '../components/DeleteAccount'
+import PathSwitcher from '../components/PathSwitcher'
 import usePortfolio from '../hooks/usePortfolio'
 import useMarket from '../hooks/useMarket'
 import { readJSON, writeJSON, removeKey, userKey } from '../utils/storage'
@@ -209,6 +210,11 @@ export default function ProfilePage() {
             </button>
           </div>
         )}
+
+        {/* The onboarding card promises "you can change path at any time".
+            Until now there was nowhere to do it, and the path decides which
+            half of the app you can see at all. */}
+        <PathSwitcher />
 
         {/* OUTSIDE the result block on purpose. It was inside, which meant an
             account that signed up but never finished the quiz — or one part

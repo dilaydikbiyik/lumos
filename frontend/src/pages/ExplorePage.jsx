@@ -112,6 +112,13 @@ function ProvinceScenario({ province, amount }) {
                   </a>
                 ))}
               </div>
+          {links.some(l => l.manual_filter) && (
+            <p style={{ fontSize: 11, opacity: 0.7, marginTop: 6 }}>
+              {t('explore.manualFilterNote', {
+                place: links.find(l => l.manual_filter).manual_filter,
+              })}
+            </p>
+          )}
             </div>
           )}
           <p style={{ fontSize: 11, opacity: 0.6, marginTop: 6 }}>{band.honesty_note}</p>
@@ -496,6 +503,13 @@ function ListingLinks() {
           ))}
         </div>
       )}
+          {links.some(l => l.manual_filter) && (
+            <p style={{ fontSize: 11, opacity: 0.7, marginTop: 6 }}>
+              {t('explore.manualFilterNote', {
+                place: links.find(l => l.manual_filter).manual_filter,
+              })}
+            </p>
+          )}
       {error && <p style={{ color: 'var(--red)', fontSize: 13, marginTop: 10 }}>{error}</p>}
     </div>
   )

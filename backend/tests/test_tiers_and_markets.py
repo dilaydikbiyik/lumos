@@ -248,15 +248,26 @@ def test_tr_listing_links_use_canonical_slugs():
     assert any("emlakjet.com/satilik-arsa/ankara-cankaya" in link["url"] for link in links)
 
 
-def test_tr_village_detail_uses_search_fallback():
-    # the "Çeribaşı village in Keşan" realism case: micro-location → search route
+def test_tr_village_detail_keeps_the_district_on_both_sites():
+    """
+    The "Çeribaşı village in Keşan" case. This test used to assert the
+    OPPOSITE — that Sahibinden fell back to `?query_text=` — and that
+    assertion was encoding a bug: query_text searches listing TITLES rather
+    than filtering by location, so the district the user picked was dropped
+    and results came back province-wide. Reported from the app with
+    Kırklareli / Lüleburgaz / Emirali.
+
+    Neither site gets a guessed village slug (Emlakjet 404s on them), so both
+    land on the district page and the finer location travels as metadata.
+    """
     links = build_listing_links("Edirne", "Keşan", "arsa", market="TR", detail="Çeribaşı köyü")
     sahibinden = next(link for link in links if link["site"] == "Sahibinden")
     emlakjet = next(link for link in links if link["site"] == "Emlakjet")
-    assert "arama?query_text=" in sahibinden["url"]
-    assert "%C3%87eriba%C5%9F%C4%B1" in sahibinden["url"] or "eriba" in sahibinden["url"]
-    # Emlakjet: never invent a village slug (404 risk) — guaranteed district page
+
+    assert sahibinden["url"] == "https://www.sahibinden.com/satilik-arsa/edirne-kesan"
     assert emlakjet["url"] == "https://www.emlakjet.com/satilik-arsa/edirne-kesan"
+    assert "query_text" not in sahibinden["url"]
+    assert sahibinden["manual_filter"] == "Çeribaşı köyü"
 
 
 def test_us_listing_links_use_pack_templates():

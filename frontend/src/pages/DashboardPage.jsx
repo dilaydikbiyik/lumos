@@ -8,6 +8,9 @@ import PortfolioChart from '../components/PortfolioChart'
 import PortfolioComparison from '../components/PortfolioComparison'
 import NewsDigest from '../components/NewsDigest'
 import GoalPlanner from '../components/GoalPlanner'
+import PathInvitation from '../components/PathInvitation'
+import PathSuggestion from '../components/PathSuggestion'
+import BudgetSplit from '../components/BudgetSplit'
 import DailyTip from '../components/DailyTip'
 import HeadlineEducation from '../components/HeadlineEducation'
 import ReadinessScore from '../components/ReadinessScore'
@@ -37,6 +40,9 @@ function ProgressiveDetails({ holdingsSummary, portfolio }) {
         </button>
       ) : (
         <>
+          <PathSuggestion />
+          <BudgetSplit />
+          <PathInvitation />
           <PortfolioComparison />
           <GoalPlanner />
           <button

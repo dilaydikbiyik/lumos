@@ -15,6 +15,8 @@ import PracticeMode from '../components/PracticeMode'
 import BoughtItBridge from '../components/BoughtItBridge'
 import BeginnerGuide from '../components/BeginnerGuide'
 import Glossary from '../components/Glossary'
+import RealEstatePathNotice from '../components/RealEstatePathNotice'
+import api from '../utils/api'
 import usePortfolio from '../hooks/usePortfolio'
 import useMarket from '../hooks/useMarket'
 
@@ -57,6 +59,19 @@ export default function RecommendPage() {
   const { portfolio, isLoading, error, recommend, loadProfile } = usePortfolio()
   const [selectedTicker, setSelectedTicker] = useState(null)
   const [layer, setLayer] = useState(null)   // 'test' | 'apply' | null
+  // A real-estate-only reader can still land here from a bookmark or the
+  // dashboard invitation. Building them a stock portfolio anyway would
+  // overrule the answer the app asked them for.
+  const [realEstateOnly, setRealEstateOnly] = useState(false)
+  const [overrode, setOverrode] = useState(false)
+
+  useEffect(() => {
+    let cancelled = false
+    api.get('/users/me')
+      .then(res => { if (!cancelled) setRealEstateOnly(res.data.investment_path === 'real_estate') })
+      .catch(() => { /* showing the portfolio is the safe default */ })
+    return () => { cancelled = true }
+  }, [])
 
   useEffect(() => {
     if (profileState?.risk_score && profileState?.answers?.budget) {
@@ -81,6 +96,15 @@ export default function RecommendPage() {
     return () => { cancelled = true }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profileState?.risk_score, profileState?.answers?.budget])
+
+  if (realEstateOnly && !overrode) return (
+    <div className="page">
+      <AppHeader />
+      <div className="page-content">
+        <RealEstatePathNotice onShowAnyway={() => setOverrode(true)} />
+      </div>
+    </div>
+  )
 
   if (isLoading) return (
     <div className="page" style={{ alignItems: 'center', justifyContent: 'center', gap: 16 }}>

@@ -93,6 +93,13 @@ class MarketPack:
     annual_upkeep_pct: float = 1.0
     # Gross rental yield, used to back out a home price from a rent figure.
     gross_rental_yield: float = 0.05
+    # The savings at which buying physical property becomes realistic here:
+    # a customary down payment PLUS the purchase costs, which in most markets
+    # cannot be borrowed. Below it the honest answer is "not yet, and here is
+    # the instrument that gives you property exposure meanwhile" rather than
+    # a smaller flat. A documented assumption, shown to the user, and a fact
+    # about a country like every other number in this file.
+    property_entry_threshold: float = 1_000_000.0
     # Real (above-inflation) spreads for the planning projections.
     housing_real_spread_pct: float = 0.0
     rent_real_spread_pct: float = 0.0

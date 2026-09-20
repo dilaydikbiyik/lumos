@@ -26,17 +26,39 @@ async def get_or_create(db: AsyncSession, clerk_user_id: str) -> User:
     never touches the market again.
     """
     user = await get_by_clerk_id(db, clerk_user_id)
-    if user is None:
-        from backend.markets import default_market_for_language
-        from backend.middleware.language import current_language
+    if user is not None:
+        return user
 
-        user = User(
-            clerk_user_id=clerk_user_id,
-            market=default_market_for_language(current_language()),
-        )
-        db.add(user)
+    from sqlalchemy.exc import IntegrityError
+
+    from backend.markets import default_market_for_language
+    from backend.middleware.language import current_language
+
+    user = User(
+        clerk_user_id=clerk_user_id,
+        market=default_market_for_language(current_language()),
+    )
+    # Check-then-insert is a race, and a brand-new account is exactly when it
+    # fires: the first page load sends several requests at once, every one of
+    # them calls this, and all of them see "no row yet". One insert wins and
+    # the rest raise IntegrityError — a 500 on somebody's first impression.
+    #
+    # The savepoint keeps the failure local. Rolling back the whole session
+    # instead would discard whatever else the request had already done.
+    try:
+        async with db.begin_nested():
+            db.add(user)
         await db.flush()
-    return user
+        return user
+    except IntegrityError:
+        # Someone else created it between our read and our insert, which means
+        # the row we wanted now exists. Read it back rather than failing.
+        # No expunge: rolling the savepoint back already discarded the pending
+        # instance, and asking the session to forget it again raises.
+        existing = await get_by_clerk_id(db, clerk_user_id)
+        if existing is None:
+            raise           # a different integrity problem — do not swallow it
+        return existing
 
 
 async def save_risk_profile(

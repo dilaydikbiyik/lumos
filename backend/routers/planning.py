@@ -220,3 +220,47 @@ async def province_projection(
         project_province, body.region_code.upper(), body.amount, body.years,
         market, lang,
     )
+
+
+@router.get("/budget-split")
+@limiter.limit("30/minute")
+async def budget_split_plan(
+    request: Request,
+    user_id: str = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+    lang: str = Depends(language),
+):
+    """
+    "I have this much — what goes where?"
+
+    The entry point for the hybrid and undecided paths. A single-world path
+    still gets an answer, but the whole budget is planned inside the world
+    that reader chose: that is the point of having chosen it.
+
+    Rule-based and explained, like every other planning engine here. Someone
+    told to put six tenths of their savings into a flat deserves the
+    reasoning in terms they can push back on.
+    """
+    from backend.i18n import t as translate
+    from backend.markets import get_market_pack
+    from backend.services import budget_split as split_service
+
+    user = await user_repository.get_or_create(db, user_id)
+    pack = get_market_pack(user.market or "TR")
+
+    result = split_service.split(
+        budget=user.budget or 0,
+        risk_score=user.risk_score,
+        monthly_outgoings=user.monthly_income,
+        entry_threshold=pack.property_entry_threshold,
+        path=user.investment_path or "hybrid",
+    )
+
+    payload = result.as_dict()
+    payload["reasons"] = [
+        translate(key, lang, months=split_service.RESERVE_MONTHS)
+        for key in payload["reasons"]
+    ]
+    payload["currency"] = pack.currency
+    payload["path"] = user.investment_path or "hybrid"
+    return payload

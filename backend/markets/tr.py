@@ -28,6 +28,8 @@ TR = MarketPack(
     vat_pct=20.0,
     annual_upkeep_pct=1.0,
     gross_rental_yield=0.05,
+    # ~20% down on a modest flat plus 4% deed fee and agency commission.
+    property_entry_threshold=1_000_000.0,
     housing_real_spread_pct=0.0,
     rent_real_spread_pct=0.0,
     portfolio_real_spread_pct=3.0,

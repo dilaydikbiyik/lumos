@@ -76,6 +76,10 @@ DE = MarketPack(
     vat_pct=19.0,
     annual_upkeep_pct=1.2,
     gross_rental_yield=0.035,
+    # Germany is the strictest of the three: lenders expect the buyer to
+    # cover the ~7% Kaufnebenkosten from their OWN funds on top of the
+    # down payment, so the entry bar is genuinely higher than elsewhere.
+    property_entry_threshold=100_000.0,
     housing_real_spread_pct=0.0,
     rent_real_spread_pct=0.0,
     portfolio_real_spread_pct=4.0,

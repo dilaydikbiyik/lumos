@@ -826,7 +826,8 @@
     "searchLabel_segment": "Search segment",
     "noResults_segment": "\"{{search}}\" not found — there are {{count}} segments.",
     "showingFirst_segment": "Showing every segment.",
-    "loading_segment": "Fetching the Bundesbank housing index…"
+    "loading_segment": "Fetching the Bundesbank housing index…",
+    "manualFilterNote": "The link filters to the district. {{place}} is finer than the site's own URLs go — apply it in the site's filters once you're there."
   },
   "rvb": {
     "title": "Rent, or buy?",
@@ -1043,6 +1044,45 @@
       "title": "Property is not the only way to grow savings",
       "body": "You chose real estate at the start. If a flat is a long way off yet, there is a way to keep the money you are saving from melting in the meantime.",
       "cta": "Show me"
+    }
+  },
+  "pathSuggestion": {
+    "title": "Where to start",
+    "confident": "Based on what you have told us, {{path}} looks like the place to begin.",
+    "tentative": "There isn't much to go on yet, so this is a starting guess: {{path}}.",
+    "threshold": "Property in your market realistically starts around {{amount}} of savings.",
+    "apply": "Start with {{path}}",
+    "applying": "Saving…",
+    "note": "A suggestion, not a verdict. You can pick anything else, and change it later.",
+    "failed": "That could not be saved. Your path is unchanged."
+  },
+  "realEstatePath": {
+    "title": "You chose the real-estate path",
+    "body": "So this page — which builds a stock and fund portfolio — is not what you asked for, and it is not going to insist. Everything you came for is on the explore side: what prices in your area have actually done, whether renting or buying wins on your numbers, and how to read a listing.",
+    "toExplore": "Go to real estate",
+    "showAnyway": "Show me the portfolio anyway",
+    "changePath": "You can change your path any time from your profile."
+  },
+  "budgetSplit": {
+    "title": "Where your budget goes",
+    "subtitle": "A plan for {{total}}, decided in the order that matters.",
+    "disclaimer": "A starting point for a conversation, not a recommendation to buy anything specific.",
+    "parts": {
+      "reserve": {
+        "label": "Kept back",
+        "hint": "Not invested. This is what you spend in an emergency instead of selling at the worst moment."
+      },
+      "property": {
+        "label": "Property"
+      },
+      "market": {
+        "label": "Stocks and funds",
+        "hint": "Shaped by your risk score on the portfolio page."
+      }
+    },
+    "vehicle": {
+      "physical": "Enough to buy a place in your market.",
+      "reit": "Through property funds — your budget cannot buy a place here yet, and a fund can."
     }
   }
 }

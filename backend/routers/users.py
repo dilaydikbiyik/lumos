@@ -263,6 +263,45 @@ async def delete_me(
     }
 
 
+@router.get("/me/path-suggestion")
+async def path_suggestion(
+    user_id: str = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+    lang: str = Depends(language),
+):
+    """
+    A suggested path for someone who answered "not sure yet".
+
+    Rule-based, not an LLM call, for the same reason `readiness_score` is:
+    a beginner told which world to start in deserves reasons they can argue
+    with. "The model said so" is not one, and a model asked twice need not
+    answer the same way.
+
+    A SUGGESTION. Nothing is saved; the user still chooses.
+    """
+    from backend.markets import get_market_pack
+    from backend.services import path_advisor
+
+    user = await user_repository.get_or_create(db, user_id)
+    pack = get_market_pack(user.market or "TR")
+
+    result = path_advisor.suggest(
+        horizon=user.time_horizon,
+        budget=user.budget,
+        primary_fear=user.primary_fear,
+        entry_threshold=pack.property_entry_threshold,
+    )
+    return {
+        "path": result.path,
+        "confident": result.confident,
+        # Sentences, in the reader's language — the engine writes prose here
+        # the same way every other engine in the app does.
+        "reasons": [t(key, lang) for key in result.reasons],
+        "entry_threshold": pack.property_entry_threshold,
+        "currency": pack.currency,
+    }
+
+
 @router.get("/me/plans")
 async def list_plans(user_id: str = Depends(get_current_user)):
     """AI plan tiers — pricing page payload (billing-ready)."""

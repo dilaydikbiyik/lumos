@@ -520,7 +520,8 @@
     "searchLabel_segment": "Segment suchen",
     "noResults_segment": "\"{{search}}\" nicht gefunden — es gibt {{count}} Segmente.",
     "showingFirst_segment": "Alle Segmente werden angezeigt.",
-    "loading_segment": "Häuserpreisindex der Bundesbank wird geladen…"
+    "loading_segment": "Häuserpreisindex der Bundesbank wird geladen…",
+    "manualFilterNote": "Der Link filtert bis zum Bezirk. {{place}} ist feiner, als die Adressen der Seite reichen — wähle es dort in den Filtern der Seite aus."
   },
   "rvb": {
     "title": "Mieten oder kaufen?",
@@ -1043,6 +1044,45 @@
       "title": "Immobilien sind nicht der einzige Weg",
       "body": "Du hast am Anfang Immobilien gewählt. Wenn die Wohnung noch weit weg ist, gibt es einen Weg, das Ersparte in der Zwischenzeit nicht dahinschmelzen zu lassen.",
       "cta": "Zeig es mir"
+    }
+  },
+  "pathSuggestion": {
+    "title": "Womit anfangen",
+    "confident": "Nach dem, was du erzählt hast, sieht {{path}} nach dem richtigen Anfang aus.",
+    "tentative": "Es gibt noch wenig Anhaltspunkte, das hier ist also eine erste Vermutung: {{path}}.",
+    "threshold": "Physische Immobilien beginnen in deinem Markt realistisch bei etwa {{amount}} Erspartem.",
+    "apply": "Mit {{path}} anfangen",
+    "applying": "Wird gespeichert…",
+    "note": "Ein Vorschlag, kein Urteil. Du kannst etwas anderes wählen und es später ändern.",
+    "failed": "Das konnte nicht gespeichert werden. Dein Weg ist unverändert."
+  },
+  "realEstatePath": {
+    "title": "Du hast den Immobilienweg gewählt",
+    "body": "Diese Seite baut ein Aktien- und Fondsportfolio — also nicht das, worum du gebeten hast, und sie wird nicht darauf bestehen. Alles, weswegen du hier bist, liegt auf der Entdecken-Seite: was die Preise in deiner Gegend tatsächlich gemacht haben, ob sich Mieten oder Kaufen bei deinen Zahlen lohnt und wie man ein Inserat liest.",
+    "toExplore": "Zu den Immobilien",
+    "showAnyway": "Zeig mir das Portfolio trotzdem",
+    "changePath": "Du kannst deinen Weg jederzeit im Profil ändern."
+  },
+  "budgetSplit": {
+    "title": "Wohin dein Budget geht",
+    "subtitle": "Ein Plan für {{total}}, in der Reihenfolge entschieden, auf die es ankommt.",
+    "disclaimer": "Ein Ausgangspunkt für ein Gespräch, keine Empfehlung, etwas Bestimmtes zu kaufen.",
+    "parts": {
+      "reserve": {
+        "label": "Zurückgelegt",
+        "hint": "Nicht angelegt. Das gibst du im Notfall aus, statt im schlechtesten Moment zu verkaufen."
+      },
+      "property": {
+        "label": "Immobilien"
+      },
+      "market": {
+        "label": "Aktien und Fonds",
+        "hint": "Auf der Portfolioseite nach deinem Risikowert geformt."
+      }
+    },
+    "vehicle": {
+      "physical": "Genug, um in deinem Markt etwas zu kaufen.",
+      "reit": "Über Immobilienfonds — dein Budget reicht hier noch nicht für ein Objekt, für einen Fonds schon."
     }
   }
 }

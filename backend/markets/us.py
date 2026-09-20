@@ -63,6 +63,10 @@ US = MarketPack(
     vat_pct=0.0,                   # no VAT on residential purchases
     annual_upkeep_pct=1.5,         # taxes, insurance and maintenance run high
     gross_rental_yield=0.06,
+    # ~20% down on an entry-level home plus ~2.5% closing costs. Lower
+    # down payments exist (FHA), but they carry mortgage insurance, so
+    # this stays the conservative figure.
+    property_entry_threshold=80_000.0,
     housing_real_spread_pct=1.0,
     rent_real_spread_pct=0.0,
     portfolio_real_spread_pct=4.5,

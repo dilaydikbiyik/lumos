@@ -13,9 +13,15 @@ REALISM NOTE (verified live 2026-07-10):
   we land on the district page instead.
 - Sahibinden's bot protection blocks external verification (403 on every
   path); we use the canonical public patterns (satilik-arsa/satilik-daire)
-  and fall back to the site's own search route (query_text) for
-  micro-locations like villages — the most robust defence against broken
-  deep links.
+  with the province-district slug.
+
+  It used to fall back to the site's own `?query_text=` search for
+  micro-locations. That turned out to be worse, not more robust: query_text
+  searches listing TITLES rather than filtering by location, so a search for
+  "Kırklareli Lüleburgaz Emirali" came back filtered to the PROVINCE only —
+  the district the user picked was silently dropped. Reported from the app.
+  A returned link now always keeps the district, and any finer location
+  travels beside it as `manual_filter` for the UI to show.
 
 Market-aware: TR keeps hand-tuned deep URLs; other markets use their
 pack's search templates.
@@ -48,22 +54,31 @@ def _tr_links(il: str, ilce: str, asset_type: str, detail: Optional[str] = None)
     location = f"{il_s}-{ilce_s}" if ilce_s else il_s
 
     if detail and detail.strip():
-        # Micro-location (village/quarter): no guaranteed deep path on
-        # Sahibinden → falling back to the site's own full-text search is
-        # the most realistic behaviour.
-        text = " ".join(part for part in (il, ilce, detail, asset_type) if part).strip()
+        # A micro-location (village / neighbourhood) has no guaranteed deep
+        # path on either site, so neither gets one invented for it. What both
+        # DO have is a reliable province-district page, and that is where the
+        # link lands.
+        #
+        # Sahibinden used to drop to `?query_text=` here. That is a full-text
+        # search over listing TITLES, not a location filter: reported from the
+        # app, "Kırklareli + Lüleburgaz + Emirali" came back filtered to
+        # Kırklareli alone, because the district and village are not words in
+        # the titles. Losing the district the user explicitly chose is worse
+        # than not applying the village — so both sites now keep the district
+        # and leave the last hop to the site's own filters.
         return [
             {
                 "site": "Sahibinden",
-                "url": f"https://www.sahibinden.com/arama?query_text={quote(text)}",
+                "url": f"https://www.sahibinden.com/{sahibinden_slug}/{location}",
+                "manual_filter": detail.strip(),
             },
             {
-                # We NEVER invent a village slug: Emlakjet paths resolve
-                # only for locations in its own database (ceribasi-koyu → 404
-                # seen live). Landing on the guaranteed province-district page
-                # and leaving the micro filter to the site is the honest move.
+                # Emlakjet paths resolve only for locations in its own
+                # database (ceribasi-koyu → 404, seen live), so the same rule
+                # applies: the guaranteed page, not a guessed slug.
                 "site": "Emlakjet",
                 "url": f"https://www.emlakjet.com/{emlakjet_slug}/{location}",
+                "manual_filter": detail.strip(),
             },
         ]
 
