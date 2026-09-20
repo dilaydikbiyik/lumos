@@ -275,7 +275,7 @@
       "reit": {
         "type": "Gayrimenkul Fonu (GYO)",
         "what": "Kira getiren mülklerden oluşan bir sepet — ofisler, depolar, konutlar. Borsadan bir dilimini alabilirsin.",
-        "why": "Daire fiyatına ihtiyaç duymadan, tapu işiyle uğraşmadan gayrimenkulde yer almak. Kira, temettü olarak geliyor.",
+        "why": "Daire fiyatına ihtiyaç duymadan, alım satım ve resmî devir işleriyle uğraşmadan gayrimenkulde yer almak. Kira, temettü olarak geliyor.",
         "risk": "Faizler yükselince mülk değerleri baskılanır. Bir de kendi dairen gibi \"elle tutulur\" değil."
       },
       "cash": {
@@ -1025,5 +1025,24 @@
     "subtitle": "Uygulamanın kullandığı her terim, başka terim kullanmadan anlatıldı. Birini bilmemek normal — bu sayfa tam da onun için.",
     "search": "Terim ara…",
     "noMatch": "“{{query}}” ile eşleşen bir şey yok. Danışmana sor, sana açıklasın."
+  },
+  "pathSwitch": {
+    "title": "Yolun",
+    "subtitle": "Lumos'un hangi yarısını gördüğün. İstediğin zaman değiştirebilirsin.",
+    "note": "Bunu değiştirmek yalnızca sana gösterileni değiştirir. Girdiğin hiçbir şey silinmez.",
+    "failed": "Kaydedilemedi. Yolun değişmedi."
+  },
+  "pathInvite": {
+    "notNow": "Şimdi değil",
+    "toRealEstate": {
+      "title": "Burada bir de emlak tarafı var",
+      "body": "Başlangıçta hisseyi seçtin, o yüzden ayak altında durmadı. Kirada mı otursam ev mi alsam diye düşündüysen ya da kendi ilçendeki fiyatlar gerçekte ne yapmış merak ettiysen, hepsi orada.",
+      "cta": "Bir bakayım"
+    },
+    "toStocks": {
+      "title": "Birikimi büyütmenin tek yolu gayrimenkul değil",
+      "body": "Başlangıçta emlağı seçtin. Ev almaya daha varsa, o arada biriktirdiğin paranın erimesini engellemenin bir yolu var.",
+      "cta": "Göster"
+    }
   }
 }

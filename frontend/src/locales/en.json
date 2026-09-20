@@ -1025,5 +1025,24 @@
     "subtitle": "Every term this app uses, explained without more jargon. Not knowing one is normal — that is what this page is for.",
     "search": "Search a term…",
     "noMatch": "Nothing matches “{{query}}”. Ask the advisor and it will explain it."
+  },
+  "pathSwitch": {
+    "title": "Your path",
+    "subtitle": "Which half of Lumos you see. You can change it whenever you like.",
+    "note": "Changing this only changes what is shown to you. Nothing you have entered is deleted.",
+    "failed": "That could not be saved. Your path is unchanged."
+  },
+  "pathInvite": {
+    "notNow": "Not now",
+    "toRealEstate": {
+      "title": "There is a whole real-estate side here too",
+      "body": "You chose stocks at the start, so it stayed out of your way. If you have ever wondered whether to rent or buy, or what your district's prices have actually done, it is all there.",
+      "cta": "Take a look"
+    },
+    "toStocks": {
+      "title": "Property is not the only way to grow savings",
+      "body": "You chose real estate at the start. If a flat is a long way off yet, there is a way to keep the money you are saving from melting in the meantime.",
+      "cta": "Show me"
+    }
   }
 }

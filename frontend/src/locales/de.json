@@ -1025,5 +1025,24 @@
     "subtitle": "Jeder Begriff, den diese App verwendet — erklärt ohne weitere Fachbegriffe. Einen nicht zu kennen ist normal; genau dafür gibt es diese Seite.",
     "search": "Begriff suchen…",
     "noMatch": "Nichts passt zu „{{query}}“. Frag den Berater, er erklärt es dir."
+  },
+  "pathSwitch": {
+    "title": "Dein Weg",
+    "subtitle": "Welche Hälfte von Lumos du siehst. Du kannst es jederzeit ändern.",
+    "note": "Das ändert nur, was dir angezeigt wird. Nichts von dem, was du eingetragen hast, wird gelöscht.",
+    "failed": "Das konnte nicht gespeichert werden. Dein Weg ist unverändert."
+  },
+  "pathInvite": {
+    "notNow": "Jetzt nicht",
+    "toRealEstate": {
+      "title": "Es gibt hier auch eine ganze Immobilienseite",
+      "body": "Du hast am Anfang Aktien gewählt, also blieb sie dir aus dem Weg. Falls du dich je gefragt hast, ob mieten oder kaufen — oder was die Preise in deinem Viertel tatsächlich gemacht haben — das ist alles da.",
+      "cta": "Mal ansehen"
+    },
+    "toStocks": {
+      "title": "Immobilien sind nicht der einzige Weg",
+      "body": "Du hast am Anfang Immobilien gewählt. Wenn die Wohnung noch weit weg ist, gibt es einen Weg, das Ersparte in der Zwischenzeit nicht dahinschmelzen zu lassen.",
+      "cta": "Zeig es mir"
+    }
   }
 }
