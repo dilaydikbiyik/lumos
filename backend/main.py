@@ -158,16 +158,40 @@ app.add_middleware(
 register_error_handlers(app)
 
 # ── Routers ───────────────────────────────────────────────────────────────────
-app.include_router(health.router, tags=["Health"])
-app.include_router(chat.router,    prefix="/chat",      tags=["Chat"])
-app.include_router(profile.router, prefix="/profile",   tags=["Profile"])
-app.include_router(recommend.router, prefix="/recommend", tags=["Recommend"])
-app.include_router(users.router,   prefix="/users",     tags=["Users"])
-app.include_router(holdings.router, prefix="/holdings", tags=["Holdings"])
-app.include_router(backtest.router, prefix="/backtest", tags=["Backtest"])
-app.include_router(news.router,     prefix="/news",      tags=["News"])
-app.include_router(coach.router,    prefix="/coach",     tags=["Coach"])
-app.include_router(planning.router, prefix="/planning",  tags=["Planning"])
-app.include_router(practice.router,  prefix="/practice",  tags=["Practice"])
-app.include_router(admin.router,    prefix="/admin",     tags=["Admin"])
-app.include_router(feedback.router, prefix="/feedback",  tags=["Feedback"])
+#
+# Every router is mounted TWICE: once under /api/v1 and once at the bare path
+# it has always been served from.
+#
+# The version prefix is the point — it is what lets a breaking change ship as
+# /api/v2 while existing clients keep working. The unprefixed mount is the
+# migration path, not a second API: the frontend and the backend deploy
+# independently (Vercel and Render), so for a window after either one ships
+# there is an old client talking to a new server. Removing the legacy mount in
+# the same release that adds the prefix would make that window an outage.
+#
+# The legacy mount is deprecated. It can go once the deployed frontend has
+# been on /api/v1 long enough that no cached bundle is still calling the old
+# paths — a week is generous, since the service worker updates on next load.
+API_V1 = "/api/v1"
+
+_ROUTERS = [
+    (health.router, "", ["Health"]),
+    (chat.router, "/chat", ["Chat"]),
+    (profile.router, "/profile", ["Profile"]),
+    (recommend.router, "/recommend", ["Recommend"]),
+    (users.router, "/users", ["Users"]),
+    (holdings.router, "/holdings", ["Holdings"]),
+    (backtest.router, "/backtest", ["Backtest"]),
+    (news.router, "/news", ["News"]),
+    (coach.router, "/coach", ["Coach"]),
+    (planning.router, "/planning", ["Planning"]),
+    (practice.router, "/practice", ["Practice"]),
+    (admin.router, "/admin", ["Admin"]),
+    (feedback.router, "/feedback", ["Feedback"]),
+]
+
+for _router, _prefix, _tags in _ROUTERS:
+    app.include_router(_router, prefix=f"{API_V1}{_prefix}", tags=_tags)
+    # Hidden from the schema so the docs describe ONE API rather than showing
+    # every endpoint twice and leaving a reader to guess which to use.
+    app.include_router(_router, prefix=_prefix, tags=_tags, include_in_schema=False)

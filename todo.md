@@ -529,7 +529,7 @@ lumos/                          ← project root
 - [/] Domain exception classes: `MarketDataError` + `AIServiceError` added (`backend/exceptions.py`), mapped to 503 in error_handler — `QuotaExceededError` comes with the quota feature
 - [x] Standard error envelope: `{detail, error:{code,message,request_id}}` — detail kept for frontend compatibility
 - [x] `X-Request-ID` middleware: contextvar-based correlation — returned in the header, visible in the error envelope and logs (3 tests)
-- [ ] API versioning: move all routers under an `/api/v1` prefix (update frontend api.js baseURL)
+- [x] API versioning: every router is mounted under `/api/v1`, and also at its bare legacy path (hidden from the schema) so the two independently-deployed halves can ship in any order. The frontend calls `/api/v1` and falls back once to the legacy path on a 404, remembering the answer — without that, the window where Vercel is live and Render is still building is a broken app, not a slow one. Remove the legacy mount and the fallback together.
 - [x] Light RBAC: `role` column (migration 734ca3a1) + `require_role()` + admin-only /admin/stats (user/holding/message volume, path distribution) (2 tests)
 - [x] Deepen the health check: `/health` genuinely probes DB connectivity and AI provider access (`{"db": "ok", "ai": "ok"}`)
 - [x] Python 3.9 → 3.12 migration: venv rebuilt, Dockerfile+CI moved to 3.12, `datetime.utcnow` deprecations fixed (Optional→| None conversion is cosmetic, gradual)
@@ -1354,21 +1354,25 @@ method, a legal identity, or a signature.
 
 #### 4. Packaging
 
-- [ ] Capacitor wrap of the existing React build — no rewrite, it is the plan
+- [x] Capacitor wrap of the existing React build — no rewrite, it is the plan
       the PWA work was building toward.
-- [ ] **Push notifications** are the reason to be in a store at all: the
+      → `frontend/capacitor.config.ts` + `docs/packaging.md`. The config, the permanent appId and the icon pipeline are in the repo; `npx cap add` itself needs a Mac with Xcode and is documented rather than run.
+- [ ] **[blocked: needs the Apple + Play accounts]** **Push notifications** are the reason to be in a store at all: the
       behavioural coach's "the market dropped, here is why not to sell" only
       works in real time, and iOS web push cannot carry it. Capacitor +
       FCM/APNs, with a backend endpoint to register device tokens.
-- [ ] Icons and splash from `brand/` at every required size (iOS 1024 marketing
+- [x] Icons and splash from `brand/` at every required size (iOS 1024 marketing
       icon, Android adaptive icon with foreground/background layers).
+      → `brand/generate-app-icons.py` emits 36 files: the alpha-free iOS 1024 marketing icon, Android adaptive foreground/background at five densities, legacy launcher icons, splash and PWA sizes. The background is SAMPLED from the artwork (#0A0B12) rather than guessed.
 - [x] `manifest.webmanifest` hardcoded `"lang": "tr"` and a Turkish description
       while the app ships three languages. Now English (the widest reach, and
       the app's own fallback for any browser that is not Turkish or German)
       with `categories: finance, education` for the install prompt.
-- [ ] Deep links / universal links so a notification opens the right screen.
-- [ ] iOS: `NSUserTrackingUsageDescription` not needed (no tracking), but
+- [x] Deep links / universal links so a notification opens the right screen.
+      → both association files and the intent-filter are specified in `docs/packaging.md`. They cannot be SERVED until the custom domain exists, which is a [you] item.
+- [x] iOS: `NSUserTrackingUsageDescription` not needed (no tracking), but
       confirm no SDK adds an IDFA dependency.
+      → confirmed: no advertising or analytics SDK, no IDFA, Sentry runs with `send_default_pii=False`. The key is deliberately absent, and `docs/packaging.md` says to re-check for transitive IDFA deps each release.
 
 #### 5. Store listings
 
@@ -1382,7 +1386,7 @@ method, a legal identity, or a signature.
       justify that the app gives no advice and moves no money.
 - [x] Age rating questionnaires. "Does your app contain financial services?" — — every question answered in `docs/store-submission.md`
       answer honestly, educational tools are fine.
-- [ ] **Demo account for reviewers** with pre-populated holdings, and its
+- [ ] **[you]** **Demo account for reviewers** with pre-populated holdings, and its
       credentials in the review notes. A reviewer who has to complete a
       9-question quiz to see anything will not.
 - [x] Review notes explaining, in one paragraph, that Lumos executes no trades — written in `docs/store-submission.md`, ready to paste

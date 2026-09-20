@@ -20,7 +20,8 @@ const { chromium, devices } = req('playwright')
 const ffmpeg = req('ffmpeg-static')
 
 const APP = 'https://lumos-sooty.vercel.app'
-const API = 'https://lumos-api-yowm.onrender.com'
+// Versioned, like the app itself — the unprefixed mount is deprecated.
+const API = 'https://lumos-api-yowm.onrender.com/api/v1'
 const PORTAL = 'https://peaceful-drake-17.accounts.dev'
 const CLERK = 'https://api.clerk.com/v1'
 const SECRET = process.env.CLERK_SECRET_KEY

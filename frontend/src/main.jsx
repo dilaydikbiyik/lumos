@@ -14,9 +14,13 @@ if (!PUBLISHABLE_KEY) {
 // Wake the backend the moment the app loads (free tier spins down when
 // idle). Fire-and-forget: by the time the user types anything the server
 // is warm, with no loading banner needed.
+// Versioned like every other call. The backend still answers the bare path,
+// but that mount is deprecated, and a warm-up ping that quietly 404s once it
+// is removed would cost the first real request a cold start with no symptom
+// anyone would notice.
 const backend = import.meta.env.VITE_BACKEND_URL
 if (backend) {
-  fetch(`${backend}/health`).catch(() => {})
+  fetch(`${backend.replace(/\/+$/, '')}/api/v1/health`).catch(() => {})
 }
 
 // PWA: register service worker (production builds only — dev uses HMR)

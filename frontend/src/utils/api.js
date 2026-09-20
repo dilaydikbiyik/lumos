@@ -1,7 +1,15 @@
 import axios from 'axios'
 
+// The API is versioned. Every call goes through /api/v1 so that a future
+// breaking change can ship as /api/v2 without stranding this client. The
+// backend still answers the old unprefixed paths, deprecated, purely so that
+// a cached bundle from before this change keeps working — the frontend and
+// the backend deploy independently, and neither can assume the other shipped.
+const API_VERSION = '/api/v1'
+const API_ROOT = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000'
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000',
+  baseURL: `${API_ROOT.replace(/\/+$/, '')}${API_VERSION}`,
   // Bound infinite hangs (Render cold-start + slow AI) — a timed-out request
   // becomes a retryable "no response" for idempotent calls below.
   // Generous: a free-tier backend waking from spin-down can take 50-90s on
@@ -73,11 +81,56 @@ export function shouldRetry({ hasResponse, status, method, retryCount }) {
   return retryable && retryCount < RETRY_DELAYS_MS.length
 }
 
+/**
+ * Version fallback, for the deploy window only.
+ *
+ * The frontend and the backend deploy from the same push but not at the same
+ * speed: Vercel is usually live in under a minute while Render rebuilds and
+ * boots. So there is a window where THIS bundle, which calls /api/v1, is
+ * talking to a server that only serves the old unprefixed paths — and every
+ * request in that window would 404. That is a broken app, not a slow one.
+ *
+ * So a 404 under the version prefix is retried once at the legacy path, and
+ * the answer is remembered for the session: after the first probe there is no
+ * extra round-trip either way.
+ *
+ * Delete this, and the legacy mount in backend/main.py, together — once no
+ * deployed bundle predates the prefix, neither has a job.
+ */
+let legacyFallback = false
+
+function withoutVersion(url = '') {
+  return url.replace(API_VERSION, '')
+}
+
+api.interceptors.request.use((config) => {
+  if (legacyFallback && config.baseURL?.endsWith(API_VERSION)) {
+    config.baseURL = withoutVersion(config.baseURL)
+  }
+  return config
+})
+
 api.interceptors.response.use(
   (res) => res,
   async (error) => {
     const cfg = error.config
     if (!cfg || error.code === 'ERR_CANCELED') return Promise.reject(error)
+
+    // A 404 from a versioned call means the server predates the prefix — not
+    // that the resource is missing. Try once without it before giving up.
+    if (error.response?.status === 404 && !legacyFallback && !cfg.__triedLegacy
+        && (cfg.baseURL || '').includes(API_VERSION)) {
+      cfg.__triedLegacy = true
+      cfg.baseURL = withoutVersion(cfg.baseURL)
+      const retried = await api.request(cfg).catch(() => null)
+      if (retried) {
+        // It worked unprefixed: the server is the old one. Stop paying for
+        // the probe on every subsequent call.
+        legacyFallback = true
+        return retried
+      }
+      return Promise.reject(error)
+    }
 
     cfg.__retryCount = cfg.__retryCount || 0
     const ok = shouldRetry({
