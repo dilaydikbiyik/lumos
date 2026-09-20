@@ -32,6 +32,9 @@ def _fetch(dataset: str, params: dict, cache_key: str) -> Optional[dict[str, flo
         return cached or None
 
     try:
+        if cache_service.in_cooldown("eurostat"):
+            raise cache_service.UpstreamInCooldown("eurostat")
+
         import httpx
 
         res = httpx.get(f"{_BASE}/{dataset}", params={"format": "JSON", "lang": "EN", **params}, timeout=25)
@@ -55,6 +58,11 @@ def _fetch(dataset: str, params: dict, cache_key: str) -> Optional[dict[str, flo
         return series
     except Exception as exc:
         logger.warning("Eurostat fetch failed for %s (%s)", dataset, type(exc).__name__)
+        # Leave this source alone for a short while. Without it every
+        # subsequent request re-attempts a dead upstream and waits out
+        # the full timeout; stale data is fine, a hung app is not.
+        if not isinstance(exc, cache_service.UpstreamInCooldown):
+            cache_service.start_cooldown("eurostat")
         fallback = cache_service.get(lkg_key)
         if fallback:
             logger.warning("Serving last-known-good Eurostat data for %s", dataset)

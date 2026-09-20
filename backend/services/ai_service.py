@@ -547,8 +547,6 @@ def extract_profile(messages: list[dict], language: str = "tr") -> dict:
 
     Raises HTTPException(422) if the AI output cannot be parsed as JSON.
     """
-    import json
-    import re
 
     extract_system = (
         Path(__file__).parent.parent / "prompts" / "profile_extract_prompt.txt"
@@ -562,32 +560,23 @@ def extract_profile(messages: list[dict], language: str = "tr") -> dict:
         language=language,
     )
 
-    # Strategy 1: strip markdown fences and try direct parse
-    cleaned = re.sub(r"^```(?:json)?\s*|\s*```$", "", raw.strip(), flags=re.MULTILINE).strip()
-    try:
-        return json.loads(cleaned)
-    except json.JSONDecodeError:
-        pass
+    # One parser, not a ladder of regexes. The old ladder's second rung was
+    # `\{[^{}]+\}` — "a brace block with no braces in it" — which, against a
+    # NESTED object preceded by any prose, matched the INNER object and
+    # returned it as the user's profile. Not a failure: a confident wrong
+    # answer feeding the risk score and therefore the whole portfolio.
+    from backend.services.json_extract import extract_json_object
 
-    # Strategy 2: find the first {...} block in the response (handles thinking tokens / prose)
-    match = re.search(r"\{[^{}]+\}", cleaned, re.DOTALL)
-    if match:
-        try:
-            return json.loads(match.group(0))
-        except json.JSONDecodeError:
-            pass
+    parsed = extract_json_object(raw)
+    if parsed is not None:
+        return parsed
 
-    # Strategy 3: find any {...} block including nested
-    match = re.search(r"\{.*?\}", raw, re.DOTALL)
-    if match:
-        try:
-            return json.loads(match.group(0))
-        except json.JSONDecodeError:
-            pass
-
+    # Length and shape only. The raw output is the user's extracted profile —
+    # age, income, debts — and a parse failure is not a reason to copy that
+    # into a log stream a third party can read.
     logger.warning(
-        "extract_profile failed to parse JSON. raw_output=%r",
-        raw[:300],
+        "extract_profile could not parse a JSON object (chars=%d, starts_with=%r)",
+        len(raw), raw[:24],
     )
     raise HTTPException(
         status_code=422,

@@ -71,8 +71,6 @@ def get_daily_digest(investment_path: str = "hybrid", market: str = "TR",
     Cached per day + path + market + language — the same headlines rewritten
     in another language are a different answer, so they need a different key.
     """
-    import json
-    import re
 
     cache_key = f"news_digest:{date.today().isoformat()}:{investment_path}:{market}:{lang}"
     cached = cache_service.get(cache_key)
@@ -90,12 +88,10 @@ def get_daily_digest(investment_path: str = "hybrid", market: str = "TR",
             language=_LANGUAGE_NAMES.get(lang, _LANGUAGE_NAMES["tr"])
         ),
     )
-    cleaned = re.sub(r"^```(?:json)?\s*|\s*```$", "", raw.strip())
-    try:
-        digest = json.loads(cleaned)
-        if not isinstance(digest, list):
-            digest = []
-    except json.JSONDecodeError:
+    from backend.services.json_extract import extract_json_array
+
+    digest = extract_json_array(raw)
+    if digest is None:
         logger.warning("News digest JSON parse failed; returning empty digest")
         digest = []
 

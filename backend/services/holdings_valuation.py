@@ -63,8 +63,14 @@ def ticker_currency(ticker: str) -> str:
 
     Deliberately offline: a listing suffix and a table of the app's own
     universe answer every symbol we recommend. Only a genuinely unfamiliar
-    ticker reaches the network, and even then a failure degrades to USD
-    rather than leaving the holding unvalued.
+    ticker reaches the network.
+
+    Returns None when even that fails. It used to return "USD", which is the
+    same mistake the caller already refuses to make two lines further down —
+    "unknown rate must mean can't value this, never an assumed 1.0". A guessed
+    currency is worse than a guessed rate: a bare BIST symbol valued as
+    dollars overstates a Turkish holding roughly fortyfold, and nothing on
+    screen says the currency was a guess.
     """
     symbol = (ticker or "").upper()
     if symbol in _KNOWN_CURRENCY:
@@ -78,9 +84,11 @@ def ticker_currency(ticker: str) -> str:
         info = ticker_lookup.lookup(symbol)
         if info and info.get("currency"):
             return info["currency"].upper()
-    except Exception:
-        pass
-    return "USD"
+    except Exception as exc:
+        logger.warning("currency lookup failed for %s (%s)",
+                       symbol, type(exc).__name__)
+    logger.warning("unknown listing currency for %s — holding left unvalued", symbol)
+    return None
 
 
 def _price_on_or_before(series, target: date) -> Optional[float]:
@@ -128,6 +136,10 @@ def _exchange_values(holdings, user_currency: str = "TRY") -> dict[int, dict]:
 
         latest = float(series.iloc[-1])
         asset_ccy = ticker_currency(h.ticker)
+        if asset_ccy is None:
+            # Same rule as the unknown FX rate below: say nothing rather than
+            # report a number in a currency we guessed.
+            continue
         # NULL means the row predates the currency column, i.e. it was written
         # when the app was Türkiye-only. Reading it as the user's CURRENT
         # market would let a market switch silently rewrite history: the same

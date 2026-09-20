@@ -90,9 +90,30 @@ def _no_network_valuation():
         yield
 
 
-@pytest.fixture
-def mock_ai():
-    """Patch the provider dispatch — tests never hit Gemini/Anthropic."""
+@pytest.fixture(autouse=True)
+def mock_ai(request):
+    """
+    No test reaches a real AI provider. Requestable by name for assertions.
+
+    This was opt-in, and only 5 of the 18 test files that touch an AI path
+    asked for it — so the rest were calling Gemini for real, with the keys
+    from the developer's .env. The suite still passed, because the failover
+    chain handles a 401 or a 429 gracefully, which is exactly what made it
+    invisible: the only symptoms were burnt quota and a runtime that wandered
+    between 10 and 90 seconds depending on how the provider felt.
+
+    Autouse, so it is on by default and a new test cannot forget it. Tests
+    that need the real chain patch the SDK client below this layer
+    (test_gemini_fallback), and tests with their own reply patch `_dispatch`
+    themselves — an inner patch wins over this one.
+    """
+    # Tests of `_dispatch` ITSELF must see the real function. They mark
+    # themselves rather than the fixture guessing, so the opt-out is visible
+    # at the test that takes it.
+    if request.node.get_closest_marker("real_dispatch"):
+        yield None
+        return
+
     with patch(
         "backend.services.ai_service._dispatch",
         return_value="Mocked AI reply ⚠️ educational purposes only",

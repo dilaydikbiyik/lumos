@@ -1,6 +1,7 @@
 """
 Paid-tier infrastructure + Market Pack tests.
 """
+import pytest
 from unittest.mock import patch
 
 from backend.markets import MARKET_PACKS, get_market_pack
@@ -25,6 +26,7 @@ def test_free_tier_quota_matches_previous_default():
     assert get_tier("free")["daily_quota"] == 50
 
 
+@pytest.mark.real_dispatch
 def test_dispatch_routes_by_tier():
     from backend.services import ai_service
 
@@ -48,6 +50,7 @@ def test_free_tier_declares_cross_provider_chain():
     assert all(step["model_chain"] for step in chain)
 
 
+@pytest.mark.real_dispatch
 def test_dispatch_falls_through_provider_chain():
     """gemini spent → groq spent → openrouter answers; user never sees an error."""
     from backend.services import ai_service
@@ -73,6 +76,7 @@ def test_dispatch_falls_through_provider_chain():
     assert calls == ["gemini", "groq", "openrouter"]
 
 
+@pytest.mark.real_dispatch
 def test_dispatch_surfaces_503_only_when_all_providers_spent():
     from fastapi import HTTPException
 
@@ -335,6 +339,7 @@ def test_advisor_endpoint_uses_advisor_mode_with_context(client):
 
 # ── Reply-quality guards ─────────────────────────────────────────────────────
 
+@pytest.mark.real_dispatch
 def test_corrupted_script_reply_is_rejected_and_next_provider_serves():
     """A reply with CJK/Cyrillic corruption must be discarded, not shown."""
     from backend.services import ai_service
@@ -352,6 +357,7 @@ def test_corrupted_script_reply_is_rejected_and_next_provider_serves():
     assert reply == "Yaşınızı paylaşır mısınız?"
 
 
+@pytest.mark.real_dispatch
 def test_profiling_mode_never_reaches_weak_providers():
     """The scripted quiz is pinned to gemini/anthropic — llama fallbacks are
     for the free-form advisor only."""
@@ -380,6 +386,7 @@ def test_profiling_mode_never_reaches_weak_providers():
     assert called == ["gemini"]  # groq/openrouter never consulted
 
 
+@pytest.mark.real_dispatch
 def test_profiling_survives_via_openrouter_google_models_only():
     """When direct Gemini keys are dead, the quiz may fall to OpenRouter —
     but only its Google-family models, never the Llama/DeepSeek entries."""

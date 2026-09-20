@@ -64,6 +64,9 @@ def _fetch_series(series_id: str, years: int = 6) -> Optional[dict[str, float]]:
     start_year = end_year - min(years, 9)
 
     try:
+        if cache_service.in_cooldown("bls"):
+            raise cache_service.UpstreamInCooldown("bls")
+
         import httpx
 
         res = httpx.post(
@@ -104,6 +107,11 @@ def _fetch_series(series_id: str, years: int = 6) -> Optional[dict[str, float]]:
         return index
     except Exception as exc:
         logger.warning("BLS fetch failed for %s (%s)", series_id, type(exc).__name__)
+        # Leave this source alone for a short while. Without it every
+        # subsequent request re-attempts a dead upstream and waits out
+        # the full timeout; stale data is fine, a hung app is not.
+        if not isinstance(exc, cache_service.UpstreamInCooldown):
+            cache_service.start_cooldown("bls")
         fallback = cache_service.get(lkg_key)
         if fallback:
             logger.warning("Serving last-known-good BLS data for %s", series_id)

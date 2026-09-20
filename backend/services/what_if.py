@@ -11,7 +11,6 @@ from the model's imagination.
 """
 import json
 import logging
-import re
 from pathlib import Path
 
 from backend.exceptions import AIServiceError
@@ -38,11 +37,12 @@ def _extract_change(question: str) -> dict:
     raw = _dispatch(
         [{"role": "user", "content": question}], _EXTRACT_PROMPT, max_tokens=200
     )
-    cleaned = re.sub(r"^```(?:json)?\s*|\s*```$", "", raw.strip())
-    try:
-        return json.loads(cleaned)
-    except json.JSONDecodeError:
+    from backend.services.json_extract import extract_json_object
+
+    parsed = extract_json_object(raw)
+    if parsed is None:
         raise AIServiceError("What-if extraction returned non-JSON output")
+    return parsed
 
 
 def _diff_summary(before: PortfolioRecommendResponse, after: PortfolioRecommendResponse) -> dict:

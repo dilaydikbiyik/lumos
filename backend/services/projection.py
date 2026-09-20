@@ -59,7 +59,15 @@ def _windowed_real_band(
             )
             reals.append(real_pct / 100)
         except Exception:
-            pass
+            # A window that cannot be deflated is dropped from the REAL band
+            # only. That is correct, but it is not neutral: deflation fails
+            # where inflation data is missing, which is systematically the
+            # OLDEST periods. So the real band can silently describe a shorter
+            # history than the nominal band printed beside it. The counts are
+            # reported per band below so the two cannot be read as covering
+            # the same span when they do not.
+            logger.debug("window %s..%s not deflatable for %s",
+                         months[start], months[start + window], market)
 
     if len(nominals) < MIN_WINDOWS:
         return {}, None
@@ -73,6 +81,8 @@ def _windowed_real_band(
             "pessimistic_pct": round(p10 * 100, 1),
             "typical_pct": round(p50 * 100, 1),
             "optimistic_pct": round(p90 * 100, 1),
+            # Its own count, because it is not always the nominal band's.
+            "windows_analysed": len(reals),
         }
     return band, real_band
 

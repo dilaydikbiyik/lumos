@@ -53,7 +53,21 @@ def register_error_handlers(app: FastAPI) -> None:
 
     @app.exception_handler(ValueError)
     async def value_error_handler(request: Request, exc: ValueError):
-        return _error_response(422, "invalid_value", str(exc))
+        # `str(exc)` used to be returned verbatim. Nothing in the app raises
+        # ValueError deliberately, so the only things this handler ever sees
+        # are incidental — raised by a driver, an SDK or the standard library
+        # — and those messages routinely carry a connection string, a URL with
+        # a key in its query, or a fragment of the input that triggered them.
+        # A test proves it: a ValueError carrying an API key was served to the
+        # client in full, in `detail` AND in `error.message`.
+        #
+        # The message is logged and a curated one is returned, which is what
+        # the other two handlers already did. The inconsistency was the bug.
+        logger.warning("[%s] Invalid value on %s %s: %s",
+                       request_id_var.get(), request.method, request.url.path, exc)
+        return _error_response(
+            422, "invalid_value", t("error.invalid_value", get_language(request)),
+        )
 
     @app.exception_handler(Exception)
     async def generic_exception_handler(request: Request, exc: Exception):

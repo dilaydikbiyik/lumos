@@ -207,3 +207,28 @@ def test_fx_history_is_fetched_once_for_many_dates():
         # Older than the series: the earliest rate beats refusing to value
         assert fx_service.rate("USD", "TRY", date(2000, 1, 1)) == 40.0
     assert m.call_count == 4  # one lookup each, all served from one cached series
+
+
+def test_an_unknown_listing_currency_leaves_the_holding_unvalued():
+    """
+    It used to return "USD" for anything it could not identify — the same
+    mistake the valuation loop already refuses to make for an unknown FX rate.
+    A bare BIST symbol valued as dollars overstates a Turkish holding roughly
+    fortyfold, and nothing on screen would say the currency was a guess.
+    """
+    from unittest.mock import patch
+
+    from backend.services.holdings_valuation import ticker_currency
+
+    with patch("backend.services.ticker_lookup.lookup",
+               side_effect=ConnectionError("lookup down")):
+        assert ticker_currency("SOMETHINGUNKNOWN") is None
+
+    with patch("backend.services.ticker_lookup.lookup", return_value=None):
+        assert ticker_currency("ALSOUNKNOWN") is None
+
+    # A symbol the app actually recommends still answers offline.
+    with patch("backend.services.ticker_lookup.lookup",
+               side_effect=AssertionError("should not be called")):
+        assert ticker_currency("SPY") == "USD"
+        assert ticker_currency("THYAO.IS") == "TRY"

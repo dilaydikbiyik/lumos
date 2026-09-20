@@ -87,6 +87,9 @@ def _observations(series: str, since: str = "2000-01-01") -> Optional[dict[str, 
         return cached or None
 
     try:
+        if cache_service.in_cooldown("fred"):
+            raise cache_service.UpstreamInCooldown("fred")
+
         import httpx
 
         res = httpx.get(
@@ -121,6 +124,11 @@ def _observations(series: str, since: str = "2000-01-01") -> Optional[dict[str, 
         return observations
     except Exception as exc:
         logger.warning("FRED fetch failed for %s (%s)", series, type(exc).__name__)
+        # Leave this source alone for a short while. Without it every
+        # subsequent request re-attempts a dead upstream and waits out
+        # the full timeout; stale data is fine, a hung app is not.
+        if not isinstance(exc, cache_service.UpstreamInCooldown):
+            cache_service.start_cooldown("fred")
         fallback = cache_service.get(lkg_key)
         if fallback:
             logger.warning("Serving last-known-good FRED data for %s", series)

@@ -171,3 +171,58 @@ def test_state_map_is_fetched_in_parallel():
         fred_service.get_all_state_hpi()
 
     assert concurrent["peak"] > 1
+
+
+def test_a_dead_upstream_is_attempted_once_not_on_every_request():
+    """
+    BUG-001's shape: a failure path that leaves nothing behind, so the next
+    request repeats it. With a 25-second timeout on a single-worker instance,
+    a provider outage stops being "some stale numbers" and becomes a hung app.
+
+    ticker_lookup already caches a miss for exactly this reason; the
+    statistics adapters did not. The inconsistency was the bug.
+    """
+    from unittest.mock import patch
+
+    from backend.services import cache as cache_service
+
+    cache_service.clear()
+    cache_service.clear_cooldown("fred")
+    calls = {"n": 0}
+
+    def dead(*args, **kwargs):
+        calls["n"] += 1
+        raise ConnectionError("upstream down")
+
+    with patch.object(fred_service.settings, "FRED_API_KEY", "k"), \
+         patch("httpx.get", side_effect=dead):
+        for _ in range(5):
+            assert fred_service.get_national_hpi() is None
+
+    assert calls["n"] == 1, (
+        f"a dead upstream was called {calls['n']} times across 5 requests"
+    )
+    cache_service.clear_cooldown("fred")
+
+
+def test_a_cooldown_never_hides_data_we_already_have():
+    """
+    The cooldown suppresses the CALL, not the answer. Refusing to serve
+    last-known-good data during an outage would invert the whole point of
+    keeping it.
+    """
+    from unittest.mock import patch
+
+    from backend.services import cache as cache_service
+
+    cache_service.clear()
+    known_good = {"2026-01": 100.0, "2026-04": 104.0}
+    cache_service.set("lkg:fred:obs:USSTHPI:2000-01-01", known_good, ttl=None)
+    cache_service.start_cooldown("fred")
+
+    with patch.object(fred_service.settings, "FRED_API_KEY", "k"), \
+         patch("httpx.get", side_effect=AssertionError("must not call upstream")):
+        assert fred_service.get_national_hpi() == known_good
+
+    cache_service.clear_cooldown("fred")
+    cache_service.clear()

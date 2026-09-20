@@ -379,6 +379,10 @@ _C: dict[str, dict[str, str]] = {
         "tr": "Yapay zeka asistanı şu an yanıt veremiyor — birazdan tekrar dene.",
         "en": "The AI assistant can't answer right now — try again shortly.",
         "de": "Der KI-Assistent kann gerade nicht antworten — versuch es gleich noch einmal."},
+    "error.invalid_value": {
+        "tr": "Gönderilen değerlerden biri geçersiz. Lütfen kontrol edip tekrar dene.",
+        "en": "One of the values sent was invalid. Please check it and try again.",
+        "de": "Einer der gesendeten Werte war ungültig. Bitte prüfe ihn und versuche es erneut."},
     "error.internal": {
         "tr": "Beklenmedik bir hata oluştu — lütfen daha sonra tekrar dene.",
         "en": "Something went wrong — please try again later.",

@@ -70,6 +70,9 @@ def _series(geo: str) -> Optional[dict[str, float]]:
         return cached or None
 
     try:
+        if cache_service.in_cooldown("bundesbank"):
+            raise cache_service.UpstreamInCooldown("bundesbank")
+
         import httpx
 
         res = httpx.get(f"{_PROPERTY}/A.{geo}.{_MEASURE}",
@@ -99,6 +102,11 @@ def _series(geo: str) -> Optional[dict[str, float]]:
         return out
     except Exception as exc:
         logger.warning("Bundesbank fetch failed for %s (%s)", geo, type(exc).__name__)
+        # Leave this source alone for a short while. Without it every
+        # subsequent request re-attempts a dead upstream and waits out
+        # the full timeout; stale data is fine, a hung app is not.
+        if not isinstance(exc, cache_service.UpstreamInCooldown):
+            cache_service.start_cooldown("bundesbank")
         fallback = cache_service.get(lkg_key)
         if fallback:
             logger.warning("Serving last-known-good Bundesbank data for %s", geo)
@@ -179,6 +187,11 @@ def _monthly(series_key: str, cache_name: str) -> Optional[dict[str, float]]:
         return out
     except Exception as exc:
         logger.warning("Bundesbank fetch failed for %s (%s)", series_key, type(exc).__name__)
+        # Leave this source alone for a short while. Without it every
+        # subsequent request re-attempts a dead upstream and waits out
+        # the full timeout; stale data is fine, a hung app is not.
+        if not isinstance(exc, cache_service.UpstreamInCooldown):
+            cache_service.start_cooldown("bundesbank")
         fallback = cache_service.get(lkg_key)
         if fallback:
             logger.warning("Serving last-known-good Bundesbank data for %s", series_key)
