@@ -161,6 +161,9 @@ def _gemini_call_model(client, model: str, contents, system: str, max_tokens: in
     return response.text
 
 
+GEMINI_TIMEOUT_SECONDS = 60
+
+
 def _gemini_chat(
     messages: list[dict], system: str, max_tokens: int,
     model_chain: Optional[list[str]] = None,
@@ -187,10 +190,17 @@ def _gemini_chat(
         for m in messages
     ]
 
+    # A wall-clock limit per call. Without it a hung request holds a
+    # thread-pool worker open indefinitely AND the failover chain never runs,
+    # because nothing ever fails — the app just stops answering. The
+    # OpenAI-compatible adapter has had 60s from the start; this is the same
+    # bound for the other provider. Milliseconds, per the SDK.
+    http_options = genai_types.HttpOptions(timeout=GEMINI_TIMEOUT_SECONDS * 1000)
+    clients = [genai.Client(api_key=k, http_options=http_options) for k in keys]
+
     # MODEL-major order: the best model is tried on ALL keys before
     # stepping down a model. When one key's quota runs out the user
     # sacrifices a key, not quality.
-    clients = [genai.Client(api_key=k) for k in keys]
     last_exc: Optional[Exception] = None
     for model_idx, model in enumerate(chain):
         for key_idx, client in enumerate(clients):
@@ -663,7 +673,19 @@ def extract_profile(messages: list[dict], language: str = "tr") -> dict:
     )
 
 
-def generate_text(prompt: str, system: Optional[str] = None, cache: bool = False) -> str:
+# Jobs that do not need a strong model. Summarising three headlines and
+# pulling a number out of one sentence are not the same task as explaining a
+# portfolio to a frightened beginner, and paying the same rate for all three
+# spends the daily quota on the cheapest work.
+#
+# Named rather than boolean so a reader of the call site can see WHY a job is
+# cheap. `light=True` would say that it is, not that it should be.
+_LIGHT_JOB_MODELS = ("gemini-2.5-flash-lite", "gemini-2.5-flash",
+                     "gemma-3-27b-it", "llama-3.1-8b-instant")
+
+
+def generate_text(prompt: str, system: Optional[str] = None, cache: bool = False,
+                  job: str = "standard") -> str:
     """
     One-shot text generation (used for explainer / REIT prompt calls).
 
@@ -672,6 +694,11 @@ def generate_text(prompt: str, system: Optional[str] = None, cache: bool = False
         system:  Optional override system prompt.
         cache:   Daily cache for deterministic calls — quota isn't burned
                  again and again for the same portfolio explanation.
+        job:     "light" for mechanical work — summarising a few headlines,
+                 pulling a number out of a sentence. These run on small fast
+                 models, because spending the advisor's model on them is how
+                 a fifty-a-day quota disappears before anyone asks a real
+                 question.
 
     Returns:
         Generated text.
@@ -692,6 +719,8 @@ def generate_text(prompt: str, system: Optional[str] = None, cache: bool = False
         [{"role": "user", "content": prompt}],
         system or _ONESHOT_SYSTEM,
         max_tokens=512,
+        model_filter=(lambda m: any(name in m.lower() for name in _LIGHT_JOB_MODELS))
+        if job == "light" else None,
     )
     if cache_key:
         from backend.services import cache as cache_service

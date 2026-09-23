@@ -21,7 +21,8 @@
     "eduFooter": "Nur zu Bildungszwecken — keine Anlageberatung.",
     "loading": "Wird geladen…",
     "redirecting": "Du wirst zur Anmeldeseite weitergeleitet…",
-    "save": "Speichern"
+    "save": "Speichern",
+    "next": "Weiter"
   },
   "language": {
     "label": "Sprache"
@@ -78,7 +79,13 @@
     "inputPlaceholder": "Schreib deine Antwort…",
     "extractError": "Deine Antworten konnten nicht zusammengefasst werden — versuch es erneut.",
     "saveError": "Dein Profil konnte nicht gespeichert werden — versuch es erneut, deine Antworten sind sicher.",
-    "sendError": "Nachricht konnte nicht gesendet werden — versuch es erneut"
+    "sendError": "Nachricht konnte nicht gesendet werden — versuch es erneut",
+    "progress": "Frage {{step}} von {{total}}",
+    "skip": "Überspringen",
+    "preferChat": "Ich rede lieber →",
+    "yearsPlaceholder": "Eine Zahl",
+    "backToQuiz": "← Zurück zum kurzen Formular",
+    "outOfRange": "Bitte gib eine Zahl zwischen {{min}} und {{max}} ein."
   },
   "profile": {
     "bands": {
@@ -88,7 +95,7 @@
     },
     "step": "Schritt 3 / 3",
     "title": "Lernen wir dich kennen",
-    "subtitle": "9 kurze Fragen — die KI erstellt dein Profil und richtet dein Portfolio danach aus.",
+    "subtitle": "9 kurze Fragen. Deine Antworten fließen direkt in den Wert ein — hier wird nichts geraten, und jeder Punkt wird dir danach gezeigt.",
     "readyTitle": "Dein Risikoprofil ist fertig",
     "readySubtitle": "Deine Antworten sind ausgewertet — dein persönliches Portfolio wird berechnet.",
     "profileWord": "Profil",

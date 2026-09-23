@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@clerk/clerk-react'
 import AppHeader from '../components/AppHeader'
 import ChatWindow from '../components/ChatWindow'
+import StructuredQuiz from '../components/StructuredQuiz'
 import RiskGauge from '../components/RiskGauge'
 import DebtFirstCard from '../components/DebtFirstCard'
 import DeleteAccount from '../components/DeleteAccount'
@@ -42,6 +43,7 @@ export default function ProfilePage() {
   const cacheKey = userKey('profile', userId)
   const [displayProfile, setDisplayProfile] = useState(() => readJSON(cacheKey))
   const [retaking, setRetaking] = useState(false)   // user chose to redo
+  const [chatMode, setChatMode] = useState(false)   // chose to talk instead
   const quizStartedRef = useRef(false)              // guards against late swaps
 
   useEffect(() => {
@@ -100,10 +102,39 @@ export default function ProfilePage() {
                 {t('profile.subtitle')}
               </p>
             </div>
-            <ChatWindow
-              onProfileComplete={handleProfileComplete}
-              onFirstMessage={() => { quizStartedRef.current = true }}
-            />
+            {/* The form is the default and the conversation is the choice,
+                not the other way round. Nine chat calls became zero, and the
+                flow that every reported bug lived in — language drift,
+                nested-JSON extraction, cold reads, quota burn — no longer
+                has a model in it at all. */}
+            {chatMode ? (
+              <>
+                <ChatWindow
+                  onProfileComplete={handleProfileComplete}
+                  onFirstMessage={() => { quizStartedRef.current = true }}
+                />
+                <button
+                  type="button"
+                  className="btn btn-ghost btn-full"
+                  style={{ marginTop: 10, opacity: 0.8 }}
+                  onClick={() => setChatMode(false)}
+                >
+                  {t('quiz.backToQuiz')}
+                </button>
+              </>
+            ) : (
+              <StructuredQuiz
+                onComplete={(result) => {
+                  // The endpoint already returned the computed profile, so
+                  // there is nothing to extract and nothing to re-save.
+                  setRetaking(false)
+                  quizStartedRef.current = false
+                  setDisplayProfile(result)
+                  writeJSON(cacheKey, result)
+                }}
+                onPreferChat={() => setChatMode(true)}
+              />
+            )}
           </>
         ) : (
           /* Score reveal — full-page result */
@@ -222,8 +253,14 @@ export default function ProfilePage() {
 
         {/* The onboarding card promises "you can change path at any time".
             Until now there was nowhere to do it, and the path decides which
-            half of the app you can see at all. */}
-        <PathSwitcher />
+            half of the app you can see at all.
+
+            Hidden while the quiz is open: somebody on question three is
+            being onboarded, and a settings control under an unfinished form
+            is noise at the exact moment attention matters most. Deletion
+            below stays visible regardless — that one is a requirement, not
+            a preference. */}
+        {showResult && <PathSwitcher />}
 
         {/* OUTSIDE the result block on purpose. It was inside, which meant an
             account that signed up but never finished the quiz — or one part

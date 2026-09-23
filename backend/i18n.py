@@ -28,6 +28,146 @@ _C: dict[str, dict[str, str]] = {
         "tr": "Atılgan", "en": "Aggressive", "de": "Offensiv"},
 
     # ── risk engine: answer labels ──
+    "quiz.q.budget.title": {
+        "tr": "Yatırıma ayırabileceğin tutar ne kadar?",
+        "en": "How much can you put aside to invest?",
+        "de": "Wie viel kannst du zum Anlegen beiseitelegen?"},
+    "quiz.q.budget.help": {
+        "tr": "Şu an elinde olan, yatırıma ayırabileceğin miktar. Yaklaşık olsun, sonra değiştirebilirsin.",
+        "en": "What you have now and could put to work. A rough figure is fine — you can change it later.",
+        "de": "Was du jetzt hast und anlegen könntest. Eine grobe Zahl reicht — du kannst sie später ändern."},
+    "quiz.q.monthly_contribution.title": {
+        "tr": "Her ay düzenli ekleyebileceğin bir tutar var mı?",
+        "en": "Is there an amount you can add every month?",
+        "de": "Gibt es einen Betrag, den du jeden Monat hinzufügen kannst?"},
+    "quiz.q.monthly_contribution.help": {
+        "tr": "Düzenli ekleme, tek seferlik bir tutardan çok daha fazlasını değiştirir. Yoksa boş bırak.",
+        "en": "Adding regularly changes the outcome far more than the starting amount does. Leave it blank if there isn't one.",
+        "de": "Regelmäßig einzuzahlen verändert das Ergebnis weit mehr als der Startbetrag. Lass es leer, wenn es keinen gibt."},
+    "quiz.q.time_horizon.title": {
+        "tr": "Bu parayı kaç yıl sonra kullanmayı düşünüyorsun?",
+        "en": "When do you think you'll need this money?",
+        "de": "Wann wirst du dieses Geld voraussichtlich brauchen?"},
+    "quiz.q.time_horizon.help": {
+        "tr": "En belirleyici soru bu. Vade uzadıkça kısa vadeli dalgalanmaların önemi azalır.",
+        "en": "This is the most decisive question. The longer the horizon, the less short-term swings matter.",
+        "de": "Das ist die entscheidendste Frage. Je länger der Horizont, desto weniger zählen kurzfristige Schwankungen."},
+    "quiz.q.time_horizon.opt.short": {
+        "tr": "2 yıldan kısa",
+        "en": "Less than 2 years",
+        "de": "Weniger als 2 Jahre"},
+    "quiz.q.time_horizon.opt.medium": {
+        "tr": "2–10 yıl arası",
+        "en": "Between 2 and 10 years",
+        "de": "Zwischen 2 und 10 Jahren"},
+    "quiz.q.time_horizon.opt.long": {
+        "tr": "10 yıldan uzun",
+        "en": "More than 10 years",
+        "de": "Mehr als 10 Jahre"},
+    "quiz.q.loss_tolerance.title": {
+        "tr": "Portföyün 6 ayda %20 düşse ne yapardın?",
+        "en": "If your portfolio fell 20% in six months, what would you do?",
+        "de": "Was würdest du tun, wenn dein Portfolio in sechs Monaten 20 % fiele?"},
+    "quiz.q.loss_tolerance.help": {
+        "tr": "Doğru ya da yanlış cevabı yok. Bu soru, kötü bir ayda gerçekte ne yapacağını anlamak için.",
+        "en": "There's no right answer. This is about what you'd actually do in a bad month, not what sounds brave.",
+        "de": "Es gibt keine richtige Antwort. Es geht darum, was du in einem schlechten Monat wirklich tätest."},
+    "quiz.q.loss_tolerance.opt.low": {
+        "tr": "Satardım — kayıp görmek bana zor gelir",
+        "en": "I'd sell — watching a loss is hard for me",
+        "de": "Ich würde verkaufen — Verluste zu sehen fällt mir schwer"},
+    "quiz.q.loss_tolerance.opt.medium": {
+        "tr": "Endişelenirdim ama beklerdim",
+        "en": "I'd worry, but I'd wait it out",
+        "de": "Ich wäre beunruhigt, würde es aber aussitzen"},
+    "quiz.q.loss_tolerance.opt.high": {
+        "tr": "Daha fazla alırdım — fırsat olarak görürdüm",
+        "en": "I'd buy more — I'd see it as a chance",
+        "de": "Ich würde nachkaufen — ich sähe es als Chance"},
+    "quiz.q.goal.title": {
+        "tr": "Temel hedefin ne?",
+        "en": "What are you mainly after?",
+        "de": "Worum geht es dir hauptsächlich?"},
+    "quiz.q.goal.help": {
+        "tr": "Birden fazlası doğru gelebilir; en çok hangisi seni tarif ediyorsa onu seç.",
+        "en": "More than one may feel true. Pick the one that describes you most.",
+        "de": "Mehreres kann zutreffen. Wähle das, was dich am ehesten beschreibt."},
+    "quiz.q.goal.opt.preservation": {
+        "tr": "Elimdekini korumak — erimesini istemiyorum",
+        "en": "Keeping what I have — I don't want it melting away",
+        "de": "Bewahren, was ich habe — es soll nicht dahinschmelzen"},
+    "quiz.q.goal.opt.income": {
+        "tr": "Düzenli gelir — temettü ya da kira gibi",
+        "en": "Regular income — dividends or rent",
+        "de": "Regelmäßiges Einkommen — Dividenden oder Miete"},
+    "quiz.q.goal.opt.growth": {
+        "tr": "Büyüme — enflasyonun üzerinde getiri",
+        "en": "Growth — returns above inflation",
+        "de": "Wachstum — Rendite über der Inflation"},
+    "quiz.q.goal.opt.speculation": {
+        "tr": "Yüksek risk, yüksek getiri",
+        "en": "High risk, high return",
+        "de": "Hohes Risiko, hohe Rendite"},
+    "quiz.q.experience.title": {
+        "tr": "Yatırım deneyimin ne kadar?",
+        "en": "How much investing have you done?",
+        "de": "Wie viel Anlageerfahrung hast du?"},
+    "quiz.q.experience.help": {
+        "tr": "Hiç yoksa da sorun değil — bu uygulama tam olarak onun için var.",
+        "en": "None is a perfectly good answer — this app exists for exactly that.",
+        "de": "Gar keine ist eine völlig gute Antwort — genau dafür gibt es diese App."},
+    "quiz.q.experience.opt.none": {
+        "tr": "Hiç yatırım yapmadım",
+        "en": "I've never invested",
+        "de": "Ich habe noch nie angelegt"},
+    "quiz.q.experience.opt.beginner": {
+        "tr": "Birikim hesabım ya da bir fonum var",
+        "en": "I have savings or a fund",
+        "de": "Ich habe Erspartes oder einen Fonds"},
+    "quiz.q.experience.opt.intermediate": {
+        "tr": "Hisse ya da ETF aldım",
+        "en": "I've bought stocks or ETFs",
+        "de": "Ich habe Aktien oder ETFs gekauft"},
+    "quiz.q.experience.opt.advanced": {
+        "tr": "Aktif portföy yönetiyorum",
+        "en": "I actively manage a portfolio",
+        "de": "Ich verwalte aktiv ein Portfolio"},
+    "quiz.q.age.title": {
+        "tr": "Yaşını paylaşmak ister misin?",
+        "en": "Would you like to share your age?",
+        "de": "Möchtest du dein Alter angeben?"},
+    "quiz.q.age.help": {
+        "tr": "İstersen atla. Genç olmak vadeyi uzatır, bu da geçici düşüşlerden toparlanmak için daha çok zaman demek.",
+        "en": "Skip it if you'd rather. Being younger lengthens the horizon, which means more time to recover from a dip.",
+        "de": "Überspring es, wenn du magst. Jünger zu sein verlängert den Horizont — mehr Zeit, sich von einem Rückgang zu erholen."},
+    "quiz.q.high_interest_debt.title": {
+        "tr": "Kredi kartı ya da ihtiyaç kredisi borcun var mı?",
+        "en": "Do you have credit-card or consumer-loan debt?",
+        "de": "Hast du Kreditkarten- oder Konsumkreditschulden?"},
+    "quiz.q.high_interest_debt.help": {
+        "tr": "Bunu sormamın sebebi şu: kart faizi yatırım getirisinin çok üstündedir, yani borç varken yatırım çoğu zaman zarar ettirir. Varsa sana dürüst olanı söyleyeceğim. Yoksa boş bırak.",
+        "en": "The reason I ask: card interest runs far above investment returns, so investing while carrying it usually loses money. If there is some, I'll tell you the honest thing. Leave it blank if there's none.",
+        "de": "Warum ich frage: Kartenzinsen liegen weit über Anlagerenditen, investieren mit solchen Schulden verliert meist Geld. Wenn es welche gibt, sage ich dir ehrlich, was gilt. Sonst lass es leer."},
+    "quiz.q.income_stability.title": {
+        "tr": "Gelirin ne kadar düzenli?",
+        "en": "How steady is your income?",
+        "de": "Wie regelmäßig ist dein Einkommen?"},
+    "quiz.q.income_stability.help": {
+        "tr": "Düzenli gelir daha fazla risk almana izin verir; düzensizse daha büyük bir güvenlik tamponu bırakırız.",
+        "en": "Steady income allows more risk; if it's irregular we leave a bigger safety buffer.",
+        "de": "Ein regelmäßiges Einkommen erlaubt mehr Risiko; ist es unregelmäßig, lassen wir einen größeren Puffer."},
+    "quiz.q.income_stability.opt.stable": {
+        "tr": "Sabit maaş",
+        "en": "A fixed salary",
+        "de": "Festes Gehalt"},
+    "quiz.q.income_stability.opt.variable": {
+        "tr": "Değişken / serbest çalışıyorum",
+        "en": "Variable / freelance",
+        "de": "Variabel / freiberuflich"},
+    "quiz.q.income_stability.opt.irregular": {
+        "tr": "Düzensiz",
+        "en": "Irregular",
+        "de": "Unregelmäßig"},
     "risk.time_horizon.short": {
         "tr": "Kısa (<2 yıl)", "en": "Short (<2 years)", "de": "Kurz (<2 Jahre)"},
     "risk.time_horizon.medium": {
@@ -104,6 +244,8 @@ _C: dict[str, dict[str, str]] = {
         "tr": "Gelir istikrarı düzeltmesi",
         "en": "Income stability adjustment",
         "de": "Anpassung für Einkommensstabilität"},
+    "risk.mod.income.stable": {
+        "tr": "Sabit maaş", "en": "A fixed salary", "de": "Festes Gehalt"},
     "risk.mod.income.variable": {
         "tr": "Değişken gelir", "en": "Variable income", "de": "Schwankendes Einkommen"},
     "risk.mod.income.irregular": {

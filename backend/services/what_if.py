@@ -35,7 +35,13 @@ End with the standard educational disclaimer."""
 
 def _extract_change(question: str) -> dict:
     raw = _dispatch(
-        [{"role": "user", "content": question}], _EXTRACT_PROMPT, max_tokens=200
+        [{"role": "user", "content": question}], _EXTRACT_PROMPT, max_tokens=200,
+        # Pulling a number and a field name out of one sentence does not need
+        # the model that later has to explain the result.
+        model_filter=lambda m: any(
+            name in m.lower()
+            for name in ("flash", "gemma", "8b-instant", "gpt-oss")
+        ),
     )
     from backend.services.json_extract import extract_json_object
 

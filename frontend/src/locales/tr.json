@@ -21,7 +21,8 @@
     "value": "Değer",
     "loading": "Yükleniyor…",
     "redirecting": "Giriş sayfasına yönlendiriliyorsun…",
-    "save": "Kaydet"
+    "save": "Kaydet",
+    "next": "Devam"
   },
   "onboarding": {
     "tagline": "Yatırım karanlık bir orman gibi görünür.",
@@ -73,7 +74,13 @@
     "inputPlaceholder": "Cevabını yaz…",
     "extractError": "Cevapların özetlenemedi — tekrar deneyebilirsin.",
     "saveError": "Profilin kaydedilemedi — tekrar deneyebilirsin, cevapların duruyor.",
-    "sendError": "Mesaj gönderilemedi — tekrar dene"
+    "sendError": "Mesaj gönderilemedi — tekrar dene",
+    "progress": "Soru {{step}} / {{total}}",
+    "skip": "Bunu atla",
+    "preferChat": "Ben konuşarak yapayım →",
+    "yearsPlaceholder": "Bir sayı",
+    "backToQuiz": "← Kısa forma dön",
+    "outOfRange": "Lütfen {{min}} ile {{max}} arasında bir sayı gir."
   },
   "profile": {
     "bands": {
@@ -83,7 +90,7 @@
     },
     "step": "Adım 3 / 3",
     "title": "Seni Tanıyalım",
-    "subtitle": "9 kısa soru — yapay zeka profilini çıkaracak, portföyünü buna göre kişiselleştirecek.",
+    "subtitle": "9 kısa soru. Cevapların doğrudan skora giriyor — burada tahmin edilen hiçbir şey yok ve her puanı sonrasında sana gösteriyoruz.",
     "readyTitle": "Risk Profilin Hazır",
     "readySubtitle": "Cevapların analiz edildi — sana özel portföy hesaplanıyor.",
     "profileWord": "Profil",

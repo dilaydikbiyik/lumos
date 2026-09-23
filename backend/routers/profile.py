@@ -13,6 +13,36 @@ from backend.services.risk_engine import compute_risk_score
 router = APIRouter()
 
 
+@router.get("/questions")
+async def quiz_questions(
+    user_id: str = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+    lang: str = Depends(language),
+):
+    """
+    The risk quiz as data, so the client can render it as real inputs.
+
+    The nine questions were written down in the system prompt and a frontier
+    model was paid to read them out — one chat call per answer, on the most
+    restricted tier, roughly ten calls from a fifty-a-day quota before a new
+    user saw anything. Served as data, the whole quiz costs zero model calls
+    and the answers arrive already shaped like RiskProfileAnswers, with
+    nothing to extract and nothing to parse.
+
+    The conversational path is untouched and still offered, because some
+    people would rather talk than fill in a form.
+    """
+    from backend.markets import get_market_pack
+    from backend.services.quiz_questions import questions
+
+    user = await user_repository.get_or_create(db, user_id)
+    pack = get_market_pack(user.market or "TR")
+    return {
+        "questions": questions(lang, pack.currency),
+        "currency": pack.currency,
+    }
+
+
 @router.post("", response_model=RiskProfileResponse)
 async def save_profile(
     answers: RiskProfileAnswers,

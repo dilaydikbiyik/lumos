@@ -118,10 +118,72 @@ const PROFILE = {
   loss_tolerance: 'medium', goal: 'growth', experience: 'none', age: 34,
 }
 
-// ── Journey 1: a returning user opens their profile ─────────────────────────
+// ── Journey 1: a brand-new account completes the quiz with NO model calls ──
+// The whole point of the restructure: nine chat calls became zero, and the
+// flow every reported bug lived in no longer has a model in it.
+console.log('\n1. the quiz completes without a model')
+await page.evaluate(() => {
+  for (const k of Object.keys(localStorage)) {
+    if (k.includes('quiz-draft') || k.includes('profile')) localStorage.removeItem(k)
+  }
+})
+
+const chatCalls = []
+await page.route('**/chat**', route => { chatCalls.push(route.request().url()); route.continue() })
+
+await page.goto(`${APP}/profile`)
+await page.waitForTimeout(8000)
+
+// The account may already carry a profile from an earlier run, and a journey
+// that only passes against a freshly created database is a journey nobody
+// will trust. If a result is on screen, take the route a real returning user
+// would to reach the quiz.
+if (/Redo|Yeniden|Erneut/i.test(await text())) {
+  await page.getByRole('button', { name: /Redo|Yeniden|Erneut/i }).first().click()
+  await page.waitForTimeout(2000)
+}
+
+// The quiz fetches its questions, so wait for one rather than sampling the
+// page header while it is still loading.
+for (let i = 0; i < 25; i++) {
+  const body = await text()
+  if (/question \d+ of|soru \d+ \/|frage \d+ von/i.test(body)) break
+  await page.waitForTimeout(1000)
+}
+const quizText = await text()
+const onQuiz = /question 1 of|soru 1 \/|frage 1 von/i.test(quizText)
+check('a fresh account lands on the structured quiz', onQuiz, quizText.slice(0, 120))
+
+if (onQuiz) {
+  // Answer every step: a choice picks the first option, an amount types one.
+  for (let i = 0; i < 12; i++) {
+    const done = await page.evaluate(() =>
+      !/question \d+ of|soru \d+ \/|frage \d+ von/i.test(document.body.innerText))
+    if (done) break
+    const option = page.locator('button:has(strong)').first()
+    const input = page.locator('input[inputmode="numeric"]').first()
+    if (await input.count()) {
+      const max = await input.getAttribute('max')
+      await input.fill(max ? String(Math.min(Number(max), 34)) : '100000')
+      await page.getByRole('button', { name: /Next|Devam|Weiter/i }).first().click()
+    } else if (await option.count()) {
+      await option.click()
+    }
+    await page.waitForTimeout(700)
+  }
+  await page.waitForTimeout(6000)
+  const after = await text()
+  check('the quiz produced a risk profile',
+    /Redo|Yeniden|Erneut/i.test(after), after.slice(0, 140))
+  check('no chat call was made during the quiz',
+    chatCalls.length === 0, `${chatCalls.length} call(s): ${chatCalls[0] || ''}`)
+}
+await page.unroute('**/chat**')
+
+// ── Journey 2: a returning user opens their profile ─────────────────────────
 // The bug this guards: the quiz rendering while the saved profile is still in
 // flight, so somebody who finished it weeks ago is asked question one again.
-console.log('\n1. returning user opens /profile')
+console.log('\n2. returning user opens /profile')
 await setState({ profile: PROFILE, path: 'hybrid' })
 await page.goto(`${APP}/profile`)
 await page.waitForTimeout(2000)
@@ -134,10 +196,10 @@ check('the saved result is shown, not the quiz',
   !settled.includes('Type your answer'), settled.slice(0, 120))
 check('the path switcher is reachable', settled.includes('Your path'))
 
-// ── Journey 2: "redo the risk analysis" starts clean ────────────────────────
+// ── Journey 3: "redo the risk analysis" starts clean ────────────────────────
 // The reported bug: redo reopened the half-finished conversation, showing
 // questions that had already been answered under a result computed from them.
-console.log('\n2. redo the risk analysis')
+console.log('\n3. redo the risk analysis')
 await page.evaluate(() => {
   // A draft left over from a previous session, exactly as the bug had it.
   const key = Object.keys(localStorage).find(k => k.includes('quiz-draft'))
@@ -160,8 +222,8 @@ if (await retake.count()) {
   check('redo button present', false, 'not found on the result screen')
 }
 
-// ── Journey 3: a stocks-only reader never meets the property half ───────────
-console.log('\n3. stocks-only path')
+// ── Journey 4: a stocks-only reader never meets the property half ───────────
+console.log('\n4. stocks-only path')
 await setState({ path: 'stocks' })
 await page.goto(`${APP}/dashboard`)
 await page.waitForTimeout(8000)
@@ -170,8 +232,8 @@ const stocksNav = await page.evaluate(() =>
 check('explore is hidden for a stocks-only reader',
   !/Explore|Keşfet|Entdecken/i.test(stocksNav), stocksNav)
 
-// ── Journey 4: a real-estate reader is not handed a stock portfolio ─────────
-console.log('\n4. real-estate path lands on /recommend')
+// ── Journey 5: a real-estate reader is not handed a stock portfolio ─────────
+console.log('\n5. real-estate path lands on /recommend')
 await setState({ path: 'real_estate' })
 await page.goto(`${APP}/recommend`)
 await page.waitForTimeout(8000)
@@ -179,8 +241,8 @@ const reco = await text()
 check('a real-estate reader gets the notice, not a forced allocation',
   /real-estate path|emlak yolunu|Immobilienweg/i.test(reco), reco.slice(0, 160))
 
-// ── Journey 5: the planning cards are reachable without owning anything ─────
-console.log('\n5. new account sees the planning cards')
+// ── Journey 6: the planning cards are reachable without owning anything ─────
+console.log('\n6. new account sees the planning cards')
 await setState({ path: 'undecided' })
 await page.goto(`${APP}/dashboard`)
 await page.waitForTimeout(10000)
@@ -190,8 +252,8 @@ check('budget split is on the dashboard',
 check('path suggestion is on the dashboard',
   /Where to start|Nereden başlamalı|Womit anfangen/i.test(dash))
 
-// ── Journey 6: every main route renders something ───────────────────────────
-console.log('\n6. every route renders')
+// ── Journey 7: every main route renders something ───────────────────────────
+console.log('\n7. every route renders')
 await setState({ path: 'hybrid' })
 for (const route of ['/', '/profile', '/recommend', '/holdings', '/explore', '/dashboard']) {
   await page.goto(`${APP}${route}`)
@@ -209,8 +271,8 @@ for (const route of ['/', '/profile', '/recommend', '/holdings', '/explore', '/d
     body.split('\n').find(l => /^[a-z]+\.[a-z.]+$/.test(l.trim())) || ''))
 }
 
-// ── Journey 7: Explore in every market ──────────────────────────────────────
-console.log('\n7. explore renders in every market')
+// ── Journey 8: Explore in every market ──────────────────────────────────────
+console.log('\n8. explore renders in every market')
 for (const market of ['TR', 'US', 'DE']) {
   await call('/users/me/market', {
     method: 'PATCH', body: JSON.stringify({ market }),

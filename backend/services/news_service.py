@@ -88,6 +88,9 @@ def get_daily_digest(investment_path: str = "hybrid", market: str = "TR",
         system=_DIGEST_SYSTEM.format(
             language=_LANGUAGE_NAMES.get(lang, _LANGUAGE_NAMES["tr"])
         ),
+        # Summarising headlines into calm one-liners is mechanical work. Run
+        # it on a small fast model rather than the one the advisor uses.
+        job="light",
     )
     from backend.services.json_extract import extract_json_array
 

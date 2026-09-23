@@ -21,7 +21,8 @@
     "value": "Value",
     "loading": "Loading…",
     "redirecting": "Redirecting you to the sign-in page…",
-    "save": "Save"
+    "save": "Save",
+    "next": "Next"
   },
   "onboarding": {
     "tagline": "Investing looks like a dark forest.",
@@ -73,7 +74,13 @@
     "inputPlaceholder": "Type your answer…",
     "extractError": "Your answers couldn't be summarised — you can try again.",
     "saveError": "Your profile couldn't be saved — you can try again, your answers are safe.",
-    "sendError": "Couldn't send the message — try again"
+    "sendError": "Couldn't send the message — try again",
+    "progress": "Question {{step}} of {{total}}",
+    "skip": "Skip this one",
+    "preferChat": "I'd rather just talk →",
+    "yearsPlaceholder": "A number",
+    "backToQuiz": "← Back to the short form",
+    "outOfRange": "Please enter a number between {{min}} and {{max}}."
   },
   "profile": {
     "bands": {
@@ -83,7 +90,7 @@
     },
     "step": "Step 3 / 3",
     "title": "Let's Get to Know You",
-    "subtitle": "9 short questions — the AI builds your profile and personalises your portfolio around it.",
+    "subtitle": "9 short questions. Your answers go straight into the score — nothing here is guessed, and every point is shown to you afterwards.",
     "readyTitle": "Your Risk Profile Is Ready",
     "readySubtitle": "Your answers are analysed — your personal portfolio is being computed.",
     "profileWord": "Profile",

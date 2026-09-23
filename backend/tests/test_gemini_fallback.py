@@ -138,3 +138,66 @@ def test_generate_text_cache_skips_second_ai_call():
         second = generate_text("aynı prompt", system="s", cache=True)
     assert first == second == "üretildi"
     assert m.call_count == 1  # second call served from cache
+
+
+def test_every_gemini_client_is_built_with_a_timeout():
+    """
+    Without a wall-clock bound a hung request holds a thread-pool worker open
+    indefinitely AND the failover chain never runs — because nothing ever
+    fails, the app just stops answering. The OpenAI-compatible adapter has
+    had 60s from the start; this is the same bound for the other provider.
+    """
+    from unittest.mock import patch
+
+    from backend.services import ai_service
+
+    captured = {}
+
+    class _Client:
+        def __init__(self, api_key=None, http_options=None):
+            captured["http_options"] = http_options
+            self.models = self
+
+        def generate_content(self, **kwargs):
+            raise RuntimeError("stop here — construction is what is under test")
+
+    with patch.object(ai_service.settings, "GEMINI_API_KEY", "k"), \
+         patch("google.genai.Client", _Client):
+        try:
+            ai_service._gemini_chat([{"role": "user", "content": "hi"}], "sys", 100)
+        except Exception:
+            pass
+
+    options = captured.get("http_options")
+    assert options is not None, "the client was built without http options"
+    assert options.timeout == ai_service.GEMINI_TIMEOUT_SECONDS * 1000, (
+        "the SDK takes MILLISECONDS; seconds here would be a 60ms timeout"
+    )
+
+
+def test_a_light_job_is_not_sent_to_the_advisors_model():
+    """
+    Summarising three headlines and explaining a portfolio to a frightened
+    beginner are not the same task. Paying the same rate for both is how a
+    fifty-a-day quota disappears before anyone asks a real question.
+    """
+    from unittest.mock import patch
+
+    from backend.services import ai_service
+
+    captured = {}
+
+    def fake_dispatch(messages, system, max_tokens=512, **kwargs):
+        captured["model_filter"] = kwargs.get("model_filter")
+        return "ok"
+
+    with patch.object(ai_service, "_dispatch", fake_dispatch):
+        ai_service.generate_text("prompt", job="light")
+        light = captured["model_filter"]
+        ai_service.generate_text("prompt")
+        standard = captured["model_filter"]
+
+    assert standard is None, "a standard job must keep the full chain"
+    assert light is not None, "a light job must be restricted to small models"
+    assert light("gemini-2.5-flash-lite") is True
+    assert light("claude-opus-4-6") is False

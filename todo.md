@@ -422,7 +422,7 @@ lumos/                          ← project root
 - [x] Record the screen capture — scripted with Playwright (`demo/capture.mjs`), so the gallery can be regenerated rather than re-filmed; captured in all three UI languages
 - [x] `docs/case_study.md` → problem, product decisions, 4 technical challenges + solutions, learnings
 - [x] Upload the demo video to the GitHub repo (`demo/video/<lang>/lumos-demo.{mp4,gif}`)
-- [ ] Share on LinkedIn
+- [ ] **[you]** Share on LinkedIn
 
 > 💡 AWS migration becomes meaningful only after this phase ships the MVP. Not before.
 
@@ -543,7 +543,7 @@ lumos/                          ← project root
 > NO switch to React Native/Flutter — the existing React codebase is preserved.
 
 - [x] PWA complete: manifest.webmanifest + sw.js (network-first, API never cached) + prod-only registration
-- [ ] Capacitor wrap (post-MVP): store legitimacy + **push notifications = the behavioural coach's carrier** ("market dropped, stay calm" only works in real time via push; iOS web push is weak) — requires Apple $99/yr + Google $25
+- [ ] **[you — the code side is done, see Packaging]** Capacitor wrap (post-MVP): store legitimacy + **push notifications = the behavioural coach's carrier** ("market dropped, stay calm" only works in real time via push; iOS web push is weak) — requires Apple $99/yr + Google $25
 
 ### Usage Quota
 
@@ -645,7 +645,7 @@ lumos/                          ← project root
       → `listing_eval` + endpoint + UI. Asking price per m² against what the area actually trades at, plus the questions to ask before anyone signs. It REFUSES in the US and Germany, whose area data is an index: dividing an asking price by an index number produces a number that means nothing. 15 tests, mostly about refusing.
 - [x] Purchase checklist guide: step-by-step checks when buying land/a flat (static education content, Turkey-specific: deed, zoning, DASK...)
       → `backend/content/purchase_checks.py`, MARKET-keyed after the guide lesson. Real local content per market — tapu and imar for TR, title insurance and zoning for the US, Grundbuch and Baulastenverzeichnis for DE — with a conformance test that every market has one and that it points at a professional.
-- [ ] (Later phase — business development) Real-estate platform API partnership: real listings + agent contact in-app
+- [ ] **[you — commercial]** (Later phase — business development) Real-estate platform API partnership: real listings + agent contact in-app
 
 #### Flow 4 — Close the Loop (after the purchase)
 
@@ -998,7 +998,7 @@ The real bug was **synchronous blocking I/O inside async FastAPI route handlers*
 ### Still open
 
 - [x] Verify advisor response on production after deploy (Render cold-start + new asyncio wrapper)
-- [ ] Add `GROQ_API_KEY` + `OPENROUTER_API_KEY` to Render env if not already set
+- [ ] **[you — Render dashboard]** Add `GROQ_API_KEY` + `OPENROUTER_API_KEY` to Render env if not already set
 - [x] Code-split the JS bundle — 21 chunks, split per route and per locale; the entry chunk is now 218 kB / 69 kB gzip and a language's copy only downloads when it is chosen
 
 ---
@@ -1319,7 +1319,7 @@ fourth market. So the shape is enforced instead.
       First load 1075 kB → ~493 kB, 326 kB → ~150 kB gzipped. index.html
       paints an inline dark splash so the pre-render wait isn't a white
       screen.
-- [ ] Sentry: set SENTRY_DSN in Render/Vercel (code already wired).
+- [ ] **[you — Render/Vercel dashboard]** Sentry: set SENTRY_DSN in Render/Vercel (code already wired).
 - [x] Privacy policy + terms pages (both stores require them). — done, see Legal pages
 - [ ] **User:** domain → Clerk production instance (+ own Google OAuth) →
       Render paid tier (see docs/production-readiness.md).
@@ -1359,7 +1359,7 @@ method, a legal identity, or a signature.
 - [x] Persistent cache: diskcache → a small Neon table. Render's disk is — done. `cache_store.py` mirrors every cached value into a `cache_entries` table through a SYNC psycopg engine (the data adapters are sync and run in thread pools). Reads fall back to it and warm the local tier on the way past. It matters for the `ttl=None` last-known-good tier, which exists for provider outages and was being discarded on every deploy. Entirely optional — no Postgres means no durable tier and identical behaviour — and hard-disabled under pytest, because a developer's .env holds the production URL. `/health` now reports `durable_cache`.
       ephemeral, so every deploy currently wipes last-known-good — the tier that
       keeps the app honest when a source is down.
-- [ ] `SENTRY_DSN` on Render and Vercel (the code is already wired). Store
+- [ ] **[you — dashboard; same item as above]** `SENTRY_DSN` on Render and Vercel (the code is already wired). Store
       review surfaces crashes you never see locally.
 
 #### 3. Legal pages — both stores reject without them
@@ -1421,7 +1421,7 @@ method, a legal identity, or a signature.
 
 #### 6. Before you submit
 
-- [ ] Test on a **real device**, not only the simulator — safe-area insets,
+- [ ] **[you — needs a physical phone]** Test on a **real device**, not only the simulator — safe-area insets,
       the keyboard covering inputs, and back-gesture behaviour are where
       Capacitor apps break.
 - [x] Cold-start path with the backend asleep, on a slow connection.
@@ -1499,6 +1499,58 @@ is what fails, and nobody was testing combinations.
       of `npx vitest run | tail -3` is tail's.
 
 ---
+
+---
+
+## LLM dependence (2026-09-24)
+
+Asked whether to fine-tune a model, self-host from HuggingFace, or cap the
+chatbot. The answer was none of the first two and something narrower than
+the third: the model is not the source of a single number this app shows, so
+moving knowledge INTO one would undo the thing the whole project is built
+on. What was worth doing was removing the model from where it never belonged.
+
+- [x] **The risk quiz no longer calls a model at all.** The nine questions
+      were written down in `prompts/system_prompt.txt` and a frontier model
+      was paid to read them out — one chat call per answer, on the most
+      restricted tier (weak models paraphrase the script), roughly ten calls
+      from a fifty-a-day quota before a new user saw anything. They are
+      served as data now (`quiz_questions.py` + `/profile/questions`), the
+      client renders real inputs, and the answers arrive already shaped like
+      `RiskProfileAnswers` — nothing to extract, nothing to parse.
+      A journey asserts zero chat calls during a full run.
+- [x] It was also where every reported bug lived: the Turkish sentence in an
+      English session, the nested-JSON profile that returned the wrong
+      object, the cold reads, the quota burn. None of them can happen in a
+      form.
+- [x] Conversation kept, as a preference rather than a fallback — some people
+      genuinely prefer to talk. Both directions are one tap.
+- [x] The quiz and the SCHEMA can no longer drift: tests assert every schema
+      field has a question, that required-on-screen matches required-in-model,
+      that no option is a value the schema would reject, and that a completed
+      quiz validates.
+- [x] Option labels come from the risk engine's own `risk.*` keys, so the
+      quiz and the score breakdown cannot word the same answer differently.
+      This surfaced a missing `risk.mod.income.stable` (the engine skips the
+      row when the modifier is zero, so it had never been needed).
+- [x] **Per-task model tiers.** Summarising three headlines and pulling a
+      number out of one sentence are not the same job as explaining a
+      portfolio to a frightened beginner. The news digest and the what-if
+      extraction now run on small fast models.
+- [x] **A wall-clock timeout on the Gemini path.** It had none: a hung
+      request held a thread-pool worker open indefinitely AND the failover
+      chain never ran, because nothing ever failed — the app just stopped
+      answering. 60s, matching the OpenAI-compatible adapter.
+- [x] Checked the other limits rather than assuming: 4000 chars per message,
+      80 messages per conversation, 500 for the advisor, 50/day free quota,
+      per-mode model restriction and per-tier `max_tokens` were all already
+      in place. The advisor's profile context is nine short lines and does
+      not grow.
+- [x] Copy corrected: the profile page said "the AI builds your profile". It
+      no longer does.
+- [ ] **[you]** Fine-tuning, self-hosted HuggingFace weights and Kaggle were
+      all considered and rejected — see the reasoning above. Revisit only if
+      the app moves off the free provider chain.
 
 ## Three things deliberately not built (2026-09-21)
 
