@@ -34,17 +34,38 @@ shows you the honest downside before the upside, and treats your fear as **data 
 The English UI below. The same build also ships Turkish and German, and the
 gallery is captured separately in each — see [all three](#the-same-app-in-three-languages).
 
-| Onboarding | Risk profile | Portfolio |
+| Onboarding | The risk quiz | Portfolio |
 |---|---|---|
-| ![Onboarding](demo/screens/en/01-karsilama.png) | ![Risk profile](demo/screens/en/02-risk-profili.png) | ![Portfolio](demo/screens/en/03-portfoy.png) |
+| ![Onboarding](demo/screens/en/01-welcome.png) | ![Risk quiz](demo/screens/en/22-risk-quiz.png) | ![Portfolio](demo/screens/en/03-portfolio.png) |
+
+The quiz above calls **no model at all**. Its nine questions used to live in the
+system prompt, read out one chat call at a time; they are served as data now and the
+answers arrive already shaped like the schema. Talking is still one tap away.
 
 | Holdings + live chart | Dashboard | AI advisor |
 |---|---|---|
-| ![Holdings](demo/screens/en/05-varliklarim.png) | ![Dashboard](demo/screens/en/06-panel.png) | ![AI advisor](demo/screens/en/08-danisman.png) |
+| ![Holdings](demo/screens/en/05-my-assets.png) | ![Dashboard](demo/screens/en/06-dashboard.png) | ![AI advisor](demo/screens/en/08-advisor.png) |
 
 | Rent vs. buy | Region price explorer | Currency split |
 |---|---|---|
-| ![Rent vs. buy](demo/screens/en/04-kira-vs-ev.png) | ![Explore real estate](demo/screens/en/07-emlak-kesfet.png) | ![Currency split](demo/screens/en/19-kur-dagilimi.png) |
+| ![Rent vs. buy](demo/screens/en/04-rent-vs-buy.png) | ![Explore real estate](demo/screens/en/07-explore-property.png) | ![Currency split](demo/screens/en/19-currency-split.png) |
+
+**Before you buy anything.** A listing's price against what the area actually trades
+at — which *refuses* to answer in the US and Germany, because their area data is an
+index and dividing an asking price by an index number means nothing. Then the same
+amount, the same window, both worlds. Then the checks that stop a bad purchase.
+
+| Check a listing | Plot or portfolio? | Before you buy |
+|---|---|---|
+| ![Listing check](demo/screens/en/25-listing-check.png) | ![Plot or portfolio](demo/screens/en/26-plot-or-portfolio.png) | ![Purchase checks](demo/screens/en/27-purchase-checks.png) |
+
+**Where the money goes, and which half of the app you see.** The reserve comes off
+the top — it is not an allocation competing with the others, it is what stops a bad
+month becoming a forced sale.
+
+| Budget split | Your path | Risk profile |
+|---|---|---|
+| ![Budget split](demo/screens/en/23-budget-split.png) | ![Your path](demo/screens/en/24-your-path.png) | ![Risk profile](demo/screens/en/02-risk-profile.png) |
 
 **Three markets, one UI language.** Market and language are independent axes:
 this is the *same English build*, pricing the US in dollars off FHFA state data
@@ -52,24 +73,24 @@ and Germany in euros off the Bundesbank.
 
 | 🇺🇸 United States | 🇩🇪 Deutschland |
 |---|---|
-| ![US market](demo/screens/en/12-pazar-abd.png) | ![German market](demo/screens/en/12-pazar-almanya.png) |
+| ![US market](demo/screens/en/12-market-us.png) | ![German market](demo/screens/en/12-market-germany.png) |
 
 **Rehearse before you risk anything.** Play money, the worst stretch of an
 asset's own history, and a scenario the app refuses to call a forecast:
 
 | Play money | Time machine | Future scenarios |
 |---|---|---|
-| ![Practice mode](demo/screens/en/14-sahte-para.png) | ![Time machine](demo/screens/en/15-zaman-makinesi.png) | ![Scenarios](demo/screens/en/16-senaryolar.png) |
+| ![Practice mode](demo/screens/en/14-play-money.png) | ![Time machine](demo/screens/en/15-time-machine.png) | ![Scenarios](demo/screens/en/16-scenarios.png) |
 
 | Why this split? | What would happen? | Goal planner |
 |---|---|---|
-| ![Why this split](demo/screens/en/13-neden-bu-dagilim.png) | ![What if](demo/screens/en/17-ne-olurdu.png) | ![Goal](demo/screens/en/18-hedef.png) |
+| ![Why this split](demo/screens/en/13-why-this-split.png) | ![What if](demo/screens/en/17-what-if.png) | ![Goal](demo/screens/en/18-goal.png) |
 
 **The screen no investing app wants to show you** — carrying card debt, the app
 says clear it first and does the arithmetic, before it will show you a portfolio:
 
 <p align="center">
-  <img src="demo/screens/en/11-borc-once.png" width="300" alt="Clear the debt first" />
+  <img src="demo/screens/en/11-clear-debt-first.png" width="300" alt="Clear the debt first" />
 </p>
 
 <details>
@@ -77,11 +98,11 @@ says clear it first and does the arithmetic, before it will show you a portfolio
 
 | Dashboard | Portfolio |
 |---|---|
-| ![Desktop dashboard](demo/screens/en/09-desktop-panel.png) | ![Desktop portfolio](demo/screens/en/10-desktop-portfoy.png) |
+| ![Desktop dashboard](demo/screens/en/09-desktop-dashboard.png) | ![Desktop portfolio](demo/screens/en/10-desktop-portfolio.png) |
 
 | Real-estate explorer | Rent vs. buy |
 |---|---|
-| ![Desktop explore](demo/screens/en/20-desktop-emlak.png) | ![Desktop rent vs buy](demo/screens/en/21-desktop-kira-vs-ev.png) |
+| ![Desktop explore](demo/screens/en/20-desktop-explore.png) | ![Desktop rent vs buy](demo/screens/en/21-desktop-rent-vs-buy.png) |
 
 </details>
 
@@ -91,8 +112,8 @@ Captured from the same production build, one run per language — not mockups.
 
 | 🇹🇷 Türkçe | 🇬🇧 English | 🇩🇪 Deutsch |
 |---|---|---|
-| ![TR](demo/screens/tr/03-portfoy.png) | ![EN](demo/screens/en/03-portfoy.png) | ![DE](demo/screens/de/03-portfoy.png) |
-| ![TR](demo/screens/tr/04-kira-vs-ev.png) | ![EN](demo/screens/en/04-kira-vs-ev.png) | ![DE](demo/screens/de/04-kira-vs-ev.png) |
+| ![TR](demo/screens/tr/03-portfolio.png) | ![EN](demo/screens/en/03-portfolio.png) | ![DE](demo/screens/de/03-portfolio.png) |
+| ![TR](demo/screens/tr/04-rent-vs-buy.png) | ![EN](demo/screens/en/04-rent-vs-buy.png) | ![DE](demo/screens/de/04-rent-vs-buy.png) |
 
 > Full demo video: [en](demo/video/en/lumos-demo.mp4) · [tr](demo/video/tr/lumos-demo.mp4) · [de](demo/video/de/lumos-demo.mp4)
 > Regenerate the whole gallery with `node demo/capture.mjs` (see [demo/](demo/)).
@@ -129,15 +150,23 @@ surface, zero custody risk — and a lower trust barrier for scared beginners.
 - **Readiness score** — five transparent milestones toward "ready for real money"; the UI background
   literally brightens from night toward dawn as the score grows
 
-### 💬 Conversational risk profiling
+### 💬 Risk profiling — nine questions, one at a time
 - 9 single-topic questions grounded in Modern Portfolio Theory (budget, horizon, age, loss
-  tolerance, goal, experience, current holdings, obligations, income stability) — each message
+  tolerance, goal, experience, obligations, income stability, monthly contribution) — each screen
   asks exactly one thing, so a nervous beginner never has to answer two questions at once
+- **It calls no model.** The questions used to live in the system prompt and a frontier model was
+  paid to read them out, one chat call per answer, on the most restricted tier. They are served
+  as data now; the answers arrive already shaped like the schema, with nothing to extract and
+  nothing to parse. Tests assert the quiz and the schema cannot drift apart
+- **Talking is still offered** — as a preference rather than a fallback, one tap either way. Some
+  people genuinely prefer a conversation, and the conversational path is untouched
 - **Zero-knowledge language rules**: every finance term explained inline on first use; technicality
   escalates only when the user demonstrates knowledge
 - **Fear-aware**: worry is acknowledged and normalized before any answer
-- Structured extraction turns the conversation into a validated 1–10 risk score with a fully
-  transparent breakdown — every factor's weight, your answer, its exact contribution, and why
+- A question the schema lets you skip is skippable on screen too, and bounds are checked at the
+  step rather than at the end — an out-of-range answer on question seven used to surface as a
+  failure after all nine were done, with nothing pointing at which one was wrong
+- The answers become a validated 1–10 risk score with a fully transparent breakdown — every factor's weight, your answer, its exact contribution, and why
   (contributions sum to the score; no black box)
 - The score drives a **risk-blended allocation engine**: cautious profiles overweight calm assets,
   bold ones overweight growth engines — and the UI shows the formula, each asset's role, and every
@@ -249,15 +278,19 @@ surface, zero custody risk — and a lower trust barrier for scared beginners.
 │             firefly design system: animated wordmark, "brightening UI" tied to readiness
 │
 ├─ backend/   FastAPI (Python 3.12) · async SQLAlchemy 2 · Alembic migrations · SQLite (dev)
+│   │         every route served under /api/v1 (and, deprecated, at its bare path)
 │   ├─ routers/       thin HTTP layer — validation, auth, rate limits only
 │   ├─ services/      domain logic (risk, portfolio, backtest, projection, inflation,
-│   │                 coach, news, what-if, evds, ai_service + ai_tiers)
+│   │                 coach, news, what-if, evds, ai_service + ai_tiers,
+│   │                 path_advisor, budget_split, listing_eval, asset_character,
+│   │                 property_vs_portfolio, quiz_questions, prompt_experiments)
 │   ├─ repositories/  ALL database access (no inline SQL in routers)
 │   ├─ markets/       Market Packs — every country-specific fact in one object (TR/US/DE)
+│   ├─ content/       market-keyed educational copy (purchase checklists)
 │   ├─ schemas/       Pydantic request/response models
-│   └─ models/        SQLAlchemy ORM (users, holdings)
+│   └─ models/        SQLAlchemy ORM (users, holdings, feedback)
 │
-└─ data       yfinance (markets) · TCMB EVDS (CPI + housing indices, live) · RSS (news)
+└─ data       yfinance (markets) · TCMB EVDS · BLS · FRED · Eurostat · Bundesbank · RSS
 ```
 
 **Engineering highlights**
@@ -267,6 +300,16 @@ surface, zero custody risk — and a lower trust barrier for scared beginners.
 - **Three-tier market-data cache** (fresh 24h → stale 7-day → never-expiring last-known-good,
   plus historical volatility baselines as the final resort) — a Yahoo Finance outage degrades
   gracefully instead of breaking the app (observed and survived live, twice)
+- **The last-known-good tier survives a deploy.** It never expires *because* it exists for
+  provider outages, yet it lived on Render's ephemeral disk and was discarded on every deploy —
+  usually right when it was most needed, since a deploy is often the response to something
+  already being wrong. Values now mirror into a small Postgres table through a synchronous
+  driver (the data adapters are sync and run in thread pools); reads fall back to it and warm
+  the local tier on the way past. Entirely optional, and hard-disabled under pytest
+- **A dead upstream is attempted once, not on every request.** Each statistics adapter enters a
+  short cooldown after a failure, raised *inside* its own `try` so the existing fallback chain
+  still runs. Without it, an outage meant every request waiting out a 25s timeout on a single
+  worker — which reads as a hung app rather than as stale data
 - **Structured observability**: every AI call logs tier, provider, prompt-version hash, latency,
   and outcome; every request carries an `X-Request-ID` echoed in the standard error envelope
   `{detail, error: {code, message, request_id}}`
@@ -274,6 +317,20 @@ surface, zero custody risk — and a lower trust barrier for scared beginners.
   every push, plus a Docker build gate and full lint/test matrix
 - **RAG chat context**: the advisor speaks from *today's* numbers (index levels + monthly CPI)
   injected into the system prompt with a 6-hour cache — and fails open if sources are down
+- **The risk quiz calls no model at all.** Its nine questions were written down in the system
+  prompt and a frontier model was paid to read them out — one chat call per answer, on the most
+  restricted tier, roughly ten calls from a 50/day quota before a new user saw anything. They
+  are served as data (`/api/v1/profile/questions`) and the answers arrive already shaped like
+  `RiskProfileAnswers`: nothing to extract, nothing to parse. Conversation is still offered as a
+  preference. Tests assert the quiz and the schema cannot drift
+- **Model output is parsed by the parser, not by regexes.** `json_extract` scans for the first
+  complete JSON value with `raw_decode`, which understands nesting, strings and escapes. The
+  ladder it replaced matched the *inner* object of a nested reply and returned it as the user's
+  whole risk profile — a confident wrong answer rather than a failure
+- **Journey tests.** Every bug reported from the live app has been a state-transition bug — the
+  right screen for the wrong account state — and unit tests pass straight through those.
+  `demo/journeys.mjs` drives the real app through the states an account actually passes through
+  and checks for the error boundary *first*, because a crashed page still renders content
 
 ---
 
@@ -301,12 +358,22 @@ returns 429/5xx, is missing a key, or is blocked by region simply hands off to t
 This is not theory: Google blocks its free Gemini tier from EU datacenter IPs, which is why the
 backend runs in Oregon — and why the chain exists at all.
 
-**2. A quality gate, not just a quota gate.** The scripted 9-question risk quiz has to follow its
-Turkish script exactly, and lighter models paraphrase questions or corrupt Turkish. So profiling
-accepts only Gemini/Gemma/Claude-class models (`gemini`, `gemma`, `claude`, `gpt-oss`) wherever
-they are hosted, while Llama and DeepSeek stay available to the free-form advisor, where a
-slightly weaker answer beats an error. Replies containing foreign-script characters (a real
-failure mode: *"rahat的话"*) are rejected and re-served by the next provider.
+**2. A quality gate, not just a quota gate.** Profiling accepts only Gemini/Gemma/Claude-class
+models (`gemini`, `gemma`, `claude`, `gpt-oss`) wherever they are hosted, while Llama and
+DeepSeek stay available to the free-form advisor, where a slightly weaker answer beats an error.
+Replies containing foreign-script characters (a real failure mode: *"rahat的话"*) are rejected
+and re-served by the next provider.
+
+The restriction existed because the 9-question quiz had to follow its script exactly and lighter
+models paraphrase it. **That quiz no longer calls a model at all** — see below — so the gate now
+protects only the paths where a model is genuinely doing the work.
+
+**2b. The cheapest job does not get the most expensive model.** Summarising three headlines and
+pulling a number out of one sentence are not the same task as explaining a portfolio to a
+frightened beginner. The news digest and the what-if extraction run on small fast models;
+everything with a person on the other end keeps the full chain. Every call also carries a
+60-second wall-clock limit — without one a hung request held a thread-pool worker open
+indefinitely *and* the failover chain never ran, because nothing ever failed.
 
 **3. Payments-ready, payments-excluded.** Providers, model chains and daily quotas all hang off a
 single tier table, so introducing paid plans later is a configuration change rather than a
@@ -325,8 +392,27 @@ the way Gemini's handles quota), but Claude has no free tier — so it sits unus
 `pro` row, waiting for the day billing is turned on.
 
 **4. AI never does math.** Risk scores, allocations, backtests, projections, drift, what-if
-comparisons — all computed by deterministic engines. The LLM extracts intent (strict JSON with a
-3-strategy parser) and phrases results. This is a product-safety decision, enforced by tests.
+comparisons — all computed by deterministic engines. The LLM phrases results; it never produces
+a number. This is a product-safety decision, enforced by tests.
+
+**5. And increasingly it does not do the talking either.** The risk quiz was nine chat calls to
+read out nine questions that were already written down — the most expensive, most fragile path
+in the app, and the one every reported bug lived in: a Turkish sentence in an English session,
+a nested-JSON reply parsed into the wrong object, cold reads, burnt quota. The questions are
+served as data now and the answers arrive already shaped like the schema. A journey test asserts
+zero chat calls across a full run.
+
+Three things were considered and rejected on the way: fine-tuning a model on investing,
+self-hosting open weights from HuggingFace, and Kaggle. The reasoning is in `todo.md`, and it
+comes down to one fact — *the model is not the source of a single number this app shows*, so
+moving knowledge into one would undo the thing the architecture is built on, and it would fail
+worst exactly where the legal exposure is.
+
+**6. Prompt A/B, off by default.** Assignment is a stable hash of the reader, so nobody has the
+prompt change between question three and four, and it is hashed with the experiment key so two
+experiments never assign in lockstep. Variants can only *append* to the control — none can drop
+the disclaimers or the language rule by omission. There is deliberately no automatic promotion
+of a winner: changing what a financial-education app says to people is a person's decision.
 
 ---
 
@@ -417,6 +503,18 @@ market.
   inside the app, with two lockout guards — an admin cannot demote themselves, and the last admin
   cannot be demoted by anyone — and every change is logged with actor and target
 - **No execution, no custody**: architecturally incapable of moving user money
+- **Delete your account, from inside the app.** It removes the profile, every holding and every
+  piece of feedback, then deletes the login itself — and if that last step fails it says so
+  rather than reporting a clean deletion you would discover was incomplete at your next sign-in.
+  Holdings are deleted explicitly rather than trusting `ON DELETE CASCADE`, which SQLite does not
+  enforce, so the guarantee and the test of it cannot disagree
+- **Public [privacy policy](frontend/src/pages/LegalPage.jsx) and terms**, in all three languages,
+  written against the actual database schema: what is stored, that the database is in Frankfurt
+  while the application server is in Oregon, and exactly what reaches an AI provider
+- **Secrets cannot reach a response or a log.** A test proves it by failing a provider with its
+  own key in the error text. The `ValueError` handler used to return `str(exc)` verbatim to the
+  client — and the only `ValueError`s the app ever sees come from drivers and SDKs, whose
+  messages carry connection strings and keyed URLs
 - **Honesty guarantees are tested**: prompt-rule regression tests, a no-dark-patterns assertion on
   the Panic Button, refusal paths for thin statistical histories
 - Full failure-mode analysis: [docs/risk_register.md](docs/risk_register.md)
@@ -424,14 +522,28 @@ market.
 ## Testing
 
 ```bash
-python -m pytest backend/tests/ -q     # 245 tests, ~3s, zero network
-cd frontend && npm test                # 14 vitest tests (retry safety, currency truth)
+./scripts/check.sh                     # everything CI runs, with exit codes that propagate
+python -m pytest backend/tests/ -q     # 668 tests
+cd frontend && npm test                # 46 vitest tests
+RUN_JOURNEYS=1 ./scripts/check.sh      # + 35 browser journey checks (needs a local app)
 ```
 
 - External boundaries (AI providers, yfinance, EVDS, RSS) are fully mocked; business logic runs real
 - **API-level E2E**: five personas (conservative → retirement) walk the entire HTTP surface:
   path selection → fear check-in → profiling → recommendation → "I bought it" → wealth summary →
   readiness score ([tests/e2e/scenarios.json](tests/e2e/scenarios.json))
+- **Journey tests** ([demo/journeys.mjs](demo/journeys.mjs)) drive the real app in a browser
+  through the states an account actually passes through — brand new, returning, mid-retake,
+  each path, each market. Every bug reported from the live app has been a state-transition bug,
+  and unit tests pass straight through all of them because each piece works in isolation.
+  They check for the **error boundary first**: a crashed page still renders *content*, which is
+  how a total crash was once reported as "the page loads slowly"
+- **A conformance contract, not a memory test**: adding a market or a language is checked by
+  tests parametrised over market × language — every pack asset must be explainable, every market
+  must have a purchase checklist, shared copy may not name one country's institutions, and the
+  quiz may not drift from the schema it fills
+- `scripts/check.sh` exists because a verification once reported success while the suite failed:
+  the exit status of `npx vitest run | tail -3` is `tail`'s. It runs with `set -euo pipefail`
 - CI on every push: ruff + pytest + eslint + frontend build + Docker image build + fresh-database
   migration check
 

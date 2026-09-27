@@ -43,6 +43,10 @@ const COPY = {
     dashboard: 'Dashboard', askAdvisor: 'Ask the advisor',
     chatPlaceholder: 'Ask anything', question: 'What is an ETF, briefly?',
     selectMarket: 'Select market', explore: 'Explore',
+    budgetSplit: 'Where your budget goes', pathSwitch: 'Your path',
+    listingEval: "Check a listing's price", purchaseChecks: 'Before you buy',
+    vsCompare: 'A plot, or a portfolio?', character: 'What each one is like to live with',
+    glossaryPage: 'Jargon, in plain words', retake: 'Redo the Risk Analysis',
     practice: 'Try It With Play Money First', timeMachine: 'Time Machine',
     scenarios: 'Future Scenarios', whatIf: 'What would happen?',
     goal: 'My Goal', fx: 'Currency Split', rationale: 'Why this split?',
@@ -57,6 +61,10 @@ const COPY = {
     dashboard: 'Kontrol Paneli', askAdvisor: 'Danışmana sor',
     chatPlaceholder: 'Bir şey sor', question: 'ETF nedir, kısaca anlatır mısın?',
     selectMarket: 'Pazar seç', explore: 'Keşfet',
+    budgetSplit: 'Bütçen nereye gidiyor', pathSwitch: 'Yolun',
+    listingEval: 'İlanın fiyatını kontrol et', purchaseChecks: 'Almadan önce',
+    vsCompare: 'Arsa mı, portföy mü?', character: 'Hangisiyle yaşamak nasıl',
+    glossaryPage: 'Sade bir dille terimler', retake: 'Risk Analizini Güncelle',
     practice: 'Önce Sahte Parayla Dene', timeMachine: 'Zaman Makinesi',
     scenarios: 'Gelecek Senaryoları', whatIf: 'Ne olurdu?',
     goal: 'Hedefim', fx: 'Kur Dağılımı', rationale: 'Neden bu dağılım?',
@@ -75,6 +83,10 @@ const COPY = {
     dashboard: 'Übersicht', askAdvisor: 'Den Berater fragen',
     chatPlaceholder: 'Frag etwas', question: 'Was ist ein ETF, kurz erklärt?',
     selectMarket: 'Markt wählen', explore: 'Entdecken',
+    budgetSplit: 'Wohin dein Budget geht', pathSwitch: 'Dein Weg',
+    listingEval: 'Den Preis eines Inserats prüfen', purchaseChecks: 'Vor dem Kauf',
+    vsCompare: 'Grundstück oder Portfolio?', character: 'Wie es sich anfühlt, jeden zu halten',
+    glossaryPage: 'Fachbegriffe, einfach gesagt', retake: 'Risikoanalyse aktualisieren',
     practice: 'Probier es erst mit Spielgeld', timeMachine: 'Zeitmaschine',
     scenarios: 'Zukunftsszenarien', whatIf: 'Was würde passieren?',
     goal: 'Mein Ziel', fx: 'Währungsaufteilung', rationale: 'Warum diese Aufteilung?',
@@ -230,9 +242,9 @@ if (!STORE) {
   const page = await ctx.newPage()
   await signIn(page)
 
-  await shoot(page, '/', '01-karsilama')
-  await shoot(page, '/profile', '02-risk-profili', { settle: 6000 })
-  await shoot(page, '/recommend', '03-portfoy', { settle: 6000, expect: T.allocation })
+  await shoot(page, '/', '01-welcome')
+  await shoot(page, '/profile', '02-risk-profile', { settle: 6000 })
+  await shoot(page, '/recommend', '03-portfolio', { settle: 6000, expect: T.allocation })
   // Real-estate decision tool: the rent-vs-buy scenario with real numbers
   try {
     await page.goto(`${APP}/explore`)
@@ -295,7 +307,7 @@ if (!STORE) {
     await page.waitForTimeout(3000)
   }
   try {
-    for (const [code, name] of [['US', 'abd'], ['DE', 'almanya']]) {
+    for (const [code, name] of [['US', 'us'], ['DE', 'germany']]) {
       await page.goto(`${APP}/explore`)
       await page.waitForTimeout(3000)
       await chooseMarket(code)
@@ -303,8 +315,8 @@ if (!STORE) {
       // The regional table is the slowest thing on the page — 51 FRED series
       // on a cold cache — so give it room rather than shooting a spinner.
       await page.waitForTimeout(9000)
-      await page.screenshot({ path: `${SCREENS}/12-pazar-${name}.png` })
-      console.log(`\u2713 12-pazar-${name}`)
+      await page.screenshot({ path: `${SCREENS}/12-market-${name}.png` })
+      console.log(`\u2713 12-market-${name}`)
     }
   } catch (e) { console.log('  … market tour skipped:', e.message.slice(0, 80)) }
   finally {
@@ -316,20 +328,46 @@ if (!STORE) {
   // ── The features that live below the fold ────────────────────────────────
   // Each of these is a distinct answer to a beginner's distinct fear, and all
   // of them were invisible in a gallery that only ever shot the top of a page.
-  await shootCard(page, '/recommend', T.rationale, '13-neden-bu-dagilim', { anchor: T.allocation })
+  await shootCard(page, '/recommend', T.rationale, '13-why-this-split', { anchor: T.allocation })
   // These four sit behind the "stress-test" drawer; it only has to be opened
   // once, and it stays open for the rest of them.
-  await shootCard(page, '/recommend', T.practice, '14-sahte-para', { open: T.testLayer })
-  await shootCard(page, '/recommend', T.timeMachine, '15-zaman-makinesi')
-  await shootCard(page, '/recommend', T.scenarios, '16-senaryolar')
-  await shootCard(page, '/recommend', T.whatIf, '17-ne-olurdu')
-  await shootCard(page, '/dashboard', T.goal, '18-hedef',
+  await shootCard(page, '/recommend', T.practice, '14-play-money', { open: T.testLayer })
+  await shootCard(page, '/recommend', T.timeMachine, '15-time-machine')
+  await shootCard(page, '/recommend', T.scenarios, '16-scenarios')
+  await shootCard(page, '/recommend', T.whatIf, '17-what-if')
+  await shootCard(page, '/dashboard', T.goal, '18-goal',
                   { anchor: T.dashboard, open: T.showDetails })
 
-  await shoot(page, '/holdings', '05-varliklarim', { settle: 7000, expect: T.holdings })
-  await shootCard(page, '/holdings', T.fx, '19-kur-dagilimi', { anchor: T.holdings })
-  await shoot(page, '/dashboard', '06-panel', { settle: 6000, expect: T.dashboard })
-  await shoot(page, '/explore', '07-emlak-kesfet', { settle: 7000 })
+  // ── Screens added after the first gallery ───────────────────────────────
+  // The quiz is the big one: it used to be a chat and is now a form, so the
+  // old 02-risk-profili showed a flow the app no longer has. Reached through
+  // "redo", which only flips local state — the saved profile is untouched
+  // unless a new one is submitted, and this never submits.
+  try {
+    await page.goto(`${APP}/profile`)
+    await waitForText(page, T.retake)
+    await page.waitForTimeout(2500)
+    await page.getByRole('button', { name: new RegExp(T.retake) }).first().click()
+    await page.waitForTimeout(3500)
+    // Clicking "redo" leaves the page scrolled to where that button was.
+    await page.evaluate(() => window.scrollTo(0, 0))
+    await page.waitForTimeout(600)
+    await page.screenshot({ path: `${SCREENS}/22-anket.png` })
+    console.log('\u2713 22-anket')
+  } catch (e) { console.log('  … 22-anket skipped:', e.message.slice(0, 80)) }
+
+  await shootCard(page, '/dashboard', T.budgetSplit, '23-budget-split',
+                  { anchor: T.dashboard })
+  await shootCard(page, '/profile', T.pathSwitch, '24-your-path', { anchor: T.retake })
+  await shootCard(page, '/explore', T.listingEval, '25-listing-check', { settle: 9000 })
+  await shootCard(page, '/explore', T.vsCompare, '26-plot-or-portfolio')
+  await shootCard(page, '/explore', T.purchaseChecks, '27-purchase-checks',
+                  { open: T.purchaseChecks })
+
+  await shoot(page, '/holdings', '05-my-assets', { settle: 7000, expect: T.holdings })
+  await shootCard(page, '/holdings', T.fx, '19-currency-split', { anchor: T.holdings })
+  await shoot(page, '/dashboard', '06-dashboard', { settle: 6000, expect: T.dashboard })
+  await shoot(page, '/explore', '07-explore-property', { settle: 7000 })
 
   // advisor chat with a real AI answer
   try {
@@ -351,14 +389,14 @@ if (!STORE) {
   const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 2 })
   const page = await ctx.newPage()
   await signIn(page)
-  await shoot(page, '/dashboard', '09-desktop-panel', { settle: 6000, expect: T.dashboard })
-  await shoot(page, '/recommend', '10-desktop-portfoy', { settle: 6000, expect: T.allocation })
+  await shoot(page, '/dashboard', '09-desktop-dashboard', { settle: 6000, expect: T.dashboard })
+  await shoot(page, '/recommend', '10-desktop-portfolio', { settle: 6000, expect: T.allocation })
   // The desktop half of the gallery only ever showed the two stock screens,
   // which made a real-estate app look like a stock app on the web. Explore is
   // the widest page in the product and it is the one that benefits most from
   // a desktop frame.
-  await shoot(page, '/explore', '20-desktop-emlak', { settle: 9000 })
-  await shootCard(page, '/explore', T.rentVsBuy, '21-desktop-kira-vs-ev', { settle: 9000 })
+  await shoot(page, '/explore', '20-desktop-explore', { settle: 9000 })
+  await shootCard(page, '/explore', T.rentVsBuy, '21-desktop-rent-vs-buy', { settle: 9000 })
   await ctx.close()
 }
 

@@ -17,7 +17,7 @@ import { confirmationMatches } from '../utils/confirmation'
  * is a typed word rather than a second button. Both exist because this cannot
  * be undone — there is no soft delete and no archived copy to restore from.
  */
-export default function DeleteAccount() {
+export default function DeleteAccount({ compact = false }) {
   const { t, i18n } = useTranslation()
   const { userId } = useAuth()
   const { signOut } = useClerk()
@@ -50,14 +50,24 @@ export default function DeleteAccount() {
   }
 
   return (
-    <div style={{
-      marginTop: '2.5rem', padding: '1rem',
-      border: '1px solid var(--border)', borderRadius: 12,
-    }}>
+    <div style={compact && !open
+      ? { marginTop: '2rem', textAlign: 'center' }
+      : {
+        marginTop: '2.5rem', padding: '1rem',
+        border: '1px solid var(--border)', borderRadius: 12,
+      }}>
       {!open ? (
         <button
-          className="btn btn-ghost btn-full"
-          style={{ color: 'var(--red, #f87171)' }}
+          className={compact ? undefined : 'btn btn-ghost btn-full'}
+          style={compact
+            // Quiet while onboarding is on screen: still reachable, no longer
+            // competing with question one for a nervous reader's attention.
+            ? {
+              background: 'none', border: 'none', padding: 0, font: 'inherit',
+              fontSize: 12, color: 'var(--text-dim)', cursor: 'pointer',
+              textDecoration: 'underline', textUnderlineOffset: 3,
+            }
+            : { color: 'var(--red, #f87171)' }}
           onClick={() => setOpen(true)}
         >
           {t('account.deleteTitle')}
