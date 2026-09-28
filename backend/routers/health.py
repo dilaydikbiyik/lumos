@@ -29,6 +29,20 @@ class HealthResponse(BaseModel):
     # unless this is true, so "is the fallback actually going to be there"
     # is a question worth being able to answer without reading logs.
     durable_cache: bool
+    # WHICH engine is behind `db` — the driver name only ("postgresql",
+    # "sqlite"), never a host, user or URL. It exists so a caller can refuse
+    # to act against the wrong one: the journey tests write profiles, paths
+    # and holdings, and the only thing standing between them and the
+    # production database was remembering to override DATABASE_URL by hand.
+    db_engine: str
+
+
+def _db_engine_name() -> str:
+    """The driver behind the connection, with no connection details."""
+    try:
+        return async_engine.url.get_backend_name()
+    except Exception:
+        return "unknown"
 
 
 def _durable_cache_enabled() -> bool:
@@ -80,6 +94,7 @@ async def health_check():
         "ai": ai_status,
         "has_admin": has_admin,
         "durable_cache": _durable_cache_enabled(),
+        "db_engine": _db_engine_name(),
         "data_sources": {
             "tcmb_evds": bool(settings.TCMB_EVDS_API_KEY),
             "fred": bool(settings.FRED_API_KEY),

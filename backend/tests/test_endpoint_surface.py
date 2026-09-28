@@ -153,12 +153,7 @@ def test_holdings_drift_without_holdings_refuses_honestly(client):
     Allocation drift needs both a profile and holdings. With neither, the
     answer is "not available, and here is why" — not a zero-drift verdict,
     which would read as reassurance nobody has earned.
-
-    Run as its OWN user: the in-memory database is shared across the whole
-    test session, so `FAKE_USER_ID` arrives here already carrying holdings
-    that another file created, and the empty case would never be exercised.
     """
-    app.dependency_overrides[get_current_user] = lambda: "user_drift_empty"
     res = client.get("/holdings/drift")
     assert res.status_code == 200
     body = res.json()

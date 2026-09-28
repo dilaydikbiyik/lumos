@@ -41,14 +41,30 @@ def client():
     app.dependency_overrides[get_current_user] = lambda: FAKE_USER_ID
     app.dependency_overrides[get_db] = _override_get_db
 
-    # Create tables on the test engine before the app runs
+    # A CLEAN database per test, not merely a created one.
+    #
+    # The engine is module-level and in-memory on a StaticPool, so every test
+    # in the session shared one database and rows outlived the test that
+    # wrote them. That is invisible until a test asserts on an EMPTY state:
+    # `FAKE_USER_ID` arrived in later files already carrying a risk profile
+    # and holdings that another file had created, so "a user with no
+    # holdings sees the honest refusal" silently stopped testing anything.
+    # Two tests had to be given their own user ids to work around it.
+    #
+    # Dropping first also means a test that leaves bad data behind fails its
+    # own assertions rather than some unrelated test three files later.
     import asyncio
 
-    async def _create():
+    # Rows are DELETED rather than the schema dropped and rebuilt: both give
+    # a clean database, but per-test DDL took the suite from 12 seconds to
+    # 44, and a slow suite is one people stop running.
+    async def _reset():
         async with _test_engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
+            for table in reversed(Base.metadata.sorted_tables):
+                await conn.execute(table.delete())
 
-    asyncio.run(_create())
+    asyncio.run(_reset())
 
     with TestClient(app) as c:
         yield c

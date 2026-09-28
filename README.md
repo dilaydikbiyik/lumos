@@ -523,10 +523,34 @@ market.
 
 ```bash
 ./scripts/check.sh                     # everything CI runs, with exit codes that propagate
-python -m pytest backend/tests/ -q     # 668 tests
+python -m pytest backend/tests/ -q     # 720 tests
 cd frontend && npm test                # 46 vitest tests
-RUN_JOURNEYS=1 ./scripts/check.sh      # + 35 browser journey checks (needs a local app)
 ```
+
+### Running the journey tests
+
+They drive a real browser against a real backend, and they **write** profiles,
+paths and holdings — so they need a throwaway database, not the one in `.env`.
+The harness refuses to start against anything but SQLite (it reads `db_engine`
+from `/health`), but the setup is three steps:
+
+```bash
+# 1. scratch database + schema
+DATABASE_URL="sqlite+aiosqlite:///./journeys-scratch.db" ./venv/bin/python -m alembic upgrade head
+
+# 2. backend on that database, and the frontend, each in its own terminal
+DATABASE_URL="sqlite+aiosqlite:///./journeys-scratch.db" ./venv/bin/python -m uvicorn backend.main:app --port 8000
+cd frontend && npm run dev
+
+# 3. the journeys — DEMO_USER_ID is a Clerk user id for a THROWAWAY account
+set -a && source .env && set +a
+DEMO_USER_ID=user_xxxxx RUN_JOURNEYS=1 ./scripts/check.sh
+```
+
+`source .env` keeps the Clerk secret out of shell history. The Clerk identity
+is real even though the database is scratch, so point `DEMO_USER_ID` at an
+account you do not mind filling with test data. Clean up with
+`rm journeys-scratch.db`.
 
 - External boundaries (AI providers, yfinance, EVDS, RSS) are fully mocked; business logic runs real
 - **API-level E2E**: five personas (conservative → retirement) walk the entire HTTP surface:

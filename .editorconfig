@@ -1,0 +1,25 @@
+# Editor settings, so the repo reads the same way outside the one machine it
+# was written on. Committed because whitespace churn in a diff hides the
+# change underneath it, and a reviewer should not have to look past it.
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+
+[*.py]
+indent_size = 4
+max_line_length = 100
+
+[*.{js,jsx,json,css,html,yml,yaml}]
+indent_size = 2
+
+[*.md]
+# Markdown gives two trailing spaces meaning, so they are not stripped here.
+trim_trailing_whitespace = false
+
+[Makefile]
+indent_style = tab

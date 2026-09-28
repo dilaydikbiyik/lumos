@@ -1,5 +1,6 @@
 import useMarket from '../hooks/useMarket'
 import { useTranslation } from 'react-i18next'
+import HeaderSelect from './HeaderSelect'
 
 const FLAGS = { TR: '🇹🇷', US: '🇺🇸', DE: '🇩🇪' }
 
@@ -15,34 +16,19 @@ export default function MarketSwitcher({ compact = false }) {
   if (packs.length < 2) return null
 
   return (
-    <label style={{
-      display: 'flex', alignItems: 'center', gap: 8,
-      fontSize: compact ? 12 : 13, color: 'var(--text-dim)',
-    }}>
-      {!compact && <span style={{ fontWeight: 600 }}>{t('market.label')}</span>}
-      <select
-        value={market}
-        onChange={e => setMarket(e.target.value)}
-        aria-label={t('market.select')}
-        style={{
-          background: 'var(--bg-input, rgba(255,255,255,0.05))',
-          color: 'var(--text)', border: '1px solid var(--border)',
-          borderRadius: 'var(--radius-xs, 8px)',
-          // `compact` used to change only the label, so the control itself
-          // stayed full size and ate a third of a 375px header.
-          padding: compact ? '4px 6px' : '7px 10px',
-          fontFamily: 'var(--font)', fontSize: compact ? 12 : 13,
-          cursor: 'pointer',
-          width: compact ? 'auto' : '100%',
-        }}
-      >
-        {packs.map(p => (
-          <option key={p.code} value={p.code}>
-            {FLAGS[p.code] ?? '🌍'}{compact ? ` ${p.code}` : ` ${p.name} (${p.currency})`}
-            {!compact && !p.live_housing_index ? ' — ' + t('market.limitedData') : ''}
-          </option>
-        ))}
-      </select>
-    </label>
+    <HeaderSelect
+      label={t('market.label')}
+      value={market}
+      onChange={setMarket}
+      ariaLabel={t('market.select')}
+      compact={compact}
+    >
+      {packs.map(p => (
+        <option key={p.code} value={p.code}>
+          {FLAGS[p.code] ?? '🌍'}{compact ? ` ${p.code}` : ` ${p.name} (${p.currency})`}
+          {!compact && !p.live_housing_index ? ' — ' + t('market.limitedData') : ''}
+        </option>
+      ))}
+    </HeaderSelect>
   )
 }

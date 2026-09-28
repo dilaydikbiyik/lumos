@@ -1710,3 +1710,69 @@ Still open, and deliberate:
       so `FAKE_USER_ID` arrives in later files already carrying holdings. Two
       new tests work around it with their own user ids. A per-test database
       would be the real fix.
+
+## Re-comparison against across2aim_analysis.pdf (2026-09-28)
+
+The first audit (2026-09-20) worked from the bug numbers. This pass worked
+from the whole document, including section 4 — the ARCHITECTURAL
+observations, which are the ones about whether code looks like a person
+built it. Lumos is AI-built end to end, so those are the findings that
+matter most here.
+
+Section 4's sharpest line is about `doc:id`: every Anypoint Studio component
+gets a UUID automatically, so their absence is "kesin göstergesi" that the
+file was produced outside the toolchain. The generalisation is what was
+applied here — **what would a working developer's toolchain have left behind
+that this repo does not have?**
+
+- [x] **Toolchain versions lived only inside the CI file, and had already
+      drifted.** CI pinned Node 22; the machine the code is written on runs
+      Node 26. Nothing declared either outside `.github/workflows/ci.yml`, so
+      "works locally" and "passes CI" were claims about two different
+      runtimes. Added `.nvmrc` and `.python-version`, and CI now READS them
+      (`node-version-file`, `python-version-file`) instead of restating them
+      — a version that lives in one place nobody runs is not a pin.
+      This is the exact class of the `doc:id` finding: not a bug, a missing
+      artifact that a human toolchain produces as a side effect of being used.
+- [x] **`.editorconfig` added.** Whitespace churn in a diff hides the change
+      underneath it.
+- [x] **Duplicated presentational shell — the "Proofreading Pipeline Kod
+      Tekrarı" pattern.** `MarketSwitcher` and `LanguageSwitcher` were 67%
+      identical: the same label-and-select shell, the same inline styles, and
+      — the giveaway — the SAME bug-fix comment copy-pasted verbatim into
+      both ("`compact` used to change only the label..."). A fix applied twice
+      by copy is one that gets applied once next time. Extracted
+      `HeaderSelect`, which owns presentation only; what the options are and
+      what choosing one does stay with each picker, because market and
+      language are independent axes and sharing a widget must not become
+      sharing a decision.
+
+Checked and genuinely clean, with the work shown rather than asserted:
+
+- **S-01 insecure TLS** — no `verify=False`, no `rejectUnauthorized`, no
+  `CERT_NONE` anywhere.
+- **S-02 API key in a header** — auth is a Clerk JWT; no app-managed API key
+  travels from the client.
+- **S-04 unsigned webhooks** — no inbound webhook exists. The three matches
+  for "webhook" are comments describing a future billing integration.
+- **BUG-004 crash recovery** — no analogue, and for a reason worth stating:
+  across2aim's recovery gap exists because its state machine is a set of
+  folders. Lumos writes NOTHING to the filesystem (verified: zero write
+  calls in `backend/`), and its one multi-step mutation, `delete_account`,
+  issues all three deletes before a single `commit()`, so a crash rolls the
+  whole thing back. Nothing can be left half-done to recover.
+- **"Dosya Tabanlı State (Ölçeklenemiyor)"** — the same answer. The
+  equivalent risk here was the cache on Render's ephemeral disk, and that is
+  what the durable Postgres tier already addresses.
+- **Naming convention** — one convention per language, applied throughout:
+  snake_case for Python functions and modules, PascalCase for components,
+  camelCase for hooks and utils. Zero violations.
+- **Error-handler inconsistency** — this is the one place Lumos is the
+  OPPOSITE of the finding. across2aim has handlers in 4 of 6 flows, mixing
+  `on-error-continue` and `on-error-propagate` arbitrarily. Lumos has
+  essentially none in its routers, because there is one centralised chain in
+  `middleware/error_handler.py` ending in a generic handler, and every
+  handler returns a curated message rather than the exception text. Uniform
+  by construction rather than by discipline.
+- **Code duplication in the backend** — a similarity scan over every module
+  pair found nothing above 62%.

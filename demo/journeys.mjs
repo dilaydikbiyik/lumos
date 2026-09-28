@@ -42,6 +42,50 @@ function check(name, condition, detail = '') {
   console.log(`   ${ok ? '✓' : '✗'} ${name}${ok || !detail ? '' : ` — ${detail}`}`)
 }
 
+/**
+ * Refuse to run against anything but a scratch database.
+ *
+ * These journeys are not read-only: they write risk profiles, investment
+ * paths and holdings as the demo user. The backend picks its database from
+ * DATABASE_URL, and a developer's `.env` holds the PRODUCTION one — so the
+ * only thing separating a journey run from writing into real accounts was
+ * remembering to override it on the command line, every time, by hand.
+ *
+ * ALLOW_NON_SQLITE=1 exists for a CI job with its own throwaway Postgres.
+ * It has to be set deliberately, which is the whole point.
+ */
+async function assertScratchDatabase() {
+  const root = API.replace(/\/api\/v1\/?$/, '')
+  let health
+  try {
+    health = await (await fetch(`${root}/health`)).json()
+  } catch {
+    throw new Error(
+      `no backend at ${root} — start it first:\n` +
+      `  DATABASE_URL="sqlite+aiosqlite:///./journeys-scratch.db" \\\n` +
+      `    ./venv/bin/python -m uvicorn backend.main:app --port 8000`
+    )
+  }
+
+  const engine = health.db_engine
+  if (engine === undefined) {
+    throw new Error(
+      'backend /health does not report db_engine — it is older than this ' +
+      'harness, and the safety check cannot run. Restart the backend.'
+    )
+  }
+  if (engine !== 'sqlite' && !process.env.ALLOW_NON_SQLITE) {
+    throw new Error(
+      `REFUSING TO RUN: the backend is on "${engine}", not a scratch SQLite ` +
+      `file.\nThese journeys WRITE profiles, paths and holdings. Restart it ` +
+      `with:\n` +
+      `  DATABASE_URL="sqlite+aiosqlite:///./journeys-scratch.db" \\\n` +
+      `    ./venv/bin/python -m uvicorn backend.main:app --port 8000\n` +
+      `(ALLOW_NON_SQLITE=1 overrides this, for a CI database you can lose.)`
+    )
+  }
+}
+
 async function ticket() {
   const res = await fetch(`${CLERK}/sign_in_tokens`, {
     method: 'POST',
@@ -52,6 +96,10 @@ async function ticket() {
   if (!json.token) throw new Error('ticket mint failed: ' + JSON.stringify(json).slice(0, 200))
   return json.token
 }
+
+// Before a browser is launched or a Clerk ticket is minted: if this is
+// pointed at the wrong database, nothing else should happen at all.
+await assertScratchDatabase()
 
 const browser = await chromium.launch()
 const ctx = await browser.newContext({
