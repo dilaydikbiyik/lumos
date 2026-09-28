@@ -1701,15 +1701,35 @@ the previous session whose HTTP surface was never tested.
       the planning router's news sentence.
 
 Still open, and deliberate:
-- [ ] `/users/me/plans` has no caller — the pricing page is not built yet.
-- [ ] **Journey tests not run for this pass.** `demo/journeys.mjs` needs
-      `CLERK_SECRET_KEY` and `DEMO_USER_ID`, which are yours, not the repo's.
-      Worth running before the next deploy: the dashboard and the portfolio
-      chart both gained a card.
-- [ ] Test isolation: the in-memory SQLite is shared across the whole session,
-      so `FAKE_USER_ID` arrives in later files already carrying holdings. Two
-      new tests work around it with their own user ids. A per-test database
-      would be the real fix.
+- [ ] **[blocked: needs merchant accounts]** `/users/me/plans` has no caller.
+      The endpoint is correct and the plan/quota machinery behind it works;
+      what is missing is the pricing page, and that cannot be built honestly
+      without Stripe/Iyzico accounts to charge against — the same blocker as
+      the billing webhook above. Left mounted rather than deleted because it
+      is the one uncalled endpoint whose caller is a known, wanted thing
+      rather than an oversight.
+- [x] **Console errors in a journey run made actionable.** The harness said
+      "a console error is a finding even when the assertions pass" and then
+      reported `Failed to load resource` with no URL, truncated to five of
+      ten — a finding nobody could act on is the same as no finding. It now
+      captures request failures with their URL and reason, groups them by
+      endpoint, and separates requests ABORTED by navigation (the page moved
+      on mid-fetch; noise) from real failures. First run with it answered the
+      standing question immediately: all seven were
+      `o449981.ingest.us.sentry.io` — Clerk's hosted script reporting to
+      Clerk's own Sentry, which is unreachable from here. Nothing in this
+      repo: no Sentry package, no DSN, no code. Not a bug, and now not a
+      mystery either.
+- [x] **Journey tests run: 35/35 passed** against a scratch SQLite backend,
+      including the routes whose cards changed this pass. The harness now
+      refuses to start against anything but SQLite — verified in both
+      directions: it blocks a Postgres backend with an actionable message,
+      FAILS CLOSED on a backend too old to report `db_engine` rather than
+      assuming safety, and `ALLOW_NON_SQLITE=1` still lets a disposable CI
+      database through.
+- [x] Test isolation fixed: rows are deleted per test rather than the schema
+      rebuilt, which keeps the suite at ~12s instead of 44s. The workaround
+      user id that one test needed is gone.
 
 ## Re-comparison against across2aim_analysis.pdf (2026-09-28)
 

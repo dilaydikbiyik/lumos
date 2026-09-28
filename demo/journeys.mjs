@@ -115,6 +115,24 @@ const consoleErrors = []
 page.on('console', m => { if (m.type() === 'error') consoleErrors.push(m.text()) })
 page.on('pageerror', e => consoleErrors.push(String(e)))
 
+// "Failed to load resource" on its own names no resource, so a run reporting
+// ten of them told you only that something went wrong ten times. The request
+// events carry the URL and the reason; without them the harness raised a
+// finding nobody could act on, which is the same as not raising it.
+const failedRequests = []
+page.on('requestfailed', r => {
+  failedRequests.push({
+    url: r.url(),
+    reason: r.failure()?.errorText || 'unknown',
+    // An abort is usually the PAGE'S doing — a fetch still in flight when the
+    // journey navigates away — and is noise. Anything else is a real failure.
+    aborted: (r.failure()?.errorText || '').includes('ERR_ABORTED'),
+  })
+})
+page.on('response', r => {
+  if (r.status() >= 400) failedRequests.push({ url: r.url(), reason: `HTTP ${r.status()}` })
+})
+
 await page.goto(`${PORTAL}/sign-in?__clerk_ticket=${await ticket()}`)
 await page.waitForTimeout(6000)
 const dbCookie = (await ctx.cookies(PORTAL)).find(c => c.name === '__clerk_db_jwt')
@@ -337,6 +355,24 @@ for (const market of ['TR', 'US', 'DE']) {
 
 console.log(`\nconsole errors during the run: ${consoleErrors.length}`)
 consoleErrors.slice(0, 5).forEach(e => console.log('   !', e.slice(0, 140)))
+
+// Grouped by URL and reason: ten failures on one endpoint is one problem, and
+// listing it ten times buries the other two.
+if (failedRequests.length) {
+  const real = failedRequests.filter(r => !r.aborted)
+  const grouped = new Map()
+  for (const r of real) {
+    // Query strings differ per call and would split one endpoint into many.
+    const key = `${r.url.split('?')[0]} — ${r.reason}`
+    grouped.set(key, (grouped.get(key) || 0) + 1)
+  }
+  console.log(`\nfailed requests: ${real.length}` +
+    (real.length === failedRequests.length
+      ? '' : ` (+${failedRequests.length - real.length} aborted on navigation, ignored)`))
+  for (const [key, n] of [...grouped].sort((a, b) => b[1] - a[1])) {
+    console.log(`   ! ${n}×  ${key}`)
+  }
+}
 
 console.log(`\n${results.filter(r => r.ok).length}/${results.length} checks passed`)
 await browser.close()
