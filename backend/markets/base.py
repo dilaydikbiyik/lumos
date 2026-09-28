@@ -100,6 +100,16 @@ class MarketPack:
     # a smaller flat. A documented assumption, shown to the user, and a fact
     # about a country like every other number in this file.
     property_entry_threshold: float = 1_000_000.0
+    # Credit-card debt: the two facts needed to tell someone honestly whether
+    # to clear it before investing. Both were Turkish constants applied to
+    # everybody — a 4.25%/month ceiling is the TCMB's, and quoting it to a
+    # German cardholder overstates their interest cost by roughly six times
+    # in the one feature that promises to be arithmetic rather than opinion.
+    card_monthly_rate_pct: float = 4.25
+    # Below this the arithmetic still favours repayment, but the amount is too
+    # small to justify interrupting someone's first investment. A raw number,
+    # so it has to be denominated in this market's own currency.
+    material_debt: float = 5_000.0
     # Real (above-inflation) spreads for the planning projections.
     housing_real_spread_pct: float = 0.0
     rent_real_spread_pct: float = 0.0

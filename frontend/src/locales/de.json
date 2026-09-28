@@ -1110,7 +1110,12 @@
       "1y": "1 Jahr",
       "3y": "3 Jahre",
       "5y": "5 Jahre"
-    }
+    },
+    "yieldTitle": "Und die laufenden Einnahmen?",
+    "grossRent": "Brutto-Mietrendite",
+    "upkeepCost": "Jährliche Bewirtschaftungskosten",
+    "netRent": "Netto-Mietrendite",
+    "dividendYield": "Dividendenrendite des Portfolios"
   },
   "character": {
     "title": "Wie es sich anfühlt, jeden zu halten",
@@ -1149,5 +1154,11 @@
     "areaAverage": "Durchschnitt {{area}}",
     "askThese": "Frag das, bevor jemand unterschreibt",
     "boughtIt": "Ich habe es gekauft — eintragen"
+  },
+  "mirror": {
+    "title": "Dein eigenes Muster",
+    "plan": "{{count}} geplant",
+    "fomo": "{{count}} aus einem Impuls",
+    "panic": "{{count}} aus Panik"
   }
 }

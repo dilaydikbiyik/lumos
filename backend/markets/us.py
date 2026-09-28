@@ -67,6 +67,11 @@ US = MarketPack(
     # down payments exist (FHA), but they carry mortgage insurance, so
     # this stays the conservative figure.
     property_entry_threshold=80_000.0,
+    # ~21% APR on US revolving card balances (Federal Reserve G.19 has run in
+    # the low twenties), expressed as the monthly periodic rate the issuer
+    # actually applies.
+    card_monthly_rate_pct=1.75,
+    material_debt=500.0,
     housing_real_spread_pct=1.0,
     rent_real_spread_pct=0.0,
     portfolio_real_spread_pct=4.5,

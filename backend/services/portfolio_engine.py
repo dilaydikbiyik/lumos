@@ -103,11 +103,46 @@ def _clamp(x: float, lo: float, hi: float) -> float:
     return max(lo, min(hi, x))
 
 
-def _apply_max_position(weights: dict[str, float]) -> dict[str, float]:
-    """Cap any position at MAX_POSITION_PCT, redistributing the excess
-    proportionally onto the uncapped positions (iterated to convergence)."""
-    cap = MAX_POSITION_PCT / 100.0
+def effective_position_cap(n_positions: int) -> float:
+    """
+    The concentration cap this many positions can actually honour.
+
+    `n` positions summing to 1.0 cannot all sit below 1/n, so the published
+    guard has to be at least that.
+    """
+    if n_positions <= 0:
+        return MAX_POSITION_PCT / 100.0
+    return max(MAX_POSITION_PCT / 100.0, 1.0 / n_positions)
+
+
+def _apply_max_position(weights: dict[str, float],
+                        defensive: set[str] | None = None) -> dict[str, float]:
+    """
+    Cap any position at MAX_POSITION_PCT, redistributing the excess
+    proportionally onto the uncapped positions (iterated to convergence).
+
+    THE EXCESS STAYS IN ITS OWN SLEEVE. Spilling it across every uncapped
+    position let a capped growth holding push weight onto cash and bonds, so
+    the defensive share drifted above the formula the allocation card prints
+    and invites the reader to check — by nearly two points whenever the
+    growth sleeve was small enough for one asset to hit the cap. The sleeve's
+    size is decided by the risk score; a concentration guard on one equity is
+    not a reason to make somebody more defensive than they asked to be.
+
+    Only if a sleeve cannot absorb its own excess — every member already at
+    the cap — does it fall back to the other one, because the weights must
+    still sum to 1.0.
+    """
+    defensive = defensive or set()
     w = dict(weights)
+    # A cap of 45% is unreachable with two positions: they must still sum to
+    # 1.0, so one of them is 55% whatever the guard says. Rather than publish
+    # a limit the portfolio visibly breaks, the cap relaxes to the tightest
+    # value the position count actually admits, and that is the number
+    # reported back. An unenforceable published bound is worse than an
+    # honestly wider one.
+    cap = effective_position_cap(len(w))
+
     for _ in range(40):
         over = [t for t, x in w.items() if x > cap + 1e-9]
         if not over:
@@ -115,11 +150,19 @@ def _apply_max_position(weights: dict[str, float]) -> dict[str, float]:
         excess = sum(w[t] - cap for t in over)
         for t in over:
             w[t] = cap
-        under = [t for t in w if w[t] < cap - 1e-9]
-        under_sum = sum(w[t] for t in under)
+
+        same_sleeve = {t in defensive for t in over}
+        candidates = [t for t in w if w[t] < cap - 1e-9]
+        if len(same_sleeve) == 1:
+            sleeve = same_sleeve.pop()
+            preferred = [t for t in candidates if (t in defensive) is sleeve]
+            if preferred and sum(w[t] for t in preferred) > 0:
+                candidates = preferred
+
+        under_sum = sum(w[t] for t in candidates)
         if under_sum <= 0:
             break
-        for t in under:
+        for t in candidates:
             w[t] += excess * (w[t] / under_sum)
     return w
 
@@ -162,13 +205,13 @@ def build_portfolio(risk_score: float, budget: float, market: str = "TR",
 
     Args:
         risk_score: 1-10 score from the risk engine
-        budget:     Investment budget in TRY
+        budget:     Investment budget in the market's own currency
 
     Returns:
         PortfolioRecommendResponse with per-asset weights, per-asset rationale,
         and fully transparent allocation logic in metadata.
     """
-    include_reits = should_include_reits(budget)
+    include_reits = should_include_reits(budget, market)
     # The investable universe is a legal fact, not a preference: EU retail
     # investors cannot buy US-domiciled ETFs (no PRIIPs Key Information
     # Document), so a market that defines its own universe always wins over
@@ -199,9 +242,11 @@ def build_portfolio(risk_score: float, budget: float, market: str = "TR",
     growth_target = 1.0 - defensive_target
     cash_share = _clamp(0.75 - 0.05 * risk_score, 0.30, 0.75)
 
-    cap = _position_cap(budget)
-    n_defensive = 0 if defensive_target == 0 else min(2, max(cap - 2, 1))
-    growth_slots = max(cap - n_defensive, 1)
+    # How many SLOTS the budget supports — distinct from the per-position
+    # WEIGHT cap below, which used to reuse this same name.
+    slot_cap = _position_cap(budget)
+    n_defensive = 0 if defensive_target == 0 else min(2, max(slot_cap - 2, 1))
+    growth_slots = max(slot_cap - n_defensive, 1)
 
     # ── Growth sleeve: volatility blend, keep the top `growth_slots` ──
     raw: dict[str, float] = {}
@@ -227,7 +272,7 @@ def build_portfolio(risk_score: float, budget: float, market: str = "TR",
                 reason = _t("drop.same_category", lang,
                            category=_t(f"category.{category_of[t]}", lang))
             else:
-                reason = _t("drop.position_cap", lang, cap=cap,
+                reason = _t("drop.position_cap", lang, cap=slot_cap,
                            budget=f"{budget:,.0f} {pack.currency_symbol}")
             dropped.append({
                 "ticker": t,
@@ -278,7 +323,8 @@ def build_portfolio(risk_score: float, budget: float, market: str = "TR",
 
     total = sum(weights.values()) or 1.0
     weights = {t: w / total for t, w in weights.items()}
-    weights = _apply_max_position(weights)  # sum-preserving; final cap wins
+    # sum-preserving; final cap wins, and the excess stays in its own sleeve
+    weights = _apply_max_position(weights, set(defensive_categories))
 
     # ── Assemble allocations with per-asset rationale ──
     by_ticker = {a["ticker"]: a for a in growth_universe}
@@ -308,11 +354,14 @@ def build_portfolio(risk_score: float, budget: float, market: str = "TR",
     # The rounding remainder has to land somewhere for the weights to sum to
     # exactly 1.0 — but not on a position already at the cap, which is how a
     # portfolio ended up publishing "max 45%" next to a 45.01% holding.
+    # Named apart from the POSITION-COUNT cap above, which it used to shadow:
+    # `position_cap` in the metadata below was reading this 0.45 rather than
+    # the number of slots it is documented to report.
+    weight_cap = effective_position_cap(len(allocations))
     rounding_gap = round(1.0 - sum(a.weight for a in allocations), 4)
     if allocations and abs(rounding_gap) > 0:
-        cap = MAX_POSITION_PCT / 100.0
         target = next(
-            (a for a in allocations if a.weight + rounding_gap <= cap + 1e-9),
+            (a for a in allocations if a.weight + rounding_gap <= weight_cap + 1e-9),
             allocations[-1],   # everything is at the cap: the smallest absorbs it
         )
         target.weight = round(target.weight + rounding_gap, 4)
@@ -331,8 +380,8 @@ def build_portfolio(risk_score: float, budget: float, market: str = "TR",
                 "defensive_target_pct": round(defensive_target * 100, 1),
                 "growth_target_pct": round(growth_target * 100, 1),
                 "formula": _t("formula.allocation", lang),
-                "position_cap": cap,
-                "max_position_pct": MAX_POSITION_PCT,
+                "position_cap": slot_cap,
+                "max_position_pct": round(weight_cap * 100, 1),
                 "min_weight_pct": MIN_WEIGHT_PCT,
                 "dropped": dropped,
             },

@@ -90,7 +90,13 @@ def inflation_as_of(market: str = "TR") -> str | None:
         from backend.services import inflation_service
 
         return inflation_service.index_as_of(market)
-    except Exception:
+    except Exception as exc:
+        # None here makes the UI drop the "measured through March 2026" line
+        # beside a figure it still shows. A number whose date silently
+        # disappeared is exactly the kind of staleness this module exists to
+        # surface, so the failure is recorded even though it degrades safely.
+        logger.warning("inflation as-of unavailable for %s (%s)",
+                       market, type(exc).__name__)
         return None
 
 
@@ -226,7 +232,13 @@ def mortgage_rate_is_live(market: str = "TR") -> bool:
     try:
         live = reader()
         return bool(live and 0 < live < 100)
-    except Exception:
+    except Exception as exc:
+        # False makes the UI label the rate an assumption rather than a live
+        # reading, which is the honest fallback — but it is also what a
+        # permanently broken reader looks like from outside, indistinguishable
+        # from a market that never had a source. The log tells them apart.
+        logger.warning("mortgage rate liveness check failed for %s (%s)",
+                       market, type(exc).__name__)
         return False
 
 

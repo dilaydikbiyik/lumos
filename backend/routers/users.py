@@ -1,7 +1,7 @@
 from typing import Literal, Optional
 
 from fastapi import APIRouter, Depends, Request
-from pydantic import BaseModel, ConfigDict, model_validator
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.db.database import get_db
@@ -46,13 +46,18 @@ class UserRead(BaseModel):
         return self
 
 
+# Both are bounded below at zero. A negative figure is not a typo the app
+# can absorb: outgoings feed the six-month reserve held back before anything
+# is invested, so a negative one makes the reserve negative and REPORTS MORE
+# money as investable than the reader has. Rejecting it at the edge keeps
+# that impossible rather than merely unlikely.
 class MonthlyIncomeUpdate(BaseModel):
-    monthly_income: float
+    monthly_income: float = Field(ge=0)
 
 
 class MonthlyOutgoingsUpdate(BaseModel):
     """Rent plus essential monthly costs — not the same number as income."""
-    monthly_outgoings: float
+    monthly_outgoings: float = Field(ge=0)
 
 
 class InvestmentPathUpdate(BaseModel):

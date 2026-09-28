@@ -9,6 +9,7 @@ import PortfolioComparison from '../components/PortfolioComparison'
 import NewsDigest from '../components/NewsDigest'
 import GoalPlanner from '../components/GoalPlanner'
 import PathInvitation from '../components/PathInvitation'
+import BehaviorMirror from '../components/BehaviorMirror'
 import PathSuggestion from '../components/PathSuggestion'
 import BudgetSplit from '../components/BudgetSplit'
 import DailyTip from '../components/DailyTip'
@@ -241,6 +242,7 @@ export default function DashboardPage() {
         <PathSuggestion />
         <BudgetSplit />
         <PathInvitation />
+        <BehaviorMirror />
 
         {/* ── Progressive details toggle ── */}
         <ProgressiveDetails holdingsSummary={holdingsSummary} portfolio={portfolio} />

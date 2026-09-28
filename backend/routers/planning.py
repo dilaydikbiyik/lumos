@@ -1,4 +1,5 @@
 import asyncio
+import logging
 
 from fastapi import APIRouter, Depends, Request
 from pydantic import BaseModel, Field
@@ -21,6 +22,8 @@ from backend.middleware.language import language
 from backend.services.goal_planner import progress_and_drift, required_monthly_contribution
 from backend.services.listing_bridge import build_listing_links
 from backend.services.rent_vs_buy import compare_rent_vs_buy
+
+logger = logging.getLogger("lumos.planning")
 
 router = APIRouter()
 
@@ -91,23 +94,14 @@ async def goal_progress(
     )
 
 
-@router.get("/region-intelligence")
-@limiter.limit("20/minute")
-async def region_intelligence(
-    request: Request,
-    horizon_years: int = 1,
-    user_id: str = Depends(get_current_user),
-    lang: str = Depends(language),
-):
-    """
-    Appreciation potential — NUTS2 regions ranked by housing-index
-    appreciation, nominal AND real (inflation-adjusted). Region-level
-    honesty: no street/parcel claims, past != future.
-    """
-    from backend.services.region_intelligence import rank_regions
-
-    horizon_years = min(max(horizon_years, 1), 3)
-    return await asyncio.to_thread(rank_regions, horizon_years, lang)
+# /region-intelligence and /projection/region used to live here. They read
+# TCMB's NUTS2 series directly and deflated by Turkish CPI with no market
+# argument at all, so a German caller would have been served Turkish regions
+# as if they were their own. `/province-intelligence` and
+# `/projection/province` below replace them exactly, dispatching on the
+# market's DECLARED housing source, and are what the client has always
+# called. Keeping the older pair mounted meant keeping a country hardcoded
+# in a reachable, authenticated route.
 
 
 @router.post("/listing-links")
@@ -140,7 +134,12 @@ async def _scenario_context(db, user_id: str, lang: str):
             context_sentence, user.investment_path or "hybrid",
             user.market or "TR", lang,
         )
-    except Exception:
+    except Exception as exc:
+        # A headline-flavoured sentence is decoration on a planning screen;
+        # failing the whole request for it would be the wrong trade. But an
+        # upstream that has been down for a week looks identical to a quiet
+        # news day from the outside, so the miss is at least recorded.
+        logger.warning("news context sentence unavailable (%s)", type(exc).__name__)
         return None
 
 
@@ -171,21 +170,6 @@ async def asset_projection(
     # which is the one thing every projection here refuses to be.
     result["context"] = await _scenario_context(db, user_id, lang)
     return result
-
-
-@router.post("/projection/region")
-@limiter.limit("15/minute")
-async def region_projection(
-    request: Request,
-    body: RegionProjectionRequest,
-    user_id: str = Depends(get_current_user),
-    lang: str = Depends(language),
-):
-    """Region scenario band — TCMB housing-index window distribution + real terms."""
-    from backend.services.projection import project_region
-    return await asyncio.to_thread(
-        project_region, body.region_code, body.amount, body.years, lang
-    )
 
 
 @router.post("/projection/portfolio")

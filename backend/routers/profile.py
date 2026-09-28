@@ -54,7 +54,12 @@ async def save_profile(
     POST /profile — receive risk-profiling answers, compute risk score,
     persist to DB linked to the Clerk user ID.
     """
-    profile = compute_risk_score(answers, lang)
+    # The user is loaded BEFORE scoring, not only to save into: the debt
+    # comparison inside the profile is priced in this market's currency at
+    # this market's card rate, and scoring without it quoted Turkish card
+    # interest to every reader in every country.
+    user = await user_repository.get_or_create(db, user_id)
+    profile = compute_risk_score(answers, lang, market=user.market or "TR")
     await user_repository.save_risk_profile(
         db, user_id,
         risk_score=profile.risk_score,
@@ -94,4 +99,4 @@ async def get_profile(
         income_stability=user.income_stability,
         high_interest_debt=user.high_interest_debt,
     )
-    return compute_risk_score(answers, lang)
+    return compute_risk_score(answers, lang, market=user.market or "TR")

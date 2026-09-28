@@ -1623,3 +1623,90 @@ testing rather than reading. Four were present and are fixed.
       inbound webhooks to sign (S-04), no module-level mutable state that
       breaks across workers (BUG-006), no copy-paste twin modules (BUG-003),
       no naming-convention drift, no missing error handlers.
+
+## End-to-End Audit (2026-09-28)
+
+A second pass over every feature and file after the push, this time asking
+where the code still disagrees with itself rather than where it crashes. The
+architecture held — dispatch-by-source, the conformance matrix and the
+independence tests all did their job. What leaked through was code written
+BEFORE the market pack existed and never revisited, plus services added in
+the previous session whose HTTP surface was never tested.
+
+- [x] **Turkish credit-card arithmetic served to every market.** `risk_engine`
+      called `debt_check.check()` with no market at all, and two constants in
+      `debt_check` were country facts wearing module-constant clothes:
+      `CARD_MONTHLY_RATE_PCT = 4.25` (the TCMB ceiling, ~65%/yr) and
+      `MATERIAL_DEBT_TRY = 5_000`. A German cardholder was told their debt cost
+      six times what it does, in the one feature whose whole pitch is "this is
+      arithmetic, not opinion", and a EUR 3,000 balance was waved through as
+      immaterial while TRY 5,000 (~EUR 120) interrupted somebody. Both moved to
+      the market pack; market threaded through `compute_risk_score` and both
+      profile routes. The SCORE stays market-independent — same answers, same
+      score anywhere — and a test pins that.
+- [x] **`should_include_reits` compared every budget to 5,000,000 TRY.** Live,
+      not dead: an $80,000 American who can genuinely put a deposit on a house
+      was told they could not afford property and handed REITs instead. The
+      pack already carried this number as `property_entry_threshold`; having a
+      second, staler answer to the same question was the defect.
+- [x] **The concentration guard inflated the defensive sleeve.** Exposed by the
+      fix above. A capped growth position spilled its excess across every
+      uncapped holding, cash and bonds included, so a reader told "10.5% stays
+      on the safe side" held 12.35%. The excess now stays in its own sleeve.
+      The allocation card prints that formula and invites the reader to check
+      it, which is the whole reason it has to be true.
+- [x] **A published cap the portfolio visibly broke.** Two positions summing to
+      1.0 put one at 55% however the 45% guard is written. The cap now relaxes
+      to the tightest value the position count admits, and THAT is the number
+      reported. Also split `cap` into `slot_cap` and `weight_cap`: the weight
+      cap shadowed the position-count cap, so `position_cap` in the metadata
+      had been publishing 0.45 instead of the slot count.
+- [x] **Two pre-market-pack routes removed.** `/planning/region-intelligence`
+      and `/planning/projection/region` read TCMB's NUTS2 series directly and
+      deflated by Turkish CPI with no market argument, bypassing the `_SOURCES`
+      dispatch. Unused by the client but authenticated and reachable. The
+      `province` variants replace them exactly.
+- [x] **Negative monthly outgoings accepted.** Found by the new endpoint tests.
+      Outgoings feed the six-month reserve held back before anything is
+      invested, so a negative one made the reserve negative and reported MORE
+      money as investable than the reader has. Both income and outgoings are
+      now bounded at zero.
+- [x] **`/planning/yield-comparison` wired.** Built last session, never
+      connected. Now the income strip under the property-vs-portfolio card,
+      kept visually separate because conflating income with growth is how
+      people come to believe rent is free money.
+- [x] **`/coach/behavior-mirror` and `/coach/market-move` wired.** Both had
+      services, tests and no caller. The mirror is a dashboard card that stays
+      silent below three tagged purchases — one is a mood, not a pattern. The
+      market-move note sits WITH the portfolio chart and only above a 5% move:
+      the moment somebody needs it is the moment they are looking at the red
+      number, and a calming note they have to navigate to is one they read
+      after they have already sold.
+- [x] **Ten endpoints had no HTTP-level test** (`test_endpoint_surface.py`).
+      Their services were each unit-tested and each passed while the routes on
+      top of them were wrong — every market-coupling bug in this audit lived in
+      that layer. The tests assert the contract and market-sensitivity, not
+      arithmetic the service tests already own.
+- [x] **Backend i18n had no parity test** (`test_i18n_parity.py`). The frontend
+      has enforced tr/en/de parity for a while; the backend catalogue is the
+      half of the screen the ENGINES write, and a Turkish-only key degrades
+      through the fallback chain rather than crashing — which is why the gap
+      was invisible. Also checks placeholder parity and catches entries where
+      the Turkish string was pasted into all three slots.
+- [x] **Four silent swallows given a reason and a log.** `bls_service`
+      (a corrupt snapshot silently costs the US market its fallback),
+      `holdings_valuation` (a holding frozen at purchase price forever),
+      `assumptions` ×2 (a figure whose as-of date vanished; a permanently
+      broken rate reader indistinguishable from a market with no source), and
+      the planning router's news sentence.
+
+Still open, and deliberate:
+- [ ] `/users/me/plans` has no caller — the pricing page is not built yet.
+- [ ] **Journey tests not run for this pass.** `demo/journeys.mjs` needs
+      `CLERK_SECRET_KEY` and `DEMO_USER_ID`, which are yours, not the repo's.
+      Worth running before the next deploy: the dashboard and the portfolio
+      chart both gained a card.
+- [ ] Test isolation: the in-memory SQLite is shared across the whole session,
+      so `FAKE_USER_ID` arrives in later files already carrying holdings. Two
+      new tests work around it with their own user ids. A per-test database
+      would be the real fix.

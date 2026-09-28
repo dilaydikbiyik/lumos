@@ -71,3 +71,52 @@ def test_profile_carries_debt_check_when_debt_reported():
 def test_profile_has_no_debt_check_without_debt():
     assert compute_risk_score(_answers()).debt_check is None
     assert compute_risk_score(_answers(high_interest_debt=0)).debt_check is None
+
+
+# ── The card rate and the materiality floor are facts about a country ──
+# Both were module constants holding Turkish values and applied to everyone.
+
+
+@pytest.mark.parametrize("market", ["TR", "US", "DE"])
+def test_card_rate_comes_from_the_market(market):
+    from backend.markets import get_market_pack
+
+    r = debt_check.check(40_000, 100_000, market=market)
+    expected = debt_check.annual_rate_from_monthly(
+        get_market_pack(market).card_monthly_rate_pct
+    )
+    assert r["assumptions"]["card_monthly_rate_pct"] == \
+        get_market_pack(market).card_monthly_rate_pct
+    assert r["debt_annual_pct"] == expected
+
+
+def test_german_cardholder_is_not_quoted_turkish_interest():
+    """
+    The regression this pins: a German reader was told their card debt cost
+    ~65% a year, because the TCMB ceiling was a module constant. German card
+    and Dispokredit rates are nowhere near that.
+    """
+    de = debt_check.check(40_000, 100_000, market="DE")
+    tr = debt_check.check(40_000, 100_000, market="TR")
+    assert de["debt_annual_pct"] < 20
+    assert tr["debt_annual_pct"] > 60
+    assert de["interest_avoided"] < tr["interest_avoided"]
+
+
+def test_materiality_floor_is_denominated_in_the_local_currency():
+    """
+    A raw 5,000 floor meant EUR 3,000 of card debt was waved through as
+    immaterial while TRY 5,000 (about EUR 120) interrupted somebody.
+    """
+    assert debt_check.check(3_000, 100_000, market="DE") is not None
+    assert debt_check.check(3_000, 100_000, market="TR") is None
+
+
+def test_score_itself_is_market_independent():
+    """The same answers deserve the same score anywhere; only the debt
+    comparison attached to them is local."""
+    scores = {
+        compute_risk_score(_answers(high_interest_debt=40_000), market=m).risk_score
+        for m in ("TR", "US", "DE")
+    }
+    assert len(scores) == 1

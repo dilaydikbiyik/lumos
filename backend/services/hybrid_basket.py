@@ -1,20 +1,27 @@
 """
-Hybrid basket service — Phase 3.5.
+Hybrid basket service.
 
-If the user's budget is below the REAL_ESTATE_THRESHOLD (in TRY),
-automatically include REIT ETFs (VNQ, SCHH) in the portfolio mix.
+Below the amount at which buying physical property is realistic, the mix
+includes REIT ETFs instead: property exposure without the capital, which is
+the honest answer to "I want a flat but I have a tenth of one".
 
-This presents real estate exposure without the capital requirement of buying property.
+THE THRESHOLD IS A FACT ABOUT A COUNTRY. It used to be a module constant of
+5,000,000 TRY compared against every budget in every currency, so an $80,000
+American — who can genuinely put a deposit on a house — was told they could
+not afford property and handed REITs instead, and the same for a German with
+EUR 200,000. The market pack already carries this number as
+`property_entry_threshold`, documented and reviewed per market; having a
+second, stale answer to the same question was the whole defect.
 """
 
-REAL_ESTATE_THRESHOLD_TRY = 5_000_000  # ~$150k at ~33 TRY/USD
+from backend.markets import get_market_pack
 
 REIT_TICKERS = ["VNQ", "SCHH"]
 
 
-def should_include_reits(budget: float) -> bool:
-    """Return True if the budget is below the real estate purchase threshold."""
-    return budget < REAL_ESTATE_THRESHOLD_TRY
+def should_include_reits(budget: float, market: str = "TR") -> bool:
+    """True when the budget is below this market's property entry point."""
+    return budget < get_market_pack(market).property_entry_threshold
 
 
 def get_reit_assets() -> list[dict]:

@@ -1110,7 +1110,12 @@
       "1y": "1 yıl",
       "3y": "3 yıl",
       "5y": "5 yıl"
-    }
+    },
+    "yieldTitle": "Peki ya kira geliri?",
+    "grossRent": "Brüt kira getirisi",
+    "upkeepCost": "Yıllık giderler",
+    "netRent": "Net kira getirisi",
+    "dividendYield": "Portföy temettü getirisi"
   },
   "character": {
     "title": "Hangisiyle yaşamak nasıl",
@@ -1149,5 +1154,11 @@
     "areaAverage": "{{area}} ortalaması",
     "askThese": "İmzadan önce bunları sor",
     "boughtIt": "Bunu aldım — kaydet"
+  },
+  "mirror": {
+    "title": "Kendi alışkanlığın",
+    "plan": "{{count}} planlı",
+    "fomo": "{{count}} aceleyle",
+    "panic": "{{count}} panikle"
   }
 }

@@ -10,18 +10,8 @@ Nothing here is a judgement call by an LLM: it is the same compound-interest
 arithmetic applied to both sides, and the user sees both numbers.
 """
 
+from backend.markets import get_market_pack
 from backend.services import assumptions
-
-# PLANNING ASSUMPTION, not a quoted official figure. The TCMB revises the
-# maximum monthly rate on TRY card balances periodically, so any constant here
-# goes stale; this is a reasonable stand-in, shown to the user as an assumption
-# and never presented as the current statutory rate. The conclusion is robust to
-# it being somewhat off — the gap to portfolio returns is wide.
-CARD_MONTHLY_RATE_PCT = 4.25
-
-# Below this, the arithmetic still favours repayment but the amount is small
-# enough that blocking someone's first investment does more harm than good.
-MATERIAL_DEBT_TRY = 5_000.0
 
 
 def annual_rate_from_monthly(monthly_pct: float) -> float:
@@ -41,12 +31,19 @@ def check(
 
     Returns None when there is nothing to say — no debt, or an amount too small
     to be worth interrupting the user over.
+
+    Both the card rate and the materiality floor are FACTS ABOUT A COUNTRY and
+    come from the market pack. They used to be module constants carrying
+    Turkish values: a German cardholder was shown their debt costing 65% a
+    year rather than ~12%, and a €3,000 balance was waved through as
+    immaterial because the floor was a raw 5,000 in whatever currency.
     """
-    if not debt or debt < MATERIAL_DEBT_TRY:
+    pack = get_market_pack(market)
+    if not debt or debt < pack.material_debt:
         return None
 
     if card_monthly_rate_pct is None:
-        card_monthly_rate_pct = CARD_MONTHLY_RATE_PCT
+        card_monthly_rate_pct = pack.card_monthly_rate_pct
     if portfolio_annual_growth_pct is None:
         portfolio_annual_growth_pct = assumptions.portfolio_growth_pct(market)
 
@@ -70,7 +67,7 @@ def check(
         "portfolio_annual_pct": portfolio_annual_growth_pct,
         "interest_avoided": round(interest_avoided, 2),
         "investment_gain": round(investment_gain, 2),
-        # How much better repayment is, over one year, in TRY.
+        # How much better repayment is, over one year, in the user's currency.
         "advantage": round(advantage, 2),
         "leftover_after_repayment": round(leftover, 2),
         "covers_debt": budget >= debt,

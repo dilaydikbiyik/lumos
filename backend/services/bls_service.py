@@ -47,7 +47,13 @@ def _static_index(series_id: str) -> Optional[dict[str, float]]:
         return None
     try:
         return json.loads((_DATA_DIR / filename).read_text())["index"]
-    except Exception:
+    except Exception as exc:
+        # The shipped snapshot is the last line of defence when BLS is
+        # unreachable, so a corrupt or missing file is not a routine miss:
+        # it means the US market silently loses its fallback and every
+        # caller degrades to a constant without anyone being told why.
+        logger.warning("static BLS snapshot %s unreadable (%s)",
+                       filename, type(exc).__name__)
         return None
 
 

@@ -80,6 +80,11 @@ DE = MarketPack(
     # cover the ~7% Kaufnebenkosten from their OWN funds on top of the
     # down payment, so the entry bar is genuinely higher than elsewhere.
     property_entry_threshold=100_000.0,
+    # German revolving card and Dispokredit rates sit around 11-12% a year,
+    # far below the Turkish ceiling — quoting 4.25% a month to a German
+    # cardholder overstates the cost of their debt by roughly six times.
+    card_monthly_rate_pct=0.95,
+    material_debt=500.0,
     housing_real_spread_pct=0.0,
     rent_real_spread_pct=0.0,
     portfolio_real_spread_pct=4.0,

@@ -13,6 +13,10 @@ const RANGES = [
   { days: 365, label: 'chart.y1' },
 ]
 
+// Below this the move is noise, and the coach stays quiet. A portfolio that
+// is down 0.4% does not need talking down from a ledge.
+const MATERIAL_MOVE_PCT = 5
+
 /** Daily value of the user's REAL holdings since purchase — live tickers
     follow actual closes; cash/manual assets are carried flat (no fake wiggle). */
 export default function PortfolioValueChart({ holdingsCount }) {
@@ -23,6 +27,7 @@ export default function PortfolioValueChart({ holdingsCount }) {
   const ck = userKey(`history-${days}`, userId)
   const [data, setData] = useState(() => readJSON(ck))
   const [error, setError] = useState(false)
+  const [coach, setCoach] = useState(null)
 
   useEffect(() => {
     if (!holdingsCount) return
@@ -37,10 +42,28 @@ export default function PortfolioValueChart({ holdingsCount }) {
     return () => { cancelled = true }
   }, [days, holdingsCount, ck])
 
-  if (!holdingsCount) return null
-
   const up = (data?.change_amount ?? 0) >= 0
   const color = up ? '#3DD68C' : '#F5515F'
+  const move = data?.change_pct ?? 0
+
+  // The grounding note is fetched only when the chart shows a move big
+  // enough to unsettle somebody. A calming message beside a 0.4% wobble
+  // teaches the reader that the app panics easily; below the threshold the
+  // honest response is to say nothing at all.
+  const material = Math.abs(move) >= MATERIAL_MOVE_PCT
+  useEffect(() => {
+    if (!material) return       // nothing fetched, and nothing rendered below
+    let cancelled = false
+    api.post('/coach/market-move', {
+      direction: move < 0 ? 'drop' : 'rise',
+      drawdown_pct: Number(move.toFixed(2)),
+    })
+      .then(res => { if (!cancelled) setCoach(res.data) })
+      .catch(() => { /* supporting content; a failure stays invisible */ })
+    return () => { cancelled = true }
+  }, [move, material])
+
+  if (!holdingsCount) return null
 
   return (
     <div className="card">
@@ -101,6 +124,21 @@ export default function PortfolioValueChart({ holdingsCount }) {
             {data.flat_count > 0 && t('chart.flatNote', { count: data.flat_count })}
             {'. '}{t('chart.dipNote')}
           </p>
+
+          {/* Sits WITH the move rather than on a separate screen: the moment
+              somebody needs this is the moment they are looking at the red
+              number, and a calming note they have to navigate to is a note
+              they read after they have already sold. The wording is keyed to
+              their own stated loss tolerance, not to the size of the drop. */}
+          {material && coach?.message && (
+            <div style={{
+              marginTop: 10, padding: '10px 12px', borderRadius: 10,
+              border: '1px solid var(--border)', background: 'var(--bg-input)',
+              fontSize: 12.5, lineHeight: 1.7,
+            }}>
+              {coach.message}
+            </div>
+          )}
         </>
       )}
       {data && data.series.length < 2 && !error && (

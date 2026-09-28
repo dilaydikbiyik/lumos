@@ -98,7 +98,14 @@ def _price_on_or_before(series, target: date) -> Optional[float]:
         if len(eligible) == 0:
             return None
         return float(eligible.iloc[-1])
-    except Exception:
+    except Exception as exc:
+        # An empty window is an ordinary answer (the asset predates the
+        # series) and returns None above. Reaching HERE means the series is
+        # shaped wrong — a tz-naive index, a frame where a series was
+        # expected — which shows up to the reader as a holding valued at its
+        # purchase price forever, with nothing on screen to explain it.
+        logger.warning("price lookup failed for target %s (%s)",
+                       target, type(exc).__name__)
         return None
 
 

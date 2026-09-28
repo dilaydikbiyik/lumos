@@ -14,7 +14,6 @@ import numpy as np
 
 from backend.exceptions import MarketDataError
 from backend.i18n import t
-from backend.services import evds_service, inflation_service
 from backend.services.market_data import fetch_price_history
 from backend.services.portfolio_series import build_normalized_series
 
@@ -171,58 +170,5 @@ def project_portfolio(weights: dict[str, float], amount: float, years: int,
         **_band(returns, amount),
         "honesty_note": (
             t("projection.note_portfolio", lang, years=years)
-        ),
-    }
-
-
-def project_region(region_code: str, amount: float, years: int, lang: str = "tr") -> dict:
-    """
-    Scenario band for a housing region from the TCMB index (monthly).
-    Also converts the typical scenario to REAL terms so a nominal boom
-    during high inflation doesn't masquerade as wealth.
-    """
-    data = evds_service.get_regional_housing_indices()
-    entry = data.get(region_code)
-    if not entry:
-        return {"available": False, "reason": t("projection.no_region", lang)}
-
-    index = entry["index"]
-    months_sorted = sorted(index)
-    values = np.array([index[m] for m in months_sorted])
-    window = years * 12
-    returns = _rolling_window_returns(values, window, step=1)
-
-    if len(returns) < MIN_WINDOWS:
-        available_years = max(len(values) // 12, 0)
-        return {
-            "available": False,
-            "reason": (
-                t("projection.region_short", lang,
-                  available=available_years, years=years)
-            ),
-        }
-
-    band = _band(returns, amount)
-
-    # real terms of the typical scenario — a nominal boom must not be mistaken for wealth
-    start_month = months_sorted[max(len(months_sorted) - 1 - window, 0)]
-    end_month = months_sorted[-1]
-    try:
-        real_typical = inflation_service.real_return_pct(
-            band["typical"]["return_pct"], start_month, end_month
-        )
-    except Exception:
-        real_typical = None
-
-    return {
-        "available": True,
-        "region_code": region_code,
-        "region": entry["region"],
-        "amount": amount,
-        "years": years,
-        **band,
-        "typical_real_return_pct": real_typical,
-        "honesty_note": (
-            t("projection.region_note", lang)
         ),
     }

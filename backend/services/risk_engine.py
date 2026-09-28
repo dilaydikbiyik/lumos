@@ -96,7 +96,8 @@ def _goal_in_sentence(goal: str, lang: str) -> str:
     return label if lang == "de" else label.lower()
 
 
-def compute_risk_score(answers: RiskProfileAnswers, lang: str = "tr") -> RiskProfileResponse:
+def compute_risk_score(answers: RiskProfileAnswers, lang: str = "tr",
+                       market: str = "TR") -> RiskProfileResponse:
     """
     Compute a 1-10 risk score from the profile answers.
 
@@ -104,6 +105,10 @@ def compute_risk_score(answers: RiskProfileAnswers, lang: str = "tr") -> RiskPro
         answers: Validated RiskProfileAnswers instance.
         lang: Request language — the score is language-independent, the
             sentences explaining it are not.
+        market: Which country's facts to reason with. The SCORE is market
+            independent — the same answers deserve the same score anywhere —
+            but the debt comparison attached to it is not: it needs this
+            market's card rate and its materiality floor, in its currency.
 
     Returns:
         RiskProfileResponse with score, label, and a summary in `lang`.
@@ -196,5 +201,7 @@ def compute_risk_score(answers: RiskProfileAnswers, lang: str = "tr") -> RiskPro
         summary=summary,
         factors=factors,
         answers=answers,
-        debt_check=debt_check.check(answers.high_interest_debt, answers.budget),
+        debt_check=debt_check.check(
+            answers.high_interest_debt, answers.budget, market=market,
+        ),
     )

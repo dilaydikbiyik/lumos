@@ -1110,7 +1110,12 @@
       "1y": "1 year",
       "3y": "3 years",
       "5y": "5 years"
-    }
+    },
+    "yieldTitle": "And the income?",
+    "grossRent": "Gross rental yield",
+    "upkeepCost": "Annual running costs",
+    "netRent": "Net rental yield",
+    "dividendYield": "Portfolio dividend yield"
   },
   "character": {
     "title": "What each one is like to live with",
@@ -1149,5 +1154,11 @@
     "areaAverage": "{{area}} average",
     "askThese": "Ask these before anyone signs",
     "boughtIt": "I bought this — record it"
+  },
+  "mirror": {
+    "title": "Your own pattern",
+    "plan": "{{count}} planned",
+    "fomo": "{{count}} in a rush",
+    "panic": "{{count}} in a panic"
   }
 }

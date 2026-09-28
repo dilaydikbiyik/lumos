@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import api, { extractErrorMessage } from '../utils/api'
 import useMarket from '../hooks/useMarket'
@@ -16,6 +16,11 @@ import useMarket from '../hooks/useMarket'
  * transfer tax, commission and upkeep that a portfolio does not, and a
  * reader who cannot see which costs were charged to which side has no reason
  * to believe the totals.
+ *
+ * The yield strip underneath answers a DIFFERENT question — income, not
+ * growth — and is kept visually separate for that reason. Conflating the two
+ * is how people come to believe rent is free money. The rent figure is net
+ * of upkeep, because the gross one is what agents quote.
  */
 export default function PropertyVsPortfolio({ regions = [] }) {
   const { t } = useTranslation()
@@ -26,6 +31,19 @@ export default function PropertyVsPortfolio({ regions = [] }) {
   const [result, setResult] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
+  const [yields, setYields] = useState(null)
+
+  // Income yields depend only on the reader's market, not on what they type,
+  // so they are fetched once and stay on screen. A failure here is silent on
+  // purpose: the growth comparison is the feature, and losing a supporting
+  // strip is not worth an error message over it.
+  useEffect(() => {
+    let cancelled = false
+    api.get('/planning/yield-comparison')
+      .then(res => { if (!cancelled) setYields(res.data) })
+      .catch(() => { /* the strip simply does not appear */ })
+    return () => { cancelled = true }
+  }, [])
 
   async function run(e) {
     e.preventDefault()
@@ -136,6 +154,39 @@ export default function PropertyVsPortfolio({ regions = [] }) {
           </ul>
 
           <p style={{ fontSize: 11.5, opacity: 0.65, marginTop: 10 }}>{result.note}</p>
+        </div>
+      )}
+
+      {yields && (
+        <div style={{
+          marginTop: 14, paddingTop: 12, borderTop: '1px solid var(--border)',
+        }}>
+          <h4 style={{ fontSize: 13, margin: '0 0 6px' }}>{t('vsCompare.yieldTitle')}</h4>
+          <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, fontSize: 12.5 }}>
+            <span style={{ opacity: 0.75 }}>{t('vsCompare.grossRent')}</span>
+            <span>{yields.gross_rental_yield_pct}%</span>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, fontSize: 12.5, marginTop: 2 }}>
+            <span style={{ opacity: 0.75 }}>{t('vsCompare.upkeepCost')}</span>
+            <span>−{yields.annual_upkeep_pct}%</span>
+          </div>
+          <div style={{
+            display: 'flex', justifyContent: 'space-between', gap: 8,
+            fontSize: 13, marginTop: 4, paddingTop: 4,
+            borderTop: '1px solid var(--border)', fontWeight: 600,
+          }}>
+            <span>{t('vsCompare.netRent')}</span>
+            <span>{yields.net_rental_yield_pct}%</span>
+          </div>
+          {yields.dividend_yield_pct != null && (
+            <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, fontSize: 12.5, marginTop: 4 }}>
+              <span style={{ opacity: 0.75 }}>{t('vsCompare.dividendYield')}</span>
+              <span>{yields.dividend_yield_pct}%</span>
+            </div>
+          )}
+          <p style={{ fontSize: 11.5, opacity: 0.65, marginTop: 8, lineHeight: 1.6 }}>
+            {yields.note}
+          </p>
         </div>
       )}
     </div>

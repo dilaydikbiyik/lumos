@@ -95,9 +95,18 @@ def test_weights_sum_to_one_and_respect_both_bounds(score):
         weights = [a.weight for a in portfolio.allocations]
 
         assert sum(weights) == pytest.approx(1.0, abs=1e-9), (score, budget)
-        # The cap is published in metadata, so it has to hold after the
-        # rounding remainder is placed — not just before.
-        assert max(weights) <= MAX_POSITION_PCT / 100 + 1e-9, (score, budget)
+
+        # Checked against the cap the app PUBLISHES, not against the constant.
+        # Those differ when the portfolio holds too few positions for 45% to
+        # be reachable — two positions summing to 1.0 put one of them at 55%
+        # however the guard is written — and the promise the reader is owed
+        # is that no holding exceeds the number shown to them.
+        published = portfolio.metadata["allocation_logic"]["max_position_pct"]
+        assert published >= MAX_POSITION_PCT, (score, budget, published)
+        assert published == pytest.approx(
+            max(MAX_POSITION_PCT, 100 / len(weights)), abs=0.1
+        ), (score, budget)
+        assert max(weights) <= published / 100 + 1e-9, (score, budget)
         assert min(weights) >= MIN_WEIGHT_PCT / 100 - 1e-9, (score, budget)
 
 
@@ -118,6 +127,28 @@ def test_defensive_share_matches_the_formula_shown_to_the_user(score):
         expected = 0.0
 
     assert actual == pytest.approx(expected, abs=0.6), (score, actual, expected)
+
+
+@pytest.mark.parametrize("score", RISK_SCORES)
+def test_concentration_guard_does_not_inflate_the_defensive_sleeve(score):
+    """
+    The regression: a growth position hitting the cap spilled its excess
+    across every uncapped holding, cash and bonds included, so a reader told
+    "10.5% stays on the safe side" was handed 12.35%. It only showed up when
+    the growth sleeve was small enough for one asset to reach the cap, which
+    a TRY-denominated REIT threshold had been hiding.
+    """
+    for budget in BUDGETS:
+        portfolio = build_portfolio(risk_score=score, budget=budget, market="TR")
+        actual = sum(a.weight for a in portfolio.allocations
+                     if a.category in ("cash", "bond")) * 100
+        published = portfolio.metadata["allocation_logic"]["defensive_target_pct"]
+        # Never MORE defensive than the reader was told. The guard may still
+        # trim the sleeve below its target — on a tiny budget a single cash
+        # position hits the position cap before the sleeve is full, and a
+        # concentration limit has to win over a sleeve target — but nothing
+        # may push weight INTO the sleeve behind the formula's back.
+        assert actual <= published + 0.6, (score, budget, actual, published)
 
 
 def test_defensive_share_never_rises_as_risk_rises():

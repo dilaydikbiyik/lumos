@@ -6,7 +6,7 @@ import pandas as pd
 import pytest
 from unittest.mock import patch
 
-from backend.services.projection import project_asset, project_portfolio, project_region
+from backend.services.projection import project_asset, project_portfolio
 
 # 10 years of daily data, steady ~12%/yr growth with noise
 _N = 2520
@@ -43,30 +43,6 @@ def test_asset_projection_refuses_thin_history():
         r = project_asset("NEW", amount=10000, years=5)
     assert r["available"] is False
     assert "geçmiş veri yok" in r["reason"]
-
-
-def _fake_regions(start="01-01-2023"):
-    # 40 months, ~2% monthly growth
-    index = {f"{2023 + m // 12}-{m % 12 + 1:02d}": 100 * (1.02 ** m) for m in range(40)}
-    return {"TP.KFE.TR51": {"region": "Ankara", "index": index}}
-
-
-def test_region_projection_band_and_real():
-    with patch("backend.services.projection.evds_service.get_regional_housing_indices",
-               side_effect=_fake_regions):
-        r = project_region("TP.KFE.TR51", amount=1000000, years=2)
-    assert r["available"] is True
-    assert r["typical"]["return_pct"] > 0
-    assert "typical_real_return_pct" in r
-    assert "NUTS2" in r["honesty_note"]
-
-
-def test_region_projection_honest_about_short_history():
-    with patch("backend.services.projection.evds_service.get_regional_housing_indices",
-               side_effect=_fake_regions):
-        r = project_region("TP.KFE.TR51", amount=1000000, years=3)
-    assert r["available"] is False
-    assert "yeterli pencere yok" in r["reason"]
 
 
 def test_portfolio_projection_combines_weighted_series():
