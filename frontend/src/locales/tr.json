@@ -1160,5 +1160,9 @@
     "plan": "{{count}} planlı",
     "fomo": "{{count}} aceleyle",
     "panic": "{{count}} panikle"
+  },
+  "population": {
+    "title": "İnsanlar nereye taşınıyor?",
+    "workingAge": "%{{pct}} çalışma çağında"
   }
 }

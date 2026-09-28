@@ -1160,5 +1160,9 @@
     "plan": "{{count}} geplant",
     "fomo": "{{count}} aus einem Impuls",
     "panic": "{{count}} aus Panik"
+  },
+  "population": {
+    "title": "Wohin die Menschen ziehen",
+    "workingAge": "{{pct}}% im Erwerbsalter"
   }
 }

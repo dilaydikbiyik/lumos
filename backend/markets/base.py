@@ -39,6 +39,14 @@ class MarketPack:
     # the Bundesbank's. A boolean could not say that, so this names the
     # regional source the same way housing_index_source names the national one.
     regional_housing_source: str = "none"   # tcmb_evds | fred | bundesbank | none
+    # Where sub-national POPULATION comes from, and the region codes to read.
+    # Separate from the housing source on purpose: they are different
+    # granularities. Türkiye's housing data is 81 provinces from TCMB, while
+    # its population data is 26 NUTS-2 regions from Eurostat, and pretending
+    # one is the other would attach a region's population trend to a single
+    # province's prices.
+    population_source: str = "none"         # eurostat | none
+    population_regions: dict[str, str] = field(default_factory=dict)
 
     @property
     def regional_housing_breakdown(self) -> bool:

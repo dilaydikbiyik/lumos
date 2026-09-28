@@ -15,6 +15,37 @@ TR = MarketPack(
     inflation_source="tcmb_evds",      # live CPI (backend/services/evds_service.py)
     housing_index_source="tcmb_evds",  # housing price index for 19 NUTS2 regions
     regional_housing_source="tcmb_evds",  # 81 provinces, TL/m² unit prices
+    population_source="eurostat",
+    # NUTS-2 regions, with Eurostat's own labels so the names on screen
+    # match the source a reader can go and check.
+    population_regions={
+        "TR10": "İstanbul",
+        "TR21": "Tekirdağ, Edirne, Kırklareli",
+        "TR22": "Balıkesir, Çanakkale",
+        "TR31": "İzmir",
+        "TR32": "Aydın, Denizli, Muğla",
+        "TR33": "Manisa, Afyonkarahisar, Kütahya, Uşak",
+        "TR41": "Bursa, Eskişehir, Bilecik",
+        "TR42": "Kocaeli, Sakarya, Düzce, Bolu, Yalova",
+        "TR51": "Ankara",
+        "TR52": "Konya, Karaman",
+        "TR61": "Antalya, Isparta, Burdur",
+        "TR62": "Adana, Mersin",
+        "TR63": "Hatay, Kahramanmaraş, Osmaniye",
+        "TR71": "Kırıkkale, Aksaray, Niğde, Nevşehir, Kırşehir",
+        "TR72": "Kayseri, Sivas, Yozgat",
+        "TR81": "Zonguldak, Karabük, Bartın",
+        "TR82": "Kastamonu, Çankırı, Sinop",
+        "TR83": "Samsun, Tokat, Çorum, Amasya",
+        "TR90": "Trabzon, Ordu, Giresun, Rize, Artvin, Gümüşhane",
+        "TRA1": "Erzurum, Erzincan, Bayburt",
+        "TRA2": "Ağrı, Kars, Iğdır, Ardahan",
+        "TRB1": "Malatya, Elazığ, Bingöl, Tunceli",
+        "TRB2": "Van, Muş, Bitlis, Hakkari",
+        "TRC1": "Gaziantep, Adıyaman, Kilis",
+        "TRC2": "Şanlıurfa, Diyarbakır",
+        "TRC3": "Mardin, Batman, Şırnak, Siirt",
+    },
     rent_index_source="none",          # no separate rent index — spread off CPI
     default_index_ticker="XU100.IS",
 

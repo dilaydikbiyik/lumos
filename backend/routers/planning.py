@@ -104,6 +104,29 @@ async def goal_progress(
 # in a reachable, authenticated route.
 
 
+@router.get("/population-trend")
+@limiter.limit("20/minute")
+async def population_trend(
+    request: Request,
+    user_id: str = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+    lang: str = Depends(language),
+):
+    """
+    Where people are actually moving — the one thing about a region a
+    beginner can check that is not a price.
+
+    Deliberately a SEPARATE endpoint from the housing breakdown rather than a
+    column inside it, because the two are different granularities: housing is
+    81 provinces in Türkiye, population is 26 NUTS-2 regions. Merging them
+    would attach a three-province trend to one province's prices.
+    """
+    from backend.services import population_signal
+
+    market = await _market_of(db, user_id)
+    return await asyncio.to_thread(population_signal.rank_regions, market, lang)
+
+
 @router.post("/listing-links")
 @limiter.limit("20/minute")
 async def listing_links(

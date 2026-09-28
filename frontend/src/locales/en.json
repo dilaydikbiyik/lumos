@@ -1160,5 +1160,9 @@
     "plan": "{{count}} planned",
     "fomo": "{{count}} in a rush",
     "panic": "{{count}} in a panic"
+  },
+  "population": {
+    "title": "Where people are moving",
+    "workingAge": "{{pct}}% working age"
   }
 }

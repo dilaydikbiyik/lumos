@@ -7,6 +7,7 @@ import IsikTut from '../components/IsikTut'
 import PropertyVsPortfolio from '../components/PropertyVsPortfolio'
 import PurchaseChecks from '../components/PurchaseChecks'
 import ListingEval from '../components/ListingEval'
+import PopulationTrend from '../components/PopulationTrend'
 import useMarket from '../hooks/useMarket'
 import { Trans, useTranslation } from 'react-i18next'
 
@@ -724,6 +725,13 @@ export default function ExplorePage() {
         {visible.length > 0 && (
           <ListingEval areas={visible.map(p => ({ code: p.code, name: p.province }))} />
         )}
+
+        {/* Sits AFTER the price tables on purpose: population is context for a
+            price, not a substitute for one, and a reader who meets it first
+            will read it as a forecast. Outside the province-list condition
+            because it is a different data source at a different granularity —
+            it has its own regions and its own reasons to be absent. */}
+        <PopulationTrend />
         <PurchaseChecks />
         <ListingLinks />
       </div>

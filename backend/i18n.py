@@ -937,6 +937,27 @@ _C: dict[str, dict[str, str]] = {
         "tr": "Verilerin silindi, ancak giriş hesabın şu anda kaldırılamadı. Destekle iletişime geçersen kalanını da silelim.",
         "en": "Your data has been deleted, but your login could not be removed just now. Contact support and we'll finish the job.",
         "de": "Deine Daten wurden gelöscht, dein Login konnte jedoch gerade nicht entfernt werden. Melde dich beim Support, dann erledigen wir den Rest."},
+    # ── population signal: a demand hint, never a price forecast ──
+    "population.caveat": {
+        "tr": "Nüfus artışı fiyat artışı demek değildir. Bir bölge insan kazanırken enflasyon sonrası değer kaybedebilir — son on yılda Türkiye'nin çoğunda olan budur. Bu rakam, gerçek fiyat değişiminin yanında okunmak içindir, onun yerine değil.",
+        "en": "A growing population is not a rising price. A region can gain people and still lose value after inflation — that is most of Türkiye over the last decade. Read this next to the real price change, not instead of it.",
+        "de": "Eine wachsende Bevölkerung ist kein steigender Preis. Eine Region kann Menschen gewinnen und real trotzdem an Wert verlieren — so war es in weiten Teilen der Türkei im letzten Jahrzehnt. Lies diese Zahl neben der realen Preisänderung, nicht an ihrer Stelle."},
+    "population.source_note": {
+        "tr": "Eurostat bölgesel nüfus verisi (NUTS-2). Bu, il değil bölge düzeyidir: 'Tekirdağ, Edirne, Kırklareli' tek satırdır.",
+        "en": "Eurostat regional population (NUTS-2). This is region level, not province level: \"Tekirdağ, Edirne, Kırklareli\" is a single row.",
+        "de": "Eurostat-Regionalbevölkerung (NUTS-2). Das ist Regions-, nicht Provinzebene: \"Tekirdağ, Edirne, Kırklareli\" ist eine einzige Zeile."},
+    "population.no_source": {
+        "tr": "Bu pazar için bölgesel nüfus verisi yok.",
+        "en": "No regional population data for this market.",
+        "de": "Für diesen Markt gibt es keine regionalen Bevölkerungsdaten."},
+    "population.no_region": {
+        "tr": "Bu bölge kodu tanınmıyor.",
+        "en": "That region code is not recognised.",
+        "de": "Dieser Regionalcode ist nicht bekannt."},
+    "population.no_data": {
+        "tr": "Nüfus verisi şu anda okunamadı.",
+        "en": "Population data could not be read right now.",
+        "de": "Bevölkerungsdaten konnten gerade nicht gelesen werden."},
 }
 
 

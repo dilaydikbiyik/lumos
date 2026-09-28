@@ -99,3 +99,91 @@ def get_house_price_index(geo: str = "DE", since: str = "2015-Q1") -> Optional[d
         {"geo": geo, "purchase": "TOTAL", "unit": "I15_Q", "sinceTimePeriod": since},
         f"eurostat:hpi:{geo}:{since}",
     )
+
+
+def get_regional_populations(geos: list[str], age: str = "TOTAL",
+                             since: str = "2019") -> Optional[dict[str, dict[str, float]]]:
+    """
+    Population for MANY NUTS-2 regions, keyed {geo: {year: value}}, in ONE
+    request.
+
+    Plural on purpose. Fetching a region at a time meant 26 serial HTTP calls
+    for a Turkish reader and 38 for a German one — doubled again by the
+    working-age band — which took two minutes on a cold cache. Eurostat
+    accepts repeated `geo` parameters, so the whole table is one call.
+
+    This is also why the TÜİK blocker lifted. Sub-national population for
+    Türkiye lives in TÜİK's MEDAS, a ZK-framework UI with no data API: every
+    response is a session-bound component update, so reading it would mean
+    scraping a government site, which this app does nowhere. Eurostat
+    publishes the same figures for Türkiye as a candidate country, through the
+    interface this module already speaks for Germany.
+
+    `age` takes Eurostat's own bands, so Y15-64 against TOTAL gives the
+    working-age share without a second data source.
+    """
+    if not geos:
+        return None
+
+    cache_key = f"eurostat:pop:{','.join(sorted(geos))}:{age}:{since}"
+    lkg_key = f"lkg:{cache_key}"
+    cached = cache_service.get(cache_key)
+    if cached is not None:
+        return cached or None
+
+    try:
+        if cache_service.in_cooldown("eurostat"):
+            raise cache_service.UpstreamInCooldown("eurostat")
+
+        import httpx
+
+        params = [("format", "JSON"), ("lang", "EN"), ("sex", "T"),
+                  ("age", age), ("sinceTimePeriod", since)]
+        params += [("geo", g) for g in geos]
+        res = httpx.get(f"{_BASE}/demo_r_pjanaggr3", params=params, timeout=30)
+        res.raise_for_status()
+        payload = res.json()
+
+        # A multi-dimension response keys values by a FLAT row-major index, so
+        # the position of each dimension has to be rebuilt from `id`/`size`
+        # rather than assumed — the dimension order is the server's to choose.
+        dim_ids = payload["id"]
+        sizes = payload["size"]
+        strides = {}
+        stride = 1
+        for name, size in zip(reversed(dim_ids), reversed(sizes)):
+            strides[name] = stride
+            stride *= size
+
+        geo_index = payload["dimension"]["geo"]["category"]["index"]
+        time_index = payload["dimension"]["time"]["category"]["index"]
+        # Every other dimension is pinned to a single value by the query, so
+        # its position is 0 and contributes nothing to the offset.
+        values = payload["value"]
+
+        out: dict[str, dict[str, float]] = {}
+        for geo, gpos in geo_index.items():
+            series = {}
+            for period, tpos in time_index.items():
+                flat = gpos * strides["geo"] + tpos * strides["time"]
+                value = values.get(str(flat))
+                if value is not None:
+                    series[period] = float(value)
+            if series:
+                out[geo] = series
+
+        if not out:
+            raise RuntimeError("Eurostat returned no observations")
+
+        cache_service.set(cache_key, out, ttl=_TTL_SECONDS)
+        cache_service.set(lkg_key, out, ttl=None)
+        return out
+    except Exception as exc:
+        logger.warning("Eurostat population fetch failed (%s)", type(exc).__name__)
+        if not isinstance(exc, cache_service.UpstreamInCooldown):
+            cache_service.start_cooldown("eurostat")
+        fallback = cache_service.get(lkg_key)
+        if fallback:
+            logger.warning("Serving last-known-good Eurostat population data")
+            return fallback
+        return None

@@ -633,7 +633,22 @@ lumos/                          ← project root
 #### Flow 2 — Region Appreciation Intelligence (the AI's "where should I buy?" answer)
 
 - [x] TCMB housing price index LIVE: 19 NUTS2 regions (TP.KFE.*), 1-3 year nominal + real appreciation ranking (`region_intelligence.py`)
-- [ ] **[blocked: no public API]** TÜİK population/migration data integration: districts with net inbound migration + young populations = demand signal
+- [x] **Population as a demand signal — unblocked via a second source.** The
+      blocker said "no public API", and for TÜİK that is still true: its
+      figures are served from MEDAS, a ZK-framework UI where every response is
+      a session-bound component update rather than data. Reading it means
+      scraping a government site, and this app scrapes nothing anywhere — the
+      listing bridge builds search links precisely so it never has to.
+      Eurostat publishes the same figures for Türkiye as a candidate country,
+      through the API this app already speaks for Germany.
+      DELIVERED SMALLER THAN ASKED, and the code says so: NUTS-2 regions (26
+      in Türkiye), not districts, and population rather than migration
+      specifically. Working-age share comes free from the same dataset, which
+      was the "young populations" half. Three honesty guards: the caveat that
+      population is not price travels WITH the number, the granularity is
+      printed ("Tekirdağ, Edirne, Kırklareli" is one row), and a series too
+      short to be a trend is excluded from the ranking rather than shown as
+      equally solid. 15 service tests + 3 endpoint tests.
 - [x] "Appreciation potential" region cards: GET /planning/region-intelligence + ExplorePage UI — verified live with TCMB data; TÜİK migration signal later
 - [x] Match against the user's goal: "I can wait 20 years" → long-horizon appreciation regions; "I'll sell in 5 years" → central, liquid regions
       → the province table ranks over the window the reader's own horizon calls for, and says why. A fixed default of three answered neither the person who can wait twenty years nor the one who needs it in three. A reader who picks a window keeps it.
@@ -1384,10 +1399,20 @@ method, a legal identity, or a signature.
 - [x] Capacitor wrap of the existing React build — no rewrite, it is the plan
       the PWA work was building toward.
       → `frontend/capacitor.config.ts` + `docs/packaging.md`. The config, the permanent appId and the icon pipeline are in the repo; `npx cap add` itself needs a Mac with Xcode and is documented rather than run.
-- [ ] **[blocked: needs the Apple + Play accounts]** **Push notifications** are the reason to be in a store at all: the
-      behavioural coach's "the market dropped, here is why not to sell" only
-      works in real time, and iOS web push cannot carry it. Capacitor +
-      FCM/APNs, with a backend endpoint to register device tokens.
+- [~] **Push notifications — the blocker was out of date.** "iOS web push
+      cannot carry it" was true when written and has not been since iOS 16.4
+      (March 2023) gave home-screen web apps the Push API; as of iOS 26 a site
+      added to the Home Screen opens as a web app by default, and Android
+      Chrome has carried it for years. So the behavioural coach's one
+      real-time message does NOT need an Apple Developer membership, a Play
+      account, or a native wrapper — for readers who INSTALL the app, which
+      the UI has to say plainly rather than asking for permission and hoping.
+      Service-worker `push` and `notificationclick` handlers are in, and a
+      `push_subscriptions` model keyed by endpoint (one row per BROWSER, not
+      per user — a phone and a laptop both expect to alert).
+      STILL TO DO: VAPID keys, the subscribe/unsubscribe endpoints, the send
+      path, and the permission prompt. A native wrapper remains the only way
+      to reach a reader who has NOT installed the app.
 - [x] Icons and splash from `brand/` at every required size (iOS 1024 marketing
       icon, Android adaptive icon with foreground/background layers).
       → `brand/generate-app-icons.py` emits 36 files: the alpha-free iOS 1024 marketing icon, Android adaptive foreground/background at five densities, legacy launcher icons, splash and PWA sizes. The background is SAMPLED from the artwork (#0A0B12) rather than guessed.
@@ -1821,18 +1846,20 @@ own policy, not this app's — the app had none — which is itself the finding.
       policy. Promote it by renaming the header key once the Vercel logs show
       no reports.
 
-- [ ] **[needs a way to set a response header without replaying the response]**
-      The journey harness can inject the production CSP locally and fail a run
-      on any violation — the code is written and wired — but it is OFF by
-      default behind `CSP_CHECK=1`. Attaching the header means intercepting
-      the document and re-serving it through `route.fetch()`/`route.fulfill()`,
-      and that breaks Clerk's session handshake: the run dies at journey 2
-      with `Failed to fetch` because the page never receives a token.
-      Confirmed it is the interception and not the policy — report-only
-      cannot block a request — and confirmed the servers were up. Narrowing
-      the interception to the document alone did not help.
-
-      Left in and labelled rather than deleted, because the idea is right and
-      only the mechanism is wrong. A check that destabilises the suite it
-      lives in is worse than no check: these journeys are how every
-      state-transition bug in this app has been caught.
+- [x] **CSP check fixed, and now runs on every journey.** The failure was the
+      approach, not the detail: making the BROWSER enforce the policy meant
+      re-serving the document, which broke Clerk's session handshake. But the
+      run already observes every request the app makes, so the policy can be
+      checked against those offline — no interception, nothing to
+      destabilise, same answer.
+      It earned itself twice on the first two runs. It flagged
+      `accounts.dev` as blocked, which was a FALSE ALARM from counting
+      requests made while the browser sat on Clerk's own hosted portal — a
+      page this repo does not ship — now filtered by initiating frame. Then
+      it flagged a `blob:` script, which is Clerk building a worker to keep
+      session-refresh timers alive in a backgrounded tab; browsers check
+      those against `worker-src`, which the policy already allows, and
+      Playwright cannot tell a worker script from a plain one. Resolved by
+      accepting either directive rather than widening `script-src` — the
+      imprecision is in the checker, and the fix for a checker's blind spot
+      is not to loosen the policy it checks.

@@ -234,3 +234,62 @@ def test_admin_rejects_an_unknown_role(client):
     res = client.patch(f"/admin/users/{FAKE_USER_ID}/role",
                        json={"role": "superuser"})
     assert res.status_code in (400, 422), res.text
+
+
+# ── /planning/population-trend ───────────────────────────────────────────────
+
+@pytest.fixture
+def offline_population():
+    """
+    No network. Eurostat is a real upstream, and letting the suite call it
+    made this file take 128 seconds instead of a fifth of one — a suite slow
+    enough to skip is a suite that stops catching things.
+    """
+    from unittest.mock import patch
+
+    from backend.markets import get_market_pack
+    from backend.services import population_signal
+
+    series = {str(y): float(1_000_000 + (y - 2019) * 25_000) for y in range(2019, 2026)}
+
+    def table(market, age="TOTAL"):
+        scale = 0.68 if age == "Y15-64" else 1.0
+        return {geo: {k: v * scale for k, v in series.items()}
+                for geo in get_market_pack(market).population_regions}
+
+    with patch.object(population_signal, "_table_for", table):
+        yield
+
+
+def test_population_trend_is_served_for_a_market_with_a_source(client, offline_population):
+    _set_market("TR")
+    res = client.get("/planning/population-trend")
+    assert res.status_code == 200, res.text
+    body = res.json()
+    if body.get("available"):
+        assert body["regions"]
+        assert body["caveat"] and body["source_note"]
+        # NUTS-2, and the answer has to say so — a three-province row must not
+        # be read as one province.
+        assert body["area_kind"] == "nuts2"
+    else:
+        # A refusal is a valid outcome (upstream unreachable in a test run)
+        # and must carry its reason rather than an empty table.
+        assert body["reason"]
+
+
+def test_population_trend_refuses_in_a_market_with_no_source(client):
+    """The US pack declares no population source; it must say so, not guess."""
+    _set_market("US")
+    res = client.get("/planning/population-trend")
+    assert res.status_code == 200
+    body = res.json()
+    assert body["available"] is False
+    assert body["reason"]
+
+
+def test_population_trend_is_mounted_on_both_paths(client, offline_population):
+    """Every router is served at /api/v1 AND its bare legacy path."""
+    _set_market("TR")
+    assert client.get("/api/v1/planning/population-trend").status_code == 200
+    assert client.get("/planning/population-trend").status_code == 200

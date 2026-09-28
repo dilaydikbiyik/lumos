@@ -111,60 +111,79 @@ const ctx = await browser.newContext({
 const page = await ctx.newPage()
 
 /**
- * Check the production CSP against the real app, locally. OPT-IN: CSP_CHECK=1.
+ * Check the production CSP against the real app, locally.
  *
  * The policy ships from `frontend/vercel.json` and only takes effect on
- * Vercel, so the only way to learn that a directive is too tight is to deploy
- * and watch a reader's console. Injecting the same policy here would catch it
- * a step earlier.
+ * Vercel, so without this the only way to learn that a directive is too tight
+ * is to deploy and watch a reader's console.
  *
- * WHY IT IS OFF BY DEFAULT. Attaching the header means intercepting the
- * document response and re-serving it, and doing that breaks Clerk's session
- * handshake — the run dies at journey 2 with `Failed to fetch`, because the
- * page never gets a token. That is a defect in this check, NOT a finding
- * about the policy, and a check that destabilises the suite it lives in is
- * worse than no check: the suite is how every state-transition bug in this
- * app has been caught. Left in, wired up and honestly labelled rather than
- * deleted, because the missing piece is a way to set a response header
- * without replaying the response.
+ * NOTHING IS INTERCEPTED. The first attempt attached the real header by
+ * re-serving the document through route.fetch/fulfill, and that broke Clerk's
+ * session handshake — the run died at journey 2 because the page never got a
+ * token. Making the browser enforce a policy was the wrong idea: the run
+ * already observes every request the app makes, so the policy can be checked
+ * against those offline. No interception, nothing to destabilise, and the
+ * answer is the same one the browser would have given.
  *
- * The policy itself is verified another way: its origin list was measured
- * from the running production app, not guessed.
+ * `self` is the dev server here rather than the deployed origin, so requests
+ * to the local app and the local API are resolved against it.
  *
- * `self` resolves to the dev server here rather than the deployed origin, so
- * the LOCAL backend is added to connect-src. Nothing else is relaxed.
+ * LIMIT, stated because it matters: this sees NETWORK requests, so it proves
+ * the origin lists are right. It cannot see inline scripts or styles, which
+ * is what `'unsafe-inline'` covers — index.html carries an inline <style>
+ * block, so style-src keeps it deliberately.
  */
-const cspPolicy = process.env.CSP_CHECK !== '1' ? null : (() => {
+const CSP_DIRECTIVE_FOR = {
+  document: 'default-src', script: 'script-src', stylesheet: 'style-src',
+  font: 'font-src', image: 'img-src', media: 'media-src',
+  fetch: 'connect-src', xhr: 'connect-src', websocket: 'connect-src',
+  eventsource: 'connect-src', manifest: 'default-src', other: 'default-src',
+}
+
+const cspPolicy = (() => {
   const cfg = JSON.parse(readFileSync(
     new URL('../frontend/vercel.json', import.meta.url), 'utf8'))
   const header = cfg.headers
     ?.find(b => b.source === '/(.*)')?.headers
     ?.find(h => h.key.startsWith('Content-Security-Policy'))
   if (!header) return null
-  return header.value.replace('connect-src ', `connect-src ${API.replace(/\/api\/v1\/?$/, '')} `)
+  const directives = {}
+  for (const part of header.value.split(';')) {
+    const [name, ...values] = part.trim().split(/\s+/)
+    if (name) directives[name] = values
+  }
+  return directives
 })()
 
-const cspViolations = []
+/** Does `origin` satisfy one CSP source expression? */
+function cspSourceAllows(source, origin, selfOrigins) {
+  if (source === "'self'") return selfOrigins.includes(origin)
+  if (source.startsWith("'")) return false          // 'none', 'unsafe-inline', …
+  if (source === 'data:' || source === 'blob:') return origin === source
+  const pattern = source.replace(/^https:\/\//, '')
+  const host = origin.replace(/^https?:\/\//, '')
+  if (pattern.startsWith('*.')) return host.endsWith(pattern.slice(1))
+  return host === pattern || origin === source
+}
+
+const cspRequests = new Map()   // "directive origin" -> count
 if (cspPolicy) {
-  await page.addInitScript(() => {
-    window.__csp = []
-    document.addEventListener('securitypolicyviolation', e => {
-      window.__csp.push(`${e.violatedDirective} blocked ${e.blockedURI}`)
-    })
-  })
-  // ONLY the top-level document, and everything else falls straight through.
-  //
-  // Intercepting every app URL and re-serving it through fetch+fulfill broke
-  // the run: a policy check is not worth destabilising the suite it lives in,
-  // and a header only has to be attached once — the document carries the CSP
-  // for every subresource it goes on to load.
-  await page.route(`${APP}/**`, async route => {
-    if (route.request().resourceType() !== 'document') return route.fallback()
-    const res = await route.fetch()
-    const headers = { ...res.headers() }
-    // Report-only: the run should SEE violations, not be broken by them.
-    headers['content-security-policy-report-only'] = cspPolicy
-    await route.fulfill({ response: res, headers })
+  page.on('request', r => {
+    // ONLY requests made from a page this repo serves. The run also visits
+    // Clerk's hosted sign-in portal, which is a different site governed by
+    // its own policy — counting its requests reported violations against
+    // pages the app does not ship, which is a false alarm, and a check that
+    // cries wolf gets switched off.
+    const from = r.frame()?.url() || ''
+    if (!from.startsWith(APP)) return
+
+    let origin
+    try {
+      const u = new URL(r.url())
+      origin = ['data:', 'blob:'].includes(u.protocol) ? u.protocol : u.origin
+    } catch { return }
+    const directive = CSP_DIRECTIVE_FOR[r.resourceType()] || 'default-src'
+    cspRequests.set(`${directive} ${origin}`, (cspRequests.get(`${directive} ${origin}`) || 0) + 1)
   })
 }
 
@@ -413,11 +432,35 @@ for (const market of ['TR', 'US', 'DE']) {
 }
 
 if (cspPolicy) {
-  const seen = await page.evaluate(() => window.__csp || []).catch(() => [])
-  cspViolations.push(...seen)
-  const unique = [...new Set(cspViolations)]
-  check('the production CSP blocks nothing the app needs',
-    unique.length === 0, unique.slice(0, 4).join(' | '))
+  // The origins that count as `'self'` when the app runs locally.
+  const selfOrigins = [APP, API.replace(/\/api\/v1\/?$/, '')]
+  const blocked = []
+  for (const key of cspRequests.keys()) {
+    const [directive, origin] = key.split(' ')
+
+    // A `blob:` script is almost always a WORKER script, and the browser
+    // checks those against worker-src, not script-src. Playwright reports
+    // both as resourceType "script", so the two cannot be told apart here.
+    // Clerk builds a blob worker to keep session-refresh timers alive in a
+    // backgrounded tab, and this reported it as a script-src violation.
+    //
+    // Accepting it when EITHER directive allows it, rather than widening
+    // script-src to cover a case it may not actually govern: the imprecision
+    // is in this checker, and the fix for a checker's blind spot is not to
+    // loosen the policy it checks. Report-only in production settles it.
+    const candidates = directive === 'script-src' && origin === 'blob:'
+      ? ['script-src', 'worker-src']
+      : [directive]
+
+    const permitted = candidates.some(d => {
+      const sources = cspPolicy[d] || cspPolicy['default-src'] || []
+      return sources.some(src => cspSourceAllows(src, origin, selfOrigins))
+    })
+    if (!permitted) blocked.push(`${directive}: ${origin}`)
+  }
+  console.log(`\nCSP: ${cspRequests.size} origin/directive pairs seen`)
+  check('the production CSP blocks nothing the app requests',
+    blocked.length === 0, blocked.join(' | '))
 }
 
 console.log(`\nconsole errors during the run: ${consoleErrors.length}`)
