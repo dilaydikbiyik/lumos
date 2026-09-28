@@ -4,7 +4,7 @@
 ![Python](https://img.shields.io/badge/python-3.12-blue)
 ![FastAPI](https://img.shields.io/badge/FastAPI-async-009688)
 ![React](https://img.shields.io/badge/react-19-61DAFB)
-![Tests](https://img.shields.io/badge/tests-489%20backend%20%2B%2029%20frontend-3DD68C)
+![Tests](https://img.shields.io/badge/tests-720%20backend%20%2B%2046%20frontend-3DD68C)
 ![Cost](https://img.shields.io/badge/running%20cost-%240%2Fmonth-F5A524)
 ![Markets](https://img.shields.io/badge/markets-TR%20%C2%B7%20US%20%C2%B7%20DE-7C5CFF)
 ![Languages](https://img.shields.io/badge/languages-tr%20%C2%B7%20en%20%C2%B7%20de-5B8EF0)
@@ -515,6 +515,15 @@ market.
   own key in the error text. The `ValueError` handler used to return `str(exc)` verbatim to the
   client — and the only `ValueError`s the app ever sees come from drivers and SDKs, whose
   messages carry connection strings and keyed URLs
+- **Browser security headers**, set in [frontend/vercel.json](frontend/vercel.json):
+  `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, HSTS for two years,
+  a referrer policy and a permissions policy denying camera, microphone and location.
+  A **Content-Security-Policy ships in `Report-Only` mode** — its origin list was
+  measured from the running app rather than guessed, and the journey harness injects
+  the same policy locally and fails a run on any violation, so a directive too tight
+  to allow sign-in is caught before a deploy rather than in a reader's console.
+  It stays report-only until it has run against real traffic; to enforce it, rename the
+  header key to `Content-Security-Policy` once the Vercel logs show no reports
 - **Honesty guarantees are tested**: prompt-rule regression tests, a no-dark-patterns assertion on
   the Panic Button, refusal paths for thin statistical histories
 - Full failure-mode analysis: [docs/risk_register.md](docs/risk_register.md)

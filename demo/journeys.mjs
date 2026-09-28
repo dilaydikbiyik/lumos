@@ -19,6 +19,7 @@
  * Exit code is the number of failed assertions, so CI can gate on it.
  */
 import { createRequire } from 'module'
+import { readFileSync } from 'fs'
 const req = createRequire(new URL('../frontend/package.json', import.meta.url))
 const { chromium, devices } = req('playwright')
 
@@ -108,6 +109,64 @@ const ctx = await browser.newContext({
   userAgent: devices['iPhone 13'].userAgent,
 })
 const page = await ctx.newPage()
+
+/**
+ * Check the production CSP against the real app, locally. OPT-IN: CSP_CHECK=1.
+ *
+ * The policy ships from `frontend/vercel.json` and only takes effect on
+ * Vercel, so the only way to learn that a directive is too tight is to deploy
+ * and watch a reader's console. Injecting the same policy here would catch it
+ * a step earlier.
+ *
+ * WHY IT IS OFF BY DEFAULT. Attaching the header means intercepting the
+ * document response and re-serving it, and doing that breaks Clerk's session
+ * handshake — the run dies at journey 2 with `Failed to fetch`, because the
+ * page never gets a token. That is a defect in this check, NOT a finding
+ * about the policy, and a check that destabilises the suite it lives in is
+ * worse than no check: the suite is how every state-transition bug in this
+ * app has been caught. Left in, wired up and honestly labelled rather than
+ * deleted, because the missing piece is a way to set a response header
+ * without replaying the response.
+ *
+ * The policy itself is verified another way: its origin list was measured
+ * from the running production app, not guessed.
+ *
+ * `self` resolves to the dev server here rather than the deployed origin, so
+ * the LOCAL backend is added to connect-src. Nothing else is relaxed.
+ */
+const cspPolicy = process.env.CSP_CHECK !== '1' ? null : (() => {
+  const cfg = JSON.parse(readFileSync(
+    new URL('../frontend/vercel.json', import.meta.url), 'utf8'))
+  const header = cfg.headers
+    ?.find(b => b.source === '/(.*)')?.headers
+    ?.find(h => h.key.startsWith('Content-Security-Policy'))
+  if (!header) return null
+  return header.value.replace('connect-src ', `connect-src ${API.replace(/\/api\/v1\/?$/, '')} `)
+})()
+
+const cspViolations = []
+if (cspPolicy) {
+  await page.addInitScript(() => {
+    window.__csp = []
+    document.addEventListener('securitypolicyviolation', e => {
+      window.__csp.push(`${e.violatedDirective} blocked ${e.blockedURI}`)
+    })
+  })
+  // ONLY the top-level document, and everything else falls straight through.
+  //
+  // Intercepting every app URL and re-serving it through fetch+fulfill broke
+  // the run: a policy check is not worth destabilising the suite it lives in,
+  // and a header only has to be attached once — the document carries the CSP
+  // for every subresource it goes on to load.
+  await page.route(`${APP}/**`, async route => {
+    if (route.request().resourceType() !== 'document') return route.fallback()
+    const res = await route.fetch()
+    const headers = { ...res.headers() }
+    // Report-only: the run should SEE violations, not be broken by them.
+    headers['content-security-policy-report-only'] = cspPolicy
+    await route.fulfill({ response: res, headers })
+  })
+}
 
 // Surface anything the page itself complains about: a console error during a
 // journey is a finding even when the assertions pass.
@@ -351,6 +410,14 @@ for (const market of ['TR', 'US', 'DE']) {
     body.trim().slice(0, 100))
   check(`${market}: explore says something about its data`,
     body.trim().length > 300, `${body.trim().length} chars`)
+}
+
+if (cspPolicy) {
+  const seen = await page.evaluate(() => window.__csp || []).catch(() => [])
+  cspViolations.push(...seen)
+  const unique = [...new Set(cspViolations)]
+  check('the production CSP blocks nothing the app needs',
+    unique.length === 0, unique.slice(0, 4).join(' | '))
 }
 
 console.log(`\nconsole errors during the run: ${consoleErrors.length}`)

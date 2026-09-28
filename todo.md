@@ -1796,3 +1796,43 @@ Checked and genuinely clean, with the work shown rather than asserted:
   by construction rather than by discipline.
 - **Code duplication in the backend** — a similarity scan over every module
   pair found nothing above 62%.
+
+## Security headers (2026-09-28)
+
+Prompted by a CSP warning in a journey console. It turned out to be Clerk's
+own policy, not this app's — the app had none — which is itself the finding.
+
+- [x] **Content-Security-Policy added, in `Report-Only` mode.** Five security
+      headers already shipped (`X-Frame-Options: DENY`, nosniff, HSTS for two
+      years, referrer and permissions policies); CSP was the notable absence,
+      and it is the one that limits what an injected or compromised script can
+      do — which matters most in an app that holds risk profiles and embeds a
+      third-party auth script.
+
+      THE ORIGIN LIST WAS MEASURED, NOT GUESSED. The live app was loaded and
+      its actual network traffic enumerated: Clerk's instance domain,
+      `clerk-telemetry.com`, Google Fonts, the Render API. Clerk's Turnstile,
+      avatar and Sentry origins were added from the paths a sign-in exercises
+      that a landing page does not. A check confirms every measured origin
+      passes the policy.
+
+      Report-only ON PURPOSE: an enforcing policy that is one directive too
+      tight breaks sign-in on a live portfolio site, and that is worse than no
+      policy. Promote it by renaming the header key once the Vercel logs show
+      no reports.
+
+- [ ] **[needs a way to set a response header without replaying the response]**
+      The journey harness can inject the production CSP locally and fail a run
+      on any violation — the code is written and wired — but it is OFF by
+      default behind `CSP_CHECK=1`. Attaching the header means intercepting
+      the document and re-serving it through `route.fetch()`/`route.fulfill()`,
+      and that breaks Clerk's session handshake: the run dies at journey 2
+      with `Failed to fetch` because the page never receives a token.
+      Confirmed it is the interception and not the policy — report-only
+      cannot block a request — and confirmed the servers were up. Narrowing
+      the interception to the document alone did not help.
+
+      Left in and labelled rather than deleted, because the idea is right and
+      only the mechanism is wrong. A check that destabilises the suite it
+      lives in is worse than no check: these journeys are how every
+      state-transition bug in this app has been caught.
