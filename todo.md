@@ -1334,7 +1334,23 @@ fourth market. So the shape is enforced instead.
       First load 1075 kB → ~493 kB, 326 kB → ~150 kB gzipped. index.html
       paints an inline dark splash so the pre-render wait isn't a white
       screen.
-- [ ] **[you — Render/Vercel dashboard]** Sentry: set SENTRY_DSN in Render/Vercel (code already wired).
+- [x] **Client crashes now reach somewhere.** The instruction said to set
+      SENTRY_DSN "in Render/Vercel (code already wired)", and the Vercel half
+      was not true: the backend is instrumented, the frontend had no Sentry
+      code at all, so setting it there would have been a no-op that looked
+      like coverage — on the half that matters more, since a React crash in a
+      reader's browser is exactly what you cannot see locally. The error
+      boundary now reports through the backend, which is already
+      instrumented, rather than adding a second SDK to a 359 KB bundle.
+      Deliberately thin: message, stack, path, component. No cookies, no
+      storage, no form contents — this app crashes on screens holding income,
+      debts and holdings. Rate limited to 10/min, because a crash inside a
+      render loop fires continuously.
+      Fixed while there: the fallback screen was hardcoded English on
+      hardcoded light colours, so a Turkish or German reader met the wrong
+      language and the wrong theme at the moment they most needed to trust it.
+- [ ] **[you — Render dashboard]** `SENTRY_DSN` on Render (backend). Vercel no
+      longer needs one — client crashes arrive via the backend.
 - [x] Privacy policy + terms pages (both stores require them). — done, see Legal pages
 - [ ] **User:** domain → Clerk production instance (+ own Google OAuth) →
       Render paid tier (see docs/production-readiness.md).
@@ -1438,9 +1454,17 @@ method, a legal identity, or a signature.
       justify that the app gives no advice and moves no money.
 - [x] Age rating questionnaires. "Does your app contain financial services?" — — every question answered in `docs/store-submission.md`
       answer honestly, educational tools are fine.
-- [ ] **[you]** **Demo account for reviewers** with pre-populated holdings, and its
-      credentials in the review notes. A reviewer who has to complete a
-      9-question quiz to see anything will not.
+- [~] **[you — create the Clerk account; the filling is done]** **Demo account
+      for reviewers.** `scripts/seed_demo_account.py user_xxx --market TR`
+      fills a profile, the hybrid path and four holdings, so a reviewer lands
+      on a working app instead of question one of nine.
+      The portfolio is deliberately UNFLATTERING: one position tagged `fomo`,
+      instruments picked from the market pack rather than hardcoded (a German
+      reviewer gets UCITS, not US-domiciled ETFs), and no debt — because the
+      debt screen is right to interrupt but would stop a reviewer reaching
+      the portfolio. A demo where everything is up teaches a reviewer the app
+      is a brochure; the honesty features only say anything when something
+      has gone wrong. Re-runnable: it clears existing holdings first.
 - [x] Review notes explaining, in one paragraph, that Lumos executes no trades — written in `docs/store-submission.md`, ready to paste
       and holds no funds. This pre-empts the most likely rejection reason.
 

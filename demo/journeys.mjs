@@ -429,6 +429,22 @@ for (const market of ['TR', 'US', 'DE']) {
     body.trim().slice(0, 100))
   check(`${market}: explore says something about its data`,
     body.trim().length > 300, `${body.trim().length} chars`)
+
+  // The population card, and the honesty guard that has to travel with it.
+  // TR and DE declare a population source; the US pack declares none, and a
+  // market with no source must render NOTHING rather than an empty table
+  // explaining its own absence.
+  const hasPopulation = /working age|çalışma çağında|Erwerbsalter/i.test(body)
+  if (market === 'US') {
+    check('US: no population card, because the pack declares no source',
+      !hasPopulation)
+  } else {
+    check(`${market}: population card is on explore`, hasPopulation)
+    // Without this sentence the percentage reads as a price forecast, which
+    // is the one thing the data does not say.
+    check(`${market}: the population caveat is on screen with it`,
+      /not a rising price|fiyat artışı demek değildir|kein steigender Preis/i.test(body))
+  }
 }
 
 if (cspPolicy) {

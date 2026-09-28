@@ -24,7 +24,9 @@ if settings.SENTRY_DSN:
 from backend.middleware.error_handler import register_error_handlers
 from backend.middleware.language import LanguageMiddleware
 from backend.middleware.request_id import RequestIDMiddleware
-from backend.routers import admin, backtest, chat, coach, feedback, health, holdings, news, planning, practice, profile, recommend, users
+from backend.routers import (admin, backtest, chat, client_errors, coach, feedback,
+                             health, holdings, news, planning, practice, profile,
+                             recommend, users)
 
 
 @asynccontextmanager
@@ -170,18 +172,24 @@ app.add_middleware(RequestIDMiddleware)
 app.add_middleware(LanguageMiddleware)
 
 # ── CORS ──────────────────────────────────────────────────────────────────────
-_dev_origins = [
-    "http://localhost:5173",
-    "http://localhost:5174",
-    "http://localhost:5175",
-    "http://127.0.0.1:5173",
-    "http://127.0.0.1:5174",
-]
-_allowed_origins = _dev_origins if settings.APP_ENV == "development" else [settings.FRONTEND_URL]
+#
+# Development used to list ports one by one — 5173, 5174, 5175. Vite picks the
+# next free port when one is busy, so a developer who already had something on
+# those got 5176 and a CORS failure that names no cause: the request simply
+# fails, the console blames the fetch, and nothing points at a port list in a
+# backend file. Any loopback port is allowed in development instead.
+#
+# PRODUCTION IS UNCHANGED and stays an exact match on the configured frontend
+# URL. The regex below is a development convenience and must never be the
+# production rule — "any localhost" is harmless on a laptop and meaningless
+# to a deployed API.
+_DEV_ORIGIN_PATTERN = r"^https?://(localhost|127\.0\.0\.1)(:\d+)?$"
+_is_dev = settings.APP_ENV == "development"
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=_allowed_origins,
+    allow_origins=[] if _is_dev else [settings.FRONTEND_URL],
+    allow_origin_regex=_DEV_ORIGIN_PATTERN if _is_dev else None,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -221,6 +229,7 @@ _ROUTERS = [
     (practice.router, "/practice", ["Practice"]),
     (admin.router, "/admin", ["Admin"]),
     (feedback.router, "/feedback", ["Feedback"]),
+    (client_errors.router, "/client-errors", ["Client"]),
 ]
 
 for _router, _prefix, _tags in _ROUTERS:

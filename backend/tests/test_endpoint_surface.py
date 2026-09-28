@@ -293,3 +293,35 @@ def test_population_trend_is_mounted_on_both_paths(client, offline_population):
     _set_market("TR")
     assert client.get("/api/v1/planning/population-trend").status_code == 200
     assert client.get("/planning/population-trend").status_code == 200
+
+
+# ── CORS ─────────────────────────────────────────────────────────────────────
+
+def test_development_allows_any_loopback_port(client):
+    """
+    Vite takes the next free port when one is busy, and the allowlist used to
+    name 5173/5174/5175 one by one — so a developer who landed on 5176 got a
+    CORS failure that named no cause.
+    """
+    import re
+
+    from backend.main import _DEV_ORIGIN_PATTERN
+
+    pattern = re.compile(_DEV_ORIGIN_PATTERN)
+    for origin in ("http://localhost:5173", "http://localhost:5176",
+                   "http://localhost:61234", "http://127.0.0.1:8080",
+                   "https://localhost:5173", "http://localhost"):
+        assert pattern.match(origin), origin
+
+
+def test_the_dev_pattern_does_not_admit_the_open_internet():
+    """It is a laptop convenience, and must not read as "any origin"."""
+    import re
+
+    from backend.main import _DEV_ORIGIN_PATTERN
+
+    pattern = re.compile(_DEV_ORIGIN_PATTERN)
+    for origin in ("http://evil.com", "http://localhost.evil.com",
+                   "http://notlocalhost", "http://127.0.0.1.evil.com",
+                   "http://localhost:5173.evil.com"):
+        assert not pattern.match(origin), origin
