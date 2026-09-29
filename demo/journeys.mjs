@@ -415,6 +415,50 @@ for (const route of ['/', '/profile', '/recommend', '/holdings', '/explore', '/d
     body.split('\n').find(l => /^[a-z]+\.[a-z.]+$/.test(l.trim())) || ''))
 }
 
+// ── Journey 9: content follows the LANGUAGE while staying about the MARKET ──
+//
+// The reported bug, as a test. A Turkish reader in the German market opened
+// "what to check before you buy" and got German prose. Each market carried
+// exactly one language and a silent fallback served whichever existed.
+//
+// The two halves have to hold at once, which is why one assertion is not
+// enough: the WORDS must be the reader's language, and the SUBJECT must stay
+// the market's — German checks talk about the Grundbuch whoever is reading.
+console.log('\n9. purchase checks follow the reader, not the market')
+for (const lang of ['tr', 'en', 'de']) {
+  await page.evaluate(l => localStorage.setItem('lumos-language', l), lang)
+  await call('/users/me/market', {
+    method: 'PATCH', body: JSON.stringify({ market: 'DE' }),
+  })
+  await page.goto(`${APP}/explore`)
+  await page.waitForTimeout(9000)
+
+  // The checklist is COLLAPSED by default — it is long, and a reader deciding
+  // where to buy should not have to scroll past seven legal checks to reach
+  // the price tables. So it has to be opened before its text is on the page;
+  // reading without expanding asserted nothing at all.
+  const toggle = page.locator('button[aria-expanded]').filter({ hasText: '📋' })
+  if (await toggle.count()) {
+    await toggle.first().click()
+    await page.waitForTimeout(600)
+  }
+  const body = await text()
+
+  // A phrase that exists in this language and in neither of the others.
+  const own = {
+    tr: /kendin incele|satıcının kopyasıyla/i,
+    en: /read the land register|not the seller's copy/i,
+    de: /grundbuchauszug selbst|nicht die kopie/i,
+  }
+  check(`DE market in ${lang}: the checks are written in ${lang}`,
+    own[lang].test(body))
+
+  // Still about Germany. Translating the content into a country is the other
+  // way to get this wrong, and it is the worse one.
+  check(`DE market in ${lang}: the checks are still about Germany`,
+    /grundbuch/i.test(body))
+}
+
 // ── Journey 8: Explore in every market ──────────────────────────────────────
 console.log('\n8. explore renders in every market')
 for (const market of ['TR', 'US', 'DE']) {

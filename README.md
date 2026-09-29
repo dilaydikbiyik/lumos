@@ -4,7 +4,7 @@
 ![Python](https://img.shields.io/badge/python-3.12-blue)
 ![FastAPI](https://img.shields.io/badge/FastAPI-async-009688)
 ![React](https://img.shields.io/badge/react-19-61DAFB)
-![Tests](https://img.shields.io/badge/tests-720%20backend%20%2B%2046%20frontend-3DD68C)
+![Tests](https://img.shields.io/badge/tests-781%20backend%20%2B%2046%20frontend-3DD68C)
 ![Cost](https://img.shields.io/badge/running%20cost-%240%2Fmonth-F5A524)
 ![Markets](https://img.shields.io/badge/markets-TR%20%C2%B7%20US%20%C2%B7%20DE-7C5CFF)
 ![Languages](https://img.shields.io/badge/languages-tr%20%C2%B7%20en%20%C2%B7%20de-5B8EF0)
@@ -532,7 +532,7 @@ market.
 
 ```bash
 ./scripts/check.sh                     # everything CI runs, with exit codes that propagate
-python -m pytest backend/tests/ -q     # 720 tests
+python -m pytest backend/tests/ -q     # 781 tests
 cd frontend && npm test                # 46 vitest tests
 ```
 
@@ -573,8 +573,15 @@ account you do not mind filling with test data. Clean up with
   how a total crash was once reported as "the page loads slowly"
 - **A conformance contract, not a memory test**: adding a market or a language is checked by
   tests parametrised over market × language — every pack asset must be explainable, every market
-  must have a purchase checklist, shared copy may not name one country's institutions, and the
-  quiz may not drift from the schema it fills
+  must have a purchase checklist **in every language**, shared copy may not name one country's
+  institutions, and the quiz may not drift from the schema it fills
+- **Language and market are independent axes, and it is enforced rather than remembered.** The
+  market decides what content is *about*; the language decides what it is *written in*. A reported
+  bug — German prose in a Turkish session — traced to content that was market-keyed but carried
+  one language each, behind a test that asked for English and accepted the fallback. Coverage is
+  now asserted per exact language, the blocks must differ and must *read* as their language by
+  script and function words, and the market-pack sweep is by reflection so a field added tomorrow
+  is covered today
 - `scripts/check.sh` exists because a verification once reported success while the suite failed:
   the exit status of `npx vitest run | tail -3` is `tail`'s. It runs with `set -euo pipefail`
 - CI on every push: ruff + pytest + eslint + frontend build + Docker image build + fresh-database

@@ -1887,3 +1887,65 @@ own policy, not this app's — the app had none — which is itself the finding.
       accepting either directive rather than widening `script-src` — the
       imprecision is in the checker, and the fix for a checker's blind spot
       is not to loosen the policy it checks.
+
+## Reported bug: German prose in a Turkish session (2026-09-29)
+
+Reported from use: Germany market, Turkish UI, and "what to check before you
+buy" came back in German. Reported alongside a fair complaint — that these
+keep being found one at a time by using the app.
+
+- [x] **The bug.** `purchase_checks` was market-keyed, which is right: a
+      German checklist has to be about the Grundbuch. But each market carried
+      exactly ONE language — TR had only `tr`, US only `en`, DE only `de` —
+      and a fallback silently served whichever existed. The module's own
+      docstring said "market-keyed, not language-keyed" and got it half
+      right: the SUBJECT is market-keyed, the WORDS are not. Language and
+      market are independent axes, which is the rule the rest of the app
+      already follows. All nine market × language combinations now exist:
+      six new translations, 42 entries.
+
+- [x] **Why no test caught it.** There was one — and it was vacuous in the
+      exact shape the AI-failure-mode audit flagged elsewhere. It asked
+      `for_market(market, "en")` and asserted the answer was non-empty, which
+      the FALLBACK satisfied by handing back German. The test named one thing
+      and verified another. Same flaw in the "points at a professional"
+      test, which checked English only — so a translation could have dropped
+      the "this is not legal advice" line, which is the one omission that
+      actually costs somebody. Both now loop every language and read the raw
+      table rather than the accessor.
+
+- [x] **The class, not the instance.** Three new layers, because finding this
+      one by hand is not a plan:
+      - `test_content_language_coverage.py` asserts existence per exact
+        language, that the languages DIFFER (a paste into all three is
+        coverage on paper), that the check COUNTS match (a translation that
+        drops two items is worse than none — the reader believes they have
+        seen the list), and that each block actually READS as its language,
+        by script and function words. That last one is what catches German
+        prose filed under `tr`.
+      - The market-pack sweep is by REFLECTION, so a per-language field added
+        to the pack tomorrow is covered today. The checklist was missed
+        precisely because nothing swept for the shape.
+      - Journey 9 walks the reported path in all three languages and asserts
+        BOTH halves: the words are the reader's language AND the subject is
+        still Germany. Translating the content into a country is the other
+        way to get this wrong, and it is the worse one.
+      Verified by reintroducing the bug: 8 tests fail, including the one
+      named for the reported symptom.
+
+- [x] **Swept the rest of the codebase for the same shape.** Two candidates,
+      both false alarms, verified rather than assumed: the prompt loader
+      seeds `{"tr": ...}` and globs the rest (all three exist — now asserted,
+      since it was untested), and `_DEEP_LINK_BUILDERS` is TR-only by
+      documented design, with other markets falling back to their pack's
+      search templates. No other partial language or market dict exists.
+
+- [ ] **[blocked: no free source]** Germany has no province-level price
+      table, and this was reported as a missing feature. Re-checked rather
+      than trusted: Destatis GENESIS still requires registration, and
+      Eurostat's house price index is country-level only — confirmed by
+      querying both. The Bundesbank's city-size segments are what exists
+      free, which is why Explore shows three rows there and says so in the
+      reader's own language. Germany DOES now have a genuine region-level
+      breakdown from yesterday's work — 38 NUTS-2 regions of population —
+      it is simply not prices. Revisit if Destatis opens an anonymous API.

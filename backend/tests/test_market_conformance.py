@@ -786,12 +786,18 @@ def test_every_market_has_a_purchase_checklist(market):
     """
     from backend.content import purchase_checks
 
-    checks = purchase_checks.for_market(market, "en")
-    assert checks, f"{market} has no purchase checklist"
-    assert len(checks) >= 5, f"{market} checklist is too thin: {len(checks)}"
-    for item in checks:
-        assert item.get("title") and item.get("body"), (market, item)
-        assert len(item["body"]) > 60, (market, item["title"])
+    # Read from the TABLE, not through the accessor. Asking the accessor for
+    # "en" passed while the market carried only German, because the fallback
+    # answered — the test named one thing and verified another, and a Turkish
+    # reader in the German market got German prose for it.
+    # Language coverage itself lives in test_content_language_coverage.py.
+    for lang in ("tr", "en", "de"):
+        checks = purchase_checks.CHECKS[market][lang]
+        assert checks, f"{market}/{lang} has no purchase checklist"
+        assert len(checks) >= 5, f"{market}/{lang} checklist is too thin: {len(checks)}"
+        for item in checks:
+            assert item.get("title") and item.get("body"), (market, lang, item)
+            assert len(item["body"]) > 60, (market, lang, item["title"])
 
 
 @pytest.mark.parametrize("market", MARKETS)
@@ -802,11 +808,16 @@ def test_a_purchase_checklist_points_at_a_professional(market):
     """
     from backend.content import purchase_checks
 
-    checks = purchase_checks.for_market(market, "en")
-    last = " ".join(f"{c['title']} {c['body']}" for c in checks[-2:]).lower()
-    assert any(word in last for word in
-               ("lawyer", "attorney", "avukat", "anwalt", "notar",
-                "legal advice", "hukuki", "rechtsberatung")), market
+    # EVERY language. This is the disclaimer that keeps a checklist from
+    # reading as sufficient, so a translation that quietly drops it is the
+    # one omission that actually costs somebody — and checking only English
+    # would never have noticed.
+    for lang in ("tr", "en", "de"):
+        checks = purchase_checks.CHECKS[market][lang]
+        last = " ".join(f"{c['title']} {c['body']}" for c in checks[-2:]).lower()
+        assert any(word in last for word in
+                   ("lawyer", "attorney", "avukat", "anwalt", "anwält", "notar",
+                    "legal advice", "hukuki", "rechtsberatung")), (market, lang)
 
 
 def test_an_unknown_market_gets_nothing_rather_than_another_countrys_checklist():
