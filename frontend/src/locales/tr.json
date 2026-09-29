@@ -341,10 +341,10 @@
   },
   "practice": {
     "title": "Önce Sahte Parayla Dene",
-    "subtitle": "Gerçek para riske atmadan bu portföyü sanal 100.000 TL ile kur — gerçek piyasa verisiyle nasıl hareket ettiğini gör.",
+    "subtitle": "Gerçek para riske atmadan bu portföyü sanal {{amount}} ile kur — gerçek piyasa fiyatlarıyla.",
     "start": "Sanal Portföyü Kur",
     "error": "Sanal portföy şu an başlatılamadı",
-    "virtualNow": "Sanal 100.000 TL şu an",
+    "virtualNow": "Sanal {{amount}} şu an",
     "thisWeek": "Bu hafta",
     "mover": "Bu haftanın en hareketli varlığı <0>{{ticker}}</0> ({{pct}}%). Bu dalgalanmayı hissettin mi? Gerçek parayla da böyle olacak — fark, şimdi hiçbir şey kaybetmiyor olman.",
     "honesty": "Bu rakam tek bir haftanın gerçek piyasa hareketi — bir getiri sözü değil. Eksi kapanan haftalar da olur; mesele o haftalarda satmamayı öğrenmek."
@@ -782,7 +782,7 @@
     "title": "Emlak Keşfet",
     "subtitle": "İl il konut m² fiyatları ve gerçek (<0>enflasyon sonrası</0>) değerlenme — resmî endeks verisiyle",
     "scenarioError": "Senaryo hesaplanamadı",
-    "whatIfBought": "{{amount}} TL ile {{province}}'de konut alsaydım?",
+    "whatIfBought": "{{amount}} ile {{province}} bölgesinde konut alsaydım?",
     "bandIntro": "<0>{{province}}</0> için resmî konut fiyat endeksine göre, geçmişteki tüm 5 yıllık dönemler tek tek hesaplandı. Bugün bu parayla konut alsaydın, o dönemlerin sonunda elindeki değer şu aralıkta olurdu:",
     "worstBand": "En kötü dönemlerden biri (%10'luk dilim)",
     "typicalBand": "Tipik dönem (ortanca)",

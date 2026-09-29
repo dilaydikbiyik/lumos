@@ -35,7 +35,7 @@ export default function PracticeMode({ allocations }) {
     <div className="card" style={{ border: '1px dashed var(--accent, #8b8bf5)' }}>
       <h3 style={{ marginBottom: 4 }}>{t('practice.title')}</h3>
       <p style={{ fontSize: 13, opacity: 0.8, marginBottom: 12 }}>
-        {t('practice.subtitle')}
+        {t('practice.subtitle', { amount: money(100000) })}
       </p>
 
       {!snapshot && (
@@ -48,7 +48,7 @@ export default function PracticeMode({ allocations }) {
         <>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
             <div>
-              <div style={{ fontSize: 12, opacity: 0.7 }}>{t('practice.virtualNow')}</div>
+              <div style={{ fontSize: 12, opacity: 0.7 }}>{t('practice.virtualNow', { amount: money(100000) })}</div>
               <div style={{ fontSize: 20, fontWeight: 700 }}>{money(snapshot.current_value, 'TRY')}</div>
             </div>
             <div>

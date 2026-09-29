@@ -1949,3 +1949,27 @@ keep being found one at a time by using the app.
       reader's own language. Germany DOES now have a genuine region-level
       breakdown from yesterday's work — 38 NUTS-2 regions of population —
       it is simply not prices. Revisit if Destatis opens an anonymous API.
+
+## Reported: "100000 TL" in the German market (2026-09-29)
+
+- [x] **Explore's scenario card showed TL to a German reader.** The code was
+      fine; `explore.whatIfBought` had " TL" typed into the Turkish string, so
+      the unit came from the LANGUAGE rather than the MARKET. The caller also
+      used `fmt()` (a bare number) instead of `money()` (the market's own
+      currency). Both fixed, plus `practice.subtitle` / `practice.virtualNow`,
+      which had 100.000 TL baked into all three languages.
+- [x] **`frontend/src/locales/currency.test.js`** forbids any currency unit in
+      any translated string, in all three languages. It found the practice
+      strings immediately and then fifteen more.
+- [ ] **15 strings baselined, and the list may only shrink.** Two different
+      problems sit in it. Most are the SAME BUG on other screens — four input
+      placeholders ("Senaryo tutarı (TL)", "Peşinat / birikimin (TL)") and the
+      what-if prompts, all of which show TL to a German reader exactly as the
+      explore card did. A few are genuinely ABOUT the lira — the inflation
+      glossary works its example in lira, the SPY risk note is about a Turkish
+      reader's purchasing power — and those need a per-market example, which
+      is a content change rather than a formatting one. Nothing new can be
+      added; the test fails on any string not already on the list.
+- [ ] **[you reported, not yet done]** The cards under "Rent or buy?" —
+      "Plot or portfolio?" and "Check a listing's price" — do not match the
+      rent-vs-buy card's UI. They should all look like that one.

@@ -744,10 +744,10 @@
   },
   "practice": {
     "title": "Probier es erst mit Spielgeld",
-    "subtitle": "Bau dieses Portfolio mit virtuellen 100.000 TL auf, bevor du echtes Geld riskierst — und sieh an echten Marktdaten, wie es sich bewegt.",
+    "subtitle": "Bau dieses Portfolio mit virtuellen {{amount}} auf, bevor du echtes Geld riskierst — zu echten Marktpreisen.",
     "start": "Virtuelles Portfolio einrichten",
     "error": "Das virtuelle Portfolio ließ sich gerade nicht starten",
-    "virtualNow": "Virtuelle 100.000 TL sind jetzt",
+    "virtualNow": "Virtuelle {{amount}} sind jetzt",
     "thisWeek": "Diese Woche",
     "mover": "Am stärksten bewegt hat sich diese Woche <0>{{ticker}}</0> ({{pct}}%). Hast du diesen Ausschlag gespürt? Mit echtem Geld fühlt es sich genauso an — nur verlierst du gerade nichts.",
     "honesty": "Diese Zahl ist eine Woche echter Marktbewegung — kein Renditeversprechen. Manche Wochen schließen im Minus; die Kunst ist, dann nicht zu verkaufen."

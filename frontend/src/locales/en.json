@@ -341,10 +341,10 @@
   },
   "practice": {
     "title": "Try It With Play Money First",
-    "subtitle": "Build this portfolio with a virtual 100,000 TL before risking real money — watch how it moves on real market data.",
+    "subtitle": "Build this portfolio with a virtual {{amount}} before risking real money — at real market prices.",
     "start": "Set Up the Virtual Portfolio",
     "error": "The virtual portfolio couldn't start right now",
-    "virtualNow": "Virtual 100,000 TL is now",
+    "virtualNow": "Virtual {{amount}} is now",
     "thisWeek": "This week",
     "mover": "This week's biggest mover was <0>{{ticker}}</0> ({{pct}}%). Did you feel that swing? Real money will feel exactly like this — the difference is you're losing nothing right now.",
     "honesty": "This figure is one week of real market movement — not a promise of returns. Some weeks close in the red; the skill is learning not to sell during them."

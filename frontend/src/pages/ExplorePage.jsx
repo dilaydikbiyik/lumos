@@ -18,7 +18,7 @@ import { Trans, useTranslation } from 'react-i18next'
 
 function ProvinceScenario({ province, amount }) {
   const { t } = useTranslation()
-  const { fmt, money, pack } = useMarket()
+  const { money, pack } = useMarket()
   const [band, setBand] = useState(null)
   const [links, setLinks] = useState(null)
   const [loading, setLoading] = useState(false)
@@ -58,7 +58,7 @@ function ProvinceScenario({ province, amount }) {
         <button className="btn btn-ghost" style={{ width: '100%' }} onClick={run} disabled={loading}>
           {loading
             ? <span className="spinner" style={{ width: 16, height: 16 }} />
-            : t('explore.whatIfBought', { amount: fmt(parseTL(amount) || 1000000), province: province.province })}
+            : t('explore.whatIfBought', { amount: money(parseTL(amount) || 1000000), province: province.province })}
         </button>
       )}
       {error && <p style={{ color: 'var(--red)', fontSize: 12 }}>{error}</p>}
