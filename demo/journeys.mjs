@@ -415,6 +415,41 @@ for (const route of ['/', '/profile', '/recommend', '/holdings', '/explore', '/d
     body.split('\n').find(l => /^[a-z]+\.[a-z.]+$/.test(l.trim())) || ''))
 }
 
+// ── Journey 10: currency risk follows the MARKET, not the language ─────────
+//
+// SPY is a dollar ETF in both the Turkish and the US universe. A Turkish
+// reader in the Turkish market carries currency risk on it; the same reader,
+// same language, in the US market does not. The copy used to decide that by
+// LANGUAGE — the Turkish text called it "a shield against the lira melting"
+// and the English text said nothing — so one reader was warned about an
+// exposure they did not have and another was never warned about one they did.
+console.log('\n10. currency risk follows the market, not the language')
+await page.evaluate(() => localStorage.setItem('lumos-language', 'tr'))
+for (const [market, expected] of [['TR', true], ['US', false]]) {
+  await call('/users/me/market', {
+    method: 'PATCH', body: JSON.stringify({ market }),
+  })
+  await page.goto(`${APP}/recommend`)
+  await page.waitForTimeout(11000)
+
+  // The legend row opens the same card as the pie slice and is a plain div
+  // with an onClick, which is far easier to drive than an SVG sector.
+  const row = page.locator('div').filter({ hasText: /^S&P 500 ETF\d/ }).last()
+  if (!(await row.count())) { check(`${market}: S&P row is on the page`, false); continue }
+  await row.click()
+  await page.waitForTimeout(1200)
+  const riskTab = page.locator('button').filter({ hasText: /⚡/ }).first()
+  if (await riskTab.count()) { await riskTab.click(); await page.waitForTimeout(800) }
+
+  const shown = /Kur etkisi|Currency effect|Währungseffekt/i.test(await text())
+  check(
+    expected
+      ? `${market}: a dollar holding warns a ${market} reader about currency`
+      : `${market}: a dollar holding does NOT invent currency risk at home`,
+    shown === expected,
+  )
+}
+
 // ── Journey 9: content follows the LANGUAGE while staying about the MARKET ──
 //
 // The reported bug, as a test. A Turkish reader in the German market opened

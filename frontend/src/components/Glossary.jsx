@@ -77,6 +77,7 @@ export default function Glossary({ onClose }) {
       </p>
 
       <input
+        className="input"
         value={query}
         onChange={e => setQuery(e.target.value)}
         placeholder={t('glossaryPage.search')}

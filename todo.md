@@ -1987,3 +1987,50 @@ keep being found one at a time by using the app.
       `className="input"` now and use the same column form and gap as the
       rent-vs-buy card. Verified by screenshot rather than by reading the
       diff.
+
+## SPY notes: currency risk was on the wrong axis (2026-10-01)
+
+The last two entries on the currency baseline, and a worse bug than the
+formatting ones around them.
+
+- [x] **The Turkish SPY copy carried the FX framing and the English did not.**
+      "TL eriyor derdine karşı bir kalkan" / "Dolar düşerse TL değerin
+      azalır" lived in the Turkish strings; English and German said nothing
+      about currency at all. So the warning followed the LANGUAGE:
+      - a Turkish reader in the **US** market was told a dollar ETF shields
+        them from lira erosion they do not have, and
+      - an English reader in the **Turkish** market, who carries the exposure
+        in full, was never warned.
+      The second is the dangerous one — a missing risk warning, not a
+      cosmetic mismatch.
+
+- [x] **Moved to where the fact lives.** Currency risk is the asset's
+      currency against the reader's market. `AssetAllocation` now carries
+      `currency`, resolved offline by the same `ticker_currency` the holdings
+      valuer uses — `None` when the symbol cannot be resolved, because a
+      guessed currency would print a confident wrong warning. The explainer
+      shows a single `explainer.fxExposure` note, in all three languages,
+      when the two differ. It sits on the RISK tab only: under "why you own
+      this" it would read as a reason to, which is exactly the sentence the
+      old Turkish copy made.
+
+- [x] **The currency baseline is now empty**, down from fifteen. Nothing can
+      be added without a deliberate edit to the list.
+
+- [x] **Pinned three ways**: the allocation must declare a currency in every
+      market; the same holding must be foreign in TR and local in US and DE;
+      and the note must name no currency of its own, since it is interpolated
+      from both sides. Journey 10 drives the real card — same reader, same
+      language, two markets — and asserts the warning appears in one and not
+      the other.
+
+- [x] **The same styling slip, found in two more cards.** Rather than fix the
+      two that were reported and move on, `frontend/src/components/cards.test.js`
+      checks it as a RULE over the source: every field in a component either
+      carries `className="input"` or is named as an exemption. It immediately
+      found `BudgetSplit` and `Glossary` carrying bare inputs too — both mine,
+      both invisible to every other test and to a diff, because the markup
+      looks perfectly reasonable. `HeaderSelect` is exempt on purpose: it is
+      the compact header control, and `.input` is sized for a form field that
+      would eat a third of a 375px header. Checkboxes and radios are skipped
+      for the same reason.

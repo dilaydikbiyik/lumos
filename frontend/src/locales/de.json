@@ -701,6 +701,10 @@
         "why": "Er schwankt meist weniger als Aktien und oft in die andere Richtung — das dämpft die Ausschläge des ganzen Portfolios.",
         "risk": "Steigen die Zinsen, fallen die Kurse bestehender Anleihen. Langfristig weniger Rendite als Aktien — das ist so gewollt."
       }
+    },
+    "fxExposure": {
+      "label": "Währungseffekt",
+      "text": "Diese Position notiert in {{assetCurrency}}, du lebst aber in {{marketCurrency}}. Beide bewegen sich nicht gemeinsam: steigt {{assetCurrency}}, steigt dein Wert in {{marketCurrency}} mit, fällt er, sinkt dein Wert auch dann, wenn die Anlage selbst sich nicht bewegt hat. Das kann ein Schutz sein oder ein zweites Risiko — was davon, entscheidet das Geld, das du ausgibst."
     }
   },
   "timeMachine": {

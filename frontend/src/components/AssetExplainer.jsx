@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import useMarket from '../hooks/useMarket'
 import { percentFromWeight } from '../utils/format'
 
 /**
@@ -44,7 +45,28 @@ const CATEGORY_META = {
 
 export default function AssetExplainer({ allocation, onClose, color }) {
   const { t, i18n } = useTranslation()
+  const { pack } = useMarket()
   const [activeTab, setActiveTab] = useState('what')
+
+  /**
+   * Does this holding carry currency risk FOR THIS READER?
+   *
+   * It used to be written into the copy, which put it on the wrong axis: the
+   * Turkish SPY text called a dollar ETF "a shield against the lira melting"
+   * and the English text said nothing at all. So a Turkish reader in the US
+   * market was told a dollar holding protects them from lira erosion they do
+   * not have, and an English reader in the Turkish market — who carries the
+   * exposure in full — was never warned.
+   *
+   * Currency risk is a fact about the money you SPEND against the money the
+   * asset is PRICED IN. Both come from the server; a missing one means the
+   * symbol could not be resolved, and no note is better than a guessed one.
+   */
+  const assetCurrency = allocation.currency
+  const marketCurrency = pack?.currency
+  const hasFxExposure = Boolean(
+    assetCurrency && marketCurrency && assetCurrency !== marketCurrency
+  )
 
   const tickerKey = (allocation.ticker || '').replace(/\./g, '_')
   const hasTickerCopy = i18n.exists(`explainer.byTicker.${tickerKey}.what`)
@@ -138,6 +160,22 @@ export default function AssetExplainer({ allocation, onClose, color }) {
       }}>
         {t(`${base}.${activeTab}`)}
       </p>
+
+      {/* Shown on the RISK tab only. It is a risk, and putting it under
+          "why you own this" would read as a reason to, which is exactly the
+          sentence the old Turkish copy made. */}
+      {activeTab === 'risk' && hasFxExposure && (
+        <div style={{
+          marginTop: 12, paddingTop: 12, borderTop: '1px solid var(--border)',
+        }}>
+          <strong style={{ fontSize: 12.5, color: 'var(--firefly)' }}>
+            💱 {t('explainer.fxExposure.label')}
+          </strong>
+          <p style={{ fontSize: 12.5, lineHeight: 1.7, marginTop: 4 }}>
+            {t('explainer.fxExposure.text', { assetCurrency, marketCurrency })}
+          </p>
+        </div>
+      )}
     </div>
   )
 }

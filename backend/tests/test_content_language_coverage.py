@@ -184,3 +184,51 @@ def test_prompt_variants_are_not_copies_of_one_another():
     for name, variants in (("system", _SYSTEM_PROMPTS), ("advisor", _ADVISOR_PROMPTS)):
         texts = {variants[lang] for lang in LANGS}
         assert len(texts) == len(LANGS), f"{name} prompt has duplicate languages"
+
+
+# ── currency exposure belongs to the market, not the copy ───────────────────
+
+@pytest.mark.parametrize("market", MARKETS)
+def test_every_allocation_declares_what_it_is_priced_in(market):
+    """
+    The client decides whether to warn about currency risk by comparing the
+    holding's currency with the reader's market. A missing value would make
+    that comparison silently skip the warning.
+    """
+    from backend.services.portfolio_engine import build_portfolio
+
+    portfolio = build_portfolio(risk_score=7, budget=1_000_000, market=market)
+    for allocation in portfolio.allocations:
+        assert allocation.currency, (market, allocation.ticker)
+
+
+def test_the_same_holding_is_foreign_in_one_market_and_local_in_another():
+    """
+    The bug this pins. SPY is a dollar ETF in both the Turkish and the US
+    universe. For a Turkish reader it carries currency risk; for an American
+    it does not — and the old copy decided that by LANGUAGE, telling a
+    Turkish reader in the US market that dollars shield them from lira
+    erosion they do not have, while never warning an English reader in the
+    Turkish market who carries the exposure in full.
+    """
+    from backend.markets import get_market_pack
+    from backend.services.portfolio_engine import build_portfolio
+
+    for market, expect_foreign in (("TR", True), ("US", False), ("DE", False)):
+        portfolio = build_portfolio(risk_score=7, budget=1_000_000, market=market)
+        pack = get_market_pack(market)
+        foreign = [a for a in portfolio.allocations if a.currency != pack.currency]
+        assert bool(foreign) is expect_foreign, (market, [a.ticker for a in foreign])
+
+
+def test_the_fx_note_names_no_currency_of_its_own():
+    """It is interpolated from both sides, so it must work for any pair."""
+    import json
+    import pathlib
+
+    for lang in LANGS:
+        bundle = json.loads(
+            pathlib.Path(f"frontend/src/locales/{lang}.json").read_text()
+        )
+        text = bundle["explainer"]["fxExposure"]["text"]
+        assert "{{assetCurrency}}" in text and "{{marketCurrency}}" in text, lang

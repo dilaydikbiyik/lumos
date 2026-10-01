@@ -298,6 +298,10 @@
         "why": "It usually moves less than stocks, and often in the other direction, which softens the whole portfolio's swings.",
         "risk": "When interest rates rise, existing bonds fall in price. Lower long-run return than stocks, by design."
       }
+    },
+    "fxExposure": {
+      "label": "Currency effect",
+      "text": "This holding is priced in {{assetCurrency}} while you live in {{marketCurrency}}. The two do not move together: if {{assetCurrency}} rises your {{marketCurrency}} value rises with it, and if it falls your value falls even when the asset itself has not moved. That can be a shield or a second risk — which one depends on the money you actually spend."
     }
   },
   "timeMachine": {

@@ -185,8 +185,8 @@
       "SPY": {
         "type": "Amerikan Hisse ETF",
         "what": "S&P 500 — dünyanın en büyük 500 Amerikan şirketinin sepeti. Apple, Google, Amazon, Tesla hepsi içinde.",
-        "why": "Dolar bazlı kazanç sağlar + ABD piyasası tarihsel olarak en istikrarlı büyüyen piyasalardan biri. TL eriyor derdine karşı bir kalkan.",
-        "risk": "Dolar düşerse TL değerin azalır. 10+ yıllık dönemlerin büyük çoğunluğunda kazandırmıştır; istisna da var — 2000-2009 arası \"kayıp on yıl\"da düşüşle kapandı. Uzun vade çoğu zaman yeter, garanti etmez."
+        "why": "Dolar bazlı getiri, tarihin en istikrarlı büyüyen piyasalarından birinden.",
+        "risk": "10+ yıllık dönemlerin büyük çoğunluğunda kazandırmıştır; istisna da var — 2000-2009 arası \"kayıp on yıl\" düşüşle kapandı. Uzun vade çoğu zaman yeter, garanti etmez."
       },
       "QQQ": {
         "type": "Teknoloji ETF",
@@ -298,6 +298,10 @@
         "why": "Genelde hisselerden daha az oynar, çoğu zaman da ters yönde — portföyün tümündeki dalgalanmayı yumuşatır.",
         "risk": "Faizler yükseldiğinde mevcut tahvillerin fiyatı düşer. Uzun vadede hisseden daha düşük getirir; zaten amacı bu."
       }
+    },
+    "fxExposure": {
+      "label": "Kur etkisi",
+      "text": "Bu varlık {{assetCurrency}} cinsinden, senin paran ise {{marketCurrency}}. İkisi aynı yöne gitmez: {{assetCurrency}} yükselirse {{marketCurrency}} karşılığı artar, düşerse varlığın kendisi hiç oynamasa bile azalır. Kalkan da olabilir, ikinci bir risk de — hangisi olduğunu hangi parayla yaşadığın belirler."
     }
   },
   "timeMachine": {

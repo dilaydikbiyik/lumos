@@ -109,6 +109,8 @@ export default function BudgetSplit() {
       {plan.reserve_is_assumed && (
         <form onSubmit={saveOutgoings} style={{ display: 'flex', gap: 8, marginTop: 10 }}>
           <input
+            className="input"
+        className="input"
             value={outgoings}
             onChange={e => setOutgoings(e.target.value)}
             inputMode="numeric"

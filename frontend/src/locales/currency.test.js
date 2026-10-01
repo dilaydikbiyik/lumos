@@ -39,26 +39,20 @@ const ALLOWED_KEYS = [
 ]
 
 /**
- * Strings that still name a currency, recorded so the suite is honest rather
- * than green by omission. THIS LIST MAY ONLY SHRINK — anything new fails.
+ * Strings that still name a currency. THE LIST IS EMPTY, and may only grow
+ * by a decision somebody makes on purpose.
  *
- * Two different problems are parked here and they need different fixes:
- *
- *   GENUINELY ABOUT THE LIRA. The inflation glossary works an example in
- *   lira, and the SPY risk note is about what happens to a Turkish reader's
- *   purchasing power when the dollar moves. Rewriting those to a generic
- *   unit would make them vaguer, not more correct — they need a per-market
- *   example, which is a content change rather than a formatting one.
- *
- *   ACTUAL BUGS, same shape as the one this file was written for: the
- *   what-if prompts and the quiz intro hardcode a unit into copy and will
- *   show TL to a German reader exactly as the explore card did.
+ * It held fifteen entries. Most were the reported bug on other screens — a
+ * unit typed into Turkish copy, so it followed the LANGUAGE rather than the
+ * MARKET. The last two were the SPY notes, which were a different problem
+ * wearing the same hat: the Turkish text framed a dollar ETF as "a shield
+ * against the lira melting" and the English text said nothing, so a Turkish
+ * reader in the US market was warned about an exposure they do not have and
+ * an English reader in the Turkish market, who carries it in full, was not
+ * warned at all. Currency risk now comes from the asset's own currency
+ * against the reader's market — see `explainer.fxExposure`.
  */
 const KNOWN_OFFENDERS = [
-  'dailyTip.tips.inflation.body',
-  'explainer.byTicker.SPY.risk',
-  'explainer.byTicker.SPY.why',
-  'glossary.enflasyon.text',
 ]
 
 function flatten(obj, prefix = '') {

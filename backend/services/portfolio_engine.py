@@ -36,6 +36,7 @@ from pathlib import Path
 from backend.i18n import t as _t
 from backend.schemas.portfolio import AssetAllocation, PortfolioRecommendResponse
 from backend.services.hybrid_basket import get_reit_assets, should_include_reits
+from backend.services.holdings_valuation import ticker_currency
 from backend.services.volatility import compute_volatility
 
 _ASSET_UNIVERSE_PATH = Path(__file__).parent.parent / "data" / "asset_universe.json"
@@ -348,6 +349,9 @@ def build_portfolio(risk_score: float, budget: float, market: str = "TR",
                 weight=round(weight, 4),
                 category=category,
                 explanation=explanation,
+                # Resolved offline from the symbol, so the client can tell a
+                # reader whether this holding carries currency risk for them.
+                currency=ticker_currency(t),
             )
         )
 
