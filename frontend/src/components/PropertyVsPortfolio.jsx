@@ -74,8 +74,13 @@ export default function PropertyVsPortfolio({ regions = [] }) {
       <h3 style={{ margin: '0 0 4px', fontSize: '1rem' }}>⚖️ {t('vsCompare.title')}</h3>
       <p style={{ fontSize: 13, opacity: 0.8, marginTop: 0 }}>{t('vsCompare.subtitle')}</p>
 
-      <form onSubmit={run} style={{ display: 'grid', gap: 8, marginTop: 10 }}>
+            {/* Fields carry `className="input"` and the form is a column with the
+          same gap as the rent-vs-buy card above. Written without them, these
+          inputs inherited no styling at all and the card read as a different
+          app sitting under the first one. */}
+      <form onSubmit={run} style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 12 }}>
         <select
+          className="input"
           value={region}
           onChange={e => setRegion(e.target.value)}
           aria-label={t(`explore.areaKind.${pack?.area_kind || 'region'}`, {
@@ -89,6 +94,7 @@ export default function PropertyVsPortfolio({ regions = [] }) {
         </select>
 
         <input
+          className="input"
           value={amount}
           onChange={e => setAmount(e.target.value)}
           inputMode="numeric"

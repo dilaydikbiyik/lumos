@@ -67,7 +67,7 @@
     "label": "Language"
   },
   "quiz": {
-    "intro": "Hi! I'm Lumos.\n\nI'll ask you 9 short questions and build your personal risk profile. Ready?\n\n**Question 1 — How much can you set aside for investing?** (e.g. 50,000)",
+    "intro": "Hi! I'm Lumos.\n\nI'll ask you 9 short questions and build your personal risk profile. Ready?\n\n**Question 1 — How much can you set aside for investing?** (e.g. 50,000 {{unit}})",
     "reveal": "I've read it — show my risk profile →",
     "noRush": "No rush — read the above for as long as you like.",
     "answersKept": "Your answers are saved — no need to start over.",
@@ -331,13 +331,13 @@
   "whatIf": {
     "title": "What would happen?",
     "subtitle": "Ask \"what if\" questions about your portfolio — the answer comes from a real calculation, not a guess.",
-    "placeholder": "e.g. what if I added 20,000 more?",
+    "placeholder": "e.g. what if I added 20,000 {{unit}} more?",
     "ask": "Ask",
     "error": "Couldn't answer right now",
-    "sug1": "What changes if I add 10,000 more?",
+    "sug1": "What changes if I add 10,000 {{unit}} more?",
     "sug2": "What would my portfolio look like if I were more cautious?",
     "sug3": "What if I went more aggressive?",
-    "notUnderstood": "I couldn't read that as a budget or risk change — try something like \"what if I added X\" or \"what if I were more aggressive/cautious\"."
+    "notUnderstood": "I couldn't read that as a budget or risk change — try something like \"what if I added X {{unit}}\" or \"what if I were more aggressive/cautious\"."
   },
   "practice": {
     "title": "Try It With Play Money First",
@@ -448,7 +448,7 @@
     },
     "enflasyon": {
       "label": "inflation",
-      "text": "Your money losing purchasing power. At 50% inflation, 100 under the mattress behaves like 67 a year later."
+      "text": "The erosion of what your money can buy. At {{rate}}% inflation, 100 {{unit}} under the mattress behaves like {{eroded}} {{unit}} a year later."
     },
     "reel getiri": {
       "label": "real return",
@@ -522,7 +522,7 @@
     "vehicleBody": "A vehicle can be part of the wealth picture — but careful: it loses 10–20% of its value every year (depreciation), plus insurance, tax and maintenance. Lumos never suggests buying a car as an investment.",
     "vehicleTip": "If you still want to add it, put its current market value into \"Current estimated value\".",
     "tickerPlaceholder": "Symbol (e.g. {{example}})",
-    "amountPlaceholder": "Purchase amount",
+    "amountPlaceholder": "Purchase amount ({{unit}})",
     "currentPlaceholder": "Current estimated value (optional)",
     "add": "Add",
     "addCta": "+ Add Asset",
@@ -599,7 +599,7 @@
       },
       "inflation": {
         "title": "Inflation Melts Your Money",
-        "body": "At 50% inflation, 100 under the mattress behaves like 67 a year later. Not investing is a risk too."
+        "body": "At {{rate}}% inflation, 100 {{unit}} under the mattress behaves like {{eroded}} {{unit}} a year later. Not investing is a risk too."
       },
       "dividend": {
         "title": "A Dividend Is Like Rent",
@@ -799,7 +799,7 @@
     "listingsTitle": "🔗 Go to the Listings",
     "listingsBody": "A pre-filtered listing search for the area you like — you make the purchase on the listing site, then come back here and say \"I bought it\".",
     "lastYears": "Last {{n}} years",
-    "amountPlaceholder": "Scenario amount",
+    "amountPlaceholder": "Scenario amount ({{unit}})",
     "amountLabel": "Scenario amount",
     "dataError": "Province data can't be reached right now — try again shortly.",
     "fetchLinks": "Fetch the Links",
@@ -837,10 +837,10 @@
   "rvb": {
     "title": "Rent, or buy?",
     "subtitle": "We compare the same home two ways: buying with a down payment plus a mortgage, or renting and investing the difference. Buying is not always the win.",
-    "cashPlaceholder": "All the cash you have",
-    "downPaymentPlaceholder": "Down payment / your savings",
+    "cashPlaceholder": "All the cash you have ({{unit}})",
+    "downPaymentPlaceholder": "Down payment / your savings ({{unit}})",
     "cashIncludesCosts": "This figure is all my cash — take the taxes and commission out of it",
-    "rentPlaceholder": "Your current monthly rent",
+    "rentPlaceholder": "Your current monthly rent ({{unit}})",
     "homePricePlaceholder": "The home's price (optional — estimated from rent if blank)",
     "incomePlaceholder": "Your monthly net income (optional — checks affordability)",
     "projectionYears": "{{n}}-year projection",

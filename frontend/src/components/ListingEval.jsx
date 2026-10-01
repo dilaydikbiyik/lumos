@@ -62,8 +62,13 @@ export default function ListingEval({ areas = [] }) {
       <h3 style={{ margin: '0 0 4px', fontSize: '1rem' }}>🔎 {t('listingEval.title')}</h3>
       <p style={{ fontSize: 13, opacity: 0.8, marginTop: 0 }}>{t('listingEval.subtitle')}</p>
 
-      <form onSubmit={run} style={{ display: 'grid', gap: 8, marginTop: 10 }}>
+            {/* Fields carry `className="input"` and the form is a column with the
+          same gap as the rent-vs-buy card above. Written without them, these
+          inputs inherited no styling at all and the card read as a different
+          app sitting under the first one. */}
+      <form onSubmit={run} style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 12 }}>
         <select
+          className="input"
           value={form.area_code}
           onChange={e => setForm({ ...form, area_code: e.target.value })}
           aria-label={t('listingEval.pickArea')}
@@ -72,6 +77,7 @@ export default function ListingEval({ areas = [] }) {
           {areas.map(a => <option key={a.code} value={a.code}>{a.name}</option>)}
         </select>
         <input
+          className="input"
           value={form.size_m2}
           onChange={e => setForm({ ...form, size_m2: e.target.value })}
           inputMode="numeric"
@@ -79,6 +85,7 @@ export default function ListingEval({ areas = [] }) {
           aria-label={t('listingEval.sizePlaceholder')}
         />
         <input
+          className="input"
           value={form.asking_price}
           onChange={e => setForm({ ...form, asking_price: e.target.value })}
           inputMode="numeric"

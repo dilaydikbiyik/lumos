@@ -178,7 +178,7 @@ function ProvinceCard({ province, amount, measure }) {
 
 function RentVsBuy() {
   const { t } = useTranslation()
-  const { fmt, money } = useMarket()
+  const { fmt, money, unit } = useMarket()
   const [form, setForm] = useState({ down_payment: '', monthly_rent: '', home_price: '', income: '', years: 10, rate: '', term: '', cash_includes_costs: false })
   const [result, setResult] = useState(null)
   const [error, setError] = useState(null)
@@ -237,7 +237,7 @@ function RentVsBuy() {
       </p>
       <form onSubmit={run} style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
         <input className="input" type="text" inputMode="numeric"
-               placeholder={form.cash_includes_costs ? t('rvb.cashPlaceholder') : t('rvb.downPaymentPlaceholder')}
+               placeholder={form.cash_includes_costs ? t('rvb.cashPlaceholder', { unit }) : t('rvb.downPaymentPlaceholder', { unit })}
                required
                value={form.down_payment} onChange={e => setForm({ ...form, down_payment: e.target.value })} />
         {/* Buyers think in "money I have", not "down payment net of fees".
@@ -252,7 +252,7 @@ function RentVsBuy() {
                  style={{ marginTop: 2, accentColor: 'var(--accent)', width: 15, height: 15, flexShrink: 0 }} />
           {t('rvb.cashIncludesCosts')}
         </label>
-        <input className="input" type="text" inputMode="numeric" placeholder={t('rvb.rentPlaceholder')} required
+        <input className="input" type="text" inputMode="numeric" placeholder={t('rvb.rentPlaceholder', { unit })} required
                value={form.monthly_rent} onChange={e => setForm({ ...form, monthly_rent: e.target.value })} />
         <input className="input" type="text" inputMode="numeric" placeholder={t('rvb.homePricePlaceholder')}
                value={form.home_price} onChange={e => setForm({ ...form, home_price: e.target.value })} />
@@ -366,7 +366,7 @@ function RentVsBuy() {
               <div style={{ fontSize: 12, opacity: 0.75 }}>{t('rvb.netWorthAfter', { years: result.years })}</div>
               <div style={{ fontSize: 17, fontWeight: 700 }}>{money(result.buy.net_worth)}</div>
               <div style={{ fontSize: 11, opacity: 0.6, marginTop: 2 }}>
-                {t('rvb.inTodaysMoney', { amount: fmt(result.buy.net_worth_real) })}
+                {t('rvb.inTodaysMoney', { amount: money(result.buy.net_worth_real) })}
               </div>
               <div style={{ fontSize: 12, opacity: 0.7, marginTop: 6, lineHeight: 1.5 }}>
                 {t('rvb.equityLine', { value: fmt(result.buy.home_value), loan: fmt(result.buy.remaining_loan) })}
@@ -386,10 +386,10 @@ function RentVsBuy() {
               <div style={{ fontSize: 12, opacity: 0.75 }}>{t('rvb.netWorthAfter', { years: result.years })}</div>
               <div style={{ fontSize: 17, fontWeight: 700 }}>{money(result.rent.net_worth)}</div>
               <div style={{ fontSize: 11, opacity: 0.6, marginTop: 2 }}>
-                {t('rvb.inTodaysMoney', { amount: fmt(result.rent.net_worth_real) })}
+                {t('rvb.inTodaysMoney', { amount: money(result.rent.net_worth_real) })}
               </div>
               <div style={{ fontSize: 12, opacity: 0.7, marginTop: 6, lineHeight: 1.5 }}>
-                {t('rvb.rentLine', { rent: fmt(result.rent.total_rent_paid) })}
+                {t('rvb.rentLine', { rent: money(result.rent.total_rent_paid) })}
               </div>
             </div>
           </div>
@@ -533,7 +533,7 @@ function ListingLinks() {
 export default function ExplorePage() {
   const { t } = useTranslation()
   const { getToken } = useAuth()
-  const { pack } = useMarket()
+  const { pack, unit } = useMarket()
   // A national house-price index and a province-by-province table are
   // different data products: Germany has the first (Eurostat) but not the
   // second, so this table is its own gate. The rent-vs-buy calculator and
@@ -644,7 +644,7 @@ export default function ExplorePage() {
               className="input"
               type="text"
               inputMode="numeric"
-              placeholder={t('explore.amountPlaceholder')}
+              placeholder={t('explore.amountPlaceholder', { unit })}
               value={scenarioAmount}
               onChange={e => setScenarioAmount(e.target.value)}
               style={{ marginBottom: 12 }}

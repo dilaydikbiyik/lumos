@@ -2,9 +2,11 @@ import { useState, useRef, useEffect } from 'react'
 import MessageBubble from './MessageBubble'
 import useChat from '../hooks/useChat'
 import { useTranslation } from 'react-i18next'
+import useMarket from '../hooks/useMarket'
 
 export default function ChatWindow({ onProfileComplete, onFirstMessage }) {
   const { t } = useTranslation()
+  const { unit } = useMarket()
   const { messages, isLoading, error, sendMessage, pendingProfile, confirmProfile,
           retryExtract, quizFinished } = useChat(onProfileComplete)
   const [input, setInput] = useState('')
@@ -43,7 +45,7 @@ export default function ChatWindow({ onProfileComplete, onFirstMessage }) {
         /* smooth momentum scroll on iOS */
         WebkitOverflowScrolling: 'touch',
       }}>
-        <MessageBubble role="assistant" content={t('quiz.intro')} />
+        <MessageBubble role="assistant" content={t('quiz.intro', { unit })} />
 
         {messages.map((msg, i) => (
           <MessageBubble key={i} role={msg.role} content={msg.content} />

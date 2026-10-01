@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import useMarket from '../hooks/useMarket'
+import { inflationExample } from '../utils/inflationExample'
 
 /**
  * "Işık Tut" (hold a light) — firefly-themed jargon tooltip.
@@ -9,6 +11,7 @@ import { useTranslation } from 'react-i18next'
  */
 export default function IsikTut({ term, children }) {
   const { t, i18n } = useTranslation()
+  const { pack, unit } = useMarket()
   const [open, setOpen] = useState(false)
   // The term is a stable identifier, not display text: printing the key
   // itself put "reel getiri" in the middle of an English sentence. Each
@@ -17,7 +20,9 @@ export default function IsikTut({ term, children }) {
   const key = 'glossary.' + term.toLowerCase()
   if (!i18n.exists(key + '.text')) return children || term
   const label = t(key + '.label', { defaultValue: term })
-  const explanation = t(key + '.text')
+  // Entries that work an example need the market's own figures; the rest
+  // simply ignore the extra interpolations.
+  const explanation = t(key + '.text', { unit, ...inflationExample(pack) })
 
   return (
     <span style={{ position: 'relative', display: 'inline-block' }}>

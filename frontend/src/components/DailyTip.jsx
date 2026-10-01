@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import useMarket from '../hooks/useMarket'
+import { inflationExample } from '../utils/inflationExample'
 import Icon from './Icon'
 
 /**
@@ -42,6 +44,7 @@ function markSeen(tipId) {
 
 export default function DailyTip() {
   const { t } = useTranslation()
+  const { pack, unit } = useMarket()
   // Start at the first unseen tip; tapping the card (or "Sonraki") marks it
   // learned and advances — the card is a mini-carousel, not a one-shot.
   const [idx, setIdx] = useState(() => {
@@ -117,7 +120,7 @@ export default function DailyTip() {
         }}>{tip.emoji}</span>
         <div>
           <p style={{ fontSize: 14, fontWeight: 700, marginBottom: 4 }}>{t(`dailyTip.tips.${tip.id}.title`)}</p>
-          <p style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.65 }}>{t(`dailyTip.tips.${tip.id}.body`)}</p>
+          <p style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.65 }}>{t(`dailyTip.tips.${tip.id}.body`, { unit, ...inflationExample(pack) })}</p>
         </div>
       </div>
 

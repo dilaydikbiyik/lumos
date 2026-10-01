@@ -72,7 +72,7 @@
     "accept": "Verstanden, weiter"
   },
   "quiz": {
-    "intro": "Hallo! Ich bin Lumos.\n\nIch stelle dir 9 kurze Fragen und erstelle daraus dein persönliches Risikoprofil. Bereit?\n\n**Frage 1 — Wie viel kannst du zum Investieren beiseitelegen?** (z. B. 50.000)",
+    "intro": "Hallo! Ich bin Lumos.\n\nIch stelle dir 9 kurze Fragen und erstelle daraus dein persönliches Risikoprofil. Bereit?\n\n**Frage 1 — Wie viel kannst du zum Investieren beiseitelegen?** (z. B. 50.000 {{unit}})",
     "reveal": "Gelesen — zeig mir mein Risikoprofil →",
     "noRush": "Keine Eile — lies oben so lange du möchtest.",
     "answersKept": "Deine Antworten sind gespeichert — du musst nicht von vorn beginnen.",
@@ -220,7 +220,7 @@
     "vehicleBody": "Ein Fahrzeug darf im Vermögensbild auftauchen — aber Vorsicht: es verliert jedes Jahr 10–20% an Wert, dazu kommen Versicherung, Steuer und Wartung. Lumos empfiehlt niemals einen Autokauf als Geldanlage.",
     "vehicleTip": "Wenn du es trotzdem aufnehmen willst, trage den aktuellen Marktwert unter \"Aktueller Schätzwert\" ein.",
     "tickerPlaceholder": "Symbol (z. B. {{example}})",
-    "amountPlaceholder": "Kaufbetrag",
+    "amountPlaceholder": "Kaufbetrag ({{unit}})",
     "currentPlaceholder": "Aktueller Schätzwert (optional)",
     "add": "Hinzufügen",
     "addCta": "+ Wert hinzufügen",
@@ -338,7 +338,7 @@
     },
     "enflasyon": {
       "label": "Inflation",
-      "text": "Dein Geld verliert an Kaufkraft. Bei 50% Inflation verhalten sich 100 unter der Matratze ein Jahr später wie 67."
+      "text": "Der Verlust dessen, was dein Geld kaufen kann. Bei {{rate}}% Inflation verhalten sich 100 {{unit}} unter der Matratze ein Jahr später wie {{eroded}} {{unit}}."
     },
     "reel getiri": {
       "label": "reale Rendite",
@@ -496,7 +496,7 @@
     "listingsTitle": "🔗 Zu den Inseraten",
     "listingsBody": "Eine vorgefilterte Inseratsuche für deine Wunschgegend — den Kauf tätigst du auf der Inseratseite und kommst dann hierher zurück und sagst \"Gekauft\".",
     "lastYears": "Letzte {{n}} Jahre",
-    "amountPlaceholder": "Szenariobetrag",
+    "amountPlaceholder": "Szenariobetrag ({{unit}})",
     "amountLabel": "Szenariobetrag",
     "dataError": "Die Provinzdaten sind gerade nicht erreichbar — versuch es gleich noch einmal.",
     "fetchLinks": "Links abrufen",
@@ -534,10 +534,10 @@
   "rvb": {
     "title": "Mieten oder kaufen?",
     "subtitle": "Wir vergleichen dieselbe Immobilie auf zwei Wegen: kaufen mit Eigenkapital plus Kredit, oder mieten und die Differenz anlegen. Kaufen ist nicht immer der Gewinn.",
-    "cashPlaceholder": "Dein gesamtes Bargeld",
-    "downPaymentPlaceholder": "Eigenkapital / deine Ersparnisse",
+    "cashPlaceholder": "Dein gesamtes Bargeld ({{unit}})",
+    "downPaymentPlaceholder": "Eigenkapital / deine Ersparnisse ({{unit}})",
     "cashIncludesCosts": "Das ist mein gesamtes Bargeld — zieh Steuern und Provision davon ab",
-    "rentPlaceholder": "Deine aktuelle Monatsmiete",
+    "rentPlaceholder": "Deine aktuelle Monatsmiete ({{unit}})",
     "homePricePlaceholder": "Preis der Immobilie (optional — sonst aus der Miete geschätzt)",
     "incomePlaceholder": "Dein monatliches Nettoeinkommen (optional — prüft die Tragfähigkeit)",
     "projectionYears": "{{n}}-Jahres-Projektion",
@@ -734,13 +734,13 @@
   "whatIf": {
     "title": "Was würde passieren?",
     "subtitle": "Stell „Was wäre wenn\"-Fragen zu deinem Portfolio — die Antwort kommt aus einer echten Rechnung, nicht aus einer Vermutung.",
-    "placeholder": "z. B. was wäre, wenn ich 20.000 mehr einzahle?",
+    "placeholder": "z. B. was wäre, wenn ich 20.000 {{unit}} mehr einzahle?",
     "ask": "Fragen",
     "error": "Konnte gerade nicht beantwortet werden",
-    "sug1": "Was ändert sich, wenn ich 10.000 mehr einzahle?",
+    "sug1": "Was ändert sich, wenn ich 10.000 {{unit}} mehr einzahle?",
     "sug2": "Wie sähe mein Portfolio aus, wenn ich vorsichtiger wäre?",
     "sug3": "Was wäre, wenn ich offensiver vorgehe?",
-    "notUnderstood": "Ich konnte darin keine Budget- oder Risikoänderung erkennen — versuch es etwa mit „was wäre, wenn ich X einzahle\" oder „was wäre, wenn ich offensiver/vorsichtiger wäre\"."
+    "notUnderstood": "Ich konnte darin keine Budget- oder Risikoänderung erkennen — versuch es etwa mit „was wäre, wenn ich X {{unit}} einzahle\" oder „was wäre, wenn ich offensiver/vorsichtiger wäre\"."
   },
   "practice": {
     "title": "Probier es erst mit Spielgeld",
@@ -831,7 +831,7 @@
       },
       "inflation": {
         "title": "Inflation lässt dein Geld schmelzen",
-        "body": "Bei 50% Inflation verhalten sich 100 unter der Matratze ein Jahr später wie 67. Nicht anzulegen ist auch ein Risiko."
+        "body": "Bei {{rate}}% Inflation verhalten sich 100 {{unit}} unter der Matratze ein Jahr später wie {{eroded}} {{unit}}. Nicht anzulegen ist auch ein Risiko."
       },
       "dividend": {
         "title": "Eine Dividende ist wie Miete",

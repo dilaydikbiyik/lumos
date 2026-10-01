@@ -24,6 +24,7 @@ const TR_FALLBACK = {
   regional_housing_breakdown: true, area_kind: 'province',
   example_district: '', example_locality: '',
   example_ticker: '', example_asset_name: '',
+  inflation_pct: 40,
 }
 
 // What the backend last told us. The first paint happens before /users/markets

@@ -58,18 +58,7 @@ const KNOWN_OFFENDERS = [
   'dailyTip.tips.inflation.body',
   'explainer.byTicker.SPY.risk',
   'explainer.byTicker.SPY.why',
-  'explore.amountPlaceholder',
   'glossary.enflasyon.text',
-  'holdings.amountPlaceholder',
-  'quiz.intro',
-  'rvb.cashPlaceholder',
-  'rvb.downPaymentPlaceholder',
-  'rvb.inTodaysMoney',
-  'rvb.rentLine',
-  'rvb.rentPlaceholder',
-  'whatIf.notUnderstood',
-  'whatIf.placeholder',
-  'whatIf.sug1',
 ]
 
 function flatten(obj, prefix = '') {

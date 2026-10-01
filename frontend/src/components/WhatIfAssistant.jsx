@@ -12,7 +12,7 @@ const SUGGESTION_KEYS = ['whatIf.sug1', 'whatIf.sug2', 'whatIf.sug3']
  */
 export default function WhatIfAssistant({ riskScore, budget }) {
   const { t } = useTranslation()
-  const { money } = useMarket()
+  const { money, unit } = useMarket()
   const [question, setQuestion] = useState('')
   const [result, setResult] = useState(null)
   const [loading, setLoading] = useState(false)
@@ -48,7 +48,7 @@ export default function WhatIfAssistant({ riskScore, budget }) {
         <input
           className="input"
           style={{ flex: 1 }}
-          placeholder={t('whatIf.placeholder')}
+          placeholder={t('whatIf.placeholder', { unit })}
           value={question}
           onChange={e => setQuestion(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && ask()}
@@ -61,8 +61,8 @@ export default function WhatIfAssistant({ riskScore, budget }) {
       {!result && !loading && (
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
           {SUGGESTION_KEYS.map(k => (
-            <button key={k} className="btn btn-ghost" style={{ fontSize: 12 }} onClick={() => ask(t(k))}>
-              {t(k)}
+            <button key={k} className="btn btn-ghost" style={{ fontSize: 12 }} onClick={() => ask(t(k, { unit }))}>
+              {t(k, { unit })}
             </button>
           ))}
         </div>
@@ -72,7 +72,7 @@ export default function WhatIfAssistant({ riskScore, budget }) {
 
       {result && !result.understood && (
         <p style={{ fontSize: 13, opacity: 0.8 }}>
-          {t('whatIf.notUnderstood')}
+          {t('whatIf.notUnderstood', { unit })}
         </p>
       )}
 

@@ -219,6 +219,14 @@ async def market_pack_content(
             "agency_commission_pct": pack.agency_commission_pct,
             "vat_pct": pack.vat_pct,
             "annual_upkeep_pct": pack.annual_upkeep_pct,
+            # The ILLUSTRATIVE inflation figure, for teaching copy that works
+            # an example ("at X% inflation, 100 under the mattress behaves
+            # like Y a year later"). That copy hardcoded 50% and lira, which
+            # is a fact about Türkiye: a German reader was being taught with
+            # someone else's numbers. The pack's own fallback is the right
+            # source here precisely because it is a documented assumption
+            # rather than a live reading — an example should not move daily.
+            "inflation_pct": pack.inflation_fallback_pct,
         },
     }
 

@@ -67,7 +67,7 @@
     "label": "Dil"
   },
   "quiz": {
-    "intro": "Merhaba! Ben Lumos.\n\nSana 9 kısa soru soracağım ve kişisel risk profilini oluşturacağım. Hazır mısın?\n\n**1. soru — Yatırıma ayırabileceğin bütçen nedir?** (Örn: 50.000 TL)",
+    "intro": "Merhaba! Ben Lumos.\n\nSana 9 kısa soru soracağım ve kişisel risk profilini oluşturacağım. Hazır mısın?\n\n**1. soru — Yatırıma ayırabileceğin bütçen nedir?** (Örn: 50.000 {{unit}})",
     "reveal": "Okudum, risk profilimi göster →",
     "noRush": "Acelen yok — yukarıyı istediğin kadar okuyabilirsin.",
     "answersKept": "Cevapların kayıtlı — baştan başlaman gerekmiyor.",
@@ -331,13 +331,13 @@
   "whatIf": {
     "title": "Ne olurdu?",
     "subtitle": "Portföyünle ilgili \"ya şöyle olsaydı\" sorularını sor — cevap gerçek hesaplamadan gelir, tahmin değil.",
-    "placeholder": "örn: 20.000 TL daha eklesem?",
+    "placeholder": "örn: 20.000 {{unit}} daha eklesem?",
     "ask": "Sor",
     "error": "Şu an cevaplanamadı",
-    "sug1": "10.000 TL daha eklesem ne değişir?",
+    "sug1": "10.000 {{unit}} daha eklesem ne değişir?",
     "sug2": "Daha temkinli olsam portföyüm nasıl olurdu?",
     "sug3": "Daha agresif olsam ne olurdu?",
-    "notUnderstood": "Bunu bütçe veya risk değişikliği sorusu olarak anlayamadım — \"X TL eklesem\" ya da \"daha agresif/temkinli olsam\" gibi sorabilirsin."
+    "notUnderstood": "Bunu bütçe veya risk değişikliği sorusu olarak anlayamadım — \"X {{unit}} eklesem\" ya da \"daha agresif/temkinli olsam\" gibi sorabilirsin."
   },
   "practice": {
     "title": "Önce Sahte Parayla Dene",
@@ -448,7 +448,7 @@
     },
     "enflasyon": {
       "label": "enflasyon",
-      "text": "Paranın alım gücünün erimesi. %50 enflasyonda yastık altındaki 100 TL, bir yıl sonra 67 TL gibi davranır."
+      "text": "Paranın alım gücünün erimesi. %{{rate}} enflasyonda yastık altındaki 100 {{unit}}, bir yıl sonra {{eroded}} {{unit}} gibi davranır."
     },
     "reel getiri": {
       "label": "reel getiri",
@@ -522,7 +522,7 @@
     "vehicleBody": "Araç servet resmine dahil edilebilir — ama dikkatli ol: her yıl %10–20 değer kaybeder (amortisman), üstüne kasko + MTV + bakım gelir. Lumos asla araç almayı yatırım olarak önermez.",
     "vehicleTip": "Bunu eklemek istiyorsan güncel piyasa değerini \"Güncel tahmini değer\"e yaz.",
     "tickerPlaceholder": "Sembol (örn: {{example}})",
-    "amountPlaceholder": "Alış tutarı (TL)",
+    "amountPlaceholder": "Alış tutarı ({{unit}})",
     "currentPlaceholder": "Güncel tahmini değer (opsiyonel)",
     "add": "Ekle",
     "addCta": "+ Varlık Ekle",
@@ -599,7 +599,7 @@
       },
       "inflation": {
         "title": "Enflasyon Paranı Eritir",
-        "body": "%50 enflasyonda yastık altındaki 100 TL, bir yıl sonra 67 TL gibi davranır. Yatırım yapmamak da bir risk."
+        "body": "%{{rate}} enflasyonda yastık altındaki 100 {{unit}}, bir yıl sonra {{eroded}} {{unit}} gibi davranır. Yatırım yapmamak da bir risk."
       },
       "dividend": {
         "title": "Temettü = Kira Gibi",
@@ -799,7 +799,7 @@
     "listingsTitle": "🔗 İlanlara Git",
     "listingsBody": "Beğendiğin bölge için filtresi hazır ilan araması — satın almayı ilan sitesinde yaparsın, sonra buraya döner \"Aldım\" dersin.",
     "lastYears": "Son {{n}} yıl",
-    "amountPlaceholder": "Senaryo tutarı (TL)",
+    "amountPlaceholder": "Senaryo tutarı ({{unit}})",
     "amountLabel": "Senaryo tutarı",
     "dataError": "İl verisi şu an alınamıyor — birazdan tekrar dene.",
     "fetchLinks": "Linkleri Getir",
@@ -837,10 +837,10 @@
   "rvb": {
     "title": "Kirada mı otur, ev mi al?",
     "subtitle": "Aynı evi iki senaryoda karşılaştırırız: peşinat + kredi ile satın almak, ya da kirada kalıp farkı yatırmak. Ev almak her zaman kazanç değildir.",
-    "cashPlaceholder": "Cebindeki toplam nakit (TL)",
-    "downPaymentPlaceholder": "Peşinat / birikimin (TL)",
+    "cashPlaceholder": "Cebindeki toplam nakit ({{unit}})",
+    "downPaymentPlaceholder": "Peşinat / birikimin ({{unit}})",
     "cashIncludesCosts": "Bu rakam elimdeki tüm nakit — vergi ve komisyonu buradan düş",
-    "rentPlaceholder": "Şu anki aylık kiran (TL)",
+    "rentPlaceholder": "Şu anki aylık kiran ({{unit}})",
     "homePricePlaceholder": "Evin fiyatı (opsiyonel — boşsa kiradan tahmin edilir)",
     "incomePlaceholder": "Aylık net gelirin (opsiyonel — taksit gücünü kontrol eder)",
     "projectionYears": "{{n}} yıllık projeksiyon",
@@ -859,10 +859,10 @@
     "ifBuy": "Ev alırsan",
     "ifRent": "Kirada kalırsan",
     "netWorthAfter": "{{years}} yıl sonra net servetin",
-    "inTodaysMoney": "bugünkü alım gücüyle ≈ {{amount}} TL",
+    "inTodaysMoney": "bugünkü alım gücüyle ≈ {{amount}}",
     "equityLine": "Ev değeri {{value}} − kalan kredi {{loan}}",
     "costsLine": "Alım masrafı {{costs}} · aidat/bakım {{upkeep}}",
-    "rentLine": "Peşinat + fark yatırımda · ödenen kira {{rent}} TL",
+    "rentLine": "Peşinat + fark yatırımda · ödenen kira {{rent}}",
     "verdictBuy": "Bu varsayımlarla <0>satın almak</0> yaklaşık <1>{{amount}} TL</1> daha avantajlı görünüyor.",
     "verdictRent": "Bu varsayımlarla <0>kirada kalıp yatırım yapmak</0> yaklaşık <1>{{amount}} TL</1> daha avantajlı görünüyor.",
     "assumptions": "Varsayımlar: konut +%{{housing}}/yıl, portföy +%{{portfolio}}/yıl, kredi %{{rate}}/yıl {{rateSource}} ({{term}} yıl vade), enflasyon %{{inflation}}/yıl ({{asOf}} verisi). Alım masrafları dahildir: devir vergileri ve resmî harçlar %{{deed}} + emlakçı komisyonu %{{agency}} + KDV (%{{vat}}) = %{{agencyVat}}; ayrıca aidat, sigorta ve bakım için yılda ev değerinin %{{upkeep}}'i. Bu oranlar mevzuat ve teamülle belirlenir, zamanla değişir. Büyük rakamlar çoğunlukla enflasyondan şişer; \"bugünkü alım gücü\" satırı gerçek değeri gösterir. Hesap, evde oturmaya devam ettiğin varsayımına dayanır; bu nedenle satış hâlinde doğabilecek vergiler ile ev sahibi olmanın parasal olmayan değeri dahil değildir — o kararın duygusal tarafı da meşrudur.",

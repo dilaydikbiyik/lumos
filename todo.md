@@ -1961,7 +1961,16 @@ keep being found one at a time by using the app.
 - [x] **`frontend/src/locales/currency.test.js`** forbids any currency unit in
       any translated string, in all three languages. It found the practice
       strings immediately and then fifteen more.
-- [ ] **15 strings baselined, and the list may only shrink.** Two different
+- [x] **Baseline cut from 15 to 2.** All the input placeholders and what-if
+      prompts are parameterised with the market's own unit now, the
+      rent-vs-buy figures use `money()` rather than `fmt()`, and the two
+      inflation examples take the market's rate AND unit — "%50 enflasyonda
+      100 TL" was teaching a German reader with Turkish arithmetic, so the
+      illustrative rate now ships in the market listing. What remains is the
+      two SPY notes, which are about a Turkish reader's purchasing power
+      against the dollar and need market-specific content rather than
+      formatting.
+      (superseded) 15 strings baselined, and the list may only shrink. Two different
       problems sit in it. Most are the SAME BUG on other screens — four input
       placeholders ("Senaryo tutarı (TL)", "Peşinat / birikimin (TL)") and the
       what-if prompts, all of which show TL to a German reader exactly as the
@@ -1970,6 +1979,11 @@ keep being found one at a time by using the app.
       reader's purchasing power — and those need a per-market example, which
       is a content change rather than a formatting one. Nothing new can be
       added; the test fails on any string not already on the list.
-- [ ] **[you reported, not yet done]** The cards under "Rent or buy?" —
-      "Plot or portfolio?" and "Check a listing's price" — do not match the
-      rent-vs-buy card's UI. They should all look like that one.
+- [x] **The cards under "Rent or buy?" now match it.** `PropertyVsPortfolio`
+      and `ListingEval` were written with bare `<input>` and `<select>`, so
+      they inherited none of the app's field styling — no touch-target
+      height, no background, no border, no 16px type — and read as a
+      different app sitting under the first card. Both carry
+      `className="input"` now and use the same column form and gap as the
+      rent-vs-buy card. Verified by screenshot rather than by reading the
+      diff.

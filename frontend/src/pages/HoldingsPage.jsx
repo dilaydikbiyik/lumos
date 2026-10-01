@@ -31,7 +31,7 @@ export default function HoldingsPage() {
   const { getToken, userId } = useAuth()
   // The example ticker and asset are facts about the MARKET, not the
   // language: a Turkish reader in the US market was being shown THYAO.IS.
-  const { money, pack } = useMarket()
+  const { money, pack, unit } = useMarket()
   const cacheKey = userKey('holdings', userId)
   // Hydrate instantly from the last snapshot so returning users never see a
   // blank/jank frame; the network refresh below replaces it in the background.
@@ -442,7 +442,7 @@ export default function HoldingsPage() {
             <input className="input" required
                    placeholder={t('holdings.namePlaceholder', { example: pack.example_asset_name })}
                    value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
-            <input className="input" type="number" placeholder={t('holdings.amountPlaceholder')} required min="1"
+            <input className="input" type="number" placeholder={t('holdings.amountPlaceholder', { unit })} required min="1"
                    value={form.purchase_amount} onChange={e => setForm({ ...form, purchase_amount: e.target.value })} />
             {computedAmount != null && (
               <p style={{ fontSize: 'var(--t-micro)', color: 'var(--text-dim)', marginTop: -4, lineHeight: 1.5 }}>
