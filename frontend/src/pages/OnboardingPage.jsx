@@ -6,6 +6,8 @@ import LumosLogo from '../components/LumosLogo'
 import { SignInButton, SignedIn, SignedOut, UserButton } from '@clerk/clerk-react'
 import DisclaimerModal from '../components/DisclaimerModal'
 import Icon from '../components/Icon'
+import useMarket from '../hooks/useMarket'
+import { realReturnExample } from '../utils/inflationExample'
 import { isInAppBrowser } from '../utils/inAppBrowser'
 import LanguageSwitcher from '../components/LanguageSwitcher'
 import { Trans, useTranslation } from 'react-i18next'
@@ -36,6 +38,7 @@ const FEATURES = [
 const PROFILE_CHECK_TIMEOUT_MS = 2500
 
 export default function OnboardingPage() {
+  const { pack } = useMarket()
   const { t } = useTranslation()
   const navigate = useNavigate()
   const { userId } = useAuth()
@@ -220,7 +223,7 @@ export default function OnboardingPage() {
                 <Icon name={f.icon} size={28} glow />
               </div>
               <h3 style={{ fontSize: 'var(--t-body)', marginBottom: 6, color: 'var(--text)' }}>{t(`onboarding.features.${f.key}.title`)}</h3>
-              <p style={{ fontSize: 'var(--t-small)', lineHeight: 1.6 }}>{t(`onboarding.features.${f.key}.desc`)}</p>
+              <p style={{ fontSize: 'var(--t-small)', lineHeight: 1.6 }}>{t(`onboarding.features.${f.key}.desc`, realReturnExample(pack))}</p>
             </div>
           ))}
         </div>

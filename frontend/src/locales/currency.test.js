@@ -77,3 +77,42 @@ describe.each([['tr', tr], ['en', en], ['de', de]])('%s copy', (lang, bundle) =>
     expect(offenders, offenders.join('\n')).toEqual([])
   })
 })
+
+/**
+ * No TEACHING EXAMPLE may hardcode a market-scale rate.
+ *
+ * The same bug as the currency one, one step further out. "You made 45% but
+ * inflation was 60%" and "I gained 300% but inflation was 320%" were written
+ * into all three languages, so this was never a translation slip — the
+ * EXAMPLE itself was Türkiye-scale. To a German reader whose inflation runs
+ * near 2% those figures are not a lesson, they are noise. The point being
+ * taught survives at any scale once the numbers come from the reader's own
+ * market, which is what `realReturnExample` and `inflationExample` do.
+ *
+ * Scoped to the keys that WORK AN EXAMPLE. Plenty of other copy names a
+ * number legitimately — QQQ really did fall 33% in 2022, EUNL really is
+ * about 70% United States — and those are facts about an asset rather than
+ * assumptions about a reader.
+ */
+const EXAMPLE_KEYS = [
+  'glossary.reel getiri.text',
+  'glossary.enflasyon.text',
+  'dailyTip.tips.reel-return.body',
+  'dailyTip.tips.inflation.body',
+  'onboarding.features.realReturn.desc',
+]
+
+describe.each([['tr', tr], ['en', en], ['de', de]])('%s teaching examples', (lang, bundle) => {
+  it('take their rates from the market rather than hardcoding them', () => {
+    const flat = Object.fromEntries(flatten(bundle))
+    const offenders = []
+    for (const key of EXAMPLE_KEYS) {
+      const value = flat[key]
+      expect(value, `${key} is missing from ${lang}`).toBeDefined()
+      // A bare two-or-three digit percentage means a rate was written down.
+      const bare = value.replace(/\{\{\w+\}\}/g, '')
+      if (/%\s?\d{2,}|\b\d{2,}\s?%/.test(bare)) offenders.push(`${key}: "${value.slice(0, 80)}"`)
+    }
+    expect(offenders, offenders.join('\n')).toEqual([])
+  })
+})

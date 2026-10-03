@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import useMarket from '../hooks/useMarket'
-import { inflationExample } from '../utils/inflationExample'
+import { inflationExample, realReturnExample } from '../utils/inflationExample'
 import Icon from './Icon'
 
 /**
@@ -120,7 +120,7 @@ export default function DailyTip() {
         }}>{tip.emoji}</span>
         <div>
           <p style={{ fontSize: 14, fontWeight: 700, marginBottom: 4 }}>{t(`dailyTip.tips.${tip.id}.title`)}</p>
-          <p style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.65 }}>{t(`dailyTip.tips.${tip.id}.body`, { unit, ...inflationExample(pack) })}</p>
+          <p style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.65 }}>{t(`dailyTip.tips.${tip.id}.body`, { unit, ...inflationExample(pack), ...realReturnExample(pack) })}</p>
         </div>
       </div>
 

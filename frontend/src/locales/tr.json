@@ -39,7 +39,7 @@
     "features": {
       "realReturn": {
         "title": "Enflasyon Sonrası Gerçek Getiri",
-        "desc": "\"%300 kazandım\" demek, enflasyon %320'yse kaybettin demektir. Lumos her rakamı resmî veriyle enflasyondan arındırıp gösterir."
+        "desc": "\"%{{nominal}} kazandım\" demek, enflasyon %{{inflation}}'se kaybettin demektir. Lumos her rakamı resmî veriyle enflasyondan arındırıp gösterir."
       },
       "realEstate": {
         "title": "Emlak ve Borsa Yan Yana",
@@ -456,7 +456,7 @@
     },
     "reel getiri": {
       "label": "reel getiri",
-      "text": "Enflasyondan arındırılmış gerçek kazanç. %45 kazandın ama enflasyon %60 ise gerçekte kaybettin."
+      "text": "Enflasyondan arındırılmış gerçek kazanç. %{{nominal}} kazandın ama enflasyon %{{inflation}} ise gerçekte kaybettin."
     },
     "drawdown": {
       "label": "drawdown",
@@ -611,7 +611,7 @@
       },
       "reel-return": {
         "title": "Reel Getiri Gerçek Kazanç",
-        "body": "%45 kazandın ama enflasyon %60 ise gerçekte kaybettin. Her zaman enflasyondan arındırılmış getiriye bak."
+        "body": "%{{nominal}} kazandın ama enflasyon %{{inflation}} ise gerçekte kaybettin. Her zaman enflasyon sonrasına bak."
       },
       "liquidity": {
         "title": "Likidite Hayat Kurtarır",

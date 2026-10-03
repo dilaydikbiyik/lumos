@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import useMarket from '../hooks/useMarket'
-import { inflationExample } from '../utils/inflationExample'
+import { inflationExample, realReturnExample } from '../utils/inflationExample'
 
 /**
  * "Işık Tut" (hold a light) — firefly-themed jargon tooltip.
@@ -22,7 +22,7 @@ export default function IsikTut({ term, children }) {
   const label = t(key + '.label', { defaultValue: term })
   // Entries that work an example need the market's own figures; the rest
   // simply ignore the extra interpolations.
-  const explanation = t(key + '.text', { unit, ...inflationExample(pack) })
+  const explanation = t(key + '.text', { unit, ...inflationExample(pack), ...realReturnExample(pack) })
 
   return (
     <span style={{ position: 'relative', display: 'inline-block' }}>

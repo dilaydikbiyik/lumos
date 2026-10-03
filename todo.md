@@ -2034,3 +2034,16 @@ formatting ones around them.
       the compact header control, and `.input` is sized for a form field that
       would eat a third of a 375px header. Checkboxes and radios are skipped
       for the same reason.
+
+- [x] **Swept one class further out, and found three more.** Asked whether
+      any other market-specific NUMBER was baked into copy, the way the
+      inflation rate had been. "You made 45% but inflation was 60%" and
+      "I gained 300% but inflation was 320%" were in all three languages —
+      so never a translation slip; the EXAMPLE itself was Türkiye-scale, and
+      to a German reader at ~2% inflation those figures are noise rather
+      than a lesson. `realReturnExample(pack)` derives both numbers from the
+      reader's market, keeping the nominal visibly under the inflation
+      figure so the point survives at any scale. A test pins the rule for
+      the five keys that work an example — and only those, since QQQ really
+      did fall 33% in 2022 and EUNL really is ~70% US, which are facts about
+      an asset rather than assumptions about a reader.

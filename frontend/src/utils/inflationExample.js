@@ -15,3 +15,25 @@ export function inflationExample(pack) {
     eroded: Math.round(100 / (1 + rate / 100)),
   }
 }
+
+
+/**
+ * The numbers a REAL-RETURN example needs, from the reader's own market.
+ *
+ * The copy read "you made 45% but inflation was 60%" and "I gained 300% but
+ * inflation was 320%" — in all three languages, so this was never a
+ * translation slip. Those are Türkiye-scale figures, and to a German reader
+ * whose inflation runs near 2% they are not a lesson, they are noise. The
+ * point being taught is that a nominal gain BELOW inflation is a real loss,
+ * and that point holds at any scale once the numbers are the reader's own.
+ *
+ * `nominal` sits visibly under `inflation` on purpose: the whole example
+ * falls apart if the two round to the same figure.
+ */
+export function realReturnExample(pack) {
+  const inflation = Math.max(Math.round(pack?.inflation_pct ?? 40), 2)
+  return {
+    inflation,
+    nominal: Math.max(Math.round(inflation * 0.7), 1),
+  }
+}

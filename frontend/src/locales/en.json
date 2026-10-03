@@ -39,7 +39,7 @@
     "features": {
       "realReturn": {
         "title": "Real Returns, After Inflation",
-        "desc": "\"I gained 300%\" means you lost if inflation was 320%. Lumos deflates every figure with official data before showing it."
+        "desc": "\"I gained {{nominal}}%\" means you lost if inflation was {{inflation}}%. Lumos deflates every figure with official data."
       },
       "realEstate": {
         "title": "Real Estate and Stocks, Side by Side",
@@ -456,7 +456,7 @@
     },
     "reel getiri": {
       "label": "real return",
-      "text": "Your true gain after inflation. You made 45% but inflation was 60%? You actually lost."
+      "text": "Your true gain after inflation. You made {{nominal}}% but inflation was {{inflation}}%? You actually lost."
     },
     "drawdown": {
       "label": "drawdown",
@@ -611,7 +611,7 @@
       },
       "reel-return": {
         "title": "Real Return Is the True Gain",
-        "body": "You made 45% but inflation was 60%? You actually lost. Always look at the inflation-adjusted return."
+        "body": "You made {{nominal}}% but inflation was {{inflation}}%? You actually lost. Always look at the figure after inflation."
       },
       "liquidity": {
         "title": "Liquidity Saves You",

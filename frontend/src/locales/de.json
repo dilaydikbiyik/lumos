@@ -47,7 +47,7 @@
     "features": {
       "realReturn": {
         "title": "Echte Rendite nach Inflation",
-        "desc": "\"Ich habe 300% gemacht\" heißt Verlust, wenn die Inflation bei 320% lag. Lumos bereinigt jede Zahl mit offiziellen Daten."
+        "desc": "\"Ich habe {{nominal}}% gemacht\" heißt Verlust, wenn die Inflation bei {{inflation}}% lag. Lumos bereinigt jede Zahl mit offiziellen Daten."
       },
       "realEstate": {
         "title": "Immobilien und Aktien nebeneinander",
@@ -342,7 +342,7 @@
     },
     "reel getiri": {
       "label": "reale Rendite",
-      "text": "Dein echter Gewinn nach Inflation. 45% gemacht, aber die Inflation lag bei 60%? Dann hast du verloren."
+      "text": "Dein echter Gewinn nach Inflation. {{nominal}}% gemacht, aber die Inflation lag bei {{inflation}}%? Dann hast du verloren."
     },
     "drawdown": {
       "label": "Drawdown",
@@ -843,7 +843,7 @@
       },
       "reel-return": {
         "title": "Die reale Rendite ist der echte Gewinn",
-        "body": "45% verdient, aber die Inflation lag bei 60%? Dann hast du verloren. Sieh dir immer die inflationsbereinigte Rendite an."
+        "body": "{{nominal}}% verdient, aber die Inflation lag bei {{inflation}}%? Dann hast du verloren. Sieh immer auf die Zahl nach Inflation."
       },
       "liquidity": {
         "title": "Liquidität rettet dich",
