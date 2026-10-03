@@ -1940,15 +1940,27 @@ keep being found one at a time by using the app.
       documented design, with other markets falling back to their pack's
       search templates. No other partial language or market dict exists.
 
-- [ ] **[blocked: no free source]** Germany has no province-level price
-      table, and this was reported as a missing feature. Re-checked rather
-      than trusted: Destatis GENESIS still requires registration, and
-      Eurostat's house price index is country-level only — confirmed by
-      querying both. The Bundesbank's city-size segments are what exists
-      free, which is why Explore shows three rows there and says so in the
-      reader's own language. Germany DOES now have a genuine region-level
-      breakdown from yesterday's work — 38 NUTS-2 regions of population —
-      it is simply not prices. Revisit if Destatis opens an anonymous API.
+- [ ] **[you — one free account, then it is mine]** Germany has no
+      province-level price table. Re-checked 2026-10-03 by querying every
+      source rather than trusting the earlier note, and the answer is
+      sharper than "no free source":
+        - Eurostat's house price index is country-level, confirmed for TR
+          and DE. Its regional POPULATION data is a different dataset, and
+          the app already uses it.
+        - The Bundesbank's BBDP1 carries exactly three region codes
+          (DE0007, DE0127, DEK). Every Bundesland code tried returns 404,
+          so this is the shape of the data, not a gap in the query.
+        - Destatis GENESIS is documented as free and registration-free and
+          its `helloworld/whoami` answers, but every data method returns the
+          web app instead of JSON — anonymous access does not reach them.
+        - **Destatis REGIONALSTATISTIK does carry Bundesland and Kreis
+          figures, and has required a free account since May 2025.**
+      So this is one free signup away, not impossible. Create the account at
+      regionalstatistik.de and put the credentials in Render's environment;
+      wiring it is then the same work as any other adapter — a source
+      declared in the pack, dispatched like the rest. Until then Explore
+      shows the Bundesbank's city-size segments and says why, in the
+      reader's own language.
 
 ## Reported: "100000 TL" in the German market (2026-09-29)
 

@@ -31,10 +31,26 @@ DE = MarketPack(
     # for every euro-area country, not only Germany. Same concept, fresher copy.
     inflation_source="bundesbank",       # HICP, monthly, no key
     housing_index_source="eurostat",   # prc_hpi_q — a real price index
-    # No Bundesland-level index exists in any free source (checked: Eurostat
-    # is country-only, GENESIS needs registration). The Bundesbank publishes
-    # city-size aggregates without a key, which is a real breakdown of a
-    # different shape — nested segments, not alternative places.
+    # No Bundesland-level index is reachable WITHOUT AN ACCOUNT, re-checked
+    # 2026-10-03 by querying each source rather than trusting the last note:
+    #   - Eurostat `prc_hpi_q` is country-level; TR and DE both return a
+    #     single series. (Its regional POPULATION data is a different
+    #     dataset, and that one the app does use.)
+    #   - The Bundesbank's BBDP1 carries exactly three region codes —
+    #     DE0007, DE0127, DEK. Every Bundesland code tried (DE1, DEBY,
+    #     DEBW, …) returns 404, so this is the shape of the data rather
+    #     than a gap in the query.
+    #   - Destatis documents GENESIS as free and registration-free, and its
+    #     `helloworld/whoami` does answer — but every data method returns the
+    #     web app rather than JSON, so anonymous access does not reach them
+    #     in practice.
+    #   - Destatis REGIONALSTATISTIK does carry Bundesland and Kreis figures
+    #     and has required a free account since May 2025. That is the one
+    #     real route to a province table here, and it needs a person to
+    #     create the account — see todo.md.
+    # The Bundesbank's city-size aggregates are what is reachable today: a
+    # real breakdown of a different shape — nested segments, not alternative
+    # places — and the UI says so in the reader's own language.
     regional_housing_source="bundesbank",
     population_source="eurostat",
     # NUTS-2 regions, with Eurostat's own labels so the names on screen
