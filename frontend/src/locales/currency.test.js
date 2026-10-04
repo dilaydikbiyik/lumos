@@ -116,3 +116,45 @@ describe.each([['tr', tr], ['en', en], ['de', de]])('%s teaching examples', (lan
     expect(offenders, offenders.join('\n')).toEqual([])
   })
 })
+
+/**
+ * No copy outlives the code that used it.
+ *
+ * `fx.low` and `fx.lowMsg` sat unused after the currency-exposure logic was
+ * corrected: the old version called an all-FX portfolio "low risk" and
+ * described it purely as protection, which is true while the lira falls and
+ * silent about the fact that the reader's rent, food and future home are
+ * priced in a currency they hold none of. The code was fixed; the sentence
+ * stayed, translated into three languages, one wiring away from putting the
+ * same claim back on screen.
+ *
+ * A key counts as used if it appears anywhere in the client source, or if a
+ * template stem that could build it does — `explore.searchLabel_${areaWord}`
+ * is how a good part of this file is reached.
+ */
+import { readFileSync as readSource, readdirSync as readDir } from 'fs'
+import { join as joinPath } from 'path'
+
+function clientSource() {
+  const walk = dir => readDir(dir, { withFileTypes: true }).flatMap(e =>
+    e.isDirectory()
+      ? (e.name === 'locales' ? [] : walk(joinPath(dir, e.name)))
+      : (/\.jsx?$/.test(e.name) ? [readSource(joinPath(dir, e.name), 'utf8')] : []))
+  return walk('src').join('\n')
+}
+
+describe('copy catalogue', () => {
+  it('has no key without code behind it', () => {
+    const blob = clientSource()
+    const stems = [
+      ...blob.matchAll(/['"`]([\w.]*?)\$\{/g),
+      ...blob.matchAll(/['"`]([\w.]+\.)['"`]\s*\+/g),
+    ].map(m => m[1]).filter(Boolean)
+
+    const dead = flatten(tr)
+      .map(([key]) => key)
+      .filter(key => !blob.includes(key) && !stems.some(s => key.startsWith(s)))
+
+    expect(dead, `copy with no code behind it:\n${dead.join('\n')}`).toEqual([])
+  })
+})

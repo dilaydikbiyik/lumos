@@ -2104,3 +2104,11 @@ market or the language being fixed in place instead.
       unit prices — the moment another gets them, a German reader is told
       their figures come from the Turkish central bank. Both branches now
       read the declared source.
+- [x] **A fixed bug left its own copy lying around.** `fx.low` / `fx.lowMsg`
+      survived the currency-exposure correction: the old logic called an
+      all-FX portfolio "low risk" and described it purely as protection —
+      true while the lira falls, silent about the reader's rent, food and
+      future home being priced in a currency they hold none of. The code was
+      fixed; the sentence stayed, translated into three languages, one
+      wiring away from putting the claim back on screen. Removed, and the
+      client catalogue now has the same no-dead-copy rule as the backend's.

@@ -356,10 +356,8 @@
     "riskLabel": "Währungsrisiko",
     "high": "Hoch",
     "mid": "Mittel",
-    "low": "Niedrig",
     "highMsg": "Der größte Teil deines Portfolios lautet auf TL. Wertet die Lira ab, spürt es das ganze Portfolio. Erwäge, fremdwährungsbasierte Anlagen beizumischen.",
     "midMsg": "Zwischen TL und Fremdwährung besteht eine vernünftige Balance. Diese Aufteilung schützt teilweise vor Währungsschwankungen.",
-    "lowMsg": "Dein Portfolio ist überwiegend fremdwährungsbasiert. Vor einer Abwertung der Lira bist du damit von Natur aus geschützt.",
     "tryLegend": "🇹🇷 TL — {{pct}}%",
     "fxLegend": "🌍 Fremdwährung — {{pct}}%"
   },
