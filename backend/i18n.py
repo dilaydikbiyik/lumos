@@ -463,18 +463,6 @@ _C: dict[str, dict[str, str]] = {
         "tr": "Bu bir tahmin DEĞİL: tüm portföyünün (ağırlıklı) kendi geçmişindeki tüm {years} yıllık dönemlerin dağılımı. Çeşitlendirme bandı daraltabilir ama garanti vermez.",
         "en": "This is NOT a forecast: it's the distribution of every {years}-year period in your whole (weighted) portfolio's own history. Diversification can narrow the band but guarantees nothing.",
         "de": "Das ist KEINE Prognose: es ist die Verteilung aller {years}-Jahres-Zeiträume aus der eigenen (gewichteten) Historie deines gesamten Portfolios. Streuung kann die Spanne verengen, garantiert aber nichts."},
-    "projection.no_region": {
-        "tr": "Bölge verisi şu an alınamıyor.",
-        "en": "Regional data can't be reached right now.",
-        "de": "Regionaldaten sind gerade nicht erreichbar."},
-    "projection.region_short": {
-        "tr": "TCMB bölge endeksi {available} yıllık geçmişe sahip — {years} yıllık senaryo bandı için yeterli pencere yok. Daha kısa vade dene (endeks 2023'te yeniden bazlandı).",
-        "en": "The central bank's regional index has {available} years of history — not enough windows for a {years}-year scenario band. Try a shorter horizon (the index was rebased in 2023).",
-        "de": "Der Regionalindex der Zentralbank reicht {available} Jahre zurück — zu wenige Fenster für eine {years}-Jahres-Spanne. Versuch einen kürzeren Zeitraum (der Index wurde 2023 neu basiert)."},
-    "projection.region_note": {
-        "tr": "Bölge (NUTS2) endeksi dağılımıdır — tek bir mahalle/parsel değil. \"60 kat arttı\" anekdotları genelde nominal ve seçilmiş örneklerdir; reel karşılığı yanında gösteriyoruz.",
-        "en": "This is the distribution of a regional (NUTS2) index — not one neighbourhood or plot. \"It went up 60x\" stories are usually nominal and cherry-picked; we show the real figure alongside.",
-        "de": "Das ist die Verteilung eines Regionalindex (NUTS2) — nicht eines einzelnen Viertels oder Grundstücks. Geschichten wie „das 60-Fache\" sind meist nominal und herausgepickt; wir zeigen den realen Wert daneben."},
 
     # ── panic button ──
     "panic.fact.recovery": {
@@ -591,22 +579,6 @@ _C: dict[str, dict[str, str]] = {
         "de": "Nur zu Bildungszwecken — Regeln ändern sich und jede Situation ist anders. Bitte bestätige alles mit einer lizenzierten Fachperson."},
 
     # ── region ranking ──
-    "region.real_gain": {
-        "tr": "Enflasyonun ÜZERİNDE değerlendi — reel kazanç.",
-        "en": "It appreciated ABOVE inflation — a real gain.",
-        "de": "Der Wert stieg ÜBER die Inflation — ein realer Gewinn."},
-    "region.near_inflation": {
-        "tr": "Nominal artışa rağmen enflasyona yakın seyretti.",
-        "en": "Despite the nominal rise, it tracked close to inflation.",
-        "de": "Trotz nominalem Anstieg lag es nahe an der Inflation."},
-    "region.real_loss": {
-        "tr": "Nominal artış yanıltıcı: enflasyon karşısında reel kayıp.",
-        "en": "The nominal rise is misleading: a real loss against inflation.",
-        "de": "Der nominale Anstieg täuscht: real ein Verlust gegenüber der Inflation."},
-    "region.note": {
-        "tr": "Bu sıralama bölge (NUTS2) seviyesindedir — mahalle/parsel analizi değildir. Geçmiş değerlenme geleceğin garantisi değildir.",
-        "en": "This ranking is at regional (NUTS2) level — not a neighbourhood or parcel analysis. Past appreciation guarantees nothing about the future.",
-        "de": "Diese Rangfolge liegt auf Regionsebene (NUTS2) — keine Viertel- oder Grundstücksanalyse. Vergangene Wertsteigerung garantiert nichts für die Zukunft."},
 
     # ── German market segments (nested, not alternatives) ──
     "segment.DE0007": {
@@ -628,9 +600,9 @@ _C: dict[str, dict[str, str]] = {
         "en": "No area-by-area housing data is published for the {market} market.",
         "de": "Für den Markt {market} werden keine regionalen Wohndaten veröffentlicht."},
     "province.note_price_level": {
-        "tr": "İl ortalaması birim fiyatlardır (TCMB) — mahalle/parsel analizi değildir. Geçmiş değerlenme geleceğin garantisi değildir.",
-        "en": "These are province-average unit prices (Turkish central bank) — not a neighbourhood or parcel analysis. Past appreciation guarantees nothing about the future.",
-        "de": "Das sind Durchschnittspreise je Provinz (türkische Zentralbank) — keine Viertel- oder Grundstücksanalyse. Vergangene Wertsteigerung garantiert nichts für die Zukunft."},
+        "tr": "İl ortalaması birim fiyatlardır ({source}) — mahalle/parsel analizi değildir. Geçmiş değerlenme geleceğin garantisi değildir.",
+        "en": "These are area average unit prices ({source}) — not a neighbourhood or parcel analysis. Past appreciation does not guarantee the future.",
+        "de": "Das sind durchschnittliche Quadratmeterpreise einer Gegend ({source}) — keine Viertel- oder Parzellenanalyse. Vergangene Wertentwicklung garantiert die Zukunft nicht."},
     "province.note_index": {
         "tr": "Bu bir fiyat ENDEKSİDİR — değerlenmeyi ölçer, metrekare fiyatını değil; o yüzden burada birim fiyat göstermiyoruz. Bölge ortalamasıdır, tek bir şehir ya da mahalle değil. Kaynak: {source}",
         "en": "This is a price INDEX — it measures appreciation, not the price of a square metre, which is why no unit price is shown. It is an area average, not one city or neighbourhood. Source: {source}",

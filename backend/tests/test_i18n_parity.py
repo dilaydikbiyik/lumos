@@ -95,3 +95,43 @@ def test_unknown_key_does_not_raise():
     """A missing key must degrade, not 500 — it is usually reached from a
     router that is already mid-response."""
     assert t("no.such.key.exists", "en") is not None
+
+
+def test_no_copy_outlives_the_code_that_used_it():
+    """
+    Dead copy is not harmless. It is translated, reviewed and carried
+    forward as if it still described the app, and the next person reading
+    the catalogue cannot tell which sentences are live.
+
+    Seven keys were left behind when `/projection/region` and
+    `rank_regions` were removed — the Turkish ones still named TCMB as the
+    source for a feature that no longer existed.
+
+    A key counts as used if it appears ANYWHERE in the source, or if any
+    prefix of it is built as an f-string stem (`f"role.{category}"`), which
+    is how most of this catalogue is reached.
+    """
+    import pathlib
+    import re
+
+    root = pathlib.Path(__file__).resolve().parents[2]
+    catalogue = (root / "backend" / "i18n.py").read_text()
+    keys = sorted(set(re.findall(r'^    "([\w.]+)":\s*\{', catalogue, re.M)))
+    assert keys, "no keys found — has the catalogue's shape changed?"
+
+    sources = [p.read_text() for p in (root / "backend").rglob("*.py")
+               if p.name != "i18n.py"]
+    sources += [p.read_text() for p in (root / "frontend" / "src").rglob("*.js")]
+    sources += [p.read_text() for p in (root / "frontend" / "src").rglob("*.jsx")]
+    blob = "\n".join(sources)
+
+    dead = []
+    for key in keys:
+        if key in blob:
+            continue
+        parts = key.split(".")
+        if any(f'{".".join(parts[:i])}.{{' in blob for i in range(1, len(parts))):
+            continue
+        dead.append(key)
+
+    assert not dead, f"copy with no code behind it: {dead}"

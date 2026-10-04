@@ -202,10 +202,17 @@ def rank_provinces(horizon_years: int = 3, market: str = "TR",
         "data_through": latest_month,
         # Named for the kind of number, not the country: a new market reading
         # an index would otherwise be handed "the US note".
-        "honesty_note": (
-            t("province.note_price_level", lang) if price_level
-            else t("province.note_index", lang,
-                   source=t(f"source.{_pack(market).regional_housing_source}", lang))
+        # BOTH branches name the source by its DECLARATION rather than by
+        # country. The price-level note used to spell "TCMB" into the copy
+        # itself, which is true only while Türkiye is the one market with
+        # unit prices — the branch beside it had already got this right.
+        "honesty_note": t(
+            "province.note_price_level" if price_level else "province.note_index",
+            lang,
+            # The source labels are written as sentences and these notes set
+            # them inside parentheses, so the full stop is dropped rather than
+            # reading "(… endeksi.)".
+            source=t(f"source.{_pack(market).regional_housing_source}", lang).rstrip("."),
         ),
         "provinces": rows,
     }

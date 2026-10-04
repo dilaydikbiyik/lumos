@@ -2086,3 +2086,21 @@ market or the language being fixed in place instead.
       percent and dates follow the language, money follows the market, and
       `format.js` documents why); no component renders an amount without the
       market helper.
+
+- [x] **Seven dead copy keys, left behind by my own deletion.** Removing
+      `/projection/region` and `rank_regions` left their sentences in the
+      catalogue — and the Turkish ones still named TCMB as the source for a
+      feature that no longer existed. Dead copy is not harmless: it is
+      translated, reviewed and carried forward as if it still described the
+      app, and the next reader cannot tell which sentences are live. Removed,
+      and a test now fails on any key with no code behind it. It counts a key
+      as used if it appears anywhere in the source or if a prefix of it is
+      built as an f-string stem, which is how most of this catalogue is
+      reached.
+- [x] **A latent market-coupling bug beside a correct one.** The province
+      honesty note has two branches: the INDEX branch already named its
+      source by declaration, and the PRICE-LEVEL branch beside it spelled
+      "TCMB" into the copy. True only while Türkiye is the one market with
+      unit prices — the moment another gets them, a German reader is told
+      their figures come from the Turkish central bank. Both branches now
+      read the declared source.
