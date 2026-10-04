@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import api from '../utils/api'
 import useMarket from '../hooks/useMarket'
+import { percent } from '../utils/format'
 
 /**
  * "I have this much — what goes where?"
@@ -93,7 +94,7 @@ export default function BudgetSplit() {
             </dt>
             <dd style={{ margin: 0, fontWeight: 600, fontSize: 13, whiteSpace: 'nowrap' }}>
               {money(plan[seg.amount])}
-              <span style={{ opacity: 0.6, fontWeight: 400 }}> · {plan[seg.pct]}%</span>
+              <span style={{ opacity: 0.6, fontWeight: 400 }}> · {percent(plan[seg.pct])}</span>
             </dd>
           </div>
         ))}

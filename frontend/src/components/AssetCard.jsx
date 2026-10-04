@@ -1,5 +1,6 @@
 import { sliceColor } from '../utils/palette'
 import { useTranslation } from 'react-i18next'
+import { percentFromWeight } from '../utils/format'
 
 
 
@@ -30,7 +31,7 @@ export default function AssetCard({ allocation, index = 0, color = null, onClose
         <div>
           <p style={{ fontSize: 11, color: 'var(--text-dim)' }}>{t('bridge.shareLabel')}</p>
           <p style={{ fontWeight: 700, fontSize: 22, color: accent }}>
-            {(allocation.weight * 100).toFixed(1)}%
+            {percentFromWeight(allocation.weight, { decimals: 1 })}
           </p>
         </div>
       </div>

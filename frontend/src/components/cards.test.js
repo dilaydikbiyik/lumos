@@ -52,3 +52,37 @@ describe('card fields use the app input styling', () => {
       .toEqual([])
   })
 })
+
+/**
+ * No component writes a percent sign next to a number.
+ *
+ * Percent placement belongs to the reading LANGUAGE: Turkish writes %45,
+ * English 45%, German 45 %. `format.js` was written to fix exactly this and
+ * says so in its own docstring — and twenty-one places still built the
+ * English form by hand, `{value}%`, including the portfolio chart's legend.
+ * So every Turkish reader, in the app's primary language, saw the wrong form
+ * on most screens.
+ *
+ * `percent()` and `signedPercent()` produce it correctly, sign included, in
+ * all three. This checks the rule over the source because the mistake is
+ * invisible in English — which is the language a reviewer reads the diff in.
+ */
+const PERCENT_DIRS = ['src/components', 'src/pages']
+
+describe('percent signs come from the formatter', () => {
+  const files = PERCENT_DIRS.flatMap(dir =>
+    readdirSync(dir).filter(f => f.endsWith('.jsx')).map(f => [dir, f]))
+
+  it.each(files)('%s/%s', (dir, file) => {
+    const source = readFileSync(join(dir, file), 'utf8')
+    // Matched WITH leading context, because a bar's `width: ${pct}%` looks
+    // identical to displayed text until you can see what precedes it — and
+    // every one of those is a legitimate CSS percentage.
+    const offenders = [...source.matchAll(/.{0,45}\{[^{}]+\}\s*%/gs)]
+      .map(([m]) => m.replace(/\s+/g, ' ').trim())
+      .filter(m => !/width|height|calc|translate|background|flex|top:|left:/.test(m))
+
+    expect(offenders, `${file} writes a percent sign by hand:\n${offenders.join('\n')}`)
+      .toEqual([])
+  })
+})

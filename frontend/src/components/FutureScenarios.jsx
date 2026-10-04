@@ -3,6 +3,7 @@ import api, { extractErrorMessage } from '../utils/api'
 import IsikTut from './IsikTut'
 import useMarket from '../hooks/useMarket'
 import { Trans, useTranslation } from 'react-i18next'
+import { signedPercent } from '../utils/format'
 
 function BandRow({ label, tone, data, amount }) {
   const { fmt, money } = useMarket()
@@ -20,7 +21,7 @@ function BandRow({ label, tone, data, amount }) {
       <div style={{ textAlign: 'right', minWidth: 120 }}>
         <span style={{ fontSize: 14, fontWeight: 700, color: colors[tone] }}>{money(data.value)}</span>
         <span style={{ fontSize: 11, opacity: 0.65, display: 'block' }}>
-          {gain >= 0 ? '+' : ''}{fmt(gain)} ({data.return_pct > 0 ? '+' : ''}{data.return_pct}%)
+          {gain >= 0 ? '+' : ''}{fmt(gain)} ({signedPercent(data.return_pct, { decimals: 1 })})
         </span>
       </div>
     </div>

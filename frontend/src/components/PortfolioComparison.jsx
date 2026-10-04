@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next'
 import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '@clerk/clerk-react'
 import api, { setAuthToken } from '../utils/api'
-import { percent } from '../utils/format'
+import { percent, signedPercent } from '../utils/format'
 
 /**
  * Actual vs recommended portfolio comparison.
@@ -115,7 +115,7 @@ export default function PortfolioComparison() {
                   : item.deviation > 0 ? 'var(--firefly)'
                   : 'var(--accent-2)',
               }}>
-                {item.deviation > 0 ? '+' : ''}{item.deviation}%
+                {signedPercent(item.deviation, { decimals: 1 })}
               </span>
             </div>
             {/* Dual bar: actual on top, target below */}

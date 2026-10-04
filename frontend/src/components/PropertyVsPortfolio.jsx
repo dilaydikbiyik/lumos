@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import api, { extractErrorMessage } from '../utils/api'
 import useMarket from '../hooks/useMarket'
+import { percent } from '../utils/format'
 
 /**
  * "A 500,000 plot, or a 500,000 portfolio?"
@@ -170,11 +171,11 @@ export default function PropertyVsPortfolio({ regions = [] }) {
           <h4 style={{ fontSize: 13, margin: '0 0 6px' }}>{t('vsCompare.yieldTitle')}</h4>
           <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, fontSize: 12.5 }}>
             <span style={{ opacity: 0.75 }}>{t('vsCompare.grossRent')}</span>
-            <span>{yields.gross_rental_yield_pct}%</span>
+            <span>{percent(yields.gross_rental_yield_pct, { decimals: 1 })}</span>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, fontSize: 12.5, marginTop: 2 }}>
             <span style={{ opacity: 0.75 }}>{t('vsCompare.upkeepCost')}</span>
-            <span>−{yields.annual_upkeep_pct}%</span>
+            <span>−{percent(yields.annual_upkeep_pct, { decimals: 1 })}</span>
           </div>
           <div style={{
             display: 'flex', justifyContent: 'space-between', gap: 8,
@@ -182,12 +183,12 @@ export default function PropertyVsPortfolio({ regions = [] }) {
             borderTop: '1px solid var(--border)', fontWeight: 600,
           }}>
             <span>{t('vsCompare.netRent')}</span>
-            <span>{yields.net_rental_yield_pct}%</span>
+            <span>{percent(yields.net_rental_yield_pct, { decimals: 1 })}</span>
           </div>
           {yields.dividend_yield_pct != null && (
             <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, fontSize: 12.5, marginTop: 4 }}>
               <span style={{ opacity: 0.75 }}>{t('vsCompare.dividendYield')}</span>
-              <span>{yields.dividend_yield_pct}%</span>
+              <span>{percent(yields.dividend_yield_pct, { decimals: 1 })}</span>
             </div>
           )}
           <p style={{ fontSize: 11.5, opacity: 0.65, marginTop: 8, lineHeight: 1.6 }}>

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import api from '../utils/api'
+import { signedPercent } from '../utils/format'
 
 /**
  * Where people are actually moving.
@@ -68,7 +69,7 @@ export default function PopulationTrend() {
               fontSize: 13, minWidth: 54, textAlign: 'right',
               color: DIRECTION_COLOR[r.direction],
             }}>
-              {r.change_pct > 0 ? '+' : ''}{r.change_pct}%
+              {signedPercent(r.change_pct, { decimals: 1 })}
             </strong>
           </div>
         ))}

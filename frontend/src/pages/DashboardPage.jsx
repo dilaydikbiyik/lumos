@@ -197,7 +197,7 @@ export default function DashboardPage() {
                         width: `${pct}%`, background: colors[i % colors.length],
                         borderRadius: 3, minWidth: pct > 0 ? 4 : 0,
                         transition: 'width 0.6s ease',
-                      }} title={`${type}: ${Math.round(pct)}%`} />
+                      }} title={`${type}: ${percent(pct)}`} />
                     )
                   })}
                 </div>

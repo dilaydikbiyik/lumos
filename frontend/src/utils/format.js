@@ -40,6 +40,26 @@ export function percent(value, { decimals = 0 } = {}) {
   }).format(Number(value) / 100)
 }
 
+/**
+ * A percentage that carries its own sign: "+8.4%" / "+%8,4" / "+8,4 %".
+ *
+ * Written because the sign was being prefixed by hand — `{x > 0 ? '+' : ''}`
+ * followed by a bare `{x}%` — which hardcodes the English form of BOTH the
+ * sign position and the percent sign. Turkish writes %45 and German 45 %,
+ * so twenty-one screens were showing a form belonging to a language the
+ * reader had not chosen. `signDisplay` places the sign correctly in all
+ * three; a zero stays unsigned, which is what "exceptZero" means.
+ */
+export function signedPercent(value, { decimals = 0 } = {}) {
+  if (missing(value)) return ''
+  return new Intl.NumberFormat(lang(), {
+    style: 'percent',
+    signDisplay: 'exceptZero',
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
+  }).format(Number(value) / 100)
+}
+
 /** The same, from a 0–1 weight, which is how allocations arrive. */
 export function percentFromWeight(weight, options) {
   if (missing(weight)) return ''

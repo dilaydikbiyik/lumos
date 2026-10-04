@@ -3,6 +3,7 @@ import { allocationColors } from '../utils/palette'
 import { useTranslation } from 'react-i18next'
 import AssetCard from './AssetCard'
 import { useMemo, useState } from 'react'
+import { percent } from '../utils/format'
 
 
 
@@ -75,7 +76,7 @@ export default function PortfolioChart({ allocations = [], onSliceClick }) {
             ))}
           </Pie>
           <Tooltip
-            formatter={(v) => [`${v}%`]}
+            formatter={(v) => [percent(v, { decimals: 1 })]}
             contentStyle={{ background: '#13141F', border: '1px solid #2A2B3D', borderRadius: 8, fontSize: 13 }}
           />
         </PieChart>
@@ -97,7 +98,7 @@ export default function PortfolioChart({ allocations = [], onSliceClick }) {
             <span style={{ width: 10, height: 10, borderRadius: '50%', background: colors[i], flexShrink: 0 }} />
             <span style={{ fontSize: 13, flex: 1 }}>{d.name}</span>
             {/* Percentage in the exact slice colour — the legend and pie read as one */}
-            <span style={{ fontSize: 13, fontWeight: 700, color: colors[i] }}>{d.value}%</span>
+            <span style={{ fontSize: 13, fontWeight: 700, color: colors[i] }}>{percent(d.value, { decimals: 1 })}</span>
           </div>
         ))}
       </div>

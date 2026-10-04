@@ -2059,3 +2059,30 @@ formatting ones around them.
       the five keys that work an example — and only those, since QQQ really
       did fall 33% in 2022 and EUNL really is ~70% US, which are facts about
       an asset rather than assumptions about a reader.
+
+## Proactive scan (2026-10-04)
+
+Asked to look for other bugs while the Destatis account is being created.
+Swept for the SHAPE the reported ones share — something that belongs to the
+market or the language being fixed in place instead.
+
+- [x] **Twenty-one screens wrote the English percent form by hand.** Percent
+      placement belongs to the reading LANGUAGE: Turkish writes %45, English
+      45%, German 45 %. `format.js` exists to get this right and says so in
+      its own docstring — and most components still built `{value}%`
+      themselves, so a Turkish reader, in the app's PRIMARY language, saw the
+      wrong form on the portfolio chart, the holdings list, the explore
+      bands, the yield strip, the drift card and the population table.
+      Also German, which needs the space.
+      Added `signedPercent()` for the places that were prefixing "+" by hand,
+      since `signDisplay` places the sign correctly in all three too. Verified
+      on screen: the explore page now reads `+%13,7` and `reel -%9,8`.
+- [x] **Pinned as a rule over the source**, matching WITH leading context —
+      a progress bar's `width: ${pct}%` is indistinguishable from displayed
+      text without it, and all eleven remaining matches turned out to be
+      exactly that. Verified by reintroducing the bug: the test names the
+      file.
+- [x] Checked and clean: date and number formatting (deliberately split —
+      percent and dates follow the language, money follows the market, and
+      `format.js` documents why); no component renders an amount without the
+      market helper.

@@ -12,6 +12,7 @@ import api, { extractErrorMessage, setAuthToken } from '../utils/api'
 import useMarket from '../hooks/useMarket'
 import { readJSON, writeJSON, userKey } from '../utils/storage'
 import { Trans, useTranslation } from 'react-i18next'
+import { percent } from '../utils/format'
 
 const TYPE_KEYS = ['stock', 'fund', 'etf', 'real_estate', 'land', 'vehicle', 'gold', 'crypto', 'cash', 'other']
 const OFF_EXCHANGE = ['real_estate', 'land', 'vehicle', 'cash', 'other']
@@ -286,7 +287,7 @@ export default function HoldingsPage() {
                           marginLeft: 6, fontWeight: 700,
                           color: h.value_change_pct >= 0 ? 'var(--green, #3DD68C)' : 'var(--red)',
                         }}>
-                          {h.value_change_pct >= 0 ? '▲' : '▼'} {Math.abs(h.value_change_pct)}%
+                          {h.value_change_pct >= 0 ? '▲' : '▼'} {percent(Math.abs(h.value_change_pct), { decimals: 1 })}
                         </span>
                       )}
                       <span style={{ marginLeft: 6, fontSize: 10, opacity: 0.6 }}>

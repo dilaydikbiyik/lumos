@@ -10,6 +10,7 @@ import ListingEval from '../components/ListingEval'
 import PopulationTrend from '../components/PopulationTrend'
 import useMarket from '../hooks/useMarket'
 import { Trans, useTranslation } from 'react-i18next'
+import { signedPercent } from '../utils/format'
 
 // Every amount here used to be TCMB TL/m² data, so a module-level formatter
 // pinned to tr-TR was correct. It stopped being correct the moment the US got
@@ -70,13 +71,13 @@ function ProvinceScenario({ province, amount }) {
                    components={[<strong key="a" />]} />
           </p>
           <div>{t('explore.worstBand')}: <strong style={{ color: 'var(--red)' }}>{money(band.pessimistic.value)}</strong>
-            {band.real_band && <span style={{ fontSize: 11, opacity: 0.7 }}> · {t('explore.real')} {band.real_band.pessimistic_pct > 0 ? '+' : ''}{band.real_band.pessimistic_pct}%</span>}
+            {band.real_band && <span style={{ fontSize: 11, opacity: 0.7 }}> · {t('explore.real')} {signedPercent(band.real_band.pessimistic_pct, { decimals: 1 })}</span>}
           </div>
           <div>{t('explore.typicalBand')}: <strong style={{ color: 'var(--firefly, #F5A524)' }}>{money(band.typical.value)}</strong>
-            {band.real_band && <span style={{ fontSize: 11, opacity: 0.7 }}> · {t('explore.real')} {band.real_band.typical_pct > 0 ? '+' : ''}{band.real_band.typical_pct}%</span>}
+            {band.real_band && <span style={{ fontSize: 11, opacity: 0.7 }}> · {t('explore.real')} {signedPercent(band.real_band.typical_pct, { decimals: 1 })}</span>}
           </div>
           <div>{t('explore.bestBand')}: <strong style={{ color: 'var(--green, #3DD68C)' }}>{money(band.optimistic.value)}</strong>
-            {band.real_band && <span style={{ fontSize: 11, opacity: 0.7 }}> · {t('explore.real')} {band.real_band.optimistic_pct > 0 ? '+' : ''}{band.real_band.optimistic_pct}%</span>}
+            {band.real_band && <span style={{ fontSize: 11, opacity: 0.7 }}> · {t('explore.real')} {signedPercent(band.real_band.optimistic_pct, { decimals: 1 })}</span>}
           </div>
           {links && (
             <div style={{ marginTop: 10, padding: 10, borderRadius: 10, border: '1px dashed var(--border)' }}>
@@ -163,12 +164,12 @@ function ProvinceCard({ province, amount, measure }) {
         </div>
       </div>
       <div style={{ textAlign: 'right', flexShrink: 0 }}>
-        <div style={{ fontSize: 13 }}>+{province.nominal_change_pct}%</div>
+        <div style={{ fontSize: 13 }}>{signedPercent(province.nominal_change_pct, { decimals: 1 })}</div>
         <div style={{
           fontSize: 13, fontWeight: 700,
           color: realPositive ? 'var(--green, #4ade80)' : 'var(--red)',
         }}>
-          {t('explore.real')} {province.real_change_pct > 0 ? '+' : ''}{province.real_change_pct}%
+          {t('explore.real')} {signedPercent(province.real_change_pct, { decimals: 1 })}
         </div>
       </div>
       {open && <div style={{ flexBasis: '100%' }}><ProvinceScenario province={province} amount={amount} /></div>}

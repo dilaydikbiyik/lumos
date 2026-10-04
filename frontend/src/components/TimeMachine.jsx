@@ -5,6 +5,7 @@ import IsikTut from './IsikTut'
 import AssetCharacter from './AssetCharacter'
 import useMarket from '../hooks/useMarket'
 import { Trans, useTranslation } from 'react-i18next'
+import { percent, signedPercent } from '../utils/format'
 
 /**
  * Time Machine — "what if you had built this portfolio N years ago?"
@@ -72,19 +73,19 @@ export default function TimeMachine({ allocations, budget }) {
                 fontSize: 20, fontWeight: 700,
                 color: result.total_return_pct >= 0 ? 'var(--green, #4ade80)' : 'var(--red)',
               }}>
-                {money(result.final_value)} ({result.total_return_pct > 0 ? '+' : ''}{result.total_return_pct}%)
+                {money(result.final_value)} ({signedPercent(result.total_return_pct, { decimals: 1 })})
               </div>
               {result.real_return_pct != null && (
                 <div style={{ fontSize: 11, opacity: 0.65, marginTop: 2 }}>
                   <Trans i18nKey="timeMachine.afterInflation"
-                         components={[<IsikTut key="a" term="reel getiri" />]} />: {result.real_return_pct > 0 ? '+' : ''}{result.real_return_pct}%
+                         components={[<IsikTut key="a" term="reel getiri" />]} />: {signedPercent(result.real_return_pct, { decimals: 1 })}
                 </div>
               )}
             </div>
             <div>
               <div style={{ fontSize: 12, opacity: 0.7 }}>{t('timeMachine.worstMoment')}</div>
               <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--red)' }}>
-                {money(result.worst_value)} ({result.max_drawdown_pct}%)
+                {money(result.worst_value)} ({percent(result.max_drawdown_pct, { decimals: 1 })})
               </div>
             </div>
           </div>
