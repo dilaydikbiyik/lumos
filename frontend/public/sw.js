@@ -62,15 +62,14 @@ self.addEventListener('fetch', event => {
    asked to see. */
 
 self.addEventListener('push', event => {
+  // A malformed payload must not throw inside the handler: an uncaught error
+  // here shows the browser's own "this site has been updated in the
+  // background" notice, which is worse than staying silent. The catch leaves
+  // the empty default in place rather than reassigning it.
   let payload = {}
   try {
     payload = event.data ? event.data.json() : {}
-  } catch {
-    // A malformed payload must not throw inside the handler: an uncaught
-    // error here shows the browser's own "this site has been updated in the
-    // background" notice, which is worse than staying silent.
-    payload = {}
-  }
+  } catch { /* keep the empty default */ }
   if (!payload.title) return
 
   event.waitUntil(self.registration.showNotification(payload.title, {

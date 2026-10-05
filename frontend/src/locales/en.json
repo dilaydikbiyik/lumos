@@ -537,7 +537,9 @@
     "quantityPlaceholder": "How many did you buy? (opt. — enables live tracking)",
     "computedNote": "Filled in as {{quantity}} × {{price}} = {{total}}. If you paid a different price, you can edit the amount.",
     "lookupConverted": "≈ {{price}} {{currency}}",
-    "selectType": "Asset type"
+    "selectType": "Asset type",
+    "confirmDelete": "Delete?",
+    "deleteLabel2": "Confirm delete"
   },
   "fx": {
     "title": "Currency Split",

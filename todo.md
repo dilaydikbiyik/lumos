@@ -2206,3 +2206,35 @@ Measured before and after on the same seeded account:
       bottom nav appears to sit on top of content in full-page screenshots.
       It does not — `.page-content` reserves 92px for it. That is a
       screenshot artefact of fixed positioning.
+
+## CI had been red, and the local gate was lying (2026-10-05)
+
+- [x] **The failure:** `frontend/public/sw.js` had a `no-useless-assignment`
+      error in the push handler — the catch reassigned `payload = {}` when it
+      already held that.
+- [x] **Why it shipped twice:** `scripts/check.sh` ran `eslint src` while CI
+      runs `npm run lint`, which is `eslint .`. So `public/` was never linted
+      locally. The script's own docstring claims it is "everything CI runs";
+      it was not, and it reported green on a commit CI then failed. A gate
+      that runs ALMOST what CI runs is not a gate — it is worse than none,
+      because it is trusted.
+- [x] **The fix is the npm scripts themselves.** check.sh now calls
+      `npm run lint`, `npm test` and `npm run build` rather than
+      hand-written equivalents, so the two cannot drift again. Verified by
+      reintroducing the error: the local gate names it now.
+- [x] **Also missing: the migration check.** CI applies every migration to an
+      EMPTY database; check.sh never did. A migration that works only against
+      a database already holding the previous state passes locally and fails
+      on a fresh deploy — the one time it matters. Added against a temp
+      SQLite file.
+- [ ] Docker build is still CI-only, deliberately: it is slow and it has
+      never been the thing that broke.
+
+- [x] **Deleting a holding had no confirmation at all.** One tap, record
+      gone, nothing to undo it with — and that target sits at the right edge
+      of every row, in the same column as the floating chat and panic
+      buttons, so a mis-tap was both easy and permanent. The app already
+      knows destructive actions need friction (closing an account makes you
+      type a word); a single holding needs less than that but more than
+      nothing. Two taps now, and the confirm times out rather than latching,
+      so a row left armed by a stray tap does not stay dangerous.

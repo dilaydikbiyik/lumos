@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 import FireflyMark from '../components/FireflyMark'
 import Icon from '../components/Icon'
 import Section from '../components/Section'
@@ -153,10 +153,36 @@ export default function HoldingsPage() {
     }
   }
 
+  /**
+   * Deleting a holding asks once first.
+   *
+   * It used to delete on a single tap, with no confirmation and nothing to
+   * undo it with — and that tap target sits at the right edge of every row,
+   * in the same column as the floating chat and panic buttons, so a mis-tap
+   * was both easy and permanent. The app already knows destructive actions
+   * need friction: closing an account makes you type a word. One holding
+   * does not need that much, but it does need more than nothing.
+   *
+   * The confirm times out rather than latching, so a row left armed by a
+   * stray tap does not stay dangerous while the reader scrolls on.
+   */
+  const [confirmingId, setConfirmingId] = useState(null)
+  const confirmTimer = useRef(null)
+
+  function askRemove(id) {
+    clearTimeout(confirmTimer.current)
+    setConfirmingId(id)
+    confirmTimer.current = setTimeout(() => setConfirmingId(null), 4000)
+  }
+
   async function remove(id) {
+    clearTimeout(confirmTimer.current)
+    setConfirmingId(null)
     await api.delete(`/holdings/${id}`)
     await refresh()
   }
+
+  useEffect(() => () => clearTimeout(confirmTimer.current), [])
 
   const needsTicker = !OFF_EXCHANGE.includes(form.asset_type)
   const isVehicle = form.asset_type === 'vehicle'
@@ -284,7 +310,23 @@ export default function HoldingsPage() {
                   )}
                 </div>
               </div>
-              <button className="btn btn-ghost" onClick={() => remove(h.id)} aria-label={t('holdings.deleteLabel')} style={{ padding: '4px 10px' }}>✕</button>
+              {confirmingId === h.id ? (
+                <button
+                  className="btn btn-ghost"
+                  onClick={() => remove(h.id)}
+                  aria-label={t('holdings.deleteLabel2')}
+                  style={{ padding: '4px 10px', fontSize: 12, color: 'var(--red, #f87171)', whiteSpace: 'nowrap' }}
+                >
+                  {t('holdings.confirmDelete')}
+                </button>
+              ) : (
+                <button
+                  className="btn btn-ghost"
+                  onClick={() => askRemove(h.id)}
+                  aria-label={t('holdings.deleteLabel')}
+                  style={{ padding: '4px 10px' }}
+                >✕</button>
+              )}
             </div>
           ))}
           {!loaded && holdings.length === 0 && (

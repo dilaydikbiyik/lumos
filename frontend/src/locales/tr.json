@@ -537,7 +537,9 @@
     "quantityPlaceholder": "Kaç adet aldın? (ops. — canlı takibi açar)",
     "computedNote": "{{quantity}} adet × {{price}} = {{total}} olarak dolduruldu. Farklı bir fiyattan aldıysan tutarı elle değiştirebilirsin.",
     "lookupConverted": "≈ {{price}} {{currency}}",
-    "selectType": "Varlık tipi"
+    "selectType": "Varlık tipi",
+    "confirmDelete": "Silinsin mi?",
+    "deleteLabel2": "Silmeyi onayla"
   },
   "fx": {
     "title": "Kur Dağılımı",

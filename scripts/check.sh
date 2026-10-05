@@ -28,14 +28,28 @@ $PYTHON -m ruff check backend/
 step "pytest"
 $PYTHON -m pytest backend/tests -q
 
+# The npm SCRIPTS, not hand-written equivalents of them. This file used to
+# run `eslint src` while CI runs `npm run lint`, which is `eslint .` — so
+# `public/` was never linted locally, a service-worker error went out twice,
+# and CI failed on something this script had reported green. A gate that
+# runs almost what CI runs is not a gate.
 step "eslint"
-(cd frontend && npx eslint src --max-warnings=0)
+(cd frontend && npm run lint)
 
 step "vitest"
-(cd frontend && npx vitest run)
+(cd frontend && npm test -- --passWithNoTests)
 
 step "build"
 (cd frontend && npm run build)
+
+# CI applies every migration to an EMPTY database. A migration that only
+# works against a database which already has the previous state passes
+# locally and fails on a fresh deploy, which is the one time it matters.
+step "alembic (fresh database)"
+_tmpdb="$(mktemp -t lumos-migrations-XXXXXX.db)"
+trap 'rm -f "$_tmpdb"' EXIT
+DATABASE_URL="sqlite+aiosqlite:///$_tmpdb" $PYTHON -m alembic upgrade head >/dev/null
+echo "   every migration applies to an empty database"
 
 # Journeys need a running app and a Clerk secret, so they are opt-in rather
 # than part of every run. They are the ones that catch state-transition bugs —

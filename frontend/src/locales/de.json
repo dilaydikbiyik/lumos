@@ -230,7 +230,9 @@
     "quantityPlaceholder": "Wie viele Stück? (opt. — aktiviert Live-Verfolgung)",
     "computedNote": "Eingetragen als {{quantity}} × {{price}} = {{total}}. Wenn du zu einem anderen Kurs gekauft hast, kannst du den Betrag ändern.",
     "lookupConverted": "≈ {{price}} {{currency}}",
-    "selectType": "Anlageart"
+    "selectType": "Anlageart",
+    "confirmDelete": "Löschen?",
+    "deleteLabel2": "Löschen bestätigen"
   },
   "goal": {
     "title": "🎯 Mein Ziel",
