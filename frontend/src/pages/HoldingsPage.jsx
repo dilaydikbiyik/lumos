@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import FireflyMark from '../components/FireflyMark'
 import Icon from '../components/Icon'
+import Section from '../components/Section'
 import { useLocation, useNavigate } from 'react-router-dom'
 import AppHeader from '../components/AppHeader'
 import CurrencyExposure from '../components/CurrencyExposure'
@@ -224,38 +225,6 @@ export default function HoldingsPage() {
           </div>
         )}
 
-        {/* Fener — health score */}
-        {health && (
-          <div className="card">
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
-              <Icon name="bulb" size={22} glow />
-              <strong>{t('holdings.healthTitle', { score: health.overall })}</strong>
-            </div>
-            <p style={{ fontSize: 11.5, color: 'var(--text-dim)', lineHeight: 1.5, marginBottom: 8 }}>
-              {t('holdings.healthBody')}
-            </p>
-            {health.notes.map((n, i) => (
-              <p key={i} style={{ fontSize: 13, lineHeight: 1.6, opacity: 0.85 }}>{n}</p>
-            ))}
-          </div>
-        )}
-
-        {/* Daily value of the real portfolio — the "what happened since I
-            bought it" chart */}
-        <PortfolioValueChart holdingsCount={holdings.length} />
-
-        {/* Post-purchase advice: has the mix drifted from the target? */}
-        <DriftCard holdingsCount={holdings.length} />
-
-        {/* Currency exposure — TL vs FX */}
-        {/* Right after the add, above the list — where the reader's eyes
-            already are, and dismissible because they may already know. */}
-        <FirstPurchaseEducation
-          assetType={firstOfType}
-          onClose={() => setFirstOfType(null)}
-        />
-        <CurrencyExposure holdings={holdings} />
-
         {/* Rebuild the portfolio with the remaining budget */}
         {profile?.risk_score != null && summary?.remaining_budget > 0 && (
           <button
@@ -271,6 +240,13 @@ export default function HoldingsPage() {
           </button>
         )}
 
+        {/* The page is called "my assets" and used to open on six analysis
+            cards: a total, an inflation warning, a health score, a chart, a
+            drift card and a currency split. A reader who came to see what
+            they own saw none of it in the first screen. The holdings lead
+            now; the analysis is what you scroll to, not what you scroll
+            past. */}
+        <Section title={t('section.yourAssets')} count={holdings.length || undefined}>
         {/* Holdings list */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {holdings.map(h => (
@@ -473,6 +449,42 @@ export default function HoldingsPage() {
         )}
 
         {error && <p style={{ color: 'var(--red)', fontSize: 13 }}>{error}</p>}
+        </Section>
+
+        <Section title={t('section.howItIsDoing')} subtitle={t('section.howItIsDoingSub')}
+                 collapsible defaultOpen={false}>
+        {/* Fener — health score */}
+        {health && (
+          <div className="card">
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+              <Icon name="bulb" size={22} glow />
+              <strong>{t('holdings.healthTitle', { score: health.overall })}</strong>
+            </div>
+            <p style={{ fontSize: 11.5, color: 'var(--text-dim)', lineHeight: 1.5, marginBottom: 8 }}>
+              {t('holdings.healthBody')}
+            </p>
+            {health.notes.map((n, i) => (
+              <p key={i} style={{ fontSize: 13, lineHeight: 1.6, opacity: 0.85 }}>{n}</p>
+            ))}
+          </div>
+        )}
+
+        {/* Daily value of the real portfolio — the "what happened since I
+            bought it" chart */}
+
+        {/* Post-purchase advice: has the mix drifted from the target? */}
+
+        {/* Currency exposure — TL vs FX */}
+        {/* Right after the add, above the list — where the reader's eyes
+            already are, and dismissible because they may already know. */}
+        <FirstPurchaseEducation
+          assetType={firstOfType}
+          onClose={() => setFirstOfType(null)}
+        />
+          <PortfolioValueChart holdingsCount={holdings.length} />
+          <DriftCard holdingsCount={holdings.length} />
+          <CurrencyExposure holdings={holdings} />
+        </Section>
       </div>
     </div>
   )

@@ -7,6 +7,7 @@ import PortfolioChart from '../components/PortfolioChart'
 import { sliceColor } from '../utils/palette'
 import ReitCard from '../components/ReitCard'
 import AssetExplainer from '../components/AssetExplainer'
+import Section from '../components/Section'
 import TimeMachine from '../components/TimeMachine'
 import FutureScenarios from '../components/FutureScenarios'
 import AllocationRationale from '../components/AllocationRationale'
@@ -154,7 +155,15 @@ export default function RecommendPage() {
           />
         )}
 
-        <AllocationRationale portfolio={portfolio} />
+        {/* The chart is the answer and occupied the top fifth; roughly
+            1500px of expanded rationale followed at the same visual weight.
+            The reasoning IS the app's honesty promise and stays one tap
+            away — but a reader who has just been handed an allocation wants
+            to see it first, not read the derivation before reaching it. */}
+        <Section title={t('section.why')} subtitle={t('section.whySub')}
+                 collapsible defaultOpen={false}>
+          <AllocationRationale portfolio={portfolio} />
+        </Section>
 
         {portfolio.plain_explanation && (
           <div className="card">

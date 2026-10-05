@@ -111,6 +111,23 @@ export default function DashboardPage() {
           <p style={{ fontSize: 13 }}>{t('dashboard.subtitle')}</p>
         </div>
 
+        {/* The ONE thing to do, when there is nothing else to look at yet.
+            It used to sit at the very bottom: a reader with no portfolio
+            scrolled past the score, the tip, the summary, the news and the
+            budget split — 2670px — to reach it. A page's primary action
+            should not be the hardest thing on it to find. Once a portfolio
+            exists this disappears and the snapshot takes over below. */}
+        {profile && !portfolio && (
+          <div className="card" style={{ textAlign: 'center', padding: '28px 24px' }}>
+            <FireflyMark size={40} style={{ display: 'block', margin: '0 auto 10px', filter: 'drop-shadow(0 0 8px rgba(245,165,36,0.3))' }} />
+            <p style={{ fontSize: 14, marginBottom: 6 }}>{t('dashboard.profileReadyTitle')}</p>
+            <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 18 }}>{t('dashboard.profileReadyBody')}</p>
+            <button className="btn btn-primary" onClick={handleRerun}>
+              {t('dashboard.buildPortfolio')}
+            </button>
+          </div>
+        )}
+
         {/* ── Courage Score — the visible face of the vision ── */}
         <ReadinessScore />
 
@@ -290,19 +307,9 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            {/* Portfolio snapshot */}
-            {portfolio ? (
-              <PortfolioChart allocations={portfolio.allocations} />
-            ) : (
-              <div className="card" style={{ textAlign: 'center', padding: '32px 24px' }}>
-                <FireflyMark size={40} style={{ display: 'block', margin: '0 auto 10px', filter: 'drop-shadow(0 0 8px rgba(245,165,36,0.3))' }} />
-                <p style={{ fontSize: 14, marginBottom: 6 }}>{t('dashboard.profileReadyTitle')}</p>
-                <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 18 }}>{t('dashboard.profileReadyBody')}</p>
-                <button className="btn btn-primary" onClick={handleRerun}>
-                  {t('dashboard.buildPortfolio')}
-                </button>
-              </div>
-            )}
+            {/* Portfolio snapshot. The empty state moved to the top of the
+                page, where an action a reader has not taken yet belongs. */}
+            {portfolio && <PortfolioChart allocations={portfolio.allocations} />}
           </>
         )}
       </div>

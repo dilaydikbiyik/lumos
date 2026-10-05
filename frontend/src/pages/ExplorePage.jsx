@@ -8,6 +8,7 @@ import PropertyVsPortfolio from '../components/PropertyVsPortfolio'
 import PurchaseChecks from '../components/PurchaseChecks'
 import ListingEval from '../components/ListingEval'
 import PopulationTrend from '../components/PopulationTrend'
+import Section from '../components/Section'
 import useMarket from '../hooks/useMarket'
 import { Trans, useTranslation } from 'react-i18next'
 import { signedPercent } from '../utils/format'
@@ -550,6 +551,7 @@ export default function ExplorePage() {
   const horizonTouched = useRef(false)
   const [scenarioAmount, setScenarioAmount] = useState('1.000.000')
   const [search, setSearch] = useState('')
+  const [showAll, setShowAll] = useState(false)
   // Loading is derived: no data yet, or data belongs to a different horizon
   const loading = hasProvinceTable && (!provinces || provinces._horizon !== horizon)
 
@@ -588,11 +590,14 @@ export default function ExplorePage() {
   // 'ıllinois' (dotless i), which never matches what a US reader types.
   const fold = (text) => text.toLocaleLowerCase(pack.locale || 'tr')
   const q = fold(search.trim())
-  const visible = provinces?.available
-    ? (q
-        ? provinces.provinces.filter(p => fold(p.province).includes(q))
-        : provinces.provinces.slice(0, 12))
-    : []
+  // Five, not twelve. A ranked table is a leaderboard, and its information
+  // value falls off a cliff after the top few — twelve rows filled almost
+  // half the page and told a reader nothing the top five had not. The rest
+  // are one tap away, and searching for a specific area always shows it.
+  const TOP_N = 5
+  const all = provinces?.available ? provinces.provinces : []
+  const matches = q ? all.filter(p => fold(p.province).includes(q)) : all
+  const visible = q || showAll ? matches : matches.slice(0, TOP_N)
 
   return (
     <div className="page">
@@ -609,7 +614,7 @@ export default function ExplorePage() {
 
         {/* Per-province price table — only where that data actually exists */}
         {hasProvinceTable ? (
-          <>
+          <Section title={t('section.prices')} subtitle={t('section.pricesSub')}>
           {/* Region intelligence */}
           <div className="card" style={{ padding: 0, background: 'none', border: 'none', boxShadow: 'none' }}>
             <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
@@ -678,10 +683,17 @@ export default function ExplorePage() {
                     </p>
                   )}
                 </div>
-                {!q && (
-                  <p style={{ fontSize: 12, opacity: 0.55, marginTop: 8, textAlign: 'center' }}>
-                    {t(`explore.showingFirst_${areaWord}`)}
-                  </p>
+                {!q && matches.length > TOP_N && (
+                  <button
+                    type="button"
+                    className="btn btn-ghost btn-full"
+                    style={{ marginTop: 10, fontSize: 12.5 }}
+                    onClick={() => setShowAll(!showAll)}
+                  >
+                    {showAll
+                      ? t('section.showLess')
+                      : t('section.showMore', { count: matches.length })}
+                  </button>
                 )}
                 <p style={{ fontSize: 12, opacity: 0.6, marginTop: 10, lineHeight: 1.5 }}>
                   {provinces.honesty_note} {t('explore.dataThrough', { month: provinces.data_through })}
@@ -695,7 +707,7 @@ export default function ExplorePage() {
               </div>
             )}
           </div>
-          </>
+          </Section>
         ) : (
           <div className="card">
             <div style={{ fontSize: 26, marginBottom: 8 }}>🌍</div>
@@ -711,30 +723,42 @@ export default function ExplorePage() {
           </div>
         )}
 
-        <RentVsBuy />
-        {/* Placed right after the area table: the reader has just seen what a
-            region did, which is exactly when "would a portfolio have done
-            better?" occurs to them. Only offered where a regional table
-            exists — without one there is no property side to compare. */}
-        {visible.length > 0 && (
-          <PropertyVsPortfolio
-            regions={visible.map(p => ({ code: p.code, name: p.province }))}
-          />
-        )}
-        {/* Before the checklist: "is this price sane" comes first, and the
-            checks are what you do once it is. */}
-        {visible.length > 0 && (
-          <ListingEval areas={visible.map(p => ({ code: p.code, name: p.province }))} />
-        )}
+        {/* This page answers three different questions and used to run them
+            down one column, four near-identical forms deep, with nothing
+            saying they were different questions. The bands are the answer:
+            where prices are, whether to buy at all, and what to do about one
+            listing you already have in hand. */}
+        <Section title={t('section.decide')} subtitle={t('section.decideSub')}>
+          <RentVsBuy />
+          {/* Right after the area table: the reader has just seen what a
+              region did, which is when "would a portfolio have done better?"
+              occurs to them. Only where a regional table exists — without one
+              there is no property side to compare. */}
+          {visible.length > 0 && (
+            <PropertyVsPortfolio
+              regions={visible.map(p => ({ code: p.code, name: p.province }))}
+            />
+          )}
+        </Section>
 
-        {/* Sits AFTER the price tables on purpose: population is context for a
-            price, not a substitute for one, and a reader who meets it first
-            will read it as a forecast. Outside the province-list condition
-            because it is a different data source at a different granularity —
-            it has its own regions and its own reasons to be absent. */}
-        <PopulationTrend />
-        <PurchaseChecks />
-        <ListingLinks />
+        <Section title={t('section.listing')} subtitle={t('section.listingSub')}>
+          {/* "Is this price sane" comes first; the checks are what you do
+              once it is. */}
+          {visible.length > 0 && (
+            <ListingEval areas={visible.map(p => ({ code: p.code, name: p.province }))} />
+          )}
+          <PurchaseChecks />
+          <ListingLinks />
+        </Section>
+
+        {/* Collapsed, and last. Population is context for a price rather than
+            a substitute for one, and a reader who meets it first reads it as
+            a forecast. Outside the province condition because it is a
+            different source at a different granularity. */}
+        <Section title={t('section.context')} subtitle={t('section.contextSub')}
+                 collapsible defaultOpen={false}>
+          <PopulationTrend />
+        </Section>
       </div>
     </div>
   )

@@ -67,9 +67,15 @@ export default function PortfolioValueChart({ holdingsCount }) {
 
   return (
     <div className="card">
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 4 }}>
+      {/* Title and range on SEPARATE rows. Floated right, the range buttons
+          sat in the bottom-right corner of the viewport whenever this card
+          scrolled there — the same column the chat and panic buttons occupy,
+          which covered "1 Yıl" by roughly 400 square pixels. Measured, not
+          guessed. On its own row the control is wider, easier to hit, and
+          never under anything. */}
+      <div style={{ marginBottom: 8 }}>
         <strong style={{ fontSize: 14 }}>{t('chart.title')}</strong>
-        <div style={{ marginLeft: 'auto', display: 'flex', gap: 4 }}>
+        <div style={{ display: 'flex', gap: 4, marginTop: 8 }}>
           {RANGES.map(r => (
             <button key={r.days} className="btn btn-ghost"
               onClick={() => setDays(r.days)}
@@ -77,6 +83,7 @@ export default function PortfolioValueChart({ holdingsCount }) {
                 padding: '3px 10px', fontSize: 11,
                 background: days === r.days ? 'var(--firefly-dim)' : 'transparent',
                 color: days === r.days ? 'var(--firefly)' : 'var(--text-dim)',
+                flex: 1,
               }}>
               {t(r.label)}
             </button>

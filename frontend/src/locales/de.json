@@ -508,8 +508,6 @@
     "searchLabel_state": "Bundesstaat suchen",
     "noResults_province": "\"{{search}}\" nicht gefunden — du kannst alle {{count}} Provinzen durchsuchen.",
     "noResults_state": "\"{{search}}\" nicht gefunden — du kannst alle {{count}} Bundesstaaten durchsuchen.",
-    "showingFirst_province": "Die ersten 12 Provinzen werden angezeigt — für die übrigen oben suchen.",
-    "showingFirst_state": "Die ersten 12 Bundesstaaten werden angezeigt — für die übrigen oben suchen.",
     "indexOnly": "Preisindex (kein Quadratmeterpreis veröffentlicht)",
     "dataThrough": "(Daten bis {{month}})",
     "loading_province": "Preisdaten werden Provinz für Provinz geladen…",
@@ -519,13 +517,11 @@
     "searchPlaceholder_region": "Region suchen",
     "searchLabel_region": "Region suchen",
     "noResults_region": "\"{{search}}\" nicht gefunden — du kannst alle {{count}} Regionen durchsuchen.",
-    "showingFirst_region": "Die ersten 12 Regionen werden angezeigt — für die übrigen oben suchen.",
     "loading_region": "Regionaldaten werden geladen…",
     "selectAssetType": "Immobilienart",
     "searchPlaceholder_segment": "Segment suchen",
     "searchLabel_segment": "Segment suchen",
     "noResults_segment": "\"{{search}}\" nicht gefunden — es gibt {{count}} Segmente.",
-    "showingFirst_segment": "Alle Segmente werden angezeigt.",
     "loading_segment": "Häuserpreisindex der Bundesbank wird geladen…",
     "manualFilterNote": "Der Link filtert bis zum Bezirk. {{place}} ist feiner, als die Adressen der Seite reichen — wähle es dort in den Filtern der Seite aus."
   },
@@ -1166,5 +1162,22 @@
   "population": {
     "title": "Wohin die Menschen ziehen",
     "workingAge": "{{pct}}% im Erwerbsalter"
+  },
+  "section": {
+    "prices": "Wo die Preise stehen",
+    "pricesSub": "Quadratmeterpreis je Gegend und was er nach Inflation wirklich wert ist.",
+    "decide": "Soll ich kaufen?",
+    "decideSub": "Dasselbe Geld, zwei Wege — keine Prognose, sondern was tatsächlich geschah.",
+    "listing": "Ein konkretes Inserat",
+    "listingSub": "Wenn du ein Inserat hast: ist der Preis plausibel, was vor der Unterschrift prüfen.",
+    "context": "Hintergrund",
+    "contextSub": "Neben einem Preis zu lesen, nicht an seiner Stelle.",
+    "showMore": "Alle anzeigen ({{count}})",
+    "showLess": "Weniger anzeigen",
+    "yourAssets": "Was du besitzt",
+    "howItIsDoing": "Wie es läuft",
+    "howItIsDoingSub": "Wert, Balance, Währung und was die Inflation nimmt.",
+    "why": "Warum diese Aufteilung?",
+    "whySub": "Jeder Schritt der Formel — bei Bedarf aufklappen."
   }
 }

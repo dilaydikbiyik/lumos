@@ -815,8 +815,6 @@
     "searchLabel_state": "Eyalet ara",
     "noResults_province": "\"{{search}}\" bulunamadı — {{count}} ilin tamamında arayabilirsin.",
     "noResults_state": "\"{{search}}\" bulunamadı — {{count}} eyaletin tamamında arayabilirsin.",
-    "showingFirst_province": "İlk 12 il gösteriliyor — diğer iller için yukarıdan ara.",
-    "showingFirst_state": "İlk 12 eyalet gösteriliyor — diğerleri için yukarıdan ara.",
     "indexOnly": "Fiyat endeksi (m² fiyatı yayınlanmıyor)",
     "dataThrough": "(Veri: {{month}})",
     "loading_province": "İl bazında fiyat verisi alınıyor…",
@@ -826,13 +824,11 @@
     "searchPlaceholder_region": "Bölge ara",
     "searchLabel_region": "Bölge ara",
     "noResults_region": "\"{{search}}\" bulunamadı — {{count}} bölgenin tamamında arayabilirsin.",
-    "showingFirst_region": "İlk 12 bölge gösteriliyor — diğerleri için yukarıdan ara.",
     "loading_region": "Bölge verisi alınıyor…",
     "selectAssetType": "Emlak tipi",
     "searchPlaceholder_segment": "Kesit ara",
     "searchLabel_segment": "Kesit ara",
     "noResults_segment": "\"{{search}}\" bulunamadı — {{count}} kesit var.",
-    "showingFirst_segment": "Tüm kesitler gösteriliyor.",
     "loading_segment": "Bundesbank konut endeksi alınıyor…",
     "manualFilterNote": "Bağlantı ilçeye kadar filtreliyor. {{place}} sitenin kendi adreslerinin indiği seviyenin altında — oraya gidince sitenin filtresinden seçmen gerekiyor."
   },
@@ -1166,5 +1162,22 @@
   "population": {
     "title": "İnsanlar nereye taşınıyor?",
     "workingAge": "%{{pct}} çalışma çağında"
+  },
+  "section": {
+    "prices": "Fiyatlar nerede",
+    "pricesSub": "Bölgelerin m² fiyatı ve enflasyon sonrası gerçek değerlenmesi.",
+    "decide": "Almalı mıyım?",
+    "decideSub": "Aynı parayla iki yol — tahmin değil, geçmişte gerçekte ne olduğu.",
+    "listing": "Belirli bir ilan",
+    "listingSub": "Elinde bir ilan varsa: fiyatı yerinde mi, imzadan önce neye bakmalı.",
+    "context": "Arka plan",
+    "contextSub": "Fiyatın yanında okunacak, yerine değil.",
+    "showMore": "Tümünü göster ({{count}})",
+    "showLess": "Daha az göster",
+    "yourAssets": "Neyin var",
+    "howItIsDoing": "Nasıl gidiyor",
+    "howItIsDoingSub": "Değer, denge, kur ve enflasyon etkisi.",
+    "why": "Neden bu dağılım?",
+    "whySub": "Formülün her adımı — istersen aç."
   }
 }

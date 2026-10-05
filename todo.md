@@ -2112,3 +2112,97 @@ market or the language being fixed in place instead.
       fixed; the sentence stayed, translated into three languages, one
       wiring away from putting the claim back on screen. Removed, and the
       client catalogue now has the same no-dead-copy rule as the backend's.
+
+## UI / information-architecture review (2026-10-05)
+
+Asked to assess each page's plan, because the information reads as a pile
+rather than a structure. Measured on a 390×844 phone with a seeded account
+(4 holdings, hybrid path, risk 6), not judged from the source.
+
+| Page | Height | Screens | Cards |
+|---|---|---|---|
+| Explore | 3678px | 4.4 | 18 |
+| Recommend | 2932px | 3.5 | 4 |
+| Dashboard | 2670px | 3.2 | 8 |
+| Holdings | 2501px | 3.0 | 10 |
+| Profile | 2149px | 2.5 | 4 |
+
+### The pattern underneath all of it
+
+Every page is ONE FLAT COLUMN OF EQUAL-WEIGHT CARDS. There are no section
+headers, no grouping, and almost nothing is collapsed by default. A card
+carrying the page's whole purpose looks exactly like a card carrying a side
+note, so the reader has to read everything to find out what matters. That is
+what "piled up" is: not too much content, but no ranking of it.
+
+Three consequences, each visible on a different page:
+
+- [ ] **The subject of the page is at the bottom.** "Varlıklarım" shows a
+      total, an inflation warning, a liquidity score, a chart, a drift card
+      and a currency card — SIX analysis cards — before the first actual
+      holding. In the opening screen a reader who came to see their assets
+      sees none of them. The holdings should lead and the analysis follow.
+- [ ] **The primary action is at the bottom.** On the dashboard, a reader
+      with no portfolio scrolls past 2670px of score, tip, summary, news,
+      headline and budget split before reaching "Portföyümü Oluştur". The
+      one thing the page wants them to do is the last thing they can find.
+- [ ] **Explore is three jobs in one column.** Browsing where prices are (a
+      12-row league table), deciding (rent-vs-buy, plot-vs-portfolio), and
+      acting on a specific listing (price check, purchase checks, listing
+      links). Four near-identical forms stack in sequence with nothing
+      saying they answer different questions. This is the worst offender and
+      the one the complaint named.
+- [ ] **Recommend inverts answer and justification.** The chart — the answer
+      — occupies the top fifth; roughly 1500px of expanded rationale follows
+      at the same visual weight. The reasoning is the app's honesty promise
+      and should stay reachable, but on demand rather than by default.
+
+### Done (2026-10-05)
+
+Measured before and after on the same seeded account:
+
+| Page | Before | After |
+|---|---|---|
+| Holdings | 2501px, 10 cards | **1306px, 6** |
+| Recommend | 2932px, 4 | **1893px, 3** |
+| Explore | 3678px, 18 | **3338px, 11** |
+| Dashboard | 2670px, 8 | **2377px, 7** |
+
+1. **Sections.** A new `Section` component gives each page titled bands, with
+   `collapsible` for the ones that are support rather than subject. Explore
+   splits into "where prices are" / "should I buy?" / "one specific listing",
+   with population collapsed as "background".
+2. **Subject first.** Holdings leads with the holdings and collapses the six
+   analysis cards behind "how it is doing". The dashboard's "build your
+   portfolio" call moved from the very bottom to the top, shown only while
+   there is no portfolio to look at instead.
+3. **Rationale on demand.** Recommend's ~1500px of expanded derivation is
+   collapsed behind "why this split?" — reachable in one tap, which is what
+   the honesty promise actually requires, rather than read-before-you-reach-
+   the-answer.
+4. **League table cut to five**, with a real "show all (76)" control. Twelve
+   rows filled half the page and said nothing the top five had not.
+
+### Superseded — the original plan
+
+1. **Group and label.** Give each page 2-4 titled sections rather than a
+   single column. Explore splits cleanly into "where prices are" /
+   "should I buy?" / "this specific listing".
+2. **Lead with the subject.** Holdings first on Holdings; the primary CTA
+   above the fold on the Dashboard when there is no portfolio.
+3. **Collapse the secondary.** The purchase checklist already does this and
+   it works. Apply it to the per-asset rationale on Recommend and to the
+   analysis cards on Holdings — visible, one tap away, not unrolled.
+4. **Cut the league table.** Twelve ranked provinces is a leaderboard;
+   information value drops after four or five. Show the top few and let the
+   reader search for a specific area.
+
+### Found while measuring
+
+- [ ] **The floating buttons cover a real control.** On `/holdings` the chat
+      and panic FABs overlap the "1 Yıl" period button by 422px² and 268px².
+      Measured, not eyeballed. The other pages are clear.
+- [x] **Not a bug, and worth recording so it is not "fixed" later:** the
+      bottom nav appears to sit on top of content in full-page screenshots.
+      It does not — `.page-content` reserves 92px for it. That is a
+      screenshot artefact of fixed positioning.

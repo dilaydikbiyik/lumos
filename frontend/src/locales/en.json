@@ -815,8 +815,6 @@
     "searchLabel_state": "Search state",
     "noResults_province": "\"{{search}}\" not found — you can search across all {{count}} provinces.",
     "noResults_state": "\"{{search}}\" not found — you can search across all {{count}} states.",
-    "showingFirst_province": "Showing the first 12 provinces — search above for the rest.",
-    "showingFirst_state": "Showing the first 12 states — search above for the rest.",
     "indexOnly": "Price index (no per-m² figure is published)",
     "dataThrough": "(Data through {{month}})",
     "loading_province": "Fetching price data province by province…",
@@ -826,13 +824,11 @@
     "searchPlaceholder_region": "Search a region",
     "searchLabel_region": "Search region",
     "noResults_region": "\"{{search}}\" not found — you can search across all {{count}} regions.",
-    "showingFirst_region": "Showing the first 12 regions — search above for the rest.",
     "loading_region": "Fetching regional data…",
     "selectAssetType": "Property type",
     "searchPlaceholder_segment": "Search a segment",
     "searchLabel_segment": "Search segment",
     "noResults_segment": "\"{{search}}\" not found — there are {{count}} segments.",
-    "showingFirst_segment": "Showing every segment.",
     "loading_segment": "Fetching the Bundesbank housing index…",
     "manualFilterNote": "The link filters to the district. {{place}} is finer than the site's own URLs go — apply it in the site's filters once you're there."
   },
@@ -1166,5 +1162,22 @@
   "population": {
     "title": "Where people are moving",
     "workingAge": "{{pct}}% working age"
+  },
+  "section": {
+    "prices": "Where prices are",
+    "pricesSub": "Price per m² by area, and what it is really worth after inflation.",
+    "decide": "Should I buy?",
+    "decideSub": "The same money, two ways — not a forecast, what actually happened.",
+    "listing": "One specific listing",
+    "listingSub": "If you have a listing in hand: is the price sane, what to check before signing.",
+    "context": "Background",
+    "contextSub": "To read beside a price, not instead of one.",
+    "showMore": "Show all ({{count}})",
+    "showLess": "Show fewer",
+    "yourAssets": "What you own",
+    "howItIsDoing": "How it is doing",
+    "howItIsDoingSub": "Value, balance, currency and what inflation is taking.",
+    "why": "Why this split?",
+    "whySub": "Every step of the formula — open it if you want it."
   }
 }
