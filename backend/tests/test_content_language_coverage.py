@@ -31,7 +31,7 @@ import dataclasses
 
 import pytest
 
-from backend.content import purchase_checks
+from backend.content import fund_facts, purchase_checks
 from backend.markets import get_market_pack
 
 MARKETS = ("TR", "US", "DE")
@@ -116,6 +116,53 @@ def test_every_language_covers_the_same_checks(market):
 def test_for_market_returns_the_requested_language_without_falling_back(market, lang):
     """The public accessor, not just the table behind it."""
     assert purchase_checks.for_market(market, lang) is purchase_checks.CHECKS[market][lang]
+
+
+# ── fund facts: the same rule, applied to the newer catalogue ──────────────
+#
+# Written after the September 2026 fund liquidations, and market-keyed for
+# the same reason the purchase checklist is: the SUBJECT differs by country
+# (Sondervermögen, SIPC, the Capital Markets Law) while the WORDS must
+# follow the reader. Added here rather than in its own file so a second
+# catalogue cannot drift from the rule the first one is held to.
+
+@pytest.mark.parametrize("market", MARKETS)
+@pytest.mark.parametrize("lang", LANGS)
+def test_every_market_has_fund_facts_in_every_language(market, lang):
+    by_lang = fund_facts.FUND_FACTS[market]
+    assert lang in by_lang, f"{market} has no {lang} fund facts"
+    assert by_lang[lang], f"{market}/{lang} fund facts are empty"
+
+
+@pytest.mark.parametrize("market", MARKETS)
+@pytest.mark.parametrize("lang", LANGS)
+def test_fund_facts_are_written_in_the_language_filed_under(market, lang):
+    text = _text_of(fund_facts.FUND_FACTS[market][lang])
+    assert _looks_like(text, lang), f"{market}/{lang} does not read as {lang}"
+
+
+@pytest.mark.parametrize("market", MARKETS)
+def test_fund_facts_cover_the_same_points_in_each_language(market):
+    counts = {lang: len(fund_facts.FUND_FACTS[market][lang]) for lang in LANGS}
+    assert len(set(counts.values())) == 1, f"{market} counts differ: {counts}"
+
+
+@pytest.mark.parametrize("market", MARKETS)
+@pytest.mark.parametrize("lang", LANGS)
+def test_fund_facts_never_promise_safety(market, lang):
+    """
+    The whole point is that separation is NOT a value guarantee. Copy that
+    drifts into "protected" or "guaranteed" would teach the opposite of
+    what the liquidations taught, so each market's set has to carry the
+    limit as well as the protection.
+    """
+    text = _text_of(fund_facts.FUND_FACTS[market][lang]).lower()
+    limits = {
+        "tr": ("garanti değil", "değildir", "demek değil"),
+        "en": ("not mean", "does not", "not a guarantee"),
+        "de": ("nicht", "kein"),
+    }
+    assert any(w in text for w in limits[lang]), (market, lang)
 
 
 # ── market packs: same rule, discovered by reflection ───────────────────────

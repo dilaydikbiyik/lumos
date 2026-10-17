@@ -1192,5 +1192,9 @@
     "howItIsDoingSub": "Value, balance, currency and what inflation is taking.",
     "why": "Why this split?",
     "whySub": "Every step of the formula — open it if you want it."
+  },
+  "fundFacts": {
+    "title": "What do you own when you own a fund?",
+    "subtitle": "Your money is separate from the manager's — but what does that guarantee, and what does it not?"
   }
 }

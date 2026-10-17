@@ -1192,5 +1192,9 @@
     "howItIsDoingSub": "Wert, Balance, Währung und was die Inflation nimmt.",
     "why": "Warum diese Aufteilung?",
     "whySub": "Jeder Schritt der Formel — bei Bedarf aufklappen."
+  },
+  "fundFacts": {
+    "title": "Was besitzt du, wenn du einen Fonds besitzt?",
+    "subtitle": "Dein Geld ist vom Verwalter getrennt — aber was garantiert das, und was nicht?"
   }
 }

@@ -385,6 +385,38 @@ async def yield_comparison(
     )
 
 
+@router.get("/fund-facts")
+async def fund_facts(
+    user_id: str = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+    lang: str = Depends(language),
+):
+    """
+    What a fund is in THIS market, and what its protections do not cover.
+
+    Written after the September 2026 liquidations, when 131 funds were
+    closed to trading at once. The app had taught only one kind of
+    liquidity — how fast an asset sells — and nothing about the wrapper
+    freezing while the asset inside stays perfectly sound.
+
+    Market-keyed because the structure genuinely differs: Sondervermögen in
+    Germany, SIPC and the custody rules in the US, the Capital Markets Law
+    in Türkiye. The lesson that separation is not a value guarantee is the
+    same everywhere, and the thing people misread is different in each.
+    """
+    from backend.content import fund_facts as content
+
+    user = await user_repository.get_or_create(db, user_id)
+    market = user.market or "TR"
+    facts = content.for_market(market, lang)
+
+    return {
+        "market": market,
+        "available": facts is not None,
+        "facts": facts or [],
+    }
+
+
 @router.get("/purchase-checks")
 async def purchase_checks(
     user_id: str = Depends(get_current_user),

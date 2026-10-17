@@ -1192,5 +1192,9 @@
     "howItIsDoingSub": "Değer, denge, kur ve enflasyon etkisi.",
     "why": "Neden bu dağılım?",
     "whySub": "Formülün her adımı — istersen aç."
+  },
+  "fundFacts": {
+    "title": "Fon aldığında ne alıyorsun?",
+    "subtitle": "Paran yöneticinin parasından ayrı — ama bu ne garanti ediyor, ne etmiyor?"
   }
 }

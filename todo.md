@@ -2337,3 +2337,45 @@ user-facing.)
       recommendation universe.** Weeks after 131 of them were frozen is not
       the moment for this app to start naming funds. Teaching the risk is
       within its purpose; selecting funds is not.
+
+## Funds, per market — and the legal brief (2026-10-18)
+
+### Correcting my own earlier framing
+
+I said the app should not "add funds". That was wrong in its premise: the
+app ALREADY recommends funds — SPY, QQQ and GLD are funds, and the German
+universe is entirely UCITS. The real distinction is structural, and it is
+exactly what the September liquidations exposed:
+
+- an **exchange-traded** fund: you sell your unit to another buyer while the
+  market is open, and never withdraw from the fund at all;
+- a **manager-redeemed** fund: you ask the fund itself, priced once a day —
+  one more link in the chain between a reader and their money.
+
+Both are called funds. Nothing in the app said they were different machines.
+
+- [x] **`backend/content/fund_facts.py`** — five points per market, all nine
+      market × language combinations, held to the same coverage test as the
+      purchase checklist. Served at `/planning/fund-facts` and shown,
+      collapsed, on the portfolio screen where every holding is a fund.
+      Researched rather than assumed. All three markets separate fund assets
+      from the manager (Capital Markets Law, custody rules, Sondervermögen)
+      — the protection is genuinely strong and worth knowing. None of them
+      guarantee VALUE or same-day ACCESS, and each market has its own
+      misreading: "the regulator approved it", "it's SIPC insured", "also
+      geschützt". A test asserts each market's set carries the limit and not
+      only the protection.
+- [ ] **Figures stay out of evergreen copy.** The 131 funds and 455,758
+      investors are in commit messages and this file, not on screen — most
+      write-ups are law-firm blogs and the numbers disagree between them.
+      If any of it ever goes user-facing, confirm against SPK bulletins.
+
+### Legal review
+
+- [x] **`docs/legal-review-brief.md`** — what to take to a lawyer and what to
+      ask, in order. The gate is one question: does naming specific
+      instruments, personalised to someone's circumstances, constitute
+      investment advice even with no execution, no custody and no fee? Every
+      other decision, including the company structure, follows from it.
+      Explicitly says NOT to open with "should I form a company" — that gets
+      a yes without touching the question that gates the product.

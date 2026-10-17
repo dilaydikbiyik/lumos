@@ -8,6 +8,7 @@ import { sliceColor } from '../utils/palette'
 import ReitCard from '../components/ReitCard'
 import AssetExplainer from '../components/AssetExplainer'
 import Section from '../components/Section'
+import FundFacts from '../components/FundFacts'
 import TimeMachine from '../components/TimeMachine'
 import FutureScenarios from '../components/FutureScenarios'
 import AllocationRationale from '../components/AllocationRationale'
@@ -178,6 +179,11 @@ export default function RecommendPage() {
         )}
 
         {portfolio.includes_reits && <ReitCard explanation={portfolio.metadata?.reit_explanation} />}
+
+        {/* Every holding above is a fund. The app had never said what that
+            means structurally — which is the thing 455,758 people in Türkiye
+            found out the hard way in September 2026. */}
+        <FundFacts />
 
         {/* ── Layer 2: SINA — test it against reality before risking money ── */}
         <Layer
