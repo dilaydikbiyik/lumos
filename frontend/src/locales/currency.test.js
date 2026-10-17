@@ -158,3 +158,39 @@ describe('copy catalogue', () => {
     expect(dead, `copy with no code behind it:\n${dead.join('\n')}`).toEqual([])
   })
 })
+
+/**
+ * A translation may not change a number.
+ *
+ * `goal.targetPlaceholder` suggested 800000 in Turkish and English and
+ * 80000 in German — one zero short, so a German reader setting a savings
+ * goal was shown an example a tenth the size. Nothing else in the suite
+ * could see it: the key existed in all three languages, carried the same
+ * placeholders, and read as fluent German.
+ *
+ * Interpolations are stripped first, and separators with them, because
+ * 100.000 and 100,000 are the same number written for different readers.
+ */
+describe('numbers survive translation', () => {
+  it('is the same figure in every language', () => {
+    const digits = (value) => {
+      const withoutVars = value.replace(/\{\{[^}]+\}\}/g, '')
+      const bare = withoutVars.replace(/[.,\s]/g, '')
+      return (bare.match(/\d+/g) || []).sort()
+    }
+    const bundles = { tr: Object.fromEntries(flatten(tr)),
+                      en: Object.fromEntries(flatten(en)),
+                      de: Object.fromEntries(flatten(de)) }
+
+    const drifted = []
+    for (const key of Object.keys(bundles.tr)) {
+      if (!(key in bundles.en) || !(key in bundles.de)) continue
+      const seen = new Set(['tr', 'en', 'de'].map(l => digits(bundles[l][key]).join('|')))
+      if (seen.size > 1) {
+        drifted.push(`${key}: ${['tr', 'en', 'de']
+          .map(l => `${l}=[${digits(bundles[l][key])}]`).join(' ')}`)
+      }
+    }
+    expect(drifted, `a translation changed a number:\n${drifted.join('\n')}`).toEqual([])
+  })
+})

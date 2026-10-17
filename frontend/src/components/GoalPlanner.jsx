@@ -10,7 +10,13 @@ import { Trans, useTranslation } from 'react-i18next'
  */
 export default function GoalPlanner() {
   const { t } = useTranslation()
-  const { money } = useMarket()
+  const { money, pack } = useMarket()
+  // A goal example is a market fact like every other amount. It was written
+  // into the copy — 800000 in Turkish and English, 80000 in German, one zero
+  // short. The pack's property entry threshold is the natural anchor: it is
+  // already "the amount at which buying here becomes realistic", which is
+  // what most people are saving towards.
+  const goalExample = money(pack?.property_entry_threshold ?? 1_000_000)
   const [form, setForm] = useState({ target_amount: '', years: 3, current_savings: '', monthly: '' })
   const [plan, setPlan] = useState(null)
   const [progress, setProgress] = useState(null)
@@ -51,7 +57,7 @@ export default function GoalPlanner() {
         {t('goal.subtitle')}
       </p>
       <form onSubmit={run} style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-        <input className="input" type="number" placeholder={t('goal.targetPlaceholder')} required min="1"
+        <input className="input" type="number" placeholder={t('goal.targetPlaceholder', { example: goalExample })} required min="1"
                value={form.target_amount} onChange={e => setForm({ ...form, target_amount: e.target.value })} />
         <div style={{ display: 'flex', gap: 8 }}>
           <select className="input" style={{ flex: 1 }} value={form.years}

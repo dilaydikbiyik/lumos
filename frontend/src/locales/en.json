@@ -22,7 +22,9 @@
     "loading": "Loading…",
     "redirecting": "Redirecting you to the sign-in page…",
     "save": "Save",
-    "next": "Next"
+    "next": "Next",
+    "disclaimer": "This is educational content, not investment advice. Lumos executes no trades, holds no money and connects to no brokerage. The decisions are yours — and if the amount is the largest you will ever spend, ask a licensed advisor.",
+    "disclaimerProjection": "Not a forecast: the distribution of past windows, applied to your amount. Past performance does not guarantee the future. Lumos executes no trades and holds no money."
   },
   "onboarding": {
     "tagline": "Investing looks like a dark forest.",
@@ -646,7 +648,7 @@
   "goal": {
     "title": "🎯 My Goal",
     "subtitle": "Let's turn a goal like \"a house deposit in 3 years\" into a concrete monthly plan.",
-    "targetPlaceholder": "Target amount (e.g. 800000)",
+    "targetPlaceholder": "Target amount (e.g. {{example}})",
     "withinYears": "within {{n}} years",
     "savingsPlaceholder": "Current savings (opt.)",
     "monthlyPlaceholder": "How much do you save monthly right now? (opt.)",

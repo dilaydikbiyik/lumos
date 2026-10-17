@@ -33,6 +33,20 @@ naming a domain someone else owns is a rejection waiting to happen.
 
 ## Review notes (paste into both consoles)
 
+**Lead with this.** Apple 5.1.1(ix) asks that apps "in highly regulated
+fields (such as banking and financial services)" be submitted by the legal
+entity providing the service rather than an individual developer, and
+3.2.1(viii) says apps "used for financial trading, investing, or money
+management" should come from the financial institution performing them.
+Google Play asks the same question through its Financial features
+declaration, whose definition of a financial product includes personalised
+investment advice.
+
+Lumos is none of those things, and the first paragraph a reviewer reads has
+to say so before they classify the app. If the app is read as a financial
+SERVICE rather than educational content, an individual-developer submission
+is rejected on the category alone, whatever the quality of the build.
+
 > Lumos is an educational tool for first-time investors. It does not execute
 > trades, hold funds, connect to any brokerage, or provide personalised
 > investment advice. Every portfolio it shows is an illustration built from

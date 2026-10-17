@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, useCallback } from 'react'
 import FireflyMark from '../components/FireflyMark'
 import Icon from '../components/Icon'
 import Section from '../components/Section'
+import Disclaimer from '../components/Disclaimer'
 import { useLocation, useNavigate } from 'react-router-dom'
 import AppHeader from '../components/AppHeader'
 import CurrencyExposure from '../components/CurrencyExposure'
@@ -492,6 +493,10 @@ export default function HoldingsPage() {
 
         {error && <p style={{ color: 'var(--red)', fontSize: 13 }}>{error}</p>}
         </Section>
+
+        {/* This screen values somebody's property and tells them their mix
+            has drifted. It said nothing about what those numbers are. */}
+        <Disclaimer />
 
         <Section title={t('section.howItIsDoing')} subtitle={t('section.howItIsDoingSub')}
                  collapsible defaultOpen={false}>

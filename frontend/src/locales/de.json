@@ -22,7 +22,9 @@
     "loading": "Wird geladen…",
     "redirecting": "Du wirst zur Anmeldeseite weitergeleitet…",
     "save": "Speichern",
-    "next": "Weiter"
+    "next": "Weiter",
+    "disclaimer": "Das ist Bildungsinhalt, keine Anlageberatung. Lumos führt keine Order aus, verwahrt kein Geld und ist mit keinem Broker verbunden. Die Entscheidungen sind deine — und wenn es die größte Ausgabe deines Lebens ist, frag eine lizenzierte Beraterin.",
+    "disclaimerProjection": "Keine Prognose: die Verteilung vergangener Zeitfenster, auf deinen Betrag angewendet. Vergangene Wertentwicklung garantiert die Zukunft nicht. Lumos führt keine Order aus und verwahrt kein Geld."
   },
   "language": {
     "label": "Sprache"
@@ -237,7 +239,7 @@
   "goal": {
     "title": "🎯 Mein Ziel",
     "subtitle": "Machen wir aus einem Ziel wie \"Eigenkapital in 3 Jahren\" einen konkreten Monatsplan.",
-    "targetPlaceholder": "Zielbetrag (z. B. 80000)",
+    "targetPlaceholder": "Zielbetrag (z. B. {{example}})",
     "withinYears": "in {{n}} Jahren",
     "savingsPlaceholder": "Vorhandene Ersparnisse (opt.)",
     "monthlyPlaceholder": "Wie viel sparst du derzeit monatlich? (opt.)",

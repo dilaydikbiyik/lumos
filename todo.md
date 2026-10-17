@@ -2238,3 +2238,55 @@ Measured before and after on the same seeded account:
       type a word); a single holding needs less than that but more than
       nothing. Two taps now, and the confirm times out rather than latching,
       so a row left armed by a stray tap does not stay dangerous.
+
+## Release polish + competitor read (2026-10-18)
+
+### The single biggest release risk is the CATEGORY, not the build
+
+Apple **5.1.1(ix)**: apps "in highly regulated fields (such as banking and
+financial services)" should be submitted by the legal entity providing the
+service, "and not by an individual developer". Apple **3.2.1(viii)**: apps
+"used for financial trading, investing, or money management" should come
+from the financial institution performing them. Google Play asks the same
+question through its **Financial features declaration**, whose definition of
+a financial product includes personalised investment advice.
+
+Read the wrong way, Lumos is rejected on the category alone — whatever the
+quality of the build. The defence is already true of the architecture (no
+execution path exists in the codebase, no custody, no brokerage) but it was
+not stated where it counts.
+
+- [x] Review notes now LEAD with the guideline numbers and answer them
+      directly, before describing the app.
+- [x] **Every screen that states a figure now carries the disclaimer.** It
+      lived on the recommendation screen alone plus a one-time modal — while
+      Holdings values someone's property and says their mix has drifted,
+      Explore returns a rent-or-buy verdict and judges a real asking price,
+      and the Dashboard divides a budget. Those are the screens a reader
+      acts on. The copy also states the position in one sentence: executes
+      nothing, holds nothing, connects to no broker.
+- [ ] **[you — the decision this turns on]** Comparable released apps in
+      this space are published by companies, not individuals (Bloom is
+      Contour Labs Inc. and is an actual SIPC-insured brokerage; Investo is
+      an LLC). A limited company is the safe route and is the one thing that
+      removes this risk entirely. Worth pricing before submitting.
+
+### A translation had changed a number
+
+- [x] `goal.targetPlaceholder` suggested 800000 in Turkish and English and
+      **80000 in German** — one zero short, so a German reader setting a
+      savings goal saw an example a tenth the size. Nothing in the suite
+      could see it: the key existed in all three languages, carried the same
+      placeholders, and read as fluent German.
+      Fixed at the root rather than the digit: the example now comes from the
+      market's own `property_entry_threshold`, like every other amount.
+      A test pins number parity across translations and was verified by
+      putting the zero back.
+- [x] Checked and clean: no copy promises a return or reads as advice — the
+      matches were all negations ("not guaranteed", "not a forecast"), which
+      is the app being careful. The legal disclaimer text is consistent in
+      all three languages ("never the sole basis of any investment
+      decision").
+- [ ] Negation parity across languages is NOT testable this way — Turkish
+      negates with a suffix (`ödeme-di-ğin`) and a regex produces ~98 false
+      positives. Spot-checked the high-stakes keys by hand instead.

@@ -22,7 +22,9 @@
     "loading": "Yükleniyor…",
     "redirecting": "Giriş sayfasına yönlendiriliyorsun…",
     "save": "Kaydet",
-    "next": "Devam"
+    "next": "Devam",
+    "disclaimer": "Burası eğitim içeriğidir, yatırım tavsiyesi değildir. Lumos işlem yapmaz, para tutmaz ve hiçbir aracı kuruma bağlanmaz. Kararlar senin; tutar hayatındaki en büyük harcamaysa lisanslı bir danışmana sor.",
+    "disclaimerProjection": "Bu bir tahmin değil: geçmişteki dönemlerin dağılımı, bugünkü tutarına uygulanmış hâli. Geçmiş performans geleceği garanti etmez. Lumos işlem yapmaz, para tutmaz."
   },
   "onboarding": {
     "tagline": "Yatırım karanlık bir orman gibi görünür.",
@@ -646,7 +648,7 @@
   "goal": {
     "title": "🎯 Hedefim",
     "subtitle": "\"3 yılda ev peşinatı\" gibi bir hedefi somut aylık plana çevirelim.",
-    "targetPlaceholder": "Hedef tutar (örn: 800000)",
+    "targetPlaceholder": "Hedef tutar (örn: {{example}})",
     "withinYears": "{{n}} yıl içinde",
     "savingsPlaceholder": "Mevcut birikim (ops.)",
     "monthlyPlaceholder": "Şu an ayda ne kadar biriktiriyorsun? (ops.)",

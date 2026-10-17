@@ -10,6 +10,7 @@ import NewsDigest from '../components/NewsDigest'
 import GoalPlanner from '../components/GoalPlanner'
 import PathInvitation from '../components/PathInvitation'
 import BehaviorMirror from '../components/BehaviorMirror'
+import Disclaimer from '../components/Disclaimer'
 import PathSuggestion from '../components/PathSuggestion'
 import BudgetSplit from '../components/BudgetSplit'
 import DailyTip from '../components/DailyTip'
@@ -263,6 +264,9 @@ export default function DashboardPage() {
 
         {/* ── Progressive details toggle ── */}
         <ProgressiveDetails holdingsSummary={holdingsSummary} portfolio={portfolio} />
+
+        {/* The budget split divides somebody's actual money. */}
+        <Disclaimer />
 
         {/* ── Risk profile / portfolio ── */}
         {!profile ? (

@@ -9,6 +9,7 @@ import PurchaseChecks from '../components/PurchaseChecks'
 import ListingEval from '../components/ListingEval'
 import PopulationTrend from '../components/PopulationTrend'
 import Section from '../components/Section'
+import Disclaimer from '../components/Disclaimer'
 import useMarket from '../hooks/useMarket'
 import { Trans, useTranslation } from 'react-i18next'
 import { signedPercent } from '../utils/format'
@@ -759,6 +760,10 @@ export default function ExplorePage() {
                  collapsible defaultOpen={false}>
           <PopulationTrend />
         </Section>
+
+        {/* Rent-or-buy returns a verdict and the listing check judges a real
+            asking price. Those are the screens a reader acts on. */}
+        <Disclaimer variant="projection" />
       </div>
     </div>
   )
