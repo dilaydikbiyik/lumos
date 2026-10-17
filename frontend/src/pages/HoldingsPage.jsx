@@ -505,7 +505,14 @@ export default function HoldingsPage() {
           <div className="card">
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
               <Icon name="bulb" size={22} glow />
-              <strong>{t('holdings.healthTitle', { score: health.overall })}</strong>
+              {/* The 0-100 "Fener Skoru" is gone. Its arithmetic was real —
+                  a Herfindahl concentration measure and the liquid share —
+                  but collapsing two different facts into one invented number
+                  hid both: a reader could not tell whether 32 meant
+                  "everything in one thing" or "nothing sellable", and could
+                  act on neither. The sentences underneath always carried the
+                  answer; they are the card now. */}
+              <strong>{t('holdings.healthTitle')}</strong>
             </div>
             <p style={{ fontSize: 11.5, color: 'var(--text-dim)', lineHeight: 1.5, marginBottom: 8 }}>
               {t('holdings.healthBody')}

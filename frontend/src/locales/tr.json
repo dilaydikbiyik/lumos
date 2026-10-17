@@ -463,6 +463,10 @@
     "drawdown": {
       "label": "drawdown",
       "text": "Tepeden dibe en büyük düşüş. \"En kötü gününde ne kadar eksideydin?\" sorusunun cevabı."
+    },
+    "karsi taraf riski": {
+      "label": "karşı taraf riski",
+      "text": "Varlığının değil, onu senin adına tutan kurumun riski. Fon kapanabilir, aracı kurumun faaliyeti durdurulabilir; bu durumda içindeki varlık sağlam olsa da paranı o süre boyunca alamazsın. Fiyat riskinden ayrı bir risktir ve grafikte görünmez."
     }
   },
   "feedback": {
@@ -509,8 +513,8 @@
     "erosionCash": "Nakit varlıkların (Varlıklarım'a eklediğin nakit): <0>{{amount}}</0>",
     "erosionBudget": "Yatırılmamış bütçen (bildirdiğin bütçe − yatırdığın): <0>{{amount}}</0>",
     "erosionFormula": "Toplam × aylık TÜFE (%{{pct}}) = {{amount}}",
-    "healthTitle": "Fener Skoru: {{score}}/100",
-    "healthBody": "Fener, portföyünün sağlığını tek bakışta gösterir: varlıkların ne kadar çeşitli ve gerektiğinde ne kadar kolay nakde çevrilebilir olduğuna bakar.",
+    "healthTitle": "Varlık dağılımın",
+    "healthBody": "İki soru: tek bir şeye mi yığılmış, ve gerektiğinde ne kadarını hızla nakde çevirebilirsin?",
     "rebuildCta": "↻ Kalan {{amount}} ile portföyümü güncelle",
     "purchase": "Alış",
     "current": "Güncel",
@@ -642,6 +646,10 @@
       "cost-avg": {
         "title": "Düzenli Yatırım Riski Azaltır",
         "body": "Her ay aynı tutarı yatırmak, bazı ay ucuza bazı ay pahalıya almana sebep olur. Sonuç: ortalamanın altında maliyet."
+      },
+      "counterparty": {
+        "title": "Varlık ayrı, saklayan ayrı",
+        "body": "Bir fonun içindeki hisseler likit olabilir ama paranı fonun kendisinden alırsın. Sarmalayıcı donarsa — fon işleme kapanır, şirket tasfiyeye girerse — varlık ayakta olsa bile paran elinde değildir. Tek bir kurumda birikmemek, tek bir varlıkta birikmemek kadar önemlidir."
       }
     }
   },
@@ -698,14 +706,15 @@
   "readiness": {
     "title": "Cesaret Skoru",
     "ready": "Gerçek yatırıma hazırsın",
-    "progressing": "Her adım seni biraz daha hazırlıyor",
     "milestones": {
       "risk_profile": "Risk profilini tamamladın",
       "path_chosen": "Yatırım yolunu seçtin",
       "fear_shared": "Korkunu paylaştın",
       "first_holding": "İlk varlığını ekledin",
       "three_holdings": "En az 3 varlık takip ediyorsun"
-    }
+    },
+    "stepsDone": "{{done}} / {{total}} adım tamam",
+    "nextUp": "Sıradaki:"
   },
   "fear": {
     "step": "Adım 2 / 3",

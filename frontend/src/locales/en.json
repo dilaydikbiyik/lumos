@@ -463,6 +463,10 @@
     "drawdown": {
       "label": "drawdown",
       "text": "The biggest peak-to-trough fall. The answer to \"how deep in the red were you on your worst day?\""
+    },
+    "karsi taraf riski": {
+      "label": "counterparty risk",
+      "text": "The risk of the institution holding something for you, rather than of the thing itself. A fund can be suspended or a broker's licence halted; the asset inside may be sound while your money stays out of reach for the duration. It is a separate risk from price, and it does not show up on a chart."
     }
   },
   "feedback": {
@@ -509,8 +513,8 @@
     "erosionCash": "Your cash holdings (cash added to My Assets): <0>{{amount}}</0>",
     "erosionBudget": "Your uninvested budget (declared budget − invested): <0>{{amount}}</0>",
     "erosionFormula": "Total × monthly CPI ({{pct}}%) = {{amount}}",
-    "healthTitle": "Lantern Score: {{score}}/100",
-    "healthBody": "The Lantern shows your portfolio's health at a glance: how diversified your assets are, and how easily they turn into cash when needed.",
+    "healthTitle": "How your wealth is spread",
+    "healthBody": "Two questions: is it piled into one thing, and how much of it could become cash quickly if you needed it to?",
     "rebuildCta": "↻ Update my portfolio with the remaining {{amount}}",
     "purchase": "Bought",
     "current": "Now",
@@ -642,6 +646,10 @@
       "cost-avg": {
         "title": "Regular Investing Lowers Risk",
         "body": "Investing the same amount monthly means buying cheap some months and dear in others. The result: a below-average cost."
+      },
+      "counterparty": {
+        "title": "The asset and the keeper are two things",
+        "body": "The shares inside a fund can be perfectly liquid, but you get your money from the fund, not from them. If the wrapper freezes — trading suspended, the company put into liquidation — the asset can be fine while your money is not reachable. Not concentrating in one institution matters as much as not concentrating in one asset."
       }
     }
   },
@@ -698,14 +706,15 @@
   "readiness": {
     "title": "Courage Score",
     "ready": "You're ready for real investing",
-    "progressing": "Every step gets you a little more ready",
     "milestones": {
       "risk_profile": "You completed your risk profile",
       "path_chosen": "You chose your investing path",
       "fear_shared": "You shared your fear",
       "first_holding": "You added your first holding",
       "three_holdings": "You're tracking at least 3 holdings"
-    }
+    },
+    "stepsDone": "{{done}} of {{total}} steps done",
+    "nextUp": "Next:"
   },
   "fear": {
     "step": "Step 2 / 3",

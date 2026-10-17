@@ -16,6 +16,12 @@ const TIPS = [
   { id: 'dividend', emoji: '💰' },
   { id: 'reel-return', emoji: '📊' },
   { id: 'liquidity', emoji: '💧' },
+  // Market liquidity — "how fast can I sell this" — was the only kind the
+  // app taught. It says nothing about the WRAPPER freezing: a fund closed
+  // to trading, a portfolio company in liquidation, the asset inside sound
+  // and the money still out of reach. Türkiye learned the difference in
+  // September 2026, when the regulator suspended 131 funds at once.
+  { id: 'counterparty', emoji: '🏛️' },
   { id: 'drawdown', emoji: '🎢' },
   { id: 'gold', emoji: '🥇' },
   { id: 'patience', emoji: '⏳' },

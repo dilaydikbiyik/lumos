@@ -50,32 +50,33 @@ export default function ReadinessScore() {
     )
   }
 
-  const { score, milestones, ready_for_real_investing } = data
+  const { milestones, ready_for_real_investing } = data
+  // The 0-100 ring is gone. It was the checklist's own percentage dressed
+  // as a score: five boxes, so it could only ever read 0, 20, 40, 60, 80 or
+  // 100, and "80" tells a beginner nothing the four ticks had not already
+  // said. The app argues this itself, in the quiz: "progress as a count,
+  // not a bar — '3 of 9' tells a nervous person how much is left; a bar
+  // only tells them they are not finished." It just had not been applied
+  // here. A count, and the one thing to do next.
+  const entries = Object.entries(milestones)
+  const done = entries.filter(([, ok]) => ok).length
+  const nextStep = entries.find(([, ok]) => !ok)?.[0]
 
   return (
     <div className="card" style={{
       border: ready_for_real_investing ? '1px solid rgba(61,214,140,0.3)' : '1px solid var(--firefly-dim)',
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10 }}>
-        <div style={{
-          width: 44, height: 44, borderRadius: '50%', flexShrink: 0,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          background: `conic-gradient(var(--firefly, #F5A524) ${score * 3.6}deg, var(--bg-input) 0deg)`,
-        }}>
-          <div style={{
-            width: 34, height: 34, borderRadius: '50%', background: 'var(--bg-card)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: 12, fontWeight: 700,
-          }}>
-            {score}
-          </div>
-        </div>
         <div>
           <strong style={{ fontSize: 14 }}>{t('readiness.title')}</strong>
-          <p style={{ fontSize: 12, opacity: 0.7, margin: 0 }}>
+          <p style={{ fontSize: 12, opacity: 0.7, margin: '2px 0 0' }}>
+            {t('readiness.stepsDone', { done, total: entries.length })}
+            {/* When the groundwork is done, say so. When it is not, name the
+                ONE thing to do next rather than a vague "progressing" —
+                that is the difference between a status and an instruction. */}
             {ready_for_real_investing
-              ? t('readiness.ready')
-              : t('readiness.progressing')}
+              ? <> · {t('readiness.ready')}</>
+              : nextStep && <> · {t('readiness.nextUp')} {t(`readiness.milestones.${nextStep}`)}</>}
           </p>
         </div>
       </div>

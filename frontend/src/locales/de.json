@@ -203,8 +203,8 @@
     "erosionCash": "Deine Barbestände (in Mein Vermögen erfasst): <0>{{amount}}</0>",
     "erosionBudget": "Dein nicht investiertes Budget (angegeben − investiert): <0>{{amount}}</0>",
     "erosionFormula": "Summe × Monatsinflation ({{pct}}%) = {{amount}}",
-    "healthTitle": "Laternen-Wert: {{score}}/100",
-    "healthBody": "Die Laterne zeigt auf einen Blick, wie gesund dein Portfolio ist: wie breit gestreut deine Anlagen sind und wie leicht sie sich bei Bedarf zu Geld machen lassen.",
+    "healthTitle": "Wie dein Vermögen verteilt ist",
+    "healthBody": "Zwei Fragen: steckt alles in einer Sache, und wie viel davon wäre im Bedarfsfall schnell Bargeld?",
     "rebuildCta": "↻ Portfolio mit den verbleibenden {{amount}} aktualisieren",
     "purchase": "Gekauft",
     "current": "Aktuell",
@@ -351,6 +351,10 @@
     "drawdown": {
       "label": "Drawdown",
       "text": "Der größte Rückgang vom Hoch zum Tief. Die Antwort auf \"wie tief im Minus warst du am schlimmsten Tag?\""
+    },
+    "karsi taraf riski": {
+      "label": "Gegenparteirisiko",
+      "text": "Das Risiko der Institution, die etwas für dich hält — nicht der Anlage selbst. Ein Fonds kann ausgesetzt, eine Brokerlizenz angehalten werden; die Anlage darin kann solide sein, während dein Geld so lange unerreichbar bleibt. Ein vom Preis getrenntes Risiko, und auf keinem Chart zu sehen."
     }
   },
   "fx": {
@@ -391,14 +395,15 @@
   "readiness": {
     "title": "Mut-Wert",
     "ready": "Du bist bereit für echtes Investieren",
-    "progressing": "Jeder Schritt macht dich ein Stück bereiter",
     "milestones": {
       "risk_profile": "Du hast dein Risikoprofil erstellt",
       "path_chosen": "Du hast deinen Anlageweg gewählt",
       "fear_shared": "Du hast deine Angst geteilt",
       "first_holding": "Du hast deine erste Anlage hinzugefügt",
       "three_holdings": "Du verfolgst mindestens 3 Anlagen"
-    }
+    },
+    "stepsDone": "{{done}} von {{total}} Schritten erledigt",
+    "nextUp": "Als Nächstes:"
   },
   "fear": {
     "step": "Schritt 2 / 3",
@@ -870,6 +875,10 @@
       "cost-avg": {
         "title": "Regelmäßiges Anlegen senkt das Risiko",
         "body": "Legst du monatlich denselben Betrag an, kaufst du in manchen Monaten günstig und in anderen teuer. Das Ergebnis: ein unterdurchschnittlicher Einstandspreis."
+      },
+      "counterparty": {
+        "title": "Die Anlage und die Verwahrstelle sind zweierlei",
+        "body": "Die Aktien in einem Fonds können völlig liquide sein, dein Geld bekommst du aber vom Fonds, nicht von ihnen. Friert die Hülle ein — Handel ausgesetzt, Gesellschaft in Abwicklung — kann die Anlage intakt sein und dein Geld trotzdem unerreichbar. Nicht auf ein Institut zu konzentrieren zählt so viel wie nicht auf eine Anlage."
       }
     }
   },

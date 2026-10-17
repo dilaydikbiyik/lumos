@@ -6,7 +6,7 @@ from backend.services.health_score import compute_health
 
 def test_empty_portfolio_scores_zero():
     result = compute_health({})
-    assert result["overall"] == 0
+    assert result["components"] == {}
     assert result["notes"]
 
 
@@ -23,7 +23,7 @@ def test_balanced_liquid_portfolio_scores_high():
     })
     assert result["components"]["diversification"] == 100
     assert result["components"]["liquidity"] == 100
-    assert result["overall"] == 100
+    assert result["components"]["liquidity"] == 100
 
 
 def test_illiquid_heavy_portfolio_warns():

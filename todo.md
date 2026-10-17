@@ -2290,3 +2290,50 @@ not stated where it counts.
 - [ ] Negation parity across languages is NOT testable this way — Turkish
       negates with a suffix (`ödeme-di-ğin`) and a regex produces ~98 false
       positives. Spot-checked the high-stakes keys by hand instead.
+
+## Concrete over scored (2026-10-18)
+
+Direction from use: "make it more concrete — things like the Fener score,
+rather than that" and "I want it to be a genuinely educational app".
+
+- [x] **The Fener score is gone.** Its arithmetic was real — a Herfindahl
+      concentration measure and the liquid share — but collapsing two
+      different facts into one invented 0-100 hid both: a reader could not
+      tell whether 32 meant "everything is in one thing" or "almost none of
+      it is sellable", and could act on neither. The module had already made
+      this argument against itself ("a number with no account of itself
+      teaches nothing... a beginner cannot act on a grade") and applied it to
+      the components while keeping the grade. The sentences it always
+      produced are the card now.
+- [x] **The Courage score is gone the same way.** Five checkboxes expressed
+      as a percentage could only ever read 0/20/40/60/80/100, and "80" said
+      nothing the four ticks had not. It is a count and the ONE next step —
+      which is the app's own principle, argued in the quiz ("progress as a
+      count, not a bar") and simply not applied here.
+- [x] **Checked rather than assumed: the panic flow is NOT wellness
+      theatre.** No breathing exercise. It pauses, then shows the reader's
+      own figures and four facts about how drops behave. That is concrete
+      and it stays.
+
+### Counterparty risk — the thing Türkiye just learned
+
+In September 2026 the regulator suspended 131 funds across seven portfolio
+companies and put them into liquidation; press releases put the number of
+individual investors at 455,758. (Most available write-ups are law-firm
+blogs — confirm figures against SPK bulletins before quoting them anywhere
+user-facing.)
+
+- [x] **The app taught the wrong kind of liquidity.** It had one idea of it:
+      "how fast can I sell this" — stocks minutes, land months. It said
+      nothing about the WRAPPER freezing: a fund closed to trading, a
+      company in liquidation, the asset inside perfectly sound and the money
+      still out of reach. Added as a glossary entry and a daily tip, in all
+      three languages.
+- [ ] **Known limitation, stated rather than half-fixed:** the spread card
+      measures concentration by asset TYPE. It cannot see that a portfolio
+      is entirely with one institution, because holdings do not record an
+      issuer. Recording one is the honest fix and is a schema change.
+- [ ] **Deliberately NOT done: adding Turkish mutual funds to the
+      recommendation universe.** Weeks after 131 of them were frozen is not
+      the moment for this app to start naming funds. Teaching the risk is
+      within its purpose; selecting funds is not.

@@ -1,11 +1,17 @@
 """
-Portfolio health score ("Fener") — one 0-100 glance at the user's wealth.
+How a reader's wealth is spread, in two measures and a sentence each.
 
-Components (each 0-100):
   - diversification: 1 - Herfindahl index over asset-type values
   - liquidity: share of wealth that can realistically become cash quickly
-Overall = weighted mean. Every component ships with a plain-language note
-so the beginner learns WHY, not just the number (vision: explain first).
+
+THERE IS NO LONGER AN OVERALL SCORE. There was: a weighted mean of the two,
+shown as "Fener Skoru: 32/100". The arithmetic was real, but collapsing two
+different facts into one invented number hid both — 32 could mean
+"everything is in one thing" or "almost none of it is sellable", and a
+reader could act on neither reading. This module already made the argument
+against itself further down: "a number with no account of itself teaches
+nothing... a beginner cannot act on a grade." The notes were always the
+answer; they are the whole output now.
 """
 
 from backend.i18n import t as _t
@@ -13,9 +19,6 @@ from backend.i18n import t as _t
 # vehicle/land/real_estate can take months to sell; cash is instant
 
 _LIQUID_TYPES = {"stock", "fund", "etf", "gold", "crypto", "cash"}
-
-_WEIGHTS = {"diversification": 0.6, "liquidity": 0.4}
-
 
 def _diversification_score(by_type: dict[str, float]) -> int:
     total = sum(by_type.values())
@@ -38,16 +41,12 @@ def _liquidity_score(by_type: dict[str, float]) -> int:
 def compute_health(by_type: dict[str, float], lang: str = "tr") -> dict:
     if not by_type:
         return {
-            "overall": 0,
             "components": {},
             "notes": [_t("health.none", lang)],
         }
 
     diversification = _diversification_score(by_type)
     liquidity = _liquidity_score(by_type)
-    overall = round(
-        diversification * _WEIGHTS["diversification"] + liquidity * _WEIGHTS["liquidity"]
-    )
 
     notes = []
     if diversification < 40:
@@ -59,13 +58,12 @@ def compute_health(by_type: dict[str, float], lang: str = "tr") -> dict:
         notes.append(_t("health.balanced", lang))
 
     return {
-        "overall": overall,
         "components": {"diversification": diversification, "liquidity": liquidity},
         "notes": notes,
-        # A number with no account of itself teaches nothing. Each component
-        # says what it measures, why it sits where it does FOR THIS portfolio,
-        # and the one thing that moves it — otherwise "liquidity: 30" is just
-        # a grade, and a beginner cannot act on a grade.
+        # Each component says what it measures, why it sits where it does
+        # FOR THIS portfolio, and the one thing that moves it. This is the
+        # reason the overall grade went: "liquidity: 30" teaches nothing on
+        # its own, and neither did averaging it with something else.
         "explanations": _explain(by_type, diversification, liquidity, lang),
     }
 
