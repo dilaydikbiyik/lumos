@@ -10,6 +10,7 @@ import ListingEval from '../components/ListingEval'
 import PopulationTrend from '../components/PopulationTrend'
 import Section from '../components/Section'
 import Disclaimer from '../components/Disclaimer'
+import HomeRoutes from '../components/HomeRoutes'
 import useMarket from '../hooks/useMarket'
 import { Trans, useTranslation } from 'react-i18next'
 import { signedPercent } from '../utils/format'
@@ -731,6 +732,10 @@ export default function ExplorePage() {
             listing you already have in hand. */}
         <Section title={t('section.decide')} subtitle={t('section.decideSub')}>
           <RentVsBuy />
+          {/* Directly beneath rent-versus-buy, because that is the moment the
+              question is in front of the reader. The calculator offers two
+              routes; in Türkiye a great many people take a third. */}
+          <HomeRoutes />
           {/* Right after the area table: the reader has just seen what a
               region did, which is when "would a portfolio have done better?"
               occurs to them. Only where a regional table exists — without one

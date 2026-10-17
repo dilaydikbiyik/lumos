@@ -1196,5 +1196,9 @@
   "fundFacts": {
     "title": "Was besitzt du, wenn du einen Fonds besitzt?",
     "subtitle": "Dein Geld ist vom Verwalter getrennt — aber was garantiert das, und was nicht?"
+  },
+  "homeRoutes": {
+    "title": "Andere Wege ins Eigenheim",
+    "subtitle": "Was es neben Miete und Finanzierung gibt — und was jeweils geschützt ist."
   }
 }

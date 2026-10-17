@@ -2379,3 +2379,48 @@ Both are called funds. Nothing in the app said they were different machines.
       other decision, including the company structure, follows from it.
       Explicitly says NOT to open with "should I form a company" — that gets
       a yes without touching the question that gates the product.
+
+## The third way into a home (2026-10-18)
+
+Asked about platforms like the savings-based home-financing companies. The
+honest finding is that rent-versus-buy was an INCOMPLETE QUESTION in
+Türkiye: a great many people get into a home by paying monthly into a pool
+and waiting their turn, and the app said nothing about it. It offered two
+routes to an audience that has three.
+
+- [x] **`backend/content/home_routes.py`**, market-keyed, all nine
+      combinations, served at `/planning/home-routes` and shown collapsed
+      directly beneath the rent-versus-buy card — the moment the question is
+      actually in front of the reader.
+
+      The structure turns out to mirror the fund lesson exactly, which is
+      why both now exist:
+      - **TR:** the sector IS regulated (Law 6361, banking authority) and the
+        pool IS legally separated from the company — cannot be attached,
+        pledged, or drawn into the bankruptcy estate. But it is NOT deposit
+        insurance, and the sharp part is this: in liquidation the right to
+        draw financing does not apply, so the expectation of a HOME becomes
+        the return of SAVINGS. The money may survive; the thing you were
+        waiting for does not. And none of the protection applies at all to an
+        unlicensed firm, which makes "is it licensed" the first question.
+      - **DE:** the Bausparvertrag is the analogue and is genuinely better
+        protected, because a Bausparkasse is a BANK — statutory deposit
+        guarantee, generally to 100,000 euro. What is not guaranteed is the
+        allocation DATE.
+      - **US:** no licensed equivalent exists. The absence of a regulated
+        category is the reason to be careful rather than a gap in the market;
+        down-payment assistance programmes are the nearest real third option.
+
+- [x] **No company is named anywhere, and a test enforces it.** Describing a
+      licensed category and what the law does for a customer is education;
+      naming a firm in a piece about what happens when firms fail is a
+      different thing with a different exposure — question 8 of the legal
+      brief. Readers are pointed at the regulator's register instead.
+- [x] **A second test forbids regulated FIGURES in this copy.** The Turkish
+      regulator changed limits, ratios and day counts twice during 2026, and
+      evergreen copy carrying one of them goes quietly wrong in a way a
+      reader cannot detect. The German deposit ceiling is the one allowed
+      exception: statutory, EU-wide, stable, and the whole point of that
+      entry is the contrast.
+- [ ] Article numbers come from secondary sources (law-firm commentary).
+      The statute is the authority — re-read 6361 before any rewording.

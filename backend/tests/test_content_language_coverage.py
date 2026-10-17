@@ -31,7 +31,7 @@ import dataclasses
 
 import pytest
 
-from backend.content import fund_facts, purchase_checks
+from backend.content import fund_facts, home_routes, purchase_checks
 from backend.markets import get_market_pack
 
 MARKETS = ("TR", "US", "DE")
@@ -163,6 +163,58 @@ def test_fund_facts_never_promise_safety(market, lang):
         "de": ("nicht", "kein"),
     }
     assert any(w in text for w in limits[lang]), (market, lang)
+
+
+# ── home routes: the third catalogue, same rule ────────────────────────────
+
+@pytest.mark.parametrize("market", MARKETS)
+@pytest.mark.parametrize("lang", LANGS)
+def test_every_market_has_home_routes_in_every_language(market, lang):
+    by_lang = home_routes.ROUTES[market]
+    assert lang in by_lang, f"{market} has no {lang} home routes"
+    assert by_lang[lang], f"{market}/{lang} home routes are empty"
+
+
+@pytest.mark.parametrize("market", MARKETS)
+@pytest.mark.parametrize("lang", LANGS)
+def test_home_routes_are_written_in_the_language_filed_under(market, lang):
+    text = _text_of(home_routes.ROUTES[market][lang])
+    assert _looks_like(text, lang), f"{market}/{lang} does not read as {lang}"
+
+
+@pytest.mark.parametrize("market", MARKETS)
+@pytest.mark.parametrize("lang", LANGS)
+def test_home_routes_name_no_company(market, lang):
+    """
+    Describing a licensed category and what the law does for a customer is
+    education. Naming a firm in a piece about what happens when firms fail
+    is a different thing with a different exposure — and the legal brief
+    flags it as a question to ask. A reader who wants to check a specific
+    company is pointed at the register instead.
+    """
+    text = _text_of(home_routes.ROUTES[market][lang]).lower()
+    for firm in ("eminevim", "emin evim", "katılımevim", "katilimevim",
+                 "birevim", "fuzul", "hedef", "pusula", "tera"):
+        assert firm not in text, f"{market}/{lang} names a company: {firm}"
+
+
+@pytest.mark.parametrize("market", MARKETS)
+@pytest.mark.parametrize("lang", LANGS)
+def test_home_routes_carry_no_regulated_figure(market, lang):
+    """
+    The Turkish regulator changed limits, ratios and day counts twice during
+    2026. Evergreen copy carrying one of those numbers goes quietly wrong,
+    and a reader cannot tell that it has. The German deposit-guarantee
+    ceiling is the single allowed exception: it is statutory, EU-wide and
+    stable, and the whole point of that entry is the contrast.
+    """
+    import re
+
+    for item in home_routes.ROUTES[market][lang]:
+        body = item["body"]
+        numbers = [n for n in re.findall(r"\b\d[\d.,]*\b", body)
+                   if n not in {"6361", "100.000", "100,000"}]
+        assert not numbers, f"{market}/{lang} carries a figure: {numbers} in {item['title']!r}"
 
 
 # ── market packs: same rule, discovered by reflection ───────────────────────

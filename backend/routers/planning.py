@@ -385,6 +385,37 @@ async def yield_comparison(
     )
 
 
+@router.get("/home-routes")
+async def home_routes(
+    user_id: str = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+    lang: str = Depends(language),
+):
+    """
+    The ways into a home in THIS market, and what each one protects.
+
+    Rent-versus-buy is an incomplete question in Türkiye, where a large
+    number of people get into a home through savings-based financing
+    instead. The calculator said nothing about it, so the app was silent on
+    the route a sizeable part of its own audience is taking.
+
+    No company is named anywhere in the content, deliberately — a test
+    enforces it. Describing a licensed category is education; naming a firm
+    in a piece about what happens when firms fail is not the same thing.
+    """
+    from backend.content import home_routes as content
+
+    user = await user_repository.get_or_create(db, user_id)
+    market = user.market or "TR"
+    routes = content.for_market(market, lang)
+
+    return {
+        "market": market,
+        "available": routes is not None,
+        "routes": routes or [],
+    }
+
+
 @router.get("/fund-facts")
 async def fund_facts(
     user_id: str = Depends(get_current_user),

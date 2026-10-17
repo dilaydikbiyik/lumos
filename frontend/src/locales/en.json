@@ -1196,5 +1196,9 @@
   "fundFacts": {
     "title": "What do you own when you own a fund?",
     "subtitle": "Your money is separate from the manager's — but what does that guarantee, and what does it not?"
+  },
+  "homeRoutes": {
+    "title": "Other ways into a home",
+    "subtitle": "What exists besides renting and a mortgage — and what each one protects."
   }
 }
