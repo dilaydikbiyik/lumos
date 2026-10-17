@@ -2424,3 +2424,47 @@ routes to an audience that has three.
       entry is the contrast.
 - [ ] Article numbers come from secondary sources (law-firm commentary).
       The statute is the authority — re-read 6361 before any rewording.
+
+## Gold and crypto — scope, and a finding (2026-10-18)
+
+Asked whether to do for crypto and gold what was done for funds and home
+routes, and whether that means the RECOMMENDED portfolios change.
+
+**They do not, and should not.** The two are in different positions already:
+
+- **Gold is already recommended** — GLD in TR and US, 4GLD.DE in Germany.
+  What is missing is not an asset, it is the explanation: in Türkiye most
+  people hold gold as metal or as a bank gold account, and those are three
+  different things with three different failure modes. Nothing in the app
+  distinguishes them.
+- **Crypto is NOT recommended and should stay out.** Users can RECORD it —
+  it is a holding type and counts as liquid in the spread card — so the app
+  already acknowledges people own it while saying nothing about what it is.
+  That is the same gap as funds. Teaching it is within the app's purpose;
+  putting it in a portfolio built for someone frightened of a 20% drop is
+  not, and Apple's 3.1.5 rules are a second reason to keep the distance.
+
+- [ ] **Still to build:** gold (metal vs bank account vs ETF) and crypto
+      (self-custody vs exchange custody, and what the new Turkish licensing
+      regime does and does not promise) as two more market-keyed catalogues,
+      held to the same tests — no company names, no regulated figures.
+      Turkish crypto custody rules were confirmed in research and are
+      genuinely relevant: a licensed platform must keep the large majority
+      of customer assets at an authorised custodian. That is a real
+      protection and, like every other one in this app, not a guarantee of
+      value.
+
+### Found while checking whether the method could even carry crypto
+
+- [ ] **`MIN_WINDOWS = 6` does not do what its comment says.** The comment
+      reads "fewer rolling windows than this -> refuse to pretend it's a
+      distribution". But the windows OVERLAP, so six of them means six
+      months beyond the horizon: a five-year band passes on five and a half
+      years of history, which is ONE independent period resampled sixty-six
+      times. I nearly reported the opposite — that the guard would refuse
+      crypto — and the arithmetic says it would wave it through.
+      The honest guard counts INDEPENDENT periods, not overlapping windows:
+      something like history >= 3x the horizon. That would make the app
+      refuse some projections it currently draws, which is the point of a
+      guard, but it is a visible behaviour change and belongs in its own
+      change rather than smuggled into a content commit.
