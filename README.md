@@ -307,6 +307,39 @@ behavioural coach needs push — and push needs the app on the home screen.
 - Renders nothing once installed or dismissed. The detection is a pure, unit-tested module —
   iPadOS 13+ reports itself as "Macintosh", so a user-agent test for "iPad" matches **no iPad made
   since 2019**, and touch points are the only thing separating one from a real Mac
+- Once installed the card **changes its ask** rather than disappearing: being on the home screen is
+  what makes push *possible* on iOS, not what grants it, and the reader who just installed is
+  exactly the reader who will say yes. The prompt fires from a click, never an effect — Safari
+  refuses otherwise, and a prompt on load is the fastest route to a permanent denial
+
+### 🔔 Push, end to end — VAPID, and no store account
+
+- `POST /push/subscribe` upserts on the **endpoint**, not the user: browsers reissue endpoints, so a
+  reader who reinstalls would otherwise accumulate dead rows retried on every market move — which on
+  a free tier is what gets a service suspended for outbound traffic
+- A `404`/`410` from the push service **retires** that subscription instead of retrying it forever.
+  Retired, not deleted: the row still records that this reader once granted permission, which is the
+  difference between "never asked" and "asked and it lapsed"
+- Unsubscribing **deletes**. `failed_at` means the push service says the browser is gone; a reader
+  switching notifications off is a different fact, and conflating them would let a later
+  re-subscribe silently revive something they turned off on purpose
+- **No keys means no push, not a crash.** A deployment without VAPID keys serves a completely working
+  app that never offers notifications, and `/push/public-key` says `available: false` so the frontend
+  does not spend a permission grant on a subscription nothing can use
+- **`POST /push/market-sweep`** is the sender, triggered by an **external cron** because a free
+  Render instance has no scheduler — and the same request keeps the instance awake, which it needs
+  anyway, so one free uptime pinger does both jobs. Authenticated by a shared secret; an empty
+  `CRON_SECRET` disables the endpoint outright and the refusal is a `404` so a scanner cannot tell
+  it exists
+- Per-reader, never a broadcast: "the market dropped" is not a fact about somebody who holds nothing.
+  Below a 5% move nothing is sent at all, and a 20-hour cooldown means a cron set to five minutes
+  cannot send the same drop twelve times an hour
+- The notification **body is the coach's sentence**, keyed to the loss tolerance the reader stated —
+  never "you are down 12%". A test asserts no figure and no percent sign reaches it: that number is
+  the alarm the message exists to answer, not to amplify
+- Keys are generated **once** by `scripts/generate_vapid_keys.py` and live only in `.env` and the
+  Render dashboard (`sync: false` for all four, the public key included, so the pair cannot drift —
+  a mismatched pair encrypts for a key no browser holds and fails *silently*)
 
 ### 🎯 Goal-based planning & 🐣 practice mode
 - "800.000 TL for a down payment in 3 years" → required monthly contribution (annuity math) with
@@ -592,8 +625,8 @@ market.
 
 ```bash
 ./scripts/check.sh                     # everything CI runs, with exit codes that propagate
-python -m pytest backend/tests/ -q     # 991 tests
-cd frontend && npm test                # 187 vitest tests
+python -m pytest backend/tests/ -q     # 1007 tests
+cd frontend && npm test                # 191 vitest tests
 ```
 
 ### Running the journey tests

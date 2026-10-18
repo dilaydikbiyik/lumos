@@ -2786,8 +2786,74 @@ meta'ları yerinde, **`sw.js` içinde push handler zaten yazılmış** (satır 6
         Mac yok.
       - `CriOS`/`FxiOS`/`EdgiOS`/`OPiOS` hariç tutuluyor.
 
-      Kalan iş: push izni isteme akışı (kurulum sonrası) ve VAPID
-      anahtarları. `sw.js` tarafı hazır, sunucu tarafı gönderimi değil.
+- [x] **Push uçtan uca tamamlandı, VAPID dahil.**
+
+      Model (`push_subscription.py`) bir önceki oturumdan duruyordu ve
+      **hiçbir yerden referans edilmiyordu** — migration yok, router yok,
+      servis yok. `alembic/env.py` modeli import etmediği için migration
+      hiç üretilememiş. Ölü kod, güzel bir docstring'le.
+
+      **Kurulanlar:**
+      - `scripts/generate_vapid_keys.py` — anahtar çifti, BİR KEZ. Özel
+        anahtarı değiştirmek rotasyon değil **sıfırlama**: mevcut her
+        aboneliği, kimseye hata göstermeden geçersiz kılıyor.
+      - `cfa2dce6239f` migration + `last_notified_at` kolonu.
+      - `push_service.py` — `404`/`410` gelen abonelik **emekliye
+        ayrılıyor**, sonsuza kadar denenmiyor. Render ücretsiz katmanında
+        servisi askıya aldıran şey giden bant genişliği, ve ölü abonelikleri
+        her hareketle yeniden denemek tam olarak o faturayı üretir.
+      - `routers/push.py` — `/public-key`, `/subscribe` (upsert), DELETE,
+        `/market-sweep`.
+      - `utils/push.js` + 4 test. Testlerin asıl hedefi base64 dönüşümü:
+        **sessizce** bozulan tek satır. Yanlışsa abonelik ya hiç gelmiyor ya
+        da kimsenin okuyamayacağı şekilde şifreleniyor — istisna yok, log
+        yok. Kendi test kurgumun aritmetiği de yanlıştı (86 karakter 64 bayt
+        eder, 65 değil); testin var oluş sebebi tam bu off-by-one.
+      - `InstallHint` artık kurulduktan sonra **isteğini değiştiriyor**:
+        ana ekranda olmak iOS'ta push'u *mümkün* kılıyor, *vermiyor*.
+
+      **Gönderen: `/market-sweep`, harici bir cron ile.** Ücretsiz Render
+      örneğinde zamanlayıcı yok — ve aynı istek örneği uyanık tutuyor, ki
+      zaten gerekiyordu. Tek bir ücretsiz uptime pinger iki işi birden
+      yapıyor. Paylaşılan sır ile korunuyor; `CRON_SECRET` boşsa uç
+      tamamen kapalı ve reddi **404**, böylece bir tarayıcı ucun var
+      olduğunu bile anlamıyor.
+
+      Kişi başına, asla yayın değil: "piyasa düştü" hiçbir şey tutmayan
+      biri hakkında bir olgu değil. %5 altında hiçbir şey gitmiyor, ve 20
+      saatlik bekleme süresi 5 dakikaya ayarlı bir cron'un aynı düşüşü
+      saatte 12 kez göndermesini engelliyor.
+
+      **Bildirim gövdesi koçun cümlesi**, kullanıcının kendi beyan ettiği
+      kayıp toleransına göre — asla "%12 düştün" değil. Bir test gövdeye
+      rakam ve yüzde işareti girmediğini doğruluyor: o sayı, mesajın
+      cevaplamak için var olduğu alarmın kendisi.
+
+- [x] **Yol boyunca bulunan iki hata.**
+      - `sw.js` bildirim ikonunu `/icons/icon-192.png`'den okuyordu —
+        **öyle bir dizin yok**, ikon kökte. Yanlış ikon yolu sessiz:
+        tarayıcı kendi jenerik zilini çiziyor, yani birinin en kötü piyasa
+        anında gelen bildirim hiçbir yerden gelmiş gibi görünüyordu.
+        `badge-72.png` ise hiç mevcut değildi; uydurma bir yol aynı hatayı
+        geri getireceği için **kaldırıldı**, gerçek varlık üretilene kadar.
+      - Ölü-kopya testi `push.move_title`'ı frontend locale'lerinde yakaladı:
+        başlığı backend render ediyor, frontend kopyası gerçekten ölüydü.
+        Bu testin bu oturumda yakaladığı üçüncü gerçek sonuç.
+
+- [ ] **[you — Render dashboard + ücretsiz cron]** Push'u canlıya almak:
+      `./venv/bin/python scripts/generate_vapid_keys.py` çalıştır, dört
+      değeri (`VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT`,
+      `CRON_SECRET`) Render dashboard'a gir — `render.yaml` dördünü de
+      `sync: false` ile tanımlıyor, yani hiçbiri repoda değil. Sonra
+      ücretsiz bir cron servisine (cron-job.org gibi) 15 dakikalık bir
+      görev kur: `POST /push/market-sweep`, header `X-Lumos-Cron: <secret>`.
+      Aynı görev Render örneğini de uyanık tutuyor, yani ücretli tier
+      ihtiyacını da karşılıyor. **Anahtarları bana ya da hiçbir sohbete
+      yazma.**
+
+- [ ] **Gerçek bir `badge-72.png`** (72px, monokrom, şeffaf) üretilip
+      `sw.js`'e geri eklenebilir. Android bildirim çubuğunda kullanılıyor;
+      yokluğu bir hata değil, eksik bir incelik.
 
 **Maliyet tabanı:** store'lara çıkmazsan **$12/yıl** (sadece domain).
 Play Store dahil **$37** (ilk yıl). Apple dahil **$136** (ilk yıl), sonra

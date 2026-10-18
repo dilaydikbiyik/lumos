@@ -1205,7 +1205,10 @@
     "action": "Add to home screen",
     "iosShare": "Tap the Share button at the bottom.",
     "iosAdd": "Scroll the list and choose \"Add to Home Screen\".",
-    "dismiss": "Dismiss"
+    "dismiss": "Dismiss",
+    "notifyTitle": "Turn on notifications",
+    "notifyWhy": "When the market drops sharply we send one message, written against the loss tolerance you told us. No marketing, no price alerts — just the thing worth reading at the moment you are closest to selling.",
+    "notifyAction": "Allow notifications"
   },
   "fundFacts": {
     "title": "What do you own when you own a fund?",

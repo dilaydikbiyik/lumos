@@ -43,3 +43,6 @@ slowapi==0.1.10
 pytest==8.3.3
 ruff==0.9.6
 pytest-asyncio==0.24.0
+
+# Web Push (VAPID) — the behavioural coach's carrier, with no store account.
+pywebpush==2.5.0

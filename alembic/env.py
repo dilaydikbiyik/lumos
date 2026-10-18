@@ -23,6 +23,7 @@ from backend.db.database import Base, normalize_db_url  # noqa: E402
 import backend.models.user  # noqa: F401, E402
 import backend.models.holding  # noqa: F401, E402
 import backend.models.feedback  # noqa: F401, E402
+import backend.models.push_subscription  # noqa: F401, E402
 
 target_metadata = Base.metadata
 

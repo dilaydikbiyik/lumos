@@ -50,3 +50,11 @@ class PushSubscription(Base):
     failed_at: Mapped[Optional[datetime]] = mapped_column(
         DateTime(timezone=True), nullable=True
     )
+    # When this browser was last told something. The sweep runs on whatever
+    # schedule the external cron happens to use, and without this a cron
+    # set to five minutes would send the same market drop twelve times an
+    # hour. An app that does that teaches the reader to turn notifications
+    # off, which costs the coach its only carrier permanently.
+    last_notified_at: Mapped[Optional[datetime]] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )

@@ -408,6 +408,15 @@ _C: dict[str, dict[str, str]] = {
     "category.cash": {"tr": "nakit", "en": "cash", "de": "Bargeld"},
     "category.other": {"tr": "diğer", "en": "other", "de": "Sonstiges"},
 
+    # ── push notification titles ──
+    # A title, not a figure. The body is the coach's own message, keyed to
+    # the reader's stated loss tolerance; a percentage in the title would
+    # turn a steadying notification into the alarm it is meant to answer.
+    "push.move_title": {
+        "tr": "Portföyün hareket etti",
+        "en": "Your portfolio moved",
+        "de": "Dein Portfolio hat sich bewegt"},
+
     # ── behaviour coach: drops ──
     "coach.drop.low": {
         "tr": "Piyasada bir düşüş görüyorsun ve bu seni tedirgin edebilir — bu son derece doğal. Geçmişte benzer düşüşlerin çoğu zamanla toparlandı. Şu an hiçbir şey yapmana gerek yok; planın zaten bu tür dalgalanmaları hesaba katarak kuruldu.",

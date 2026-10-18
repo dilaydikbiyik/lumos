@@ -25,7 +25,25 @@ class Settings(BaseSettings):
     # dormant without its key.
     OPENAI_API_KEY: str = ""      # https://platform.openai.com/api-keys
     OPENAI_BASE_URL: str = "https://api.openai.com/v1"
-    MISTRAL_API_KEY: str = ""     # https://console.mistral.ai/api-keys
+    MISTRAL_API_KEY: str = ""      # https://console.mistral.ai/api-keys
+
+    # ── Web Push (VAPID) ──────────────────────────────────────────────────
+    # Generated once by scripts/generate_vapid_keys.py. The PUBLIC key is
+    # handed to every browser and is not a secret; the PRIVATE key is, and
+    # render.yaml declares it `sync: false` so it lives only in the
+    # dashboard. Empty values disable push entirely rather than failing:
+    # a deployment without keys should serve a working app that simply
+    # never offers notifications.
+    VAPID_PUBLIC_KEY: str = ""
+    VAPID_PRIVATE_KEY: str = ""
+    # mailto: or https: URL identifying the sender. Push services use it to
+    # reach whoever is sending, and a wrong value is grounds to drop.
+    VAPID_SUBJECT: str = ""
+    # Shared secret for the market sweep, which an EXTERNAL cron triggers
+    # because a free Render instance has no scheduler. Empty disables the
+    # endpoint outright: an unauthenticated sweep would let anyone make the
+    # app notify every user at will.
+    CRON_SECRET: str = ""
     MISTRAL_BASE_URL: str = "https://api.mistral.ai/v1"
     # Local models: no key, no account, no network. Lets a fresh clone run the
     # whole app without any provider at all.

@@ -74,8 +74,13 @@ self.addEventListener('push', event => {
 
   event.waitUntil(self.registration.showNotification(payload.title, {
     body: payload.body || '',
-    icon: '/icons/icon-192.png',
-    badge: '/icons/badge-72.png',
+    // Root, not /icons/ — there is no such directory, and there never was.
+    // A wrong icon path is silent: the browser draws its own generic bell,
+    // so the notification that arrives at somebody's worst market moment
+    // looks like it came from nowhere in particular.
+    icon: '/icon-192.png',
+    // No badge file exists, and inventing a path would reintroduce exactly
+    // the bug above. Omitted until there is a real 72px monochrome asset.
     // Same tag replaces rather than stacks: three notifications about one
     // market drop is the app panicking at somebody.
     tag: payload.tag || 'lumos',

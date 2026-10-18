@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { isIosSafari, isStandaloneDisplay } from '../utils/install'
+import { pushSupported, subscribeToPush } from '../utils/push'
 
 /**
  * The one piece missing from a free route to people's phones.
@@ -60,6 +61,23 @@ export default function InstallHint() {
     return () => window.removeEventListener('beforeinstallprompt', onPrompt)
   }, [])
 
+  const [granted, setGranted] = useState(false)
+
+  const enableNotifications = async () => {
+    try {
+      const ok = await subscribeToPush()
+      setGranted(ok)
+      // Only a GRANT closes the card. A denial leaves it, because the
+      // backend answering `available: false` — no VAPID keys — is the other
+      // way this returns false, and hiding the invitation then would make a
+      // misconfigured deployment look like a reader who said no.
+      if (ok) close()
+    } catch {
+      // A refused prompt is not an error, and neither is a push service
+      // that is unreachable right now.
+    }
+  }
+
   const close = () => {
     setDismissed(true)
     try {
@@ -79,7 +97,44 @@ export default function InstallHint() {
     } catch { /* a dismissed OS dialog is not an error */ }
   }
 
-  if (dismissed || isStandaloneDisplay(window.matchMedia, window.navigator)) return null
+  if (dismissed) return null
+
+  // Installed, and that is where the old version stopped — which left the
+  // feature one step short of working. Being on the home screen is what
+  // makes push POSSIBLE on iOS; it does not grant it. So the card changes
+  // its ask rather than disappearing: the reader who just installed is
+  // exactly the reader who will say yes.
+  if (isStandaloneDisplay(window.matchMedia, window.navigator)) {
+    const canAsk = pushSupported()
+      && window.Notification.permission === 'default'
+      && !granted
+    if (!canAsk) return null
+    return (
+      <div className="card" style={{ borderColor: 'var(--firefly-dim)' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8 }}>
+          <strong style={{ fontSize: '0.95rem' }}>🔔 {t('install.notifyTitle')}</strong>
+          <button type="button" onClick={close} aria-label={t('install.dismiss')}
+                  style={{
+                    background: 'none', border: 'none', cursor: 'pointer',
+                    color: 'var(--text-dim)', font: 'inherit', padding: 0, lineHeight: 1,
+                  }}>
+            ✕
+          </button>
+        </div>
+        <p style={{ fontSize: 12.5, lineHeight: 1.65, margin: '6px 0 0', opacity: 0.88 }}>
+          {t('install.notifyWhy')}
+        </p>
+        {/* From a CLICK, never an effect. The permission prompt must follow a
+            user gesture — Safari refuses otherwise — and a prompt on page
+            load is the fastest way to a permanent denial, which the reader
+            then has to go into settings to undo. */}
+        <button type="button" className="btn btn-primary" onClick={enableNotifications}
+                style={{ marginTop: 12, width: '100%' }}>
+          {t('install.notifyAction')}
+        </button>
+      </div>
+    )
+  }
 
   const android = Boolean(prompt)
   const ios = !android && isIosSafari(window.navigator)

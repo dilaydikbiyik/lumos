@@ -1205,7 +1205,10 @@
     "action": "Zum Startbildschirm hinzufügen",
     "iosShare": "Tippe unten auf die Teilen-Schaltfläche.",
     "iosAdd": "Scrolle die Liste und wähle „Zum Home-Bildschirm“.",
-    "dismiss": "Schließen"
+    "dismiss": "Schließen",
+    "notifyTitle": "Benachrichtigungen einschalten",
+    "notifyWhy": "Wenn der Markt stark fällt, senden wir eine einzige Nachricht, geschrieben auf die Verlusttoleranz, die du uns genannt hast. Kein Marketing, keine Kursalarme — nur das, was in dem Moment zählt, in dem du am ehesten verkaufen würdest.",
+    "notifyAction": "Benachrichtigungen erlauben"
   },
   "fundFacts": {
     "title": "Was besitzt du, wenn du einen Fonds besitzt?",

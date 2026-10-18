@@ -3,6 +3,7 @@ from fastapi import APIRouter
 from pydantic import BaseModel
 from backend.db.database import engine as async_engine
 from backend.config import settings
+from backend.services import push_service
 from sqlalchemy import text
 
 logger = logging.getLogger("lumos.health")
@@ -99,4 +100,8 @@ async def health_check():
             "tcmb_evds": bool(settings.TCMB_EVDS_API_KEY),
             "fred": bool(settings.FRED_API_KEY),
         },
+        # A BOOLEAN, like every other keyed source here. Whether this
+        # deployment can send notifications is operationally useful; the key
+        # itself never leaves the environment.
+        "push": push_service.is_configured(),
     }

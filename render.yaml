@@ -61,3 +61,24 @@ services:
         sync: false
       - key: SENTRY_DSN
         sync: false
+      # ── Web Push (VAPID) ──
+      # sync:false for all four. The PUBLIC key is not a secret, but it is
+      # declared the same way so the keypair cannot drift: a public key
+      # committed here against a private key in the dashboard would send
+      # notifications encrypted for a key no browser holds — and that fails
+      # silently, with no error anywhere.
+      #
+      # Generate once with scripts/generate_vapid_keys.py. Replacing the
+      # private key invalidates EVERY existing subscription without telling
+      # anybody; it is not a rotation, it is a reset.
+      - key: VAPID_PUBLIC_KEY
+        sync: false
+      - key: VAPID_PRIVATE_KEY
+        sync: false
+      - key: VAPID_SUBJECT
+        sync: false
+      # Shared secret for POST /push/market-sweep, which an external cron
+      # triggers because a free instance has no scheduler. Empty disables
+      # the endpoint outright rather than leaving it open.
+      - key: CRON_SECRET
+        sync: false

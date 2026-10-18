@@ -1205,7 +1205,10 @@
     "action": "Ana ekrana ekle",
     "iosShare": "Alttaki Paylaş düğmesine dokun.",
     "iosAdd": "Listeyi kaydır ve \"Ana Ekrana Ekle\"yi seç.",
-    "dismiss": "Kapat"
+    "dismiss": "Kapat",
+    "notifyTitle": "Bildirimleri aç",
+    "notifyWhy": "Piyasa sert düştüğünde, kendi kayıp toleransına göre yazılmış tek bir mesaj gönderiyoruz. Pazarlama yok, fiyat bildirimi yok — sadece satmaya en yakın olduğun anda okuman gereken şey.",
+    "notifyAction": "Bildirimlere izin ver"
   },
   "fundFacts": {
     "title": "Fon aldığında ne alıyorsun?",
