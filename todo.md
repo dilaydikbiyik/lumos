@@ -2968,3 +2968,71 @@ Soru: "reit_explanation için de aynı kontrol var mı?" Cevabı *vardı* ve
 - [x] **Testler iki yönde de boş olmadığı kanıtlandı.** Korumayı elle
       kaldırdım (çelişki geçti → kırmızı), sonra **yanlış** korumayı geri
       koydum (doğru açıklama silindi → kırmızı). Üçüncü hali yeşil.
+
+### Üçüncü AI alanı: context_sentence (2026-10-19)
+
+Soru: "context_sentence için de aynı kontrol var mı?" Hayır — **ve portföy
+kuralını buraya uygulamak REIT hatasının üçüncü tekrarı olurdu.** Bu cümle
+okuyucunun tahsisi hakkında hiçbir iddia taşımıyor; karşılaştırılacak bir
+şey yok. Onu koruyan şey yapısal izolasyon, ve o zaten test edilmiş
+(`test_the_context_sentence_never_touches_the_numbers`: cümle varken ve
+yokken diğer her alan birebir aynı).
+
+Ama denetlenmeyen gerçek bir risk vardı, ve türü farklıydı.
+
+- [x] **Tahmin dili.** Projeksiyon kartının tüm iddiası üzerinde yazılı:
+      *"Bu bir tahmin DEĞİL."* Yanındaki cümle "analistler düşüşün
+      süreceğini bekliyor" derse bu sayısal değil **türsel** bir çelişki:
+      sayılar ölçüm olarak kalırken yanındaki nesir tahmin yapıyor, ve
+      okuyucunun iki yarının farklı türde ifade olduğunu anlamasının bir
+      yolu yok.
+
+      Digest prompt'u yalnızca *"Never use alarmist words"* diyordu. Alarm
+      ile tahmin aynı şey değil: "Fed faizi indirebilir" son derece sakin
+      ve yine de bir tahmin. Prompt'a açık yasak eklendi, ve
+      `forecast_language.py` cümleyi üç dilde denetliyor.
+
+      **Maliyet asimetrisi burada ters yönde**, o yüzden bu kural
+      `explanation_check`'ten daha sıkı: `context_sentence` zaten tasarım
+      gereği `None` dönüyor ve kart cümlesiz render ediliyor, yani sınırda
+      bir cümleyi düşürmenin maliyeti neredeyse sıfır — tahmin basmanın
+      maliyeti ise kartın verdiği tek sözü kaybetmek.
+
+      Yine de sınırlı: açık tahmin **belirteçleri**, gelecekten her söz
+      değil. "Borsa düşebilir" oynaklık hakkında bir olgu ve geçmeli;
+      "borsa düşecek" bir sonraki adım hakkında iddia ve geçmemeli. İkisi
+      de test edildi.
+
+      İlk taslakta Türkçede yalnızca edilgen "bekleniyor" vardı; **etken
+      "bekliyor" yoktu**, yani Türk finans haberlerindeki en yaygın tahmin
+      kalıbı doğrudan geçiyordu. Ölçerek yakalandı, ikisi de eklendi.
+
+- [x] **Gizli hata: ölü anahtarlar en kötü alanı kazandırıyordu.**
+      `context_sentence`, `takeaway` → `summary` → `headline` zincirini
+      okuyordu. Digest bunlardan **ilk ikisini hiç üretmiyor** — repoda
+      hiçbir yerde yok. Yani zincir her zaman `headline`'a düşüyordu: üç
+      alandan **tahmin taşımaya en yatkın olanı**, ve sakin/tahminsiz olmak
+      üzere yazılmış `why_it_matters` ile `calmness_note` hiç
+      kullanılmıyordu.
+
+      `why_it_matters` seçildi. Bir projeksiyon bandının yanındaki cümlenin
+      işi okuyucuya haberin kendisini ilgilendirip ilgilendirmediğini
+      söylemek; manşetin işi manşet olmak. Alan yoksa artık manşete
+      düşmüyor, boş kalıyor — dürüst cevap o.
+
+- [x] **Üç korumanın üçü de elle bozularak yük taşıdığı kanıtlandı:**
+      tahmin kontrolü kaldırıldı → kırmızı; eski ölü-anahtar zinciri geri
+      kondu → iki testte kırmızı; prompt yasağı kaldırıldı → kırmızı.
+
+### Üç AI alanı, üç ayrı kural — ve ders
+
+| Alan | Kural | Neden |
+|---|---|---|
+| `plain_explanation` | portföy tutarlılığı (ağırlık, kategori, risk puanı) | prompt'u portföyün kendi sayılarını veriyor |
+| `reit_explanation` | yüzde kuralı KAPALI, enstrüman + risk puanı açık | prompt'u portföy dışı mevzuat/tarihsel rakam talimat ediyor |
+| `context_sentence` | tahmin dili | portföy hakkında iddia yok; yanındaki kart "tahmin değil" diyor |
+
+**Bir tutarlılık kuralı yalnızca prompt'u aynı şeyleri vaat eden metin için
+geçerlidir.** Bu oturumda aynı hatayı iki kez yaptım (REIT'te uygulayarak,
+ve testleri boş bırakarak); üçüncüsünde kuralı kopyalamak yerine metnin ne
+vaat ettiğine baktım.

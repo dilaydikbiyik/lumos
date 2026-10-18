@@ -14,6 +14,7 @@ from typing import Optional
 import httpx
 
 from backend.services import cache as cache_service
+from backend.services import forecast_language
 from backend.services.ai_service import generate_text
 
 logger = logging.getLogger("lumos.news")
@@ -32,7 +33,9 @@ For each picked item output exactly this JSON structure, and output ONLY a JSON 
 [{{"headline": "<rewritten in plain, calm language - no shouting, no jargon>",
   "why_it_matters": "<1 sentence: does this affect a beginner's portfolio?>",
   "calmness_note": "<1 sentence that prevents panic, e.g. 'There is nothing you need to do right now.'>"}}]
-Never use alarmist words. If nothing is relevant, output []."""
+Never use alarmist words.
+NEVER PREDICT. Report what has happened, never what will happen: no "expected to", no analyst targets, no direction for the days ahead. One of these sentences is shown beside a card whose whole claim is that it is NOT a forecast, so a prediction there contradicts the app rather than informing the reader. Say what a beginner should understand about an event that has already occurred.
+If nothing is relevant, output []."""
 
 
 def _parse_rss(xml_text: str, limit: int = 15) -> list[dict]:
@@ -131,6 +134,32 @@ def context_sentence(investment_path: str = "hybrid", market: str = "TR",
     # already cached for the day — one more model call here would buy nothing
     # except another thing to go wrong.
     first = digest[0]
-    if isinstance(first, dict):
-        return first.get("takeaway") or first.get("summary") or first.get("headline")
+    if not isinstance(first, dict):
+        return None
+
+    # `why_it_matters`, not the headline.
+    #
+    # This read "takeaway" or "summary" or "headline", and the digest emits
+    # none of the first two — they exist nowhere in this repository. So the
+    # chain always landed on the headline: of the three fields, the one most
+    # likely to carry a forecast, while the two written to be calm and
+    # non-predictive were never used at all.
+    #
+    # What a sentence beside a scenario band is FOR is telling the reader
+    # whether the news concerns them. That is why_it_matters' whole job; the
+    # headline's job is to be a headline.
+    sentence = (first.get("why_it_matters") or "").strip() or None
+    if sentence is None:
+        return None
+
+    # A forecast here would contradict the card it sits beside, whose own
+    # text says it is not one. Dropped rather than shown: this function
+    # already returns None by design when there is nothing to say, so the
+    # card renders correctly without a sentence and the cost of dropping a
+    # borderline one is close to zero.
+    if forecast_language.is_forecast(sentence):
+        logger.info("context sentence dropped — reads as a forecast: %s",
+                    forecast_language.markers_in(sentence))
+        return None
+    return sentence
     return str(first) if first else None

@@ -608,7 +608,11 @@ market.
   silently delete every German explanation the app ever wrote). The REIT explanation gets a
   **different** rule, because its prompt instructs figures that are deliberately not portfolio
   weights — "at least 90% of taxable income", "~8–10% annualized over 20 years" — so the
-  portfolio rule deleted every correct REIT explanation until the two were separated
+  portfolio rule deleted every correct REIT explanation until the two were separated. The news
+  sentence beside a projection gets a **third** rule, because it makes no claim about the portfolio
+  at all: it must not **forecast**. That card's own text says it is not one, so a sentence
+  predicting what happens next contradicts it in kind rather than in number — and "the Fed may cut
+  rates" is perfectly calm, so forbidding alarmist language never covered it
 - **No execution, no custody**: architecturally incapable of moving user money
 - **Delete your account, from inside the app.** It removes the profile, every holding and every
   piece of feedback, then deletes the login itself — and if that last step fails it says so
@@ -639,7 +643,7 @@ market.
 
 ```bash
 ./scripts/check.sh                     # everything CI runs, with exit codes that propagate
-python -m pytest backend/tests/ -q     # 1030 tests
+python -m pytest backend/tests/ -q     # 1061 tests
 cd frontend && npm test                # 191 vitest tests
 ```
 
