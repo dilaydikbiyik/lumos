@@ -181,4 +181,6 @@ async def what_if_endpoint(
                      quota=settings.DAILY_MESSAGE_QUOTA),
         )
 
-    return await asyncio.to_thread(answer_what_if, body.question, body.risk_score, body.budget)
+    user = await user_repository.get_or_create(db, user_id)
+    return await asyncio.to_thread(answer_what_if, body.question, body.risk_score,
+                                   body.budget, user.market or "TR")

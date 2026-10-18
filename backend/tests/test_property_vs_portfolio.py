@@ -16,7 +16,12 @@ WEIGHTS = {"XU100.IS": 0.6, "GLD": 0.4}
 
 
 def _fake_backtest(total_return_pct=50.0):
-    return lambda weights, budget, period="5y": {
+    # Takes **kwargs so the fake cannot silently reject an argument the real
+    # function gained. It lagged behind `market` and the resulting TypeError
+    # was swallowed by compare()'s `except Exception`, which reported the
+    # portfolio side as "unavailable" — a signature mismatch arriving as a
+    # plausible-looking empty result rather than an error.
+    return lambda weights, budget, period="5y", **kwargs: {
         "total_return_pct": total_return_pct,
     }
 

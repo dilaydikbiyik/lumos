@@ -248,7 +248,14 @@ async def portfolio_summary(
     idle_cash = by_type.get("cash", 0.0) + (remaining or 0.0)
     cash_erosion = None
     if idle_cash > 0:
-        erosion = inflation_service.monthly_cash_erosion(idle_cash)
+        # The user's OWN market. This omitted the argument, so the default
+        # applied and every US and German reader was shown Turkish
+        # inflation eating their cash: 100.000 idle came back as 2.025 lost
+        # per month when the German figure is 548. A frightening number
+        # that is 3.7x too large is worse than no number, and this one sits
+        # under a heading that asks "is my money melting?".
+        erosion = inflation_service.monthly_cash_erosion(
+            idle_cash, market=user.market or "TR")
         cash_erosion = CashErosion(
             **erosion,
             idle_cash=round(idle_cash, 2),

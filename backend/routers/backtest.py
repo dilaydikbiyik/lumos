@@ -44,13 +44,14 @@ async def backtest(
 
     from backend.services import asset_character
 
-    result = await asyncio.to_thread(run_backtest, body.weights, body.budget, body.period)
+    user = await user_repository.get_or_create(db, user_id)
+    result = await asyncio.to_thread(run_backtest, body.weights, body.budget,
+                                     body.period, user.market or "TR")
 
     # The character metrics were already computed and returned, and nothing
     # rendered them — which is the least useful place for them. A beginner
     # cannot read "-42% over 18 months" and know whether that is survivable
     # for THEM, so each asset is judged against their own answers.
-    user = await user_repository.get_or_create(db, user_id)
     result["per_asset"] = asset_character.describe_all(
         result.get("per_asset") or {},
         loss_tolerance=user.loss_tolerance,

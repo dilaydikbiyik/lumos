@@ -59,7 +59,8 @@ def _longest_stagnation_months(series: pd.Series) -> float:
     return round(longest / TRADING_DAYS_PER_MONTH, 1)
 
 
-def run_backtest(weights: dict[str, float], budget: float, period: str = "5y") -> dict:
+def run_backtest(weights: dict[str, float], budget: float, period: str = "5y",
+                 market: str = "TR") -> dict:
     """
     Simulate holding a weighted portfolio over the period.
 
@@ -110,7 +111,14 @@ def run_backtest(weights: dict[str, float], budget: float, period: str = "5y") -
     start_month = inflation_service.years_to_months_ago(years)
     end_month = inflation_service.years_to_months_ago(0)
     try:
-        real_pct = inflation_service.real_return_pct(total_return_pct, start_month, end_month)
+        # Deflated by the READER'S inflation. This omitted the market, so
+        # "the honest number most apps hide" was deflated by Turkish
+        # inflation for every US and German reader — roughly 2% a month
+        # against their real 0.55%, which turns a genuine gain into a
+        # fabricated loss. Dishonest in exactly the place that claims
+        # otherwise.
+        real_pct = inflation_service.real_return_pct(
+            total_return_pct, start_month, end_month, market)
     except Exception:
         real_pct = None
 

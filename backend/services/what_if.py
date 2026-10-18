@@ -69,7 +69,8 @@ def _diff_summary(before: PortfolioRecommendResponse, after: PortfolioRecommendR
     }
 
 
-def answer_what_if(question: str, current_risk_score: float, current_budget: float) -> dict:
+def answer_what_if(question: str, current_risk_score: float, current_budget: float,
+                   market: str = "TR") -> dict:
     """
     Returns {"understood": bool, "answer": str|None, "diff": dict|None}.
     When not understood, the caller should fall back to normal chat.
@@ -81,8 +82,14 @@ def answer_what_if(question: str, current_risk_score: float, current_budget: flo
     new_budget = max(current_budget + change.get("budget_delta", 0), 1)
     new_risk = min(max(current_risk_score + change.get("risk_score_delta", 0), 1), 10)
 
-    before = build_portfolio(risk_score=current_risk_score, budget=current_budget)
-    after = build_portfolio(risk_score=new_risk, budget=new_budget)
+    # On the reader's OWN market. Both calls omitted it, so every what-if
+    # answer compared two TURKISH portfolios — a German user asking what
+    # changes if they add money was shown BIST instruments and told the
+    # numbers came from the portfolio engine, which they did, for the wrong
+    # country.
+    before = build_portfolio(risk_score=current_risk_score, budget=current_budget,
+                             market=market)
+    after = build_portfolio(risk_score=new_risk, budget=new_budget, market=market)
     diff = _diff_summary(before, after)
 
     context = (

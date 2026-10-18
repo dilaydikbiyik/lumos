@@ -2501,6 +2501,62 @@ routes, and whether that means the RECOMMENDED portfolios change.
 
 ### End-to-end polish, all markets (2026-10-18)
 
+#### Three live cross-market bugs, found by scanning for an ABSENT argument
+
+Forty-eight backend functions declare `market: str = "TR"`. The default is
+reasonable in isolation and that is what made it dangerous: a caller that
+forgets to pass market does not fail, does not warn, and returns a
+confident Turkish answer to a German reader. No test caught any of these,
+because every test passed the market explicitly. The bug lives in the
+absence of an argument, which only a scan of the source can see.
+
+- [x] **`backtest.py` real return — the worst one.** `real_return_pct` was
+      called without a market, so "the honest number most apps hide" was
+      deflated by TURKISH inflation for every US and German reader. A
+      German user with a genuine +50% nominal five-year return was shown a
+      real return of **−80.2% instead of +21.2%**. A real gain rendered as
+      a catastrophe, on the exact figure that claims to be the honest one.
+      `run_backtest` now takes a market; the router passes the user's and
+      `property_vs_portfolio` passes the one it already knew.
+
+- [x] **`holdings.py` cash erosion.** `monthly_cash_erosion(idle_cash)`
+      omitted the market, so 100.000 idle came back as **2.025 lost per
+      month against a real German figure of 548** — 3.7x too large, under
+      a heading that asks whether their money is melting. A frightening
+      number that is wrong in the frightening direction.
+
+- [x] **`what_if.py` before/after.** Both `build_portfolio` calls omitted
+      the market, so every what-if answer compared two TURKISH portfolios.
+      A German user asking what changes if they add money was shown BIST
+      instruments, narrated as real engine output — which it was, for the
+      wrong country. `answer_what_if` now takes a market and the chat
+      router threads the user's in.
+
+- [x] **The rule that closes the class.**
+      `backend/tests/test_market_is_never_defaulted.py` walks the AST and
+      fails on any call to a market-defaulting function that does not
+      supply one, positionally or by keyword. It FOUND the backtest bug by
+      itself after I had fixed the other two by hand. It also guards
+      itself: a second test fails if the scan finds fewer than twenty such
+      functions, because a broken scan would make the real test pass for
+      free.
+
+      One exemption, with its reason in the file: `get_rent_index` resolves
+      the market itself and forwards to country-specific services that take
+      no market argument.
+
+- [ ] **Smell found on the way, not fixed:** `property_vs_portfolio.compare`
+      wraps the backtest in `except Exception` and reports "portfolio side
+      unavailable". When the test fake's signature lagged the real one, the
+      resulting `TypeError` was swallowed and surfaced as a plausible empty
+      result rather than an error. Worth narrowing to the exceptions it
+      actually means (`MarketDataError` and friends) so a programming
+      mistake cannot masquerade as missing data. The fake now takes
+      `**kwargs` so it cannot silently reject a new argument.
+
+#### UI
+
+
 - [x] **Three stacked reference cards were themselves a pile.** Funds, gold
       and crypto each had their own card with its own collapse toggle, in a
       row, under no header — which is the exact thing `Section.jsx` was

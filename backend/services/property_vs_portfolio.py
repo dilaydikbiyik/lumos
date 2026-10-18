@@ -97,7 +97,7 @@ def compare(*, amount: float, region_code: str, weights: dict[str, float],
     try:
         from backend.services.backtest import run_backtest
 
-        portfolio = run_backtest(weights, amount, period=period)
+        portfolio = run_backtest(weights, amount, period=period, market=market)
     except Exception as exc:
         logger.warning("portfolio side unavailable (%s)", type(exc).__name__)
         return {"available": False, "reason": t("compare.no_portfolio", lang)}
