@@ -1193,7 +1193,11 @@
     "why": "Why this split?",
     "whySub": "Every step of the formula — open it if you want it.",
     "whatYouHold": "Know what you hold",
-    "whatYouHoldSub": "Funds, gold, crypto — what the thing actually is, and what protects it"
+    "whatYouHoldSub": "Funds, gold, crypto — what the thing actually is, and what protects it",
+    "whatsHappening": "What's happening",
+    "whatsHappeningSub": "The headlines, and how to read the language they use",
+    "yourNextMove": "Your next move",
+    "yourNextMoveSub": "The step that fits you, and how your budget divides"
   },
   "fundFacts": {
     "title": "What do you own when you own a fund?",

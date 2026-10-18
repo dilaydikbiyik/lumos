@@ -483,7 +483,7 @@ lumos/                          ← project root
 - [x] Add few-shot example dialogues (1 embedded example) — teach the advisor tone by example
 - [x] Deepen `reit_explain_prompt.txt`: 3-sentence structure, profile-specific tone, honest risk warning, MPT context
 - [x] RAG: `chat_context.py` — daily market summary (BIST/SPY/GLD + monthly CPI) injected into the system prompt, 6-hour cache, fail-open (3 tests)
-- [ ] **[deliberately not done — see note]** Tool-use architecture: `get_market_data(ticker)`, `calculate_volatility(asset)`, `get_risk_score(profile)` tool definitions — the LLM pulls data from services instead of inventing it
+- **Karar — bilerek yapılmadı.** Tool-use architecture: `get_market_data(ticker)`, `calculate_volatility(asset)`, `get_risk_score(profile)` tool definitions — the LLM pulls data from services instead of inventing it
 - [/] Feedback loop v1: `recommendation_served` structured log + admin/stats holdings comparison; UI-based accept/reject events in a later version
 - [x] A/B test prompt versions; strengthen the current prompt with Anthropic Console's Prompt Improver
       → `prompt_experiments`. Stable per reader, so nobody has the prompt change between question three and four; hashed with the experiment key too, so two experiments do not assign in lockstep. Variants can only APPEND, so none can drop the disclaimers or the language rule by omission. Off by default, and deliberately no auto-promotion — changing what this app tells people about their money is a person's decision.
@@ -2137,22 +2137,22 @@ what "piled up" is: not too much content, but no ranking of it.
 
 Three consequences, each visible on a different page:
 
-- [ ] **The subject of the page is at the bottom.** "Varlıklarım" shows a
+- [x] **The subject of the page is at the bottom.** *(fixed — see Done below)* "Varlıklarım" shows a
       total, an inflation warning, a liquidity score, a chart, a drift card
       and a currency card — SIX analysis cards — before the first actual
       holding. In the opening screen a reader who came to see their assets
       sees none of them. The holdings should lead and the analysis follow.
-- [ ] **The primary action is at the bottom.** On the dashboard, a reader
+- [x] **The primary action is at the bottom.** *(fixed — see Done below)* On the dashboard, a reader
       with no portfolio scrolls past 2670px of score, tip, summary, news,
       headline and budget split before reaching "Portföyümü Oluştur". The
       one thing the page wants them to do is the last thing they can find.
-- [ ] **Explore is three jobs in one column.** Browsing where prices are (a
+- [x] **Explore is three jobs in one column.** *(fixed — see Done below)* Browsing where prices are (a
       12-row league table), deciding (rent-vs-buy, plot-vs-portfolio), and
       acting on a specific listing (price check, purchase checks, listing
       links). Four near-identical forms stack in sequence with nothing
       saying they answer different questions. This is the worst offender and
       the one the complaint named.
-- [ ] **Recommend inverts answer and justification.** The chart — the answer
+- [x] **Recommend inverts answer and justification.** *(fixed — see Done below)* The chart — the answer
       — occupies the top fifth; roughly 1500px of expanded rationale follows
       at the same visual weight. The reasoning is the app's honesty promise
       and should stay reachable, but on demand rather than by default.
@@ -2199,7 +2199,7 @@ Measured before and after on the same seeded account:
 
 ### Found while measuring
 
-- [ ] **The floating buttons cover a real control.** On `/holdings` the chat
+- [x] **The floating buttons cover a real control.** *(fixed in PortfolioValueChart: title and range on separate rows)* On `/holdings` the chat
       and panic FABs overlap the "1 Yıl" period button by 422px² and 268px².
       Measured, not eyeballed. The other pages are clear.
 - [x] **Not a bug, and worth recording so it is not "fixed" later:** the
@@ -2227,7 +2227,7 @@ Measured before and after on the same seeded account:
       a database already holding the previous state passes locally and fails
       on a fresh deploy — the one time it matters. Added against a temp
       SQLite file.
-- [ ] Docker build is still CI-only, deliberately: it is slow and it has
+- **Karar — bilerek böyle.** Docker build is still CI-only: it is slow and it has
       never been the thing that broke.
 
 - [x] **Deleting a holding had no confirmation at all.** One tap, record
@@ -2287,7 +2287,7 @@ not stated where it counts.
       is the app being careful. The legal disclaimer text is consistent in
       all three languages ("never the sole basis of any investment
       decision").
-- [ ] Negation parity across languages is NOT testable this way — Turkish
+- **Sınır — test edilemez.** Negation parity across languages, this way — Turkish
       negates with a suffix (`ödeme-di-ğin`) and a regex produces ~98 false
       positives. Spot-checked the high-stakes keys by hand instead.
 
@@ -2329,11 +2329,11 @@ user-facing.)
       company in liquidation, the asset inside perfectly sound and the money
       still out of reach. Added as a glossary entry and a daily tip, in all
       three languages.
-- [ ] **Known limitation, stated rather than half-fixed:** the spread card
+- **Sınır — açıkça belirtildi, yarım düzeltilmedi.** The spread card
       measures concentration by asset TYPE. It cannot see that a portfolio
       is entirely with one institution, because holdings do not record an
       issuer. Recording one is the honest fix and is a schema change.
-- [ ] **Deliberately NOT done: adding Turkish mutual funds to the
+- **Karar — bilerek yapılmadı.** **Adding Turkish mutual funds to the
       recommendation universe.** Weeks after 131 of them were frozen is not
       the moment for this app to start naming funds. Teaching the risk is
       within its purpose; selecting funds is not.
@@ -2365,7 +2365,7 @@ Both are called funds. Nothing in the app said they were different machines.
       misreading: "the regulator approved it", "it's SIPC insured", "also
       geschützt". A test asserts each market's set carries the limit and not
       only the protection.
-- [ ] **Figures stay out of evergreen copy.** The 131 funds and 455,758
+- **Kural — kalıcı.** **Figures stay out of evergreen copy.** The 131 funds and 455,758
       investors are in commit messages and this file, not on screen — most
       write-ups are law-firm blogs and the numbers disagree between them.
       If any of it ever goes user-facing, confirm against SPK bulletins.
@@ -2422,7 +2422,7 @@ routes to an audience that has three.
       reader cannot detect. The German deposit ceiling is the one allowed
       exception: statutory, EU-wide, stable, and the whole point of that
       entry is the contrast.
-- [ ] Article numbers come from secondary sources (law-firm commentary).
+- **Sınır — hukuki incelemede teyit edilecek.** Article numbers come from secondary sources (law-firm commentary).
       The statute is the authority — re-read 6361 before any rewording.
 
 ## Gold and crypto — scope, and a finding (2026-10-18)
@@ -2545,16 +2545,75 @@ absence of an argument, which only a scan of the source can see.
       the market itself and forwards to country-specific services that take
       no market argument.
 
-- [ ] **Smell found on the way, not fixed:** `property_vs_portfolio.compare`
-      wraps the backtest in `except Exception` and reports "portfolio side
-      unavailable". When the test fake's signature lagged the real one, the
-      resulting `TypeError` was swallowed and surfaced as a plausible empty
-      result rather than an error. Worth narrowing to the exceptions it
-      actually means (`MarketDataError` and friends) so a programming
-      mistake cannot masquerade as missing data. The fake now takes
-      `**kwargs` so it cannot silently reject a new argument.
+- [x] **A programming error could not be told from missing data — fixed.**
+      `property_vs_portfolio.compare` wrapped the backtest in
+      `except Exception` and answered BOTH cases with a calm "portfolio
+      side unavailable". Found when the test fake's signature lagged
+      `run_backtest` gaining `market`: the `TypeError` came back as missing
+      data. A mistake in the costume of an empty provider is the hardest
+      kind to find, because nothing looks wrong on the screen.
+
+      Narrowed to `MarketDataError`, which is what every real failure on
+      that path raises — `market_data` when the provider returns nothing
+      usable, `portfolio_series` when the tickers share no history. So
+      narrowing loses no genuine case and lets everything else crash
+      loudly. A test now pins both branches: missing data is reported,
+      a `TypeError` propagates.
+
+      **An existing test was lying and the broad handler let it.**
+      `test_a_missing_portfolio_side_shows_nothing_rather_than_one_side`
+      simulated "market data down" with a `RuntimeError`, which production
+      never raises there. It passed because the handler caught everything.
+      Corrected to `MarketDataError`.
+
+      **Same defect found and fixed in `portfolio_history.py`:** its
+      fallback carries every holding FLAT, so a broken call would flatten
+      everybody's chart and render as a quiet market rather than an error.
+      Also narrowed to `MarketDataError`.
+
+      Not changed: the other broad handlers in services/routers (46 in
+      all). They were checked — the rest either set a value to `None`,
+      which the reader sees as absent rather than as data, or guard
+      supporting content whose failure is meant to be invisible. Only these
+      two turned an exception into a believable number.
 
 #### UI
+
+- [x] **Three stacked reference cards were themselves a pile.** Funds, gold
+      and crypto each had their own card with its own collapse toggle, in a
+      row, under no header — the exact thing `Section.jsx` was written to
+      remove from every other page, reintroduced by me three commits later.
+      Now ONE collapsible band ("Ne aldığını bil") holding three plain
+      cards. A card that needs its own tap inside an opened band is a
+      second lock on an unlocked door.
+
+- [x] **The three component files were near-identical copies** and had
+      already begun to disagree (different docstrings, one different emoji
+      size). Collapsed into `ReferenceFacts.jsx`, driven by props.
+
+- [x] **The Dashboard had never been banded.** Explore, Holdings and
+      Recommend were restructured earlier in the release; the dashboard —
+      the FIRST screen a user sees — was left as eleven components in one
+      flat column. Two headed bands now: "Piyasada ne oluyor" (news +
+      headline education) and "Sırada ne var" (path, budget split,
+      invitation, mirror).
+
+      Neither band is collapsed, deliberately. The planning cards carry a
+      warning from earlier work: they were kept OUT of the details drawer
+      precisely because it is collapsed by default and hidden until the
+      user owns a holding, so a new account would never have seen them.
+      Adding a header must not quietly undo that. Per Section.jsx's own
+      docstring, "piled up" is the absence of ranking, not the volume — so
+      a header is the whole fix.
+
+- [x] **Section coverage audited per page.** Admin (2 internal cards),
+      FearCheckIn (1), Profile (2), Legal/Onboarding/PathSelection (0) are
+      short or single-purpose and do not need banding. Explore 4, Holdings
+      2, Recommend 2, Dashboard 2.
+
+- [x] **Locale parity verified** across all three files: 0 missing, 0 extra
+      keys in en and de against tr.
+
 
 
 - [x] **Three stacked reference cards were themselves a pile.** Funds, gold
@@ -2623,3 +2682,95 @@ absence of an argument, which only a scan of the source can see.
       The test fixtures had encoded the old behaviour (ten years of fake
       data under a five-year window), so they were the first thing the new
       guard caught.
+
+## Ücretli maddelerin ücretsiz alternatifleri — araştırma (2026-10-18)
+
+Açık 21 maddenin hepsi `[you]` ya da `[blocked]`. Para isteyenleri tek tek
+araştırdım. Rakamlar 2026-10-18 tarihli; satın almadan önce sağlayıcının
+kendi sayfasından teyit et (aşağıda hangisi ikincil kaynak, yazıyor).
+
+### Zaten ücretsiz — alınacak bir şey yok
+
+- **Sentry.** Ücretsiz Developer planı: ~5.000 hata/ay, 1 kullanıcı. Lansman
+  öncesi bir portfolyo projesi için fazlasıyla yeter. `SENTRY_DSN` maddesi
+  bir **hesap açma** işi, bir satın alma değil. Kaynaklar bir yerde 50K
+  diyor, çoğunluk 5K; sentry.io/pricing'den teyit et. Kendi kendine barındırma
+  (GlitchTip, Bugsink — Sentry SDK uyumlu) sonsuza kadar ücretsiz, ama bir
+  sunucu gerektirir, yani burada tasarruf değil masraf.
+- **Clerk production instance.** Ücretsiz plan production'ı VE **custom
+  domain**'i kapsıyor — bunda bütün kaynaklar hemfikir. MAU limiti çelişkili
+  (10.000 mi 50.000 mi), ama hangisi olursa olsun bu projenin çok üstünde.
+  Yani "Clerk production" maddesi de ücretsiz; bağlı olduğu tek masraf
+  domain.
+- **Groq / OpenRouter anahtarları.** İkisinin de ücretsiz katmanı var.
+- **Destatis Regionalstatistik.** Ücretsiz hesap (todo'da da öyle yazıyor).
+- **Stripe hesabı açmak** ücretsiz; maliyet komisyon. O madde aslında bir
+  masraf engeli değil, **şirket/merchant** gerekliliği — limited şirket
+  kararına bağlı, ayrı bir kalem değil.
+
+### Ücretsiz çözümü bulundu
+
+- **Render ücretli tier → ücretsiz, bir uptime pinger ile.** Render'ın kendi
+  dokümanı: workspace başına **ayda 750 ücretsiz instance saati**, servis 15
+  dakika trafik almazsa uyuyor, uyanması ~1 dakika. 31 günlük bir ay kesintisiz
+  **744 saat** — yani 750'nin ALTINDA. Tek bir servisi 10-14 dakikada bir
+  harici bir uptime monitörüyle dürterek sürekli ayakta tutmak matematiksel
+  olarak mümkün ve $0.
+
+  **Payı 6 saat.** Marj yok: ikinci bir ücretsiz servis açarsan limit patlar,
+  ve Render ücretsiz servisi "her an yeniden başlatabileceğini" söylüyor.
+  Ayrıca giden bant genişliği aşılırsa ücretsiz servisler askıya alınıyor.
+
+  Bizim lehimize olan şey: **Postgres Neon'da, Render'da değil.** Render'ın
+  ücretsiz veritabanı 30 günde sona eriyor; bu bizi hiç ilgilendirmiyor.
+  Mimari bu konuda şans eseri değil, doğru.
+
+### Ücretsiz alternatifi YOK — doğrulandı
+
+- **Apple Developer Program $99/yıl.** Muafiyet var ama bize kapalı: Apple'ın
+  kendi fee-waiver sayfası yalnızca **kâr amacı gütmeyen kuruluş, akredite
+  eğitim kurumu ve devlet kurumu** için veriyor; **şahıs şirketi / tek kişi
+  açıkça hariç**, ve **Paid Applications Agreement'ı imzalamış olmak da
+  diskalifiye ediyor** — yani ileride ücretli bir şey satma ihtimali bile
+  muafiyeti bitiriyor. $299'luk Enterprise daha ucuz bir yol değil; App
+  Store'a yayın yapamıyor, sadece şirket içi dağıtım.
+- **Google Play Console $25 (tek seferlik).** Hiçbir muafiyet bulunamadı.
+  APK'yı doğrudan dağıtmak ücretsiz ama o Play Store değil.
+- **Custom domain (~$10-15/yıl).** Ücretsiz altdomainler var (`is-a.dev`,
+  `eu.org`, `js.org`) ama **bu projeye tavsiye etmiyorum**: finans eğitimi
+  veren bir uygulamanın `lumos.is-a.dev` adresinde durması hem store
+  incelemesinde hem hukuki incelemede güvenilirliğe zarar verir, ki ikisi de
+  bu listedeki en kritik maddeler. Listedeki en ucuz kalem; ödenecek yer bu.
+
+### Asıl bulgu: $0 yolu zaten neredeyse kurulu
+
+Todo'daki Capacitor maddesinin gerekçesi şu: *"push notifications = the
+behavioural coach's carrier ... iOS web push is weak"*. Bu **artık tam doğru
+değil** ve fark $124 ile $0 arasında.
+
+- iOS'ta web push **iOS 16.4'ten (Mart 2023) beri çalışıyor** — ama yalnızca
+  **ana ekrana eklenmiş** web uygulamaları için. Safari sekmesi olmaz; iOS'taki
+  Chrome/Firefox da olmaz, hepsi WebKit.
+- Zayıf olan şey push'un kendisi değil: **iOS otomatik kurulum promptu
+  göstermiyor.** Kullanıcı Paylaş → Ana Ekrana Ekle'yi kendi bulmak zorunda.
+- iOS 26'da ana ekrana eklenen her site varsayılan olarak web app açılıyor.
+
+Ve Lumos'un PWA tarafı **eksiksiz**: `manifest.webmanifest` tam (standalone,
+start_url, maskable 512 ikon), `apple-touch-icon` ve `apple-mobile-web-app-*`
+meta'ları yerinde, **`sw.js` içinde push handler zaten yazılmış** (satır 64,
+`showNotification` 75).
+
+- [ ] **Eksik olan tek parça: uygulamada hiçbir kurulum yönlendirmesi yok.**
+      `beforeinstallprompt`, "Ana Ekrana Ekle" ipucu, standalone tespiti —
+      hiçbiri yok. Yani davranışsal koçun taşıyıcısı olan push, iOS'ta
+      kimseye ulaşamıyor: kullanıcı kendiliğinden kurmayı bilmiyorsa
+      izin isteyecek bir yer bile yok.
+
+      Bunu yapmak ücretsiz ve $124'lük ilk yıl maliyetini test etmeden önce
+      denenmesi gereken şey. Android'de `beforeinstallprompt` gerçek bir
+      prompt verir; iOS'ta Safari'de ve standalone DEĞİLKEN gösterilecek
+      kısa bir yönlendirme gerekir.
+
+**Maliyet tabanı:** store'lara çıkmazsan **$12/yıl** (sadece domain).
+Play Store dahil **$37** (ilk yıl). Apple dahil **$136** (ilk yıl), sonra
+$111/yıl.

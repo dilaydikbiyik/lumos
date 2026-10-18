@@ -24,6 +24,7 @@ from backend.services.holdings_valuation import (
 from backend.services import fx_service
 from backend.services.holdings_valuation import LEGACY_CURRENCY, ticker_currency
 from backend.services.market_data import fetch_price_history
+from backend.exceptions import MarketDataError
 
 logger = logging.getLogger("lumos.portfolio_history")
 
@@ -44,8 +45,15 @@ def portfolio_value_history(holdings, days: int = 30, user_currency: str = "TRY"
     if live:
         try:
             history = fetch_price_history(sorted({h.ticker for h in live}), period="3mo")
-        except Exception as exc:
-            logger.warning("price history unavailable (%s) — carrying holdings flat", type(exc).__name__)
+        except MarketDataError as exc:
+            # MarketDataError only, for the same reason as in
+            # property_vs_portfolio: this fallback carries every holding
+            # FLAT, which draws a believable chart. A broken call here
+            # would flatten everybody's history and look like a quiet
+            # market. fetch_price_history raises MarketDataError for every
+            # real failure, so narrowing costs nothing and stops a
+            # programming error from being rendered as data.
+            logger.warning("price history unavailable (%s) — carrying holdings flat", exc)
             history = {}
 
     # Trading-day index from whatever price data we have

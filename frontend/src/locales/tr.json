@@ -1193,7 +1193,11 @@
     "why": "Neden bu dağılım?",
     "whySub": "Formülün her adımı — istersen aç.",
     "whatYouHold": "Ne aldığını bil",
-    "whatYouHoldSub": "Fon, altın, kripto — elindeki şey tam olarak ne ve neyi koruyor?"
+    "whatYouHoldSub": "Fon, altın, kripto — elindeki şey tam olarak ne ve neyi koruyor?",
+    "whatsHappening": "Piyasada ne oluyor",
+    "whatsHappeningSub": "Haberler ve o haberlerin dilini okuma",
+    "yourNextMove": "Sırada ne var",
+    "yourNextMoveSub": "Sana göre bir sonraki adım ve bütçenin dağılımı"
   },
   "fundFacts": {
     "title": "Fon aldığında ne alıyorsun?",

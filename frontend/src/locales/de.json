@@ -1193,7 +1193,11 @@
     "why": "Warum diese Aufteilung?",
     "whySub": "Jeder Schritt der Formel — bei Bedarf aufklappen.",
     "whatYouHold": "Wisse, was du hältst",
-    "whatYouHoldSub": "Fonds, Gold, Krypto — was es wirklich ist und was es schützt"
+    "whatYouHoldSub": "Fonds, Gold, Krypto — was es wirklich ist und was es schützt",
+    "whatsHappening": "Was gerade passiert",
+    "whatsHappeningSub": "Die Schlagzeilen und wie du ihre Sprache liest",
+    "yourNextMove": "Dein nächster Schritt",
+    "yourNextMoveSub": "Der Schritt, der zu dir passt, und wie sich dein Budget aufteilt"
   },
   "fundFacts": {
     "title": "Was besitzt du, wenn du einen Fonds besitzt?",

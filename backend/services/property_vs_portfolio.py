@@ -28,6 +28,7 @@ Three honesty rules, because this is the screen most able to mislead:
 import logging
 from typing import Optional
 
+from backend.exceptions import MarketDataError
 from backend.i18n import t
 from backend.services import assumptions
 
@@ -98,8 +99,23 @@ def compare(*, amount: float, region_code: str, weights: dict[str, float],
         from backend.services.backtest import run_backtest
 
         portfolio = run_backtest(weights, amount, period=period, market=market)
-    except Exception as exc:
-        logger.warning("portfolio side unavailable (%s)", type(exc).__name__)
+    except MarketDataError as exc:
+        # MarketDataError ONLY. This was `except Exception`, which cannot
+        # tell "the provider has no history for these tickers" from "this
+        # code is broken" — and it answered both with a calm, plausible
+        # "the portfolio side is unavailable".
+        #
+        # Found when the test fake's signature lagged run_backtest gaining
+        # a market argument: the TypeError was swallowed and the comparison
+        # reported missing data. A programming mistake wearing the costume
+        # of an empty provider is the hardest kind to find, because nothing
+        # looks wrong.
+        #
+        # Every genuine data failure on this path raises MarketDataError —
+        # market_data raises it when the provider returns nothing usable,
+        # portfolio_series when the tickers have no overlapping history.
+        # So narrowing loses no real case and lets the rest crash loudly.
+        logger.warning("portfolio side unavailable (%s)", exc)
         return {"available": False, "reason": t("compare.no_portfolio", lang)}
 
     # ── Property, with the costs only it pays ───────────────────────────

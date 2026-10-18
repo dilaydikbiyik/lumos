@@ -50,10 +50,21 @@ def test_an_unknown_region_says_so_rather_than_guessing():
 
 
 def test_a_missing_portfolio_side_shows_nothing_rather_than_one_side():
-    """A one-sided comparison is worse than no comparison."""
+    """
+    A one-sided comparison is worse than no comparison.
+
+    The simulated failure is a MarketDataError, because that is what "market
+    data down" actually raises: market_data raises it when the provider
+    returns nothing usable, portfolio_series when the tickers share no
+    history. It used to be a RuntimeError, which production never produces
+    here — the old `except Exception` was broad enough that the test could
+    be wrong about the real system and still pass.
+    """
+    from backend.exceptions import MarketDataError
+
     with patch.object(compare_service, "_region_growth_pct", return_value=(60.0, 5.0)), \
          patch("backend.services.backtest.run_backtest",
-               side_effect=RuntimeError("market data down")):
+               side_effect=MarketDataError("yfinance returned no usable data")):
         result = compare_service.compare(
             amount=500_000, region_code="34", weights=WEIGHTS, market="TR", lang="en")
 
@@ -117,3 +128,28 @@ def test_the_rent_yield_offered_for_comparison_is_net_not_gross():
 def test_the_yield_note_names_the_upkeep_it_deducted():
     result = compare_service.yield_comparison(market="US", lang="en")
     assert str(result["annual_upkeep_pct"]) in result["note"]
+
+
+def test_a_broken_call_crashes_instead_of_claiming_missing_data():
+    """
+    The handler used to be `except Exception`, which could not tell "the
+    provider has no history" from "this code is broken" — and answered both
+    with a calm, plausible "the portfolio side is unavailable".
+
+    It was found the honest way: the fake in this file lagged behind
+    run_backtest gaining a `market` argument, and the resulting TypeError
+    came back as missing data. A programming mistake in the costume of an
+    empty provider is the hardest kind to find, because nothing looks
+    wrong on the screen.
+
+    So anything that is not a MarketDataError must now propagate.
+    """
+    def broken(*args, **kwargs):
+        raise TypeError("run_backtest() got an unexpected keyword argument")
+
+    with patch.object(compare_service, "_region_growth_pct", return_value=(60.0, 5.0)), \
+         patch("backend.services.backtest.run_backtest", broken):
+        with pytest.raises(TypeError):
+            compare_service.compare(
+                amount=500_000, region_code="34", weights=WEIGHTS,
+                period="5y", market="TR", lang="en")

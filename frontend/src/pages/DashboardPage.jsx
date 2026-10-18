@@ -11,6 +11,7 @@ import GoalPlanner from '../components/GoalPlanner'
 import PathInvitation from '../components/PathInvitation'
 import BehaviorMirror from '../components/BehaviorMirror'
 import Disclaimer from '../components/Disclaimer'
+import Section from '../components/Section'
 import PathSuggestion from '../components/PathSuggestion'
 import BudgetSplit from '../components/BudgetSplit'
 import DailyTip from '../components/DailyTip'
@@ -246,21 +247,34 @@ export default function DashboardPage() {
           </div>
         )}
 
-        {/* ── News digest ── */}
-        <NewsDigest />
+        {/* Two bands, because this was eleven cards in one flat column on
+            the first screen a user sees — the pile Section.jsx was written
+            to remove from every other page, still here because the
+            dashboard was never revisited. A header is enough: per that
+            file, "piled up" is the absence of ranking, not the volume.
 
-        {/* ── Headline-language education ── */}
-        <HeadlineEducation />
+            NEITHER band is collapsed, and that is deliberate. The planning
+            cards below carry a warning from earlier work: they were kept
+            out of the details drawer precisely because it is collapsed by
+            default and hidden until the user owns a holding, so a new
+            account — exactly who this app is for — would never have seen
+            them. Giving them a header must not quietly undo that. */}
+        <Section title={t('section.whatsHappening')}
+                 subtitle={t('section.whatsHappeningSub')}>
+          <NewsDigest />
+          <HeadlineEducation />
+        </Section>
 
-        {/* Primary planning content, deliberately NOT inside the details
-            drawer below: that drawer is collapsed by default AND hidden
-            entirely until the user owns a holding, so a new account —
-            exactly who this is for — would never have seen any of it. Each
-            card hides itself when it has nothing to say. */}
-        <PathSuggestion />
-        <BudgetSplit />
-        <PathInvitation />
-        <BehaviorMirror />
+        {/* Each card hides itself when it has nothing to say, so this band
+            can be empty — which is why its header lives with the cards
+            rather than above the whole region. */}
+        <Section title={t('section.yourNextMove')}
+                 subtitle={t('section.yourNextMoveSub')}>
+          <PathSuggestion />
+          <BudgetSplit />
+          <PathInvitation />
+          <BehaviorMirror />
+        </Section>
 
         {/* ── Progressive details toggle ── */}
         <ProgressiveDetails holdingsSummary={holdingsSummary} portfolio={portfolio} />
