@@ -1191,7 +1191,9 @@
     "howItIsDoing": "How it is doing",
     "howItIsDoingSub": "Value, balance, currency and what inflation is taking.",
     "why": "Why this split?",
-    "whySub": "Every step of the formula — open it if you want it."
+    "whySub": "Every step of the formula — open it if you want it.",
+    "whatYouHold": "Know what you hold",
+    "whatYouHoldSub": "Funds, gold, crypto — what the thing actually is, and what protects it"
   },
   "fundFacts": {
     "title": "What do you own when you own a fund?",
@@ -1200,6 +1202,10 @@
   "goldFacts": {
     "title": "What do you hold when you hold gold?",
     "subtitle": "Metal in a safe, a claim on a bank, a fund share — all called gold, all different"
+  },
+  "cryptoFacts": {
+    "title": "Crypto: why we don't recommend it",
+    "subtitle": "Your keys or someone else's — and what a licence does and does not protect"
   },
   "homeRoutes": {
     "title": "Other ways into a home",

@@ -1191,7 +1191,9 @@
     "howItIsDoing": "Wie es läuft",
     "howItIsDoingSub": "Wert, Balance, Währung und was die Inflation nimmt.",
     "why": "Warum diese Aufteilung?",
-    "whySub": "Jeder Schritt der Formel — bei Bedarf aufklappen."
+    "whySub": "Jeder Schritt der Formel — bei Bedarf aufklappen.",
+    "whatYouHold": "Wisse, was du hältst",
+    "whatYouHoldSub": "Fonds, Gold, Krypto — was es wirklich ist und was es schützt"
   },
   "fundFacts": {
     "title": "Was besitzt du, wenn du einen Fonds besitzt?",
@@ -1200,6 +1202,10 @@
   "goldFacts": {
     "title": "Was hältst du, wenn du Gold hältst?",
     "subtitle": "Barren, Forderung an eine Bank, Fondsanteil — alles Gold, alles verschieden"
+  },
+  "cryptoFacts": {
+    "title": "Krypto: warum wir es nicht empfehlen",
+    "subtitle": "Deine Schlüssel oder die eines Instituts — und was eine Zulassung schützt"
   },
   "homeRoutes": {
     "title": "Andere Wege ins Eigenheim",

@@ -2476,14 +2476,67 @@ routes, and whether that means the RECOMMENDED portfolios change.
       German *garantiert*, both of which this copy has to say. A name
       indistinguishable from ordinary prose cannot be banned by substring.
 
-- [ ] **Still to build: crypto.** Self-custody vs exchange custody, and
-      what the new Turkish licensing regime does and does not promise.
-      Same shape, same tests. Turkish crypto custody rules were confirmed
-      in research and are genuinely relevant: a licensed platform must keep
-      the large majority of customer assets at an authorised custodian.
-      That is a real protection and, like every other one in this app, not
-      a guarantee of value. **Do not ship the capital figures** — sources
-      conflict on them.
+- [x] **Crypto catalogue built.** `backend/content/crypto_facts.py`, nine
+      combinations, four points each, at `/planning/crypto-facts`.
+
+      The card LEADS with why crypto is in no recommended portfolio, and
+      gives the methodological reason rather than a moral one, because that
+      is the true one: the projection guard refuses bands resting on too
+      few independent periods and crypto's record cannot supply them — the
+      same guard that now refuses a ten-year band for gold and for the
+      Nasdaq ETF. A test pins that sentence to the FIRST point of every
+      combination, so a reorder that buries it fails. Reference copy beside
+      a recordable asset without it reads as endorsement.
+
+      The content: your keys or someone else's (the only real distinction);
+      a licence is real supervision but not deposit insurance; transfers
+      are irreversible and that is why fraud concentrates there. Germany
+      gets the ETP/ETC point, which ties back to gold — the exchange-traded
+      crypto product in Europe is usually a debt security, not a fund.
+
+      The Turkish custody percentages and capital figures are NOT shipped:
+      they conflicted between sources. The copy states the protection
+      qualitatively ("the large majority", at an authorised custodian) and
+      a test forbids any digit in either catalogue.
+
+### End-to-end polish, all markets (2026-10-18)
+
+- [x] **Three stacked reference cards were themselves a pile.** Funds, gold
+      and crypto each had their own card with its own collapse toggle, in a
+      row, under no header — which is the exact thing `Section.jsx` was
+      written to remove from every other page, reintroduced by me three
+      commits later. Now ONE collapsible band ("Ne aldığını bil") with
+      three plain cards inside it. A card that needs its own tap inside an
+      opened band is a second lock on an unlocked door.
+
+- [x] **The three component files were near-identical copies** and had
+      already begun to disagree (different docstrings, one different emoji
+      size). Collapsed into `ReferenceFacts.jsx`, driven by props. A fourth
+      copy is where they would have drifted for real.
+
+- [x] **The serving layer had NO test, and that is where the bug lived.**
+      `test_content_endpoints_speak_the_readers_language.py`: every market ×
+      every language × every content endpoint, through HTTP, asserting the
+      prose reads as the DEVICE language whatever the market. Plus the
+      unsupported-language fallback.
+
+      Proven non-vacuous by reintroducing the original bug (market picks
+      language) in `gold_facts.for_market`: the new file fails 6 times while
+      **all 206 table-level tests pass.** That is why it shipped the first
+      time — the tables were never the problem, the path to them was.
+
+- [x] **The test registry is now itself a rule over source.**
+      `test_every_market_keyed_catalogue_is_held_by_these_rules` walks
+      `backend/content/`, finds every market-keyed table, and fails if one
+      is not in `REFERENCE_CATALOGUES` or exempted with a reason. Verified
+      by dropping a probe catalogue in and watching it fail. The next
+      catalogue cannot arrive unheld — which is how gold arrived with one
+      language per market.
+
+      `purchase_checks`, `home_routes` and `fund_facts` are exempted with
+      the reason: their market-specific legal figures (Law 6361, the
+      deposit-guarantee amount) are the POINT of that copy, so the generic
+      no-digit rule would contradict them.
 
 ### Found while checking whether the method could even carry crypto
 

@@ -8,8 +8,7 @@ import { sliceColor } from '../utils/palette'
 import ReitCard from '../components/ReitCard'
 import AssetExplainer from '../components/AssetExplainer'
 import Section from '../components/Section'
-import FundFacts from '../components/FundFacts'
-import GoldFacts from '../components/GoldFacts'
+import ReferenceFacts from '../components/ReferenceFacts'
 import TimeMachine from '../components/TimeMachine'
 import FutureScenarios from '../components/FutureScenarios'
 import AllocationRationale from '../components/AllocationRationale'
@@ -181,14 +180,38 @@ export default function RecommendPage() {
 
         {portfolio.includes_reits && <ReitCard explanation={portfolio.metadata?.reit_explanation} />}
 
-        {/* Every holding above is a fund. The app had never said what that
-            means structurally — which is the thing 455,758 people in Türkiye
-            found out the hard way in September 2026. */}
-        <FundFacts />
-        {/* Beside the fund card on purpose: every portfolio this page builds
-            holds gold, and the two cards answer the same question about
-            different wrappers. In Germany they answer it oppositely. */}
-        <GoldFacts />
+        {/* ONE band, not three stacked cards.
+            Funds, gold and crypto each had their own card with its own
+            collapse toggle, in a row, under no header — which is the pile
+            this app spent a release removing from every other page. The
+            band says what the three are for; a reader opens it once and
+            reads whichever one they came with a question about.
+
+            Collapsed by default: this is reference you consult while
+            deciding, not something to meet while reading a price. */}
+        <Section
+          title={t('section.whatYouHold')}
+          subtitle={t('section.whatYouHoldSub')}
+          collapsible
+          defaultOpen={false}
+          count={3}
+        >
+          <ReferenceFacts
+            endpoint="/planning/fund-facts" icon="🏛️"
+            titleKey="fundFacts.title" subtitleKey="fundFacts.subtitle"
+          />
+          <ReferenceFacts
+            endpoint="/planning/gold-facts" icon="🪙"
+            titleKey="goldFacts.title" subtitleKey="goldFacts.subtitle"
+          />
+          {/* The only one about something this page never recommends. It
+              belongs here anyway: the question a reader arrives with is
+              usually why their friend's coin is not on the list. */}
+          <ReferenceFacts
+            endpoint="/planning/crypto-facts" icon="₿"
+            titleKey="cryptoFacts.title" subtitleKey="cryptoFacts.subtitle"
+          />
+        </Section>
 
         {/* ── Layer 2: SINA — test it against reality before risking money ── */}
         <Layer

@@ -541,3 +541,36 @@ async def gold_facts(
         "available": facts is not None,
         "facts": facts or [],
     }
+
+
+@router.get("/crypto-facts")
+async def crypto_facts(
+    user_id: str = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+    lang: str = Depends(language),
+):
+    """
+    The asset the app refuses to recommend, explained anyway.
+
+    Users have been able to record a crypto holding since the first
+    migration, and the app has never said anything about it. Silence
+    beside a recorded asset reads as endorsement, and the people most
+    drawn to crypto are exactly this app's readers — the ones who enjoy
+    risk and have the least protection explained to them.
+
+    The copy gives the methodological reason it stays out of every
+    recommended portfolio rather than a moral one, because the reason IS
+    methodological: the projection guard refuses bands that rest on too
+    few independent periods, and crypto's record cannot supply them.
+    """
+    from backend.content import crypto_facts as content
+
+    user = await user_repository.get_or_create(db, user_id)
+    market = user.market or "TR"
+    facts = content.for_market(market, lang)
+
+    return {
+        "market": market,
+        "available": facts is not None,
+        "facts": facts or [],
+    }

@@ -1191,7 +1191,9 @@
     "howItIsDoing": "Nasıl gidiyor",
     "howItIsDoingSub": "Değer, denge, kur ve enflasyon etkisi.",
     "why": "Neden bu dağılım?",
-    "whySub": "Formülün her adımı — istersen aç."
+    "whySub": "Formülün her adımı — istersen aç.",
+    "whatYouHold": "Ne aldığını bil",
+    "whatYouHoldSub": "Fon, altın, kripto — elindeki şey tam olarak ne ve neyi koruyor?"
   },
   "fundFacts": {
     "title": "Fon aldığında ne alıyorsun?",
@@ -1200,6 +1202,10 @@
   "goldFacts": {
     "title": "Altın aldığında ne alıyorsun?",
     "subtitle": "Kasandaki metal, bankadaki alacak ve fon payı — üçü de altın, üçü de başka şey"
+  },
+  "cryptoFacts": {
+    "title": "Kripto: neden önermiyoruz?",
+    "subtitle": "Anahtar sende mi, bir kurumda mı — ve lisans neyi koruyor, neyi korumuyor?"
   },
   "homeRoutes": {
     "title": "Eve giden başka yollar",

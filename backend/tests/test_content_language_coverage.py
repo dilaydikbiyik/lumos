@@ -31,7 +31,13 @@ import dataclasses
 
 import pytest
 
-from backend.content import fund_facts, gold_facts, home_routes, purchase_checks
+from backend.content import (
+    crypto_facts,
+    fund_facts,
+    gold_facts,
+    home_routes,
+    purchase_checks,
+)
 from backend.markets import get_market_pack
 
 MARKETS = ("TR", "US", "DE")
@@ -333,7 +339,7 @@ def test_the_fx_note_names_no_currency_of_its_own():
         assert "{{assetCurrency}}" in text and "{{marketCurrency}}" in text, lang
 
 
-# ── gold ────────────────────────────────────────────────────────────────────
+# ── gold and crypto ─────────────────────────────────────────────────────────
 #
 # Gold arrived with only the native language per market: TR/tr, US/en, DE/de.
 # Through for_market's fallback that is the session's recurring bug wearing a
@@ -341,69 +347,183 @@ def test_the_fx_note_names_no_currency_of_its_own():
 # German prose, which is the exact complaint that started this series. Market
 # and language are independent axes; these tests are what makes that true
 # rather than intended.
+#
+# Parametrised over the CATALOGUE rather than written out per catalogue,
+# because the fifth copy of a block is where the copies start to disagree.
+# A new catalogue is one line here and inherits every rule.
 
+REFERENCE_CATALOGUES = {
+    "gold": gold_facts.GOLD,
+    "crypto": crypto_facts.CRYPTO,
+}
+_CATALOGUE_IDS = sorted(REFERENCE_CATALOGUES)
+
+
+@pytest.mark.parametrize("catalogue", _CATALOGUE_IDS)
 @pytest.mark.parametrize("market", MARKETS)
 @pytest.mark.parametrize("lang", LANGS)
-def test_every_market_has_gold_facts_in_every_language(market, lang):
-    by_lang = gold_facts.GOLD[market]
-    assert lang in by_lang, f"{market} has no {lang} gold facts (fallback would hide this)"
-    assert by_lang[lang], f"{market}/{lang} gold facts are empty"
+def test_reference_catalogue_covers_every_market_and_language(catalogue, market, lang):
+    by_lang = REFERENCE_CATALOGUES[catalogue][market]
+    assert lang in by_lang, f"{catalogue} {market} has no {lang} (fallback would hide this)"
+    assert by_lang[lang], f"{catalogue} {market}/{lang} is empty"
 
 
+@pytest.mark.parametrize("catalogue", _CATALOGUE_IDS)
 @pytest.mark.parametrize("market", MARKETS)
 @pytest.mark.parametrize("lang", LANGS)
-def test_gold_facts_are_written_in_the_language_they_are_filed_under(market, lang):
-    text = _text_of(gold_facts.GOLD[market][lang])
+def test_reference_catalogue_reads_as_the_language_it_is_filed_under(catalogue, market, lang):
+    text = _text_of(REFERENCE_CATALOGUES[catalogue][market][lang])
     assert _looks_like(text, lang), (
-        f"gold {market}/{lang} does not read as {lang}: {text[:120]!r}"
+        f"{catalogue} {market}/{lang} does not read as {lang}: {text[:120]!r}"
+    )
+
+
+@pytest.mark.parametrize("catalogue", _CATALOGUE_IDS)
+@pytest.mark.parametrize("market", MARKETS)
+def test_reference_catalogue_languages_are_not_copies(catalogue, market):
+    table = REFERENCE_CATALOGUES[catalogue][market]
+    rendered = {lang: _text_of(table[lang]) for lang in LANGS}
+    assert len(set(rendered.values())) == len(LANGS), (
+        f"{catalogue} {market} has duplicate languages"
+    )
+
+
+@pytest.mark.parametrize("catalogue", _CATALOGUE_IDS)
+@pytest.mark.parametrize("market", MARKETS)
+def test_reference_catalogue_languages_cover_the_same_points(catalogue, market):
+    table = REFERENCE_CATALOGUES[catalogue][market]
+    counts = {lang: len(table[lang]) for lang in LANGS}
+    assert len(set(counts.values())) == 1, (
+        f"{catalogue} {market} languages differ in length: {counts}"
+    )
+
+
+@pytest.mark.parametrize("catalogue", _CATALOGUE_IDS)
+@pytest.mark.parametrize("market", MARKETS)
+@pytest.mark.parametrize("lang", LANGS)
+def test_reference_catalogue_names_no_product_or_provider(catalogue, market, lang):
+    """
+    The fund catalogue refuses to name funds; gold and crypto refuse to name
+    products, dealers, platforms and tokens for the same reason. A beginner
+    needs the STRUCTURE — fund, debt security, metal, own keys or somebody
+    else's — and naming one issuer turns reference material into a
+    recommendation the app is not licensed to make.
+
+    One Turkish bank's name is also the Turkish word for guarantee and a
+    substring of the German "garantiert", both of which this copy needs to
+    say. A name that cannot be distinguished from ordinary prose cannot be
+    banned by substring, so it is not in this list — the rule it would
+    enforce is carried by the names that ARE unambiguous.
+    """
+    text = _text_of(REFERENCE_CATALOGUES[catalogue][market][lang]).lower()
+    banned = (
+        # gold
+        "xetra", "4gld", "gld", "ishares", "wisdomtree", "invesco",
+        "degussa", "ziraat", "i̇ş bankası",
+        # crypto platforms and tokens. "bitcoin" is exempt deliberately: it
+        # appears only inside the quoted sentence a reader says about
+        # themselves ("I own bitcoin"), which is the misreading being named.
+        "binance", "coinbase", "kraken", "paribu", "btcturk", "bitci",
+        "ftx", "celsius", "tether", "usdt", "ethereum", "solana",
+    )
+    for name in banned:
+        assert name not in text, f"{catalogue} {market}/{lang} names {name}"
+
+
+@pytest.mark.parametrize("catalogue", _CATALOGUE_IDS)
+@pytest.mark.parametrize("market", MARKETS)
+@pytest.mark.parametrize("lang", LANGS)
+def test_reference_catalogue_carries_no_figure(catalogue, market, lang):
+    """
+    Spreads, premiums, purity, tax rates, custody percentages and capital
+    requirements all differ by provider and by year. Evergreen copy carrying
+    one goes quietly wrong, and a reader who trusts a stale number is worse
+    off than one who was told to go and ask.
+
+    For crypto this is not merely tidiness: the Turkish custody percentage
+    and the capital figures CONFLICTED between sources during research. The
+    rule the copy follows is to state the protection qualitatively — "the
+    large majority", held at an authorised custodian — and let the reader
+    check the current figure. A digit here means somebody answered instead.
+    """
+    import re as _re
+    text = _text_of(REFERENCE_CATALOGUES[catalogue][market][lang])
+    assert not _re.search(r"\d", text), (
+        f"{catalogue} {market}/{lang} carries a figure: "
+        f"{_re.findall(r'[^.]*[0-9][^.]*', text)}"
     )
 
 
 @pytest.mark.parametrize("market", MARKETS)
-def test_gold_languages_are_not_copies_of_each_other(market):
-    rendered = {lang: _text_of(gold_facts.GOLD[market][lang]) for lang in LANGS}
-    assert len(set(rendered.values())) == len(LANGS), f"gold {market} has duplicate languages"
-
-
-@pytest.mark.parametrize("market", MARKETS)
-def test_every_gold_language_covers_the_same_points(market):
-    counts = {lang: len(gold_facts.GOLD[market][lang]) for lang in LANGS}
-    assert len(set(counts.values())) == 1, f"gold {market} languages differ in length: {counts}"
-
-
-@pytest.mark.parametrize("market", MARKETS)
 @pytest.mark.parametrize("lang", LANGS)
-def test_gold_facts_name_no_product_or_dealer(market, lang):
+def test_crypto_says_it_is_not_recommended(market, lang):
     """
-    The fund catalogue refuses to name funds; gold refuses to name products
-    and dealers for the same reason. A beginner needs the STRUCTURE — fund,
-    debt security, or metal — and naming one issuer turns reference material
-    into a recommendation the app is not licensed to make.
+    The one claim the crypto catalogue must never lose. A reader can RECORD
+    crypto in this app, and reference copy sitting beside a recordable asset
+    without this sentence reads as endorsement — which is both dishonest and
+    the exposure Apple's 3.1.5 and the legal brief both circle.
+
+    Checked structurally rather than by wording: the first point of every
+    combination is the one that carries it, so a reorder that buries it
+    fails here.
     """
-    text = _text_of(gold_facts.GOLD[market][lang])
-    # One Turkish bank's name is also the Turkish word for guarantee and a
-    # substring of the German "garantiert", both of which this copy needs to
-    # say. A name that cannot be distinguished from ordinary prose cannot be
-    # banned by substring, so it is not in this list — the rule it would
-    # enforce is carried by the issuer names that ARE unambiguous.
-    for banned in ("Xetra", "4GLD", "GLD", "iShares", "WisdomTree", "Invesco",
-                   "Degussa", "Ziraat", "İş Bankası"):
-        assert banned.lower() not in text.lower(), (
-            f"gold {market}/{lang} names {banned}"
-        )
+    first = crypto_facts.CRYPTO[market][lang][0]
+    blob = f"{first['title']} {first['body']}".lower()
+    negations = ("önermiyor", "not recommend", "empfiehlt kein")
+    assert any(n in blob for n in negations), (
+        f"crypto {market}/{lang} does not open by saying it is not recommended: "
+        f"{first['title']!r}"
+    )
 
 
-@pytest.mark.parametrize("market", MARKETS)
-@pytest.mark.parametrize("lang", LANGS)
-def test_gold_facts_carry_no_spread_premium_or_tax_figure(market, lang):
+def test_every_market_keyed_catalogue_is_held_by_these_rules():
     """
-    Spreads, premiums, purity and tax rates differ by dealer and by year.
-    Evergreen copy carrying one goes quietly wrong, and a reader who trusts
-    a stale number is worse off than one who was told to go and ask. The
-    copy says what to ASK; a digit here means somebody answered instead.
+    The registry above is hand-written, which means the next catalogue can
+    be added to backend/content/ and simply not appear in it — shipping
+    nine-combination copy with none of these rules applied. That is exactly
+    how gold arrived with one language per market.
+
+    So the registry is checked against the SOURCE. Any module in
+    backend/content/ exposing a market-keyed table must be listed in
+    REFERENCE_CATALOGUES or named in the exemptions below with a reason.
+    Adding a catalogue and forgetting the tests fails here.
     """
-    import re as _re
-    text = _text_of(gold_facts.GOLD[market][lang])
-    assert not _re.search(r"\d", text), (
-        f"gold {market}/{lang} carries a figure: {_re.findall(r'[^.]*\\d[^.]*', text)}"
+    import importlib
+    import pkgutil
+
+    import backend.content as content_pkg
+
+    # Catalogues with their own dedicated blocks earlier in this file. They
+    # are held, just not through the parametrised registry: purchase_checks
+    # and home_routes carry market-specific legal rules that the generic
+    # no-figure rule would contradict (Law 6361 and the deposit-guarantee
+    # amount are the point of that copy, not a stale detail).
+    HELD_ELSEWHERE = {"purchase_checks", "home_routes", "fund_facts"}
+
+    # Module names of the catalogues the registry above already covers,
+    # derived from it rather than restated, so the two cannot drift.
+    registered = {f"{name}_facts" for name in REFERENCE_CATALOGUES}
+
+    unheld = []
+    for mod_info in pkgutil.iter_modules(content_pkg.__path__):
+        name = mod_info.name
+        if name.startswith("_") or name in HELD_ELSEWHERE or name in registered:
+            continue
+        module = importlib.import_module(f"backend.content.{name}")
+        for attr in dir(module):
+            if attr.startswith("_") or not attr.isupper():
+                continue
+            value = getattr(module, attr)
+            if not isinstance(value, dict):
+                continue
+            # Market-keyed: top level is market codes, second level languages.
+            if set(value) & set(MARKETS) and all(
+                isinstance(v, dict) and set(v) & set(LANGS) for v in value.values()
+            ):
+                unheld.append(f"{name}.{attr}")
+
+    assert not unheld, (
+        "market-keyed catalogues not held by the language/figure rules: "
+        f"{unheld}. Add them to REFERENCE_CATALOGUES, or to HELD_ELSEWHERE "
+        "with the reason they need their own block."
     )
