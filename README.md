@@ -147,8 +147,11 @@ surface, zero custody risk — and a lower trust barrier for scared beginners.
 - **Path selection** — stocks-only, real-estate-only, hybrid, or "undecided, guide me"; navigation
   and modules adapt to the choice (no real-estate content forced on a stocks-only user)
 - **Fear check-in** — "What scares you most?" with instant, specific reassurance; feeds the AI's tone
-- **Readiness score** — five transparent milestones toward "ready for real money"; the UI background
-  literally brightens from night toward dawn as the score grows
+- **Readiness milestones** — five transparent steps toward "ready for real money", each one
+  something the user actually did. It shows how many are done and **the single next step**, not a
+  percentage: a ring reading 40% tells a beginner they are failing, while "two of five done, next:
+  record one holding" tells them what to do. The UI background still brightens from night toward
+  dawn as they progress
 
 ### 💬 Risk profiling — nine questions, one at a time
 - 9 single-topic questions grounded in Modern Portfolio Theory (budget, horizon, age, loss
@@ -185,7 +188,14 @@ surface, zero custody risk — and a lower trust barrier for scared beginners.
   optimistic p90), never a model's guess
 - Works per-asset, for the **whole weighted portfolio** (diversification visibly narrows the band),
   and for **housing regions** (with the real-return companion that exposes nominal illusions)
-- Thin histories are refused outright rather than dressed up as statistics
+- **Thin histories are refused, counted honestly.** The guard counts how many times the horizon
+  fits in the record *without reusing the same years* — three minimum — and reports that number
+  beside the band. It used to count overlapping windows, which is six steps past the horizon: a
+  five-year band passed on five and a half years of history, one stretch resampled sixty-six times
+  and drawn as a spread of outcomes. Both paths now also read the **whole** price record instead of
+  ten years, which was the real reason bands were thin. The effect is visible: SPY's 5-year band
+  went from two independent periods to six, and 10-year bands for gold and the Nasdaq ETF are now
+  refused rather than drawn
 
 ### 🏘️ Real-estate intelligence (live official data, per market)
 - **Sub-national housing**, from each country's own source and honest about what it is:
@@ -228,8 +238,11 @@ surface, zero custody risk — and a lower trust barrier for scared beginners.
   score and compared with reality; below a meaningful threshold it explicitly says *do nothing*,
   and the suggested remedy is steering new contributions rather than selling
 - **Monthly-plan tracking** for people who invest regularly: planned vs. recorded this month
-- **Fener (lantern) score**: 0–100 portfolio health from diversification + liquidity, with
-  plain-language notes explaining *why* and *how to improve*
+- **Portfolio health, as two separate numbers** — diversification and liquidity, each with a
+  plain-language note saying what it measures, why it sits where it does *for this portfolio*,
+  and the one thing that moves it. There is deliberately **no single 0–100 grade**: averaging two
+  unrelated facts into one invented number hid both of them, and "liquidity: 30" teaches nothing
+  on its own either, so the explanation is the feature rather than the score
 - One-tap **"I bought it" bridge** transfers a recommendation into holdings after an external
   purchase — and stops offering itself once the portfolio is already recorded
 
@@ -247,6 +260,53 @@ surface, zero custody risk — and a lower trust barrier for scared beginners.
   Above the portfolio, not below it. Every app with something to sell has a reason not to say this
 - **Feedback from inside the app**: beginners close the tab rather than report problems, so saying
   "I didn't understand this screen" costs one tap and captures the route automatically
+
+### 📚 What you're actually holding — structural reference, per market
+
+Four catalogues, each written for all three markets **and** all three languages independently
+(nine combinations, enforced by tests), because the structure genuinely differs by country while
+the thing people misread differs too:
+
+- **Funds** — written after 131 Turkish funds were closed to trading at once in September 2026.
+  The app had always recommended funds (SPY, QQQ and GLD all are; the German universe is entirely
+  UCITS) but taught only one kind of liquidity: how fast an asset sells. What actually happened to
+  people was the other kind — the asset inside was fine, the wrapper froze. Separation is real,
+  separation is **not** a guarantee of value, and the common misreading is different in each market
+  ("the regulator approved it" / "it's SIPC insured" / "Sondervermögen, also geschützt")
+- **Gold** — metal in a drawer, a claim on a bank, and a fund share are all called gold and fail in
+  different ways. The point the fund lesson cannot teach: in Europe the common gold product is an
+  **ETC, a debt security of its issuer, not a segregated fund** — so a reader who learned "funds are
+  segregated" and applies it here has it exactly backwards
+- **Crypto** — the one asset the app refuses to recommend, which makes it the one it owes the
+  clearest explanation. A holding has been recordable since the first migration, and silence beside
+  a recorded asset reads as endorsement. The card leads with *why* it is in no recommended
+  portfolio, and the reason given is the real one: the projection guard refuses bands resting on too
+  few independent periods, and crypto's record cannot supply them. Then — your keys or someone
+  else's, a licence is supervision and not deposit insurance, and transfers are irreversible
+- **Routes into a home** — savings-pool home financing alongside cash and a mortgage. In Türkiye the
+  pool is legally segregated and that is *not* deposit insurance; in Germany the equivalent is a
+  **bank** with a statutory deposit guarantee, but the allocation **date** is never promised
+
+No product, fund, dealer or platform is named in any of them, and a test enforces it: a beginner
+needs the *structure* explained, and naming one issuer would turn reference material into a
+recommendation this app is not licensed to make. Volatile figures (spreads, tax rates, custody
+percentages) are kept out by another test — the copy says what to **ask**, not what the answer is.
+
+### 📲 Installable, because push is the coach's only carrier
+
+"The market dropped, here is what you said you would do" is worthless an hour later, so the
+behavioural coach needs push — and push needs the app on the home screen.
+
+- Complete PWA: manifest, maskable icons, service worker with a **push handler**
+- **Android** gets the real OS install dialog via `beforeinstallprompt`, held and offered in the
+  page where the reason for it is, instead of Chrome's own mini-infobar
+- **iOS** gets instructions instead, because there is no API — web push has worked since iOS 16.4
+  but **only for home-screen web apps, and iOS never offers to install one.** Shown only in Safari:
+  Chrome and Firefox on iOS are WebKit underneath and cannot add to the home screen at all, so
+  telling their readers to tap Share would send them hunting for a menu item that is not there
+- Renders nothing once installed or dismissed. The detection is a pure, unit-tested module —
+  iPadOS 13+ reports itself as "Macintosh", so a user-agent test for "iPad" matches **no iPad made
+  since 2019**, and touch points are the only thing separating one from a real Mac
 
 ### 🎯 Goal-based planning & 🐣 practice mode
 - "800.000 TL for a down payment in 3 years" → required monthly contribution (annuity math) with
@@ -532,8 +592,8 @@ market.
 
 ```bash
 ./scripts/check.sh                     # everything CI runs, with exit codes that propagate
-python -m pytest backend/tests/ -q     # 781 tests
-cd frontend && npm test                # 46 vitest tests
+python -m pytest backend/tests/ -q     # 991 tests
+cd frontend && npm test                # 187 vitest tests
 ```
 
 ### Running the journey tests

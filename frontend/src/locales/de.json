@@ -1199,6 +1199,14 @@
     "yourNextMove": "Dein nächster Schritt",
     "yourNextMoveSub": "Der Schritt, der zu dir passt, und wie sich dein Budget aufteilt"
   },
+  "install": {
+    "title": "Lumos auf dein Handy legen",
+    "why": "Nur so erreichen wir dich in dem Moment, in dem der Markt fällt. Eine Webseite, die nicht auf dem Startbildschirm liegt, kann keine Benachrichtigungen senden — und eine beruhigende Nachricht ist wertlos, wenn sie eine Stunde später gelesen wird.",
+    "action": "Zum Startbildschirm hinzufügen",
+    "iosShare": "Tippe unten auf die Teilen-Schaltfläche.",
+    "iosAdd": "Scrolle die Liste und wähle „Zum Home-Bildschirm“.",
+    "dismiss": "Schließen"
+  },
   "fundFacts": {
     "title": "Was besitzt du, wenn du einen Fonds besitzt?",
     "subtitle": "Dein Geld ist vom Verwalter getrennt — aber was garantiert das, und was nicht?"

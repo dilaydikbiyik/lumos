@@ -2760,16 +2760,34 @@ start_url, maskable 512 ikon), `apple-touch-icon` ve `apple-mobile-web-app-*`
 meta'ları yerinde, **`sw.js` içinde push handler zaten yazılmış** (satır 64,
 `showNotification` 75).
 
-- [ ] **Eksik olan tek parça: uygulamada hiçbir kurulum yönlendirmesi yok.**
-      `beforeinstallprompt`, "Ana Ekrana Ekle" ipucu, standalone tespiti —
-      hiçbiri yok. Yani davranışsal koçun taşıyıcısı olan push, iOS'ta
-      kimseye ulaşamıyor: kullanıcı kendiliğinden kurmayı bilmiyorsa
-      izin isteyecek bir yer bile yok.
+- [x] **Kurulum ipucu yazıldı — $0 yolu artık gerçekten açık.**
+      `frontend/src/components/InstallHint.jsx`, dashboard'ın en üstünde,
+      her şeyin önünde. İki platform zıt şeylere ihtiyaç duyduğu için tek
+      bileşen iki dallı:
 
-      Bunu yapmak ücretsiz ve $124'lük ilk yıl maliyetini test etmeden önce
-      denenmesi gereken şey. Android'de `beforeinstallprompt` gerçek bir
-      prompt verir; iOS'ta Safari'de ve standalone DEĞİLKEN gösterilecek
-      kısa bir yönlendirme gerekir.
+      - **Android**: `beforeinstallprompt` yakalanıp tutuluyor, buton
+        `prompt()` çağırıyor, diyaloğu OS çiziyor. `preventDefault()` ile
+        Chrome'un kendi mini-infobar'ı engelleniyor — davet, gerekçesinin
+        yazılı olduğu yerde duruyor.
+      - **iOS**: API yok, o yüzden jest anlatılıyor — ve **yalnızca
+        Safari'de.** iOS'taki Chrome/Firefox WebKit üzerinde çalışıyor ve
+        ana ekrana hiç ekleyemiyor; onlara "Paylaş'a dokun" demek
+        olmayan bir menü öğesini aratmak olurdu.
+
+      Kurulu ya da kapatılmışsa hiçbir şey render etmiyor.
+
+      **Tespit saf bir modüle çıkarıldı** (`utils/install.js`) çünkü test
+      ortamında DOM yok ve bu mantık sessizce yanlış olmaya en müsait yer.
+      10 unit test, ikisi gerçek cihaz sınıfı:
+
+      - **iPadOS 13+ kendini "Macintosh" diye tanıtıyor**, yani UA'da
+        "iPad" aramak **2019'dan beri üretilmiş hiçbir iPad'i yakalamıyor.**
+        Ayırt eden tek sinyal dokunma noktası sayısı: dokunmatik ekranlı
+        Mac yok.
+      - `CriOS`/`FxiOS`/`EdgiOS`/`OPiOS` hariç tutuluyor.
+
+      Kalan iş: push izni isteme akışı (kurulum sonrası) ve VAPID
+      anahtarları. `sw.js` tarafı hazır, sunucu tarafı gönderimi değil.
 
 **Maliyet tabanı:** store'lara çıkmazsan **$12/yıl** (sadece domain).
 Play Store dahil **$37** (ilk yıl). Apple dahil **$136** (ilk yıl), sonra

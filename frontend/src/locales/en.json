@@ -1199,6 +1199,14 @@
     "yourNextMove": "Your next move",
     "yourNextMoveSub": "The step that fits you, and how your budget divides"
   },
+  "install": {
+    "title": "Add Lumos to your phone",
+    "why": "This is the only way we can reach you the moment the market drops. A web page that has not been added to your home screen cannot send notifications — and a steadying message is worthless read an hour later.",
+    "action": "Add to home screen",
+    "iosShare": "Tap the Share button at the bottom.",
+    "iosAdd": "Scroll the list and choose \"Add to Home Screen\".",
+    "dismiss": "Dismiss"
+  },
   "fundFacts": {
     "title": "What do you own when you own a fund?",
     "subtitle": "Your money is separate from the manager's — but what does that guarantee, and what does it not?"

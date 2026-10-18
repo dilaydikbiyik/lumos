@@ -1199,6 +1199,14 @@
     "yourNextMove": "Sırada ne var",
     "yourNextMoveSub": "Sana göre bir sonraki adım ve bütçenin dağılımı"
   },
+  "install": {
+    "title": "Lumos'u telefonuna ekle",
+    "why": "Piyasa düştüğünde seni o anda uyarabilmemizin tek yolu bu. Ana ekrana eklenmemiş bir web sayfası bildirim gönderemez — ve bir sakinleştirme mesajı, bir saat sonra okunduğunda işe yaramaz.",
+    "action": "Ana ekrana ekle",
+    "iosShare": "Alttaki Paylaş düğmesine dokun.",
+    "iosAdd": "Listeyi kaydır ve \"Ana Ekrana Ekle\"yi seç.",
+    "dismiss": "Kapat"
+  },
   "fundFacts": {
     "title": "Fon aldığında ne alıyorsun?",
     "subtitle": "Paran yöneticinin parasından ayrı — ama bu ne garanti ediyor, ne etmiyor?"

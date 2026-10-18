@@ -12,6 +12,7 @@ import PathInvitation from '../components/PathInvitation'
 import BehaviorMirror from '../components/BehaviorMirror'
 import Disclaimer from '../components/Disclaimer'
 import Section from '../components/Section'
+import InstallHint from '../components/InstallHint'
 import PathSuggestion from '../components/PathSuggestion'
 import BudgetSplit from '../components/BudgetSplit'
 import DailyTip from '../components/DailyTip'
@@ -129,6 +130,13 @@ export default function DashboardPage() {
             </button>
           </div>
         )}
+
+        {/* Above everything, and only ever on the first screen. The ask is
+            "let us reach you when the market drops", so it has to arrive
+            before the reader has gone looking for anything else — and it
+            renders nothing at all once the app is installed or the hint has
+            been dismissed, which is the usual case after one visit. */}
+        <InstallHint />
 
         {/* ── Courage Score — the visible face of the vision ── */}
         <ReadinessScore />
