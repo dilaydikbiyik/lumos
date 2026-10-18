@@ -73,7 +73,12 @@ async def recommend(
         reit_text = await asyncio.to_thread(
             explain_reit_inclusion, portfolio, user_profile, lang
         )
-        portfolio.metadata["reit_explanation"] = explanation_check.verified_or_dropped(
+        # The REIT-specific checker, NOT the portfolio one. Its prompt
+        # instructs regulatory and historical figures ("at least 90% of
+        # taxable income", "~8-10% annualized over 20 years") that are not
+        # portfolio weights, so the percentage rule deletes every correct
+        # REIT explanation — which it did, until this line.
+        portfolio.metadata["reit_explanation"] = explanation_check.reit_verified_or_dropped(
             reit_text, portfolio
         )
 

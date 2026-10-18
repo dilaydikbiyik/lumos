@@ -605,7 +605,10 @@ market.
   which half to believe, and will believe the sentence, because it is the half in their language.
   The guard runs in production because the thing it checks is non-deterministic; the tests pin the
   rule, including the false-positive half (German capitalises every noun, so a careless rule would
-  silently delete every German explanation the app ever wrote)
+  silently delete every German explanation the app ever wrote). The REIT explanation gets a
+  **different** rule, because its prompt instructs figures that are deliberately not portfolio
+  weights — "at least 90% of taxable income", "~8–10% annualized over 20 years" — so the
+  portfolio rule deleted every correct REIT explanation until the two were separated
 - **No execution, no custody**: architecturally incapable of moving user money
 - **Delete your account, from inside the app.** It removes the profile, every holding and every
   piece of feedback, then deletes the login itself — and if that last step fails it says so
@@ -636,7 +639,7 @@ market.
 
 ```bash
 ./scripts/check.sh                     # everything CI runs, with exit codes that propagate
-python -m pytest backend/tests/ -q     # 1023 tests
+python -m pytest backend/tests/ -q     # 1030 tests
 cd frontend && npm test                # 191 vitest tests
 ```
 

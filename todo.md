@@ -2930,3 +2930,41 @@ ettiği gerçek bir açık vardı, sadece başka yerde.
       olarak `docs/legal-review-brief.md`'nin işaret ettiği risk. Şu anki
       savunma "formül ekranda, çıktısının yanında" — bir finans modelini
       ekrana yazamazsın.
+
+### Ve kontrolün kendisi bir hata taşıyordu (2026-10-19)
+
+Soru: "reit_explanation için de aynı kontrol var mı?" Cevabı *vardı* ve
+**yanlış olan tam da buydu.**
+
+- [x] **Yayınladığım koruma, her REIT açıklamasını sessizce siliyordu.**
+      `reit_explain_prompt.txt` modele, portföy ağırlığı OLMAYAN rakamları
+      yazmasını açıkça talimat ediyor:
+
+        "required by law to distribute at least 90% of taxable income"
+        "VNQ has delivered ~8-10% annualized returns over 20 years"
+        "VNQ and/or SCHH"
+
+      Yani 90, 8 ve 10 hiçbir ağırlığa ve hiçbir kategori toplamına denk
+      gelmiyor; üstüne `GYO` da başıboş sembol sanılıyor. **Üç bağımsız
+      sebep, her biri prompt'un kendi talimatı garantisinde.** Ölçtüm:
+      gerçekçi bir REIT açıklaması her seferinde düşüyordu.
+
+      Bunu kapsaması gereken iddia **boş**tu: `reit_explanation`'ın içinde
+      "QQQ" olmadığını doğruluyordu, ama o alan test ortamında
+      `'Mocked AI reply'` — yani hiçbir koruma çalışmasa da geçerdi. Bir
+      önceki maddede Türkçe yüzde regex'i için yazdığım dersin aynısı, iki
+      commit sonra tekrar.
+
+      **Düzeltme:** `reit_verified_or_dropped` — yüzde kuralı KAPALI,
+      enstrüman kuralı motorun REIT evrenine (VNQ, SCHH) karşı açık,
+      risk puanı kuralı AÇIK (prompt gerçek puanı modele veriyor, yani
+      orada denetlenebilir bir şey var).
+
+      **Asıl ders, olduğu yere kaydedildi:** bir tutarlılık kuralı, yalnızca
+      prompt'u aynı şeyleri vaat eden metin için geçerlidir. Tek kuralı iki
+      farklı prompt'a uygulamak, korumanın doğru işi silmeye başlama
+      biçimidir.
+
+- [x] **Testler iki yönde de boş olmadığı kanıtlandı.** Korumayı elle
+      kaldırdım (çelişki geçti → kırmızı), sonra **yanlış** korumayı geri
+      koydum (doğru açıklama silindi → kırmızı). Üçüncü hali yeşil.

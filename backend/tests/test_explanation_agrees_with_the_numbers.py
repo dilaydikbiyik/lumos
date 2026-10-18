@@ -19,7 +19,11 @@ production.
 import pytest
 
 from backend.schemas.portfolio import AssetAllocation, PortfolioRecommendResponse
-from backend.services.explanation_check import contradictions, verified_or_dropped
+from backend.services.explanation_check import (
+    contradictions,
+    reit_verified_or_dropped,
+    verified_or_dropped,
+)
 
 
 def _portfolio() -> PortfolioRecommendResponse:
@@ -168,7 +172,6 @@ def test_a_contradicting_explanation_never_reaches_the_client(client):
     # which would have made this test fail for the right reason by accident
     # and then been "fixed" by weakening the guard.
     assert "QQQ" not in body["plain_explanation"]
-    assert "QQQ" not in (body.get("metadata", {}).get("reit_explanation") or "")
 
 
 def test_a_consistent_explanation_is_served_normally(client):
@@ -186,3 +189,106 @@ def test_a_consistent_explanation_is_served_normally(client):
         res = client.post("/recommend", json={"risk_score": 6.0, "budget": 250000})
 
     assert res.json()["plain_explanation"] == honest, "consistent prose was dropped"
+
+
+# ── the REIT explanation, which needed a DIFFERENT rule ─────────────────────
+#
+# The portfolio checker was applied here first and that was a real bug: it
+# silently deleted essentially every REIT explanation the app produced,
+# because reit_explain_prompt.txt instructs the model to state figures that
+# are deliberately not portfolio weights.
+#
+# The assertion that was supposed to cover this was vacuous. It checked that
+# "QQQ" was absent from an explanation that the test fixture had set to
+# "Mocked AI reply" — true whether or not any guard ran at all.
+
+def _reit_prose() -> str:
+    """
+    The explanation the prompt actually asks for, figures and all. Every
+    number here is instructed by reit_explain_prompt.txt:
+      "required by law to distribute at least 90% of taxable income"
+      "VNQ has delivered ~8-10% annualized returns over 20 years"
+    """
+    return ("GYO'lar gelir getiren gayrimenkul işleten şirketlerdir ve yasa gereği "
+            "vergilendirilebilir gelirlerinin en az %90'ını temettü olarak dağıtmak "
+            "zorundadır. VNQ ve SCHH gibi fonlar 20 yılda yıllık ~%8–10 getiri "
+            "sağladı; bu gelecek için garanti değildir. Risk puanın 6/10 olduğu "
+            "için faiz duyarlılığı senin için kabul edilebilir bir risk.")
+
+
+def test_the_portfolio_rule_would_delete_a_correct_reit_explanation():
+    """
+    The bug, pinned so it cannot come back by someone "simplifying" the two
+    checkers into one. Three independent reasons, each guaranteed by the
+    prompt: the 90% distribution rule, the 8-10% historical range, and GYO
+    read as a stray symbol.
+    """
+    problems = contradictions(_reit_prose(), _portfolio())
+    assert len(problems) >= 2, (
+        "the portfolio rule no longer objects to correct REIT prose — if that "
+        "is because the rule got smarter, good; check reit_verified_or_dropped "
+        f"is still needed. problems={problems}"
+    )
+
+
+def test_the_reit_rule_keeps_a_correct_reit_explanation():
+    text = _reit_prose()
+    assert reit_verified_or_dropped(text, _portfolio()) == text
+
+
+def test_the_reit_rule_still_catches_a_wrong_risk_score():
+    """
+    Turning the percentage rule off must not turn the whole check off. The
+    risk score IS checkable here: the prompt hands the model the real one.
+    """
+    text = _reit_prose().replace("6/10", "9/10")
+    assert reit_verified_or_dropped(text, _portfolio()) == ""
+
+
+def test_the_reit_rule_still_catches_an_invented_instrument():
+    """The worst case stays guarded: a reader may act on a symbol."""
+    text = _reit_prose() + " Ayrıca ARKK da ekledik."
+    assert reit_verified_or_dropped(text, _portfolio()) == ""
+
+
+def test_the_reit_rule_allows_the_engines_own_reit_universe():
+    """
+    The prompt says "VNQ and/or SCHH" without knowing which was selected, so
+    naming the one that was not allocated is the prompt's doing rather than
+    an invention. This portfolio holds VNQ; SCHH must still pass.
+    """
+    text = "SCHH ve VNQ, GYO fonlarının iki örneğidir. Risk puanın 6/10."
+    assert reit_verified_or_dropped(text, _portfolio()) == text
+
+
+def test_a_contradicting_reit_explanation_never_reaches_the_client(client):
+    """
+    End to end, and NOT vacuous this time: the prose is a real contradiction
+    and the assertion is that it was dropped.
+    """
+    from unittest.mock import patch
+
+    with patch("backend.routers.recommend.explain_reit_inclusion",
+               return_value="GYO tarafını ARKK ile kurduk."):
+        res = client.post("/recommend", json={"risk_score": 6.0, "budget": 250000})
+
+    assert res.status_code == 200
+    body = res.json()
+    assert body["includes_reits"] is True, "the fixture must actually include REITs"
+    assert body["metadata"].get("reit_explanation") == "", "ARKK reached the reader"
+
+
+def test_a_correct_reit_explanation_is_served_end_to_end(client):
+    """
+    The half that would also pass if the guard dropped everything — which is
+    exactly how the REIT bug survived its first test.
+    """
+    from unittest.mock import patch
+
+    with patch("backend.routers.recommend.explain_reit_inclusion",
+               return_value=_reit_prose()):
+        res = client.post("/recommend", json={"risk_score": 6.0, "budget": 250000})
+
+    assert res.json()["metadata"]["reit_explanation"] == _reit_prose(), (
+        "a correct REIT explanation was dropped"
+    )

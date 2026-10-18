@@ -64,7 +64,7 @@ _SCORE_RE = re.compile(r"\b(\d{1,2}(?:[.,]\d)?)\s*/\s*10\b")
 # ordinary vocabulary reach the assertion.
 _NOT_TICKERS = {
     # Sentence-initial and common capitalised prose across the three languages.
-    "ETF", "ETFS", "REIT", "REITS", "BIST", "TRY", "USD", "EUR", "TL",
+    "ETF", "ETFS", "REIT", "REITS", "GYO", "GYOS", "BIST", "TRY", "USD", "EUR", "TL",
     "AB", "EU", "US", "USA", "UK", "SPK", "SEC", "BAFIN", "UCITS", "ETC",
     "DAX", "MSCI", "VAT", "KDV", "AI", "APP", "PWA",
     # German nouns in caps that fit the ticker shape.
@@ -98,16 +98,29 @@ def _allowed_percentages(portfolio: "PortfolioRecommendResponse") -> set[float]:
     return allowed
 
 
-def contradictions(text: str, portfolio: "PortfolioRecommendResponse") -> list[str]:
+def contradictions(
+    text: str,
+    portfolio: "PortfolioRecommendResponse",
+    *,
+    check_percentages: bool = True,
+    extra_tickers: frozenset[str] = frozenset(),
+) -> list[str]:
     """
     Where the prose disagrees with the figures. Empty means it is consistent
     as far as this can tell — which is not the same as "it is good prose".
+
+    `check_percentages=False` is for prose whose PROMPT supplies figures that
+    are deliberately not portfolio weights; see reit_verified_or_dropped.
+    `extra_tickers` widens the set of instruments the text may legitimately
+    name beyond the ones actually allocated.
     """
     if not text:
         return []
 
     problems: list[str] = []
-    real_tickers = {a.ticker.upper() for a in portfolio.allocations}
+    real_tickers = {a.ticker.upper() for a in portfolio.allocations} | {
+        t.upper() for t in extra_tickers
+    }
 
     # 1. A ticker that is not in this portfolio. Unambiguous: the prompt was
     #    given these holdings and no others, so naming a different one is
@@ -124,7 +137,7 @@ def contradictions(text: str, portfolio: "PortfolioRecommendResponse") -> list[s
 
     # 2. A percentage matching no weight, no category total, and not 100.
     allowed = _allowed_percentages(portfolio)
-    for prefix, suffix in set(_PERCENT_RE.findall(text)):
+    for prefix, suffix in (set(_PERCENT_RE.findall(text)) if check_percentages else set()):
         value = float((prefix or suffix).replace(",", "."))
         if any(abs(value - ok) <= TOLERANCE_PP for ok in allowed):
             continue
@@ -146,7 +159,8 @@ def contradictions(text: str, portfolio: "PortfolioRecommendResponse") -> list[s
     return problems
 
 
-def verified_or_dropped(text: str, portfolio: "PortfolioRecommendResponse") -> str:
+def verified_or_dropped(text: str, portfolio: "PortfolioRecommendResponse",
+                        **checks) -> str:
     """
     The explanation, or an empty string when it contradicts the figures.
 
@@ -156,7 +170,7 @@ def verified_or_dropped(text: str, portfolio: "PortfolioRecommendResponse") -> s
     are all still there. A missing paragraph is a smaller failure than a
     confident wrong one.
     """
-    problems = contradictions(text, portfolio)
+    problems = contradictions(text, portfolio, **checks)
     if not problems:
         return text
     # WARNING, not debug: this firing means the model contradicted its own
@@ -164,3 +178,39 @@ def verified_or_dropped(text: str, portfolio: "PortfolioRecommendResponse") -> s
     # rather than discovering in a screenshot.
     logger.warning("explanation dropped — contradicts the portfolio: %s", problems)
     return ""
+
+
+# The REIT ETFs this app's engine can select. The REIT explanation names its
+# subject, which may be a fund the engine considered but did not allocate —
+# the prompt itself says "VNQ and/or SCHH" without knowing which was chosen.
+_REIT_UNIVERSE = frozenset({"VNQ", "SCHH"})
+
+
+def reit_verified_or_dropped(text: str, portfolio: "PortfolioRecommendResponse") -> str:
+    """
+    The REIT explanation, checked with the rules that actually apply to it.
+
+    THE PERCENTAGE RULE IS OFF HERE, and leaving it on was a real bug that
+    shipped: it silently deleted essentially every REIT explanation the app
+    produced. The reason is that reit_explain_prompt.txt INSTRUCTS the model
+    to state figures that are deliberately not portfolio weights —
+
+        "required by law to distribute at least 90% of taxable income"
+        "VNQ has delivered ~8-10% annualized returns over 20 years"
+
+    — so 90, 8 and 10 all matched no holding's weight and no category total,
+    and the guard dropped the paragraph every time. Three independent
+    reasons, each one guaranteed by the prompt.
+
+    What remains checkable is what the prompt actually hands the model about
+    THIS reader: the risk score. And instrument names, against the engine's
+    REIT universe rather than only the allocation, because the prompt names
+    its subject without knowing which fund was selected.
+
+    The lesson, recorded where it happened: a consistency rule is only valid
+    for text whose prompt promises the same things. Reusing one across two
+    different prompts is how a guard starts deleting correct work.
+    """
+    return verified_or_dropped(
+        text, portfolio, check_percentages=False, extra_tickers=_REIT_UNIVERSE,
+    )
