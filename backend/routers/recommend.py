@@ -12,6 +12,7 @@ from backend.schemas.portfolio import PortfolioRecommendRequest, PortfolioRecomm
 from backend.markets import get_market_pack
 from backend.middleware.language import language
 from backend.services.portfolio_engine import build_portfolio
+from backend.services import explanation_check
 from backend.services.explainer import explain_portfolio, explain_reit_inclusion
 
 router = APIRouter()
@@ -49,15 +50,32 @@ async def recommend(
 
     # explain_portfolio / explain_reit_inclusion call generate_text() which is
     # synchronous blocking I/O — run in a thread so the event loop stays free.
-    portfolio.plain_explanation = await asyncio.to_thread(
+    explanation = await asyncio.to_thread(
         explain_portfolio, portfolio, user_profile, lang, pack.currency, market
+    )
+    # Checked against the figures it was given before it reaches the reader.
+    #
+    # The allocation is a formula and the same input produces the same
+    # portfolio every time; the sentence beside it is not deterministic, so
+    # a test cannot stand in for this. Prose that says one thing while the
+    # chart says another leaves a reader unable to tell which half to
+    # believe — and they will believe the sentence, because it is the half
+    # written in their own language.
+    #
+    # A contradiction DROPS the paragraph rather than correcting it: the
+    # allocation, the chart and the formula are all still on the page, and a
+    # missing explanation is a smaller failure than a confident wrong one.
+    portfolio.plain_explanation = explanation_check.verified_or_dropped(
+        explanation, portfolio
     )
 
     if portfolio.includes_reits:
         reit_text = await asyncio.to_thread(
             explain_reit_inclusion, portfolio, user_profile, lang
         )
-        portfolio.metadata["reit_explanation"] = reit_text
+        portfolio.metadata["reit_explanation"] = explanation_check.verified_or_dropped(
+            reit_text, portfolio
+        )
 
     logger.info(
         "recommendation_served user=%s risk=%s budget=%s reits=%s",

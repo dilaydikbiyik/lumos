@@ -2858,3 +2858,75 @@ meta'ları yerinde, **`sw.js` içinde push handler zaten yazılmış** (satır 6
 **Maliyet tabanı:** store'lara çıkmazsan **$12/yıl** (sadece domain).
 Play Store dahil **$37** (ilk yıl). Apple dahil **$136** (ilk yıl), sonra
 $111/yıl.
+
+## Nesir ile sayıların çelişmemesi (2026-10-19)
+
+"Tutarlı ve gerçekçi olması projemin temel amaçlarından." Hazır bir finans
+modeli bu amaca hizmet etmez — öneriler zaten bir modelden gelmiyor
+(`build_portfolio` saf formül; aynı girdiyle 5 kez çalıştırdım, **1 farklı
+sonuç**). Model eklemek tutarlılığı ancak düşürür. Ama endişenin işaret
+ettiği gerçek bir açık vardı, sadece başka yerde.
+
+- [x] **Nesrin sayılarla çelişmediğini hiçbir şey garanti etmiyordu.**
+      `plain_explanation`'a değen her test ya boş string geçiyor ya
+      mock'lanmış değerin aynen döndüğünü doğruluyordu — yani koruma yarın
+      silinse o testler geçmeye devam ederdi.
+
+      Riski şu: grafik hisseye ağırlıklıyken nesir "altına ağırlıklı"
+      derse, okuyucu hangi yarıya inanacağını bilemez — ve **cümleye**
+      inanır, çünkü kendi dilinde olan yarı o.
+
+      `backend/services/explanation_check.py`, üç şeyi kontrol ediyor:
+      portföyde olmayan bir **enstrüman adı** (en kötüsü — okuyucu bir
+      sembole göre işlem yapabilir), hiçbir ağırlığa ve hiçbir kategori
+      toplamına denk gelmeyen bir **yüzde**, ve kullanıcının kendisine ait
+      olmayan bir **risk puanı**.
+
+      **Test değil, üretimde koruma.** Model çıktısı deterministik
+      olmadığı için bir test onu çalışma anında yakalayamaz: kural
+      `recommend.py`'de çalışıyor, testler kuralı sabitliyor. Çelişki
+      paragrafı **düşürüyor, düzeltmiyor** — modelin cümlesini sayılara
+      uydurmak kimsenin yazmadığı ve kimsenin denetlemediği bir nesir
+      üretirdi, ve sayfa onsuz da tam: tahsis, grafik ve formül yerinde.
+
+      **Bilerek muhafazakâr.** Doğru bir açıklamayı düşürmek okuyucuya
+      sayfanın kendisi için yazılmış tek parçasını kaybettirir, o yüzden
+      kural yalnızca kesin yanlış olanı işaretliyor. Rastgele alt küme
+      toplamlarına izin verilmedi: beş varlıklı bir portföyde o neredeyse
+      her sayıyı meşru kılar ve kontrol anlamsızlaşır.
+
+- [x] **Kendi testim boş yere yeşildi ve sebebi önemli.** Yüzde regex'i
+      yalnızca `55%` biçimini görüyordu; **Türkçe `%55` yazıyor, işaret
+      sayıdan önce.** Yani Türkçe nesirde hiçbir yüzde tespit edilmiyordu
+      ve kontrol "tutarlı" dönüyordu — "gerçek rakamlar geçer" testim de
+      bu yüzden geçiyordu, karşılaştıracak bir şey bulamadığı için.
+      Dışarıdan bir vacuous test tam böyle görünüyor.
+
+      Üç dilin üç yazımı da ölçülerek doğrulandı: `%30,3` (TR önek),
+      `30.3%` (EN sonek), `30,3 %` (DE boşluklu).
+
+      Yanlış alarm tarafı da test edildi: Almanca her ismi büyük harfle
+      yazıyor, İngilizce cümleler büyük harfle başlıyor — sözlük koruması
+      olmasa enstrüman kuralı sıradan nesirde ateşlenip yazılmış her
+      Almanca açıklamayı sessizce silerdi.
+
+- [x] **Uçtan uca test, HTTP üzerinden** — kuralın yazıldığını değil
+      **bağlandığını** doğrulamak için. Korumayı elle kaldırıp testin
+      kırmızıya döndüğünü teyit ettim.
+
+      Bu testi yazarken kendi iddiam fazla kabaydı: `"QQQ" not in res.text`
+      dedim, halbuki QQQ yanıtta **meşru olarak** var — `metadata`
+      reddedilen adayları gerekçesiyle ("aynı kategoriden bir varlık zaten
+      seçildi") ve volatilite tablosunu yayımlıyor. Bu bir şeffaflık
+      özelliği. İddia açıklamanın kendisine daraltıldı; aksi halde test
+      yanlış sebeple kırmızı kalır ve birisi onu korumayı zayıflatarak
+      "düzeltirdi".
+
+- [ ] **Hazır finans modeli — değerlendirildi, reddedildi.** Nedenleri:
+      FinBERT sınıfı modeller **İngilizce**, üç dilli bir app için sert
+      engel. FinGPT sınıfı açık ağırlıklar **self-host → GPU sunucu**
+      gerektirir ve tüm ücretsiz mimariyi yok eder. BloombergGPT erişilebilir
+      değil. Ve hepsi **analist gibi konuşmak üzere** eğitilmiş: bu tam
+      olarak `docs/legal-review-brief.md`'nin işaret ettiği risk. Şu anki
+      savunma "formül ekranda, çıktısının yanında" — bir finans modelini
+      ekrana yazamazsın.

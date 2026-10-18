@@ -595,6 +595,17 @@ market.
   ability to change other people's plans (`user` / `support` / `admin`). Roles are managed from
   inside the app, with two lockout guards — an admin cannot demote themselves, and the last admin
   cannot be demoted by anyone — and every change is logged with actor and target
+- **The AI never writes a number, and the prose is checked against the ones it was given.** The
+  portfolio is a deterministic formula — the same input produces the same allocation every time —
+  and the only AI-written fields are prose. Those are still verified before they reach the reader:
+  an instrument not in the portfolio, a percentage matching no holding's weight and no category
+  total, or a risk score that is not the reader's **drops the paragraph**. Not corrected —
+  rewriting a model's sentence to fit the figures produces prose nobody wrote and nobody checked,
+  and the page is complete without it. A reader shown prose that contradicts the chart cannot tell
+  which half to believe, and will believe the sentence, because it is the half in their language.
+  The guard runs in production because the thing it checks is non-deterministic; the tests pin the
+  rule, including the false-positive half (German capitalises every noun, so a careless rule would
+  silently delete every German explanation the app ever wrote)
 - **No execution, no custody**: architecturally incapable of moving user money
 - **Delete your account, from inside the app.** It removes the profile, every holding and every
   piece of feedback, then deletes the login itself — and if that last step fails it says so
@@ -625,7 +636,7 @@ market.
 
 ```bash
 ./scripts/check.sh                     # everything CI runs, with exit codes that propagate
-python -m pytest backend/tests/ -q     # 1007 tests
+python -m pytest backend/tests/ -q     # 1023 tests
 cd frontend && npm test                # 191 vitest tests
 ```
 
