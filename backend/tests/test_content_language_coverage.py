@@ -31,7 +31,7 @@ import dataclasses
 
 import pytest
 
-from backend.content import fund_facts, home_routes, purchase_checks
+from backend.content import fund_facts, gold_facts, home_routes, purchase_checks
 from backend.markets import get_market_pack
 
 MARKETS = ("TR", "US", "DE")
@@ -331,3 +331,79 @@ def test_the_fx_note_names_no_currency_of_its_own():
         )
         text = bundle["explainer"]["fxExposure"]["text"]
         assert "{{assetCurrency}}" in text and "{{marketCurrency}}" in text, lang
+
+
+# ── gold ────────────────────────────────────────────────────────────────────
+#
+# Gold arrived with only the native language per market: TR/tr, US/en, DE/de.
+# Through for_market's fallback that is the session's recurring bug wearing a
+# new hat — a Turkish reader on the German market would have been handed
+# German prose, which is the exact complaint that started this series. Market
+# and language are independent axes; these tests are what makes that true
+# rather than intended.
+
+@pytest.mark.parametrize("market", MARKETS)
+@pytest.mark.parametrize("lang", LANGS)
+def test_every_market_has_gold_facts_in_every_language(market, lang):
+    by_lang = gold_facts.GOLD[market]
+    assert lang in by_lang, f"{market} has no {lang} gold facts (fallback would hide this)"
+    assert by_lang[lang], f"{market}/{lang} gold facts are empty"
+
+
+@pytest.mark.parametrize("market", MARKETS)
+@pytest.mark.parametrize("lang", LANGS)
+def test_gold_facts_are_written_in_the_language_they_are_filed_under(market, lang):
+    text = _text_of(gold_facts.GOLD[market][lang])
+    assert _looks_like(text, lang), (
+        f"gold {market}/{lang} does not read as {lang}: {text[:120]!r}"
+    )
+
+
+@pytest.mark.parametrize("market", MARKETS)
+def test_gold_languages_are_not_copies_of_each_other(market):
+    rendered = {lang: _text_of(gold_facts.GOLD[market][lang]) for lang in LANGS}
+    assert len(set(rendered.values())) == len(LANGS), f"gold {market} has duplicate languages"
+
+
+@pytest.mark.parametrize("market", MARKETS)
+def test_every_gold_language_covers_the_same_points(market):
+    counts = {lang: len(gold_facts.GOLD[market][lang]) for lang in LANGS}
+    assert len(set(counts.values())) == 1, f"gold {market} languages differ in length: {counts}"
+
+
+@pytest.mark.parametrize("market", MARKETS)
+@pytest.mark.parametrize("lang", LANGS)
+def test_gold_facts_name_no_product_or_dealer(market, lang):
+    """
+    The fund catalogue refuses to name funds; gold refuses to name products
+    and dealers for the same reason. A beginner needs the STRUCTURE — fund,
+    debt security, or metal — and naming one issuer turns reference material
+    into a recommendation the app is not licensed to make.
+    """
+    text = _text_of(gold_facts.GOLD[market][lang])
+    # One Turkish bank's name is also the Turkish word for guarantee and a
+    # substring of the German "garantiert", both of which this copy needs to
+    # say. A name that cannot be distinguished from ordinary prose cannot be
+    # banned by substring, so it is not in this list — the rule it would
+    # enforce is carried by the issuer names that ARE unambiguous.
+    for banned in ("Xetra", "4GLD", "GLD", "iShares", "WisdomTree", "Invesco",
+                   "Degussa", "Ziraat", "İş Bankası"):
+        assert banned.lower() not in text.lower(), (
+            f"gold {market}/{lang} names {banned}"
+        )
+
+
+@pytest.mark.parametrize("market", MARKETS)
+@pytest.mark.parametrize("lang", LANGS)
+def test_gold_facts_carry_no_spread_premium_or_tax_figure(market, lang):
+    """
+    Spreads, premiums, purity and tax rates differ by dealer and by year.
+    Evergreen copy carrying one goes quietly wrong, and a reader who trusts
+    a stale number is worse off than one who was told to go and ask. The
+    copy says what to ASK; a digit here means somebody answered instead.
+    """
+    import re as _re
+    text = _text_of(gold_facts.GOLD[market][lang])
+    assert not _re.search(r"\d", text), (
+        f"gold {market}/{lang} carries a figure: {_re.findall(r'[^.]*\\d[^.]*', text)}"
+    )

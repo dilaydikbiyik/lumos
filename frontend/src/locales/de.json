@@ -1197,6 +1197,10 @@
     "title": "Was besitzt du, wenn du einen Fonds besitzt?",
     "subtitle": "Dein Geld ist vom Verwalter getrennt — aber was garantiert das, und was nicht?"
   },
+  "goldFacts": {
+    "title": "Was hältst du, wenn du Gold hältst?",
+    "subtitle": "Barren, Forderung an eine Bank, Fondsanteil — alles Gold, alles verschieden"
+  },
   "homeRoutes": {
     "title": "Andere Wege ins Eigenheim",
     "subtitle": "Was es neben Miete und Finanzierung gibt — und was jeweils geschützt ist."

@@ -8,16 +8,22 @@ from unittest.mock import patch
 
 from backend.services.projection import project_asset, project_portfolio
 
-# 10 years of daily data, steady ~12%/yr growth with noise
-_N = 2520
+# THIRTY years of daily data, steady ~12%/yr growth with noise.
+#
+# It was ten, which is exactly the thin case the independent-period guard
+# now refuses: a five-year window over ten years of history is TWO
+# non-overlapping stretches, however many overlapping ones are counted. The
+# fixture was encoding the behaviour the guard was added to stop, so a test
+# asking for a five-year band had to be given a record that can carry one.
+_N = 252 * 30
 _rng = np.random.default_rng(7)
 _GROWTH = pd.Series(
     100 * np.cumprod(1 + _rng.normal(0.00045, 0.01, _N)),
-    index=pd.date_range("2016-01-01", periods=_N, freq="B"),
+    index=pd.date_range("1996-01-01", periods=_N, freq="B"),
 )
 
 
-def _fake_history(tickers, period="10y"):
+def _fake_history(tickers, period="max"):
     return {t: _GROWTH for t in tickers}
 
 
@@ -47,11 +53,11 @@ def test_asset_projection_refuses_thin_history():
 
 def test_portfolio_projection_combines_weighted_series():
     # Two different growth profiles — the diversified band must be narrower than a single asset's
-    n = 2520
+    n = 252 * 30   # enough record for a five-year window to have independent periods
     rng2 = np.random.default_rng(11)
     calm = pd.Series(
         100 * np.cumprod(1 + rng2.normal(0.0003, 0.004, n)),
-        index=pd.date_range("2016-01-01", periods=n, freq="B"),
+        index=pd.date_range("1996-01-01", periods=n, freq="B"),
     )
 
     def fake_multi(tickers, period="10y"):
@@ -140,3 +146,36 @@ def test_a_failing_digest_costs_the_card_its_sentence_and_nothing_else(client):
 
     assert res.status_code == 200
     assert res.json().get("context") is None
+
+
+def test_a_band_needs_independent_periods_not_just_overlapping_windows():
+    """
+    The guard this replaced counted OVERLAPPING windows, and its comment
+    claimed it stopped the app "pretending it's a distribution". Six
+    overlapping windows is six steps past the horizon: a five-year band
+    passed on five and a half years of history — one stretch of history
+    resampled sixty-six times, drawn as a spread of outcomes.
+
+    Twelve years cannot carry a five-year band honestly: it holds two
+    non-overlapping stretches. Thirty years holds six.
+    """
+    from unittest.mock import patch
+
+    def history_of(years):
+        n = 252 * years
+        rng = np.random.default_rng(3)
+        return {"SPY": pd.Series(
+            100 * np.cumprod(1 + rng.normal(0.0004, 0.01, n)),
+            index=pd.date_range("1990-01-01", periods=n, freq="B"),
+        )}
+
+    with patch("backend.services.projection.fetch_price_history",
+               side_effect=lambda t, period="max": history_of(12)):
+        thin = project_asset("SPY", amount=10_000, years=5)
+    assert thin["available"] is False, "12 years is two independent 5-year periods"
+
+    with patch("backend.services.projection.fetch_price_history",
+               side_effect=lambda t, period="max": history_of(30)):
+        ok = project_asset("SPY", amount=10_000, years=5)
+    assert ok["available"] is True
+    assert ok["independent_periods"] >= 3

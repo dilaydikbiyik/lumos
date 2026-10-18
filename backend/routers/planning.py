@@ -507,3 +507,37 @@ async def listing_eval(
         area_code=body.area_code, size_m2=body.size_m2,
         asking_price=body.asking_price, market=market, lang=lang,
     )
+
+@router.get("/gold-facts")
+async def gold_facts(
+    user_id: str = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+    lang: str = Depends(language),
+):
+    """
+    What a reader is actually holding when they hold gold.
+
+    The app has recommended gold in every portfolio it has ever built —
+    GLD in Türkiye and the US, 4GLD.DE in Germany — and has never said
+    what the holding IS. That gap is widest exactly where this app's
+    readers are: in Türkiye most people's gold is metal in a drawer or a
+    number in a bank app, and neither behaves like the fund the app
+    recommends.
+
+    The structural point the fund lesson cannot teach: in Europe the
+    common gold product is an ETC, a debt security of its issuer, NOT a
+    fund. A reader who learned "funds are segregated" and applies it to a
+    gold ETC has drawn exactly the wrong conclusion, so the German text
+    says so plainly and sends them to the prospectus.
+    """
+    from backend.content import gold_facts as content
+
+    user = await user_repository.get_or_create(db, user_id)
+    market = user.market or "TR"
+    facts = content.for_market(market, lang)
+
+    return {
+        "market": market,
+        "available": facts is not None,
+        "facts": facts or [],
+    }

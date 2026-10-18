@@ -2444,27 +2444,73 @@ routes, and whether that means the RECOMMENDED portfolios change.
   putting it in a portfolio built for someone frightened of a 20% drop is
   not, and Apple's 3.1.5 rules are a second reason to keep the distance.
 
-- [ ] **Still to build:** gold (metal vs bank account vs ETF) and crypto
-      (self-custody vs exchange custody, and what the new Turkish licensing
-      regime does and does not promise) as two more market-keyed catalogues,
-      held to the same tests — no company names, no regulated figures.
-      Turkish crypto custody rules were confirmed in research and are
-      genuinely relevant: a licensed platform must keep the large majority
-      of customer assets at an authorised custodian. That is a real
-      protection and, like every other one in this app, not a guarantee of
-      value.
+- [x] **Gold catalogue built.** `backend/content/gold_facts.py`, nine
+      market×language combinations, four points each, served at
+      `/planning/gold-facts` and shown collapsed on Recommend beside the
+      fund card — on purpose, because every portfolio this app builds holds
+      gold and the two cards answer the same question about different
+      wrappers.
+
+      The content distinguishes metal (no counterparty, but theft and the
+      dealer's spread), a bank gold account (a CLAIM, and the question is
+      whether the contract gives a right to physical delivery or only a
+      cash payment), and a fund (the whole fund lesson applies).
+
+      **The finding that justifies the German text:** in Europe the common
+      gold product is an **ETC — a debt security of its issuer, NOT a
+      Sondervermögen.** A reader who learned "funds are segregated" and
+      applies it to a gold ETC has drawn exactly the wrong conclusion, so
+      the German copy leads with it and sends them to the prospectus. One
+      source claims separate accounting at the clearer; it conflicts with
+      the others, so no claim either way is shipped — the copy says what to
+      read, not what it will say.
+
+      Caught on the way in: the catalogue was first written with only the
+      native language per market, which through `for_market`'s fallback is
+      this session's recurring bug in a new hat — a Turkish reader on the
+      German market would have been served German prose. The coverage tests
+      now hold gold too, so the next catalogue cannot repeat it.
+
+      One test needed narrowing rather than the content: a Turkish bank's
+      name is also the Turkish word for guarantee and a substring of the
+      German *garantiert*, both of which this copy has to say. A name
+      indistinguishable from ordinary prose cannot be banned by substring.
+
+- [ ] **Still to build: crypto.** Self-custody vs exchange custody, and
+      what the new Turkish licensing regime does and does not promise.
+      Same shape, same tests. Turkish crypto custody rules were confirmed
+      in research and are genuinely relevant: a licensed platform must keep
+      the large majority of customer assets at an authorised custodian.
+      That is a real protection and, like every other one in this app, not
+      a guarantee of value. **Do not ship the capital figures** — sources
+      conflict on them.
 
 ### Found while checking whether the method could even carry crypto
 
-- [ ] **`MIN_WINDOWS = 6` does not do what its comment says.** The comment
+- [x] **`MIN_WINDOWS = 6` did not do what its comment said.** The comment
       reads "fewer rolling windows than this -> refuse to pretend it's a
       distribution". But the windows OVERLAP, so six of them means six
       months beyond the horizon: a five-year band passes on five and a half
       years of history, which is ONE independent period resampled sixty-six
       times. I nearly reported the opposite — that the guard would refuse
       crypto — and the arithmetic says it would wave it through.
-      The honest guard counts INDEPENDENT periods, not overlapping windows:
-      something like history >= 3x the horizon. That would make the app
-      refuse some projections it currently draws, which is the point of a
-      guard, but it is a visible behaviour change and belongs in its own
-      change rather than smuggled into a content commit.
+      **Fixed.** `MIN_INDEPENDENT_PERIODS = 3` counts non-overlapping
+      stretches, and the count is returned so a reader sees what the band
+      rests on rather than a window total that sounds like observations.
+
+      The deeper cause was upstream: `project_asset` asked for
+      `period="10y"`. Ten years under a five-year window is two independent
+      periods however many overlapping ones are counted, and it refused
+      ten-year bands outright for assets with thirty years of record. It
+      asks for the whole record now, which both widens and tightens:
+
+      | | before | after |
+      |---|---|---|
+      | SPY 5y | 10y history, 2 periods | 33.7y, **6** |
+      | SPY 10y | **refused** | 33.7y, **3** |
+      | GLD 10y | drawn from 10y | **refused** — 22y holds 2 |
+      | QQQ 10y | drawn from 10y | **refused** — 27.6y holds 2 |
+
+      The test fixtures had encoded the old behaviour (ten years of fake
+      data under a five-year window), so they were the first thing the new
+      guard caught.

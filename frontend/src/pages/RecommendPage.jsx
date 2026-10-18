@@ -9,6 +9,7 @@ import ReitCard from '../components/ReitCard'
 import AssetExplainer from '../components/AssetExplainer'
 import Section from '../components/Section'
 import FundFacts from '../components/FundFacts'
+import GoldFacts from '../components/GoldFacts'
 import TimeMachine from '../components/TimeMachine'
 import FutureScenarios from '../components/FutureScenarios'
 import AllocationRationale from '../components/AllocationRationale'
@@ -184,6 +185,10 @@ export default function RecommendPage() {
             means structurally — which is the thing 455,758 people in Türkiye
             found out the hard way in September 2026. */}
         <FundFacts />
+        {/* Beside the fund card on purpose: every portfolio this page builds
+            holds gold, and the two cards answer the same question about
+            different wrappers. In Germany they answer it oppositely. */}
+        <GoldFacts />
 
         {/* ── Layer 2: SINA — test it against reality before risking money ── */}
         <Layer

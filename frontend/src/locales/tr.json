@@ -1197,6 +1197,10 @@
     "title": "Fon aldığında ne alıyorsun?",
     "subtitle": "Paran yöneticinin parasından ayrı — ama bu ne garanti ediyor, ne etmiyor?"
   },
+  "goldFacts": {
+    "title": "Altın aldığında ne alıyorsun?",
+    "subtitle": "Kasandaki metal, bankadaki alacak ve fon payı — üçü de altın, üçü de başka şey"
+  },
   "homeRoutes": {
     "title": "Eve giden başka yollar",
     "subtitle": "Kira ve kredi dışında ne var — ve hangisi neyi koruyor?"
