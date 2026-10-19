@@ -103,8 +103,37 @@ def get_daily_digest(investment_path: str = "hybrid", market: str = "TR",
         digest = []
 
     digest = digest[:3]
-    cache_service.set(cache_key, digest, ttl=_DIGEST_TTL)
-    return digest
+
+    # The forecast rule applied to the digest ITSELF, not only to the one
+    # sentence context_sentence pulls out of it.
+    #
+    # The prompt forbids prediction for every item; the check was enforcing
+    # it on one of two consumers. The dashboard renders these three cards
+    # directly through /news, so a predictive item reached the reader there
+    # while the identical text would have been dropped beside a projection.
+    # A prompt and its enforcement disagreeing is the gap, whichever side is
+    # right.
+    #
+    # The ITEM is dropped rather than the field, because an item whose
+    # "why it matters" had to be removed has nothing left to say — the
+    # headline alone is what this app set out not to be.
+    kept = [item for item in digest if not _item_predicts(item)]
+    if len(kept) != len(digest):
+        logger.info("news digest: %s of %s items dropped as forecasts",
+                    len(digest) - len(kept), len(digest))
+
+    cache_service.set(cache_key, kept, ttl=_DIGEST_TTL)
+    return kept
+
+
+def _item_predicts(item: object) -> bool:
+    """Whether any prose in one digest item reads as a forecast."""
+    if not isinstance(item, dict):
+        return False
+    return any(
+        forecast_language.is_forecast(str(item.get(field) or ""))
+        for field in ("headline", "why_it_matters", "calmness_note")
+    )
 
 
 def context_sentence(investment_path: str = "hybrid", market: str = "TR",

@@ -49,8 +49,19 @@ def behavior_mirror(stated_loss_tolerance: str, recent_action: str,
 
 def ai_coach_message(loss_tolerance: str, context: str) -> str:
     """
-    Richer, situation-specific coaching via the LLM — used when the chat
-    surface wants a tailored response rather than a static template.
+    Richer, situation-specific coaching via the LLM.
+
+    NOT CALLED ANYWHERE. Kept because the panic and market-move surfaces
+    may want it, but it is an unguarded AI entry point sitting in a file
+    everything else in imports, and the docstring used to claim the chat
+    surface used it — which it does not, and never did.
+
+    If it is wired up, it needs a rule of its own first. A coaching message
+    makes no claim about an allocation, so the portfolio check does not
+    apply; what it must not do is predict, exactly like the news sentence.
+    `forecast_language.is_forecast` is the rule it wants, and the registry
+    test in test_every_ai_field_is_accounted_for.py will fail until this
+    function is either guarded or removed.
     """
     system = (
         "You are Lumos's behavioral coach. The user's loss tolerance is "

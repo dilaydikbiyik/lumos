@@ -3036,3 +3036,79 @@ Ama denetlenmeyen gerçek bir risk vardı, ve türü farklıydı.
 geçerlidir.** Bu oturumda aynı hatayı iki kez yaptım (REIT'te uygulayarak,
 ve testleri boş bırakarak); üçüncüsünde kuralı kopyalamak yerine metnin ne
 vaat ettiğine baktım.
+
+### Denetimsiz kalan AI alanları — kaynak taraması (2026-10-19)
+
+Soru: "başka denetlenmeyen ai alanı kaldı mı?" Hatırlamaya güvenmek yerine
+AST taradım. **Üç gerçek açık, bir ölü kod, ve taramamda bir kör nokta.**
+
+- [x] **`what_if.answer_what_if` denetimsizdi — ve en riskli olan bu.**
+      Model gerçek bir öncesi/sonrası farkı alıp anlatıyor.
+      `_ANSWER_SYSTEM` *"ONLY the numbers given to you — never invent or
+      round differently than shown"* diyor; bu bir **talimat, garanti
+      değil**. Risk şu: "bütçeyi artırınca hisse payın %45'e çıkıyor"
+      derken gerçek rakam %38 ise, okuyucu **tam o kararı verirken** yanlış
+      bir sayı almış olur.
+
+      `whatif_verified_or_dropped` — portföy kuralından **farklı izin
+      kümesi**, ve o kuralı buraya kopyalamak iki yönden yanlış olurdu: bir
+      what-if cevabı meşru olarak mevcut portföyde olmayan **önceki**
+      ağırlıkları söyler, ve semboller iki portföyün birleşimi. Düşürmek
+      güvenli çünkü `diff` kendi alanında gidiyor — gerçek sayılar
+      istemciye ulaşmaya devam ediyor.
+
+- [x] **Haber digest'i: prompt tahmini yasaklıyordu, kontrol yalnızca bir
+      tüketiciye uygulanıyordu.** `/news` üç kartı doğrudan dashboard'a
+      veriyor; `context_sentence` yolundaki tahmin kontrolü oraya hiç
+      uğramıyordu. Yani aynı metin projeksiyonun yanında düşerken
+      dashboard'da geçiyordu. **Bir prompt ile onun uygulanmasının
+      çelişmesi, hangi taraf haklı olursa olsun, açığın kendisi.**
+      Artık digest üretildiği yerde, madde madde filtreleniyor. Alan değil
+      **madde** düşüyor: "neden önemli" kısmı çıkarılmış bir maddenin
+      söyleyecek şeyi kalmaz, geriye manşet kalır — ki bu app tam olarak o
+      olmamak için kuruldu.
+
+- [x] **`behavior_coach.ai_coach_message` ölü kod ve denetimsiz.** Repoda
+      hiçbir yerden çağrılmıyor, ama docstring'i *"used when the chat
+      surface wants..."* diyordu — kullanmıyor, hiç kullanmamış. Sildim
+      demedim, bıraktım ama docstring'ine ne gerektiğini yazdım: bir koçluk
+      mesajı tahsis iddiası taşımaz, yani portföy kuralı geçmez;
+      gerekli olan `forecast_language`. Kayıt testi bu fonksiyon
+      denetlenene ya da silinene kadar onu listede tutuyor.
+
+- [x] **Taramamın kör noktası, ve bulduğu iki uç.** İlk tarama yalnızca
+      *çağrı hedeflerine* bakıyordu. `routers/chat.py` modele
+      `asyncio.to_thread(ai_chat, ...)` ile ulaşıyor — fonksiyonu
+      **referans** olarak geçiriyor, çağırmıyor. Yani tarama dört yer
+      bulup kapsamlı görünürken **uygulamanın en geniş AI yüzeyini
+      kaçırıyordu.** Referansları da sayacak şekilde genişletince
+      `chat_endpoint` ve `advisor_endpoint` çıktı — ikisi de o ana kadar
+      farkında olmadığım uçlar.
+
+- [x] **`test_every_ai_field_is_accounted_for.py` — asıl dayanıklı parça.**
+      Sekiz çağrı yerinin hepsi kayıtta, **hangi kuralla ve neden o kural**
+      yazılı. Kayıt yalnızca "denetlenenler" listesi değil: *"içerik kuralı
+      gerekmez, sebebi şu"* diyen maddeler de var — çünkü alternatifi, her
+      gelenin bunu sıfırdan yeniden karara bağlaması ve birinin yanlış
+      karar vermesi.
+
+      Üç test: kayıtta olmayan bir çağrı yeri varsa fail; kayıtta artık var
+      olmayan bir yer varsa fail (kayıt kurgu haline gelmesin); ve tarama
+      4'ten az yer bulursa fail (boş tarama gerçek testi bedava
+      geçirirdi). Üçünü de elle bozarak kanıtladım.
+
+      Testin hata mesajı asıl dersi taşıyor: *"Do not copy an existing
+      rule: applying the portfolio check to the REIT explanation silently
+      deleted every correct one."*
+
+### Sekiz AI çağrı yeri, nihai durum
+
+| Yer | Kural |
+|---|---|
+| `explainer.explain_portfolio` | portföy tutarlılığı |
+| `explainer.explain_reit_inclusion` | yüzde KAPALI + enstrüman/risk puanı |
+| `what_if.answer_what_if` | diff'e karşı, kendi izin kümesiyle |
+| `news_service.get_daily_digest` | tahmin dili, madde madde |
+| `behavior_coach.ai_coach_message` | **denetimsiz, çağrılmıyor** — bağlanırsa önce kural gerekir |
+| `ai_service.generate_text` / `chat` | üreticiler: kural burada olmamalı, çağıranın ne istediğini bilemezler |
+| `chat.chat_endpoint` / `advisor_endpoint` | içerik kuralı yok, **bilerek**: anlattığı tek sayı kümesi yok. Koruma yapısal — injection sertleştirme, kota, parayı hareket ettiren araç yok |

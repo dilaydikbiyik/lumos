@@ -15,6 +15,7 @@ from pathlib import Path
 
 from backend.exceptions import AIServiceError
 from backend.schemas.portfolio import PortfolioRecommendResponse
+from backend.services import explanation_check
 from backend.services.ai_service import _dispatch, generate_text
 from backend.services.portfolio_engine import build_portfolio
 
@@ -98,6 +99,13 @@ def answer_what_if(question: str, current_risk_score: float, current_budget: flo
         f"{json.dumps(diff, ensure_ascii=False, indent=2)}"
     )
     answer = generate_text(context, system=_ANSWER_SYSTEM)
+    # _ANSWER_SYSTEM tells the model to use only the numbers it was given.
+    # That is an instruction, not a guarantee — and this is the riskiest
+    # prose in the app, because the answer is a claim about what CHANGES
+    # while the reader is in the middle of making the decision. The diff
+    # travels in its own field, so dropping the sentence still leaves the
+    # real before/after numbers on the card.
+    answer = explanation_check.whatif_verified_or_dropped(answer, diff)
 
     logger.info(
         "what_if_answered budget_delta=%s risk_delta=%s",

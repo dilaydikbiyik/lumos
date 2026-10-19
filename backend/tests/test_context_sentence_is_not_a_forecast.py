@@ -145,3 +145,32 @@ def test_the_digest_prompt_forbids_prediction_not_only_alarm():
 
     assert "NEVER PREDICT" in _DIGEST_SYSTEM
     assert "alarmist" in _DIGEST_SYSTEM, "the original instruction was dropped"
+
+
+# ── the digest itself, not only the sentence pulled from it ─────────────────
+
+def test_a_predictive_item_is_dropped_from_the_digest(monkeypatch):
+    """
+    The prompt forbids prediction for every item; the check was enforcing it
+    on one of two consumers. /news renders these cards straight to the
+    dashboard, so a predictive item reached the reader there while the
+    identical text would have been dropped beside a projection.
+    """
+    from backend.services import cache as cache_service
+    from backend.services import news_service
+
+    items = [
+        {"headline": "Enflasyon açıklandı", "why_it_matters": "Bu seni şöyle etkiler.",
+         "calmness_note": "Yapman gereken bir şey yok."},
+        {"headline": "Faiz kararı", "why_it_matters": "Analistler indirim bekliyor.",
+         "calmness_note": "Sakin ol."},
+    ]
+    monkeypatch.setattr(news_service, "fetch_headlines", lambda market="TR": [{"title": "x"}])
+    monkeypatch.setattr(news_service, "generate_text", lambda *a, **k: "[]")
+    monkeypatch.setattr("backend.services.json_extract.extract_json_array", lambda raw: items)
+    monkeypatch.setattr(cache_service, "get", lambda key: None)
+    monkeypatch.setattr(cache_service, "set", lambda key, value, ttl=None: None)
+
+    kept = news_service.get_daily_digest()
+    assert len(kept) == 1, f"the forecast item survived: {kept}"
+    assert kept[0]["headline"] == "Enflasyon açıklandı"

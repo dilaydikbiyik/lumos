@@ -612,7 +612,16 @@ market.
   sentence beside a projection gets a **third** rule, because it makes no claim about the portfolio
   at all: it must not **forecast**. That card's own text says it is not one, so a sentence
   predicting what happens next contradicts it in kind rather than in number — and "the Fed may cut
-  rates" is perfectly calm, so forbidding alarmist language never covered it
+  rates" is perfectly calm, so forbidding alarmist language never covered it. The what-if answer
+  gets a **fourth**, against the before/after diff it was handed — the riskiest prose in the app,
+  since it is a claim about what changes while the reader is deciding
+- **Every AI call site is registered, with which rule guards it and why that rule fits** — and a
+  test walks the AST to fail when a new one appears unaccounted for. The register also records the
+  sites that need no content rule and the reason, because the alternative is each person
+  re-deciding it and one of them getting it wrong. Broadening that scan from call *targets* to
+  references is what revealed the two chat endpoints: the app reaches the model through
+  `to_thread(ai_chat, ...)`, so a scan looking only at call targets missed its widest AI surface
+  while reporting four sites and looking thorough
 - **No execution, no custody**: architecturally incapable of moving user money
 - **Delete your account, from inside the app.** It removes the profile, every holding and every
   piece of feedback, then deletes the login itself — and if that last step fails it says so
@@ -643,7 +652,7 @@ market.
 
 ```bash
 ./scripts/check.sh                     # everything CI runs, with exit codes that propagate
-python -m pytest backend/tests/ -q     # 1061 tests
+python -m pytest backend/tests/ -q     # 1065 tests
 cd frontend && npm test                # 191 vitest tests
 ```
 

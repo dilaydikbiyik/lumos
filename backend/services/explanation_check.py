@@ -214,3 +214,79 @@ def reit_verified_or_dropped(text: str, portfolio: "PortfolioRecommendResponse")
     return verified_or_dropped(
         text, portfolio, check_percentages=False, extra_tickers=_REIT_UNIVERSE,
     )
+
+
+# ── the what-if answer ──────────────────────────────────────────────────────
+
+def whatif_contradictions(text: str, diff: dict) -> list[str]:
+    """
+    Where a what-if answer disagrees with the diff it was handed.
+
+    A DIFFERENT allowed set from the portfolio rule, and reusing that one
+    here would be wrong in both directions: a what-if answer legitimately
+    states BEFORE weights that are not in the current portfolio, and the
+    tickers in play are the union of two portfolios rather than one.
+
+    `_ANSWER_SYSTEM` tells the model to use "ONLY the numbers given to you —
+    never invent or round differently than shown". That is an instruction,
+    not a guarantee, and this is the riskiest of the app's AI fields: the
+    answer is a claim about what CHANGES, so "adding this raises your stock
+    share to 45%" when the real figure is 38% is a wrong number about a
+    decision the reader is in the middle of making.
+    """
+    if not text:
+        return []
+
+    problems: list[str] = []
+    changes = diff.get("allocation_changes") or []
+
+    # Both sides of every change, because the answer describes a transition.
+    allowed = {100.0}
+    for c in changes:
+        for key in ("before_pct", "after_pct"):
+            if c.get(key) is not None:
+                allowed.add(round(float(c[key]), 1))
+
+    tickers = {str(c.get("ticker", "")).upper() for c in changes if c.get("ticker")}
+
+    for token in set(_TICKER_RE.findall(text)):
+        if token in _NOT_TICKERS or token in tickers:
+            continue
+        problems.append(f"names {token!r}, which is not in this change")
+
+    for prefix, suffix in set(_PERCENT_RE.findall(text)):
+        value = float((prefix or suffix).replace(",", "."))
+        if any(abs(value - ok) <= TOLERANCE_PP for ok in allowed):
+            continue
+        problems.append(f"states {value}%, which is neither a before nor an after weight")
+
+    # The risk score, on either side of the change.
+    scores = {
+        round(float(diff[k]), 2)
+        for k in ("before_risk_score", "after_risk_score")
+        if diff.get(k) is not None
+    }
+    for raw in set(_SCORE_RE.findall(text)):
+        value = float(raw.replace(",", "."))
+        if scores and not any(abs(value - s) <= 0.05 for s in scores):
+            problems.append(
+                f"states a risk score of {value}/10; the change is between "
+                f"{sorted(scores)}"
+            )
+
+    return problems
+
+
+def whatif_verified_or_dropped(text: str, diff: dict) -> str:
+    """
+    The what-if answer, or empty when it contradicts its own diff.
+
+    Dropping is safe here for the same reason as elsewhere: the endpoint
+    returns `diff` alongside `answer`, so the real before/after numbers
+    still reach the client and the card can render them without the prose.
+    """
+    problems = whatif_contradictions(text, diff)
+    if not problems:
+        return text
+    logger.warning("what-if answer dropped — contradicts the diff: %s", problems)
+    return ""
