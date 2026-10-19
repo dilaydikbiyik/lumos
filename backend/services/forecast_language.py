@@ -67,13 +67,68 @@ _ALL = re.compile(
 )
 
 
+# Negators that turn a forecast marker into its opposite.
+#
+# This is not a refinement, it is a correctness fix for a shipped bug. The
+# first version flagged any marker anywhere, so it dropped exactly the
+# sentences this app exists to produce:
+#
+#   "Kimse borsanın ne yapacağını öngöremez."   -> matched "öngör"
+#   "Nobody can forecast the market."           -> matched "forecast"
+#   "This is NOT a forecast."                   -> matched "forecast"
+#
+# That last one is the app's OWN honesty note, printed on every projection
+# card. Measured against the app's 239 translated strings, 12 tripped the
+# rule and 7 of those were the disclaimers asserting that a figure is not a
+# forecast. A rule that deletes the sentence "this is not a forecast" for
+# containing the word "forecast" is worse than no rule.
+_NEGATORS_BEFORE = (
+    r"kimse", r"hiç kimse", r"değil", r"yok",
+    r"not", r"no one", r"nobody", r"cannot", r"can't", r"never", r"n't",
+    r"kein", r"keine", r"nicht", r"niemand",
+)
+_NEG_BEFORE_RE = re.compile("|".join(_NEGATORS_BEFORE), re.IGNORECASE)
+
+# Turkish negates with a SUFFIX, so the negator sits after the stem rather
+# than before it: öngör|eme|z, bekle|me|yor. Nothing in a word-list
+# approach catches that, which is why it is matched separately.
+_TR_NEG_SUFFIX_RE = re.compile(r"^(?:[eaıi]?m[ae]|[eaıi]?maz|[eaıi]?mez)", re.IGNORECASE)
+
+# How far back a negator still governs the marker. One clause, roughly —
+# long enough for "kimse ... öngöremez", short enough that a negation two
+# sentences earlier does not excuse a forecast.
+_NEGATION_WINDOW = 45
+
+
+def _is_negated(text: str, match: "re.Match[str]") -> bool:
+    """Whether this particular marker is governed by a negation."""
+    before = text[max(0, match.start() - _NEGATION_WINDOW):match.start()]
+    if _NEG_BEFORE_RE.search(before):
+        return True
+    # Turkish suffixal negation, immediately after the stem.
+    return bool(_TR_NEG_SUFFIX_RE.match(text[match.end():]))
+
+
 def is_forecast(text: str) -> bool:
-    """True when the sentence predicts rather than reports."""
-    return bool(text) and bool(_ALL.search(text))
+    """
+    True when the sentence predicts rather than reports.
+
+    A negated marker does not count: discussing forecasts, or saying that
+    nobody can make one, is the opposite of making one — and is a thing
+    this app says constantly.
+    """
+    if not text:
+        return False
+    return any(not _is_negated(text, m) for m in _ALL.finditer(text))
 
 
 def markers_in(text: str) -> list[str]:
-    """Which markers fired — for logging, so a drop can be explained."""
+    """
+    Which markers fired, negated ones excluded — for logging, so a drop can
+    be explained and so a drop with no marker is impossible.
+    """
     if not text:
         return []
-    return sorted({m.group(0).lower() for m in _ALL.finditer(text)})
+    return sorted({
+        m.group(0).lower() for m in _ALL.finditer(text) if not _is_negated(text, m)
+    })

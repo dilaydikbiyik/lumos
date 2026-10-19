@@ -174,3 +174,83 @@ def test_a_predictive_item_is_dropped_from_the_digest(monkeypatch):
     kept = news_service.get_daily_digest()
     assert len(kept) == 1, f"the forecast item survived: {kept}"
     assert kept[0]["headline"] == "Enflasyon açıklandı"
+
+
+# ── negation: the fix for a shipped bug ─────────────────────────────────────
+#
+# The first version of this rule flagged any marker anywhere, so it dropped
+# exactly the sentences this app exists to produce. Measured against the
+# app's 239 translated strings it fired on 12, and SEVEN of those were the
+# honesty notes asserting that a figure is not a forecast — a rule that
+# deletes the sentence "this is not a forecast" for containing the word
+# "forecast" is worse than no rule.
+#
+# The digest filter was live with that bug: an item whose calmness note said
+# "nobody can predict the market" would have been dropped.
+
+@pytest.mark.parametrize("text", [
+    # Turkish negates with a SUFFIX, which no word-list catches:
+    # öngör|eme|z. This is the case that needed its own pattern.
+    "Kimse borsanın ne yapacağını öngöremez.",
+    "Hiç kimse faizin ne olacağını tahmin edemez.",
+    "Bu bir tahmin değil, geçmişin dağılımı.",
+    # English
+    "Nobody can forecast the market.",
+    "This is NOT a forecast.",
+    "No one is expected to time this correctly.",
+    # German
+    "Das ist keine Prognose.",
+    "Niemand kann eine Prognose stellen.",
+])
+def test_a_negated_marker_is_not_a_forecast(text):
+    """Saying nobody can predict is the opposite of predicting."""
+    assert not is_forecast(text), f"negation missed: {text!r} -> {markers_in(text)}"
+
+
+def test_the_apps_own_honesty_note_survives_the_rule():
+    """
+    The specific sentence the first version deleted, in all three languages,
+    read from the live catalogue rather than retyped here — so a reword of
+    the disclaimer is still covered.
+    """
+    from backend.i18n import _C
+
+    note = _C["projection.note_asset"]
+    for lang, text in note.items():
+        rendered = text.replace("{ticker}", "SPY").replace("{years}", "5")
+        assert not is_forecast(rendered), (
+            f"the app's own 'this is not a forecast' note [{lang}] trips the "
+            f"forecast rule: {markers_in(rendered)}"
+        )
+
+
+def test_negation_does_not_excuse_a_forecast_elsewhere_in_the_sentence():
+    """
+    The window is one clause. A negation at the start must not license a
+    prediction at the end, or "nobody knows, but rates will fall" passes.
+    """
+    text = ("Kimse kesin bir şey bilemez. Yine de analistler düşüşün "
+            "süreceğini bekliyor ve hedef fiyat yükseltildi.")
+    assert is_forecast(text), f"a forecast slipped through: {markers_in(text)}"
+
+
+def test_a_calm_digest_item_is_not_dropped_as_a_forecast(monkeypatch):
+    """
+    End to end, on the bug as shipped: this item's calmness note is the most
+    valuable sentence the digest can carry, and the live filter removed it.
+    """
+    from backend.services import cache as cache_service
+    from backend.services import news_service
+
+    items = [{
+        "headline": "Faiz kararı açıklandı",
+        "why_it_matters": "Bu, kredi maliyetini etkiler.",
+        "calmness_note": "Kimse bundan sonrasını öngöremez; yapman gereken bir şey yok.",
+    }]
+    monkeypatch.setattr(news_service, "fetch_headlines", lambda market="TR": [{"title": "x"}])
+    monkeypatch.setattr(news_service, "generate_text", lambda *a, **k: "[]")
+    monkeypatch.setattr("backend.services.json_extract.extract_json_array", lambda raw: items)
+    monkeypatch.setattr(cache_service, "get", lambda key: None)
+    monkeypatch.setattr(cache_service, "set", lambda key, value, ttl=None: None)
+
+    assert news_service.get_daily_digest() == items, "a calm item was dropped"

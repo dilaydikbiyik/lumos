@@ -8,7 +8,6 @@ optional richer AI-generated version is available for the chat surface.
 from typing import Optional
 
 from backend.i18n import t
-from backend.services.ai_service import generate_text
 
 # Calm, profile-specific templates — no AI call needed for the common case.
 # The wording lives in the catalogue so the message speaks the reader's
@@ -45,28 +44,3 @@ def behavior_mirror(stated_loss_tolerance: str, recent_action: str,
         ("high", "sold_dip"): "coach.mirror.sold",
     }.get((stated_loss_tolerance, recent_action))
     return t(key, lang) if key else None
-
-
-def ai_coach_message(loss_tolerance: str, context: str) -> str:
-    """
-    Richer, situation-specific coaching via the LLM.
-
-    NOT CALLED ANYWHERE. Kept because the panic and market-move surfaces
-    may want it, but it is an unguarded AI entry point sitting in a file
-    everything else in imports, and the docstring used to claim the chat
-    surface used it — which it does not, and never did.
-
-    If it is wired up, it needs a rule of its own first. A coaching message
-    makes no claim about an allocation, so the portfolio check does not
-    apply; what it must not do is predict, exactly like the news sentence.
-    `forecast_language.is_forecast` is the rule it wants, and the registry
-    test in test_every_ai_field_is_accounted_for.py will fail until this
-    function is either guarded or removed.
-    """
-    system = (
-        "You are Lumos's behavioral coach. The user's loss tolerance is "
-        f"'{loss_tolerance}' (low/medium/high). Respond in 2-3 calm sentences: "
-        "acknowledge the situation, ground them in their own plan, never alarmist, "
-        "never dismissive. Respond in the same language as the context."
-    )
-    return generate_text(context, system=system)

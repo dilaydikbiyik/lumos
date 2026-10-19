@@ -621,7 +621,12 @@ market.
   re-deciding it and one of them getting it wrong. Broadening that scan from call *targets* to
   references is what revealed the two chat endpoints: the app reaches the model through
   `to_thread(ai_chat, ...)`, so a scan looking only at call targets missed its widest AI surface
-  while reporting four sites and looking thorough
+  while reporting four sites and looking thorough. The forecast rule handles **negation**, because
+  the first version deleted the app's own "this is NOT a forecast" note for containing the word
+  "forecast" — measured against 239 translated strings it fired on 12, seven of them the honesty
+  notes themselves, and 3 after the fix. On the chat it is **measured rather than enforced**: a
+  dropped reply leaves somebody who asked a question with nothing, and the rule's residue grows
+  with answer length, so the longest, most careful answers would be the likeliest destroyed
 - **No execution, no custody**: architecturally incapable of moving user money
 - **Delete your account, from inside the app.** It removes the profile, every holding and every
   piece of feedback, then deletes the login itself — and if that last step fails it says so
@@ -652,7 +657,7 @@ market.
 
 ```bash
 ./scripts/check.sh                     # everything CI runs, with exit codes that propagate
-python -m pytest backend/tests/ -q     # 1065 tests
+python -m pytest backend/tests/ -q     # 1076 tests
 cd frontend && npm test                # 191 vitest tests
 ```
 

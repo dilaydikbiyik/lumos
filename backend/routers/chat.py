@@ -1,4 +1,5 @@
 import asyncio
+import logging
 from typing import Literal
 
 from fastapi import APIRouter, Depends, HTTPException, Request
@@ -14,7 +15,43 @@ from backend.middleware.language import get_language
 from backend.middleware.verify_clerk import get_current_user
 from backend.repositories import user_repository
 from backend.schemas.user_profile import RiskProfileAnswers
+from backend.services import forecast_language
 from backend.services.ai_service import chat as ai_chat, extract_profile
+
+logger = logging.getLogger("lumos.chat")
+
+
+def _note_if_predictive(reply: str, surface: str) -> None:
+    """
+    MEASURED, NOT ENFORCED — and the distinction is deliberate.
+
+    advisor_prompt.txt forbids predicting market direction, and
+    forecast_language can detect it. The news digest has that rule enforced:
+    an item is dropped. A chat reply is not dropped, for two measured
+    reasons.
+
+    First, the cost is not comparable. A dropped news sentence leaves a card
+    that renders fine without one — it returns None by design. A dropped
+    chat reply leaves somebody who asked a question with nothing, which is
+    worse than an imperfect answer.
+
+    Second, the rule is not precise enough for long prose. Checked against
+    this app's 239 translated strings it fired on 12; adding negation
+    handling brought that to 3, and those 3 are the word's non-market
+    senses ("unpredictable income", "when will you need this money"). On a
+    one-sentence digest item that residue is acceptable. A chat reply is
+    many sentences, so the chance one of them trips it grows with the
+    length of the answer — and the longest, most careful answers would be
+    the likeliest to be destroyed.
+
+    So it is logged. The prompt's rule becomes measurable rather than
+    merely stated, and if it turns out to fire often that is worth knowing
+    before deciding to enforce it. Markers only, never the reply text.
+    """
+    if forecast_language.is_forecast(reply):
+        logger.info("chat reply reads as predictive surface=%s markers=%s",
+                    surface, forecast_language.markers_in(reply))
+
 
 router = APIRouter()
 
@@ -69,6 +106,7 @@ async def chat_endpoint(
         ai_chat, messages, user.plan, "profiling", "",
         get_language(request), user.market or "TR", user_id,
     )
+    _note_if_predictive(reply, "profiling")
     return {"reply": reply}
 
 
@@ -133,6 +171,7 @@ async def advisor_endpoint(
         ai_chat, messages, user.plan, "advisor", context,
         get_language(request), user.market or "TR", user_id,
     )
+    _note_if_predictive(reply, "advisor")
     return {"reply": reply}
 
 

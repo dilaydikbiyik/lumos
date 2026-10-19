@@ -46,10 +46,6 @@ REGISTER = {
         "set from the portfolio rule, because a what-if answer legitimately "
         "states before-weights that are not in the current portfolio and the "
         "tickers are the union of two portfolios.",
-    ("behavior_coach.py", "ai_coach_message"):
-        "UNGUARDED AND UNCALLED. Nothing in the repository calls it. If it "
-        "is wired up it needs forecast_language first — a coaching message "
-        "makes no allocation claim, so the portfolio rule does not apply.",
     ("ai_service.py", "chat"):
         "The multi-turn producer. Like generate_text it has no content rule "
         "and should not: it cannot know what its caller asked for. Its own "
@@ -59,15 +55,21 @@ REGISTER = {
         "what its caller asked for, which is exactly why each caller needs "
         "its own. Carries the daily cache and the provider fallback chain.",
     ("chat.py", "chat_endpoint"):
-        "The risk-quiz conversation. No content rule, deliberately: there "
-        "is no single set of numbers it narrates, so there is nothing to "
-        "check prose against, and a rule invented for it would be the REIT "
-        "mistake again. Guarded structurally instead — prompt-injection "
-        "hardening, per-user quotas, and no tool that can move money.",
+        "forecast_language, MEASURED not enforced (_note_if_predictive). "
+        "No figure rule: there is no single set of numbers it narrates. "
+        "The forecast rule is detectable and deliberately not enforced — a "
+        "dropped reply leaves somebody who asked a question with nothing, "
+        "and on long prose the rule's residual imprecision (3 of this "
+        "app's 239 strings, in the word's non-market senses) grows with "
+        "answer length. Structural guards carry it: injection hardening, "
+        "quotas, no tool that can move money.",
     ("chat.py", "advisor_endpoint"):
-        "The free-form education assistant, same reasoning as above. The "
-        "surface with the widest output and the least checkable claim, so "
-        "its protection is structural rather than a content rule.",
+        "Same as chat_endpoint, and the reason matters more here: this is "
+        "the widest output in the app. advisor_prompt.txt forbids naming "
+        "instruments as a buy call, predicting direction, tax or legal "
+        "advice, and inventing numbers. Only the prediction clause is "
+        "mechanically detectable, and it is logged rather than enforced "
+        "for the reason above.",
 }
 
 

@@ -3112,3 +3112,67 @@ AST taradım. **Üç gerçek açık, bir ölü kod, ve taramamda bir kör nokta.
 | `behavior_coach.ai_coach_message` | **denetimsiz, çağrılmıyor** — bağlanırsa önce kural gerekir |
 | `ai_service.generate_text` / `chat` | üreticiler: kural burada olmamalı, çağıranın ne istediğini bilemezler |
 | `chat.chat_endpoint` / `advisor_endpoint` | içerik kuralı yok, **bilerek**: anlattığı tek sayı kümesi yok. Koruma yapısal — injection sertleştirme, kota, parayı hareket ettiren araç yok |
+
+### Tek tek denetim — ve kendi son commit'imdeki hata (2026-10-19)
+
+- [x] **`ai_coach_message` silindi.** Hiçbir yerden çağrılmıyordu,
+      docstring'i *"used when the chat surface wants..."* diye yanlış bir
+      iddia taşıyordu, ve "ne olur ne olmaz" diye tutulan denetimsiz bir AI
+      girişi tam olarak sonradan denetimsiz bağlanan şey oluyor. Gerekirse
+      kuralıyla birlikte yeniden yazılır. `behavior_coach` artık hiç AI
+      çağırmıyor — saf şablon.
+
+- [x] **Chat uçlarını denetledim ve `advisor_prompt.txt` zaten doğru
+      şeyleri yasaklıyor:** isimle enstrüman tavsiyesi, piyasa yönü tahmini,
+      vergi/hukuk tavsiyesi, sayı uydurma, ve injection sertleştirme.
+      Bunlardan **mekanik olarak denetlenebilir olan tek şey tahmin.**
+
+- [x] **TAHMİN KURALINI SON COMMIT'TE HATALI YAYINLAMIŞIM.** İlk sürüm
+      belirteci nerede görürse işaretliyordu, yani **uygulamanın var olma
+      sebebi olan cümleleri düşürüyordu:**
+
+        "Kimse borsanın ne yapacağını öngöremez."  -> "öngör" eşleşti
+        "Nobody can forecast the market."          -> "forecast" eşleşti
+        "This is NOT a forecast."                  -> "forecast" eşleşti
+
+      Son satır **uygulamanın kendi dürüstlük notu**, her projeksiyon
+      kartında yazılı. Uygulamanın 239 çevirisine karşı ölçtüm: **12 tanesi
+      kurala takılıyordu ve 7'si bir rakamın tahmin OLMADIĞINI söyleyen
+      ibarelerdi.** "Bu bir tahmin değildir" cümlesini, içinde "tahmin"
+      geçtiği için silen bir kural, kuralsızlıktan kötüdür.
+
+      Ve digest filtresi bu hatayla **canlıydı**: `calmness_note`'u "kimse
+      öngöremez" diyen bir madde düşecekti — digest'in taşıyabileceği en
+      değerli cümle.
+
+      **Düzeltme:** olumsuzlama. Belirtecin öncesinde bir pencere içinde
+      olumsuzlayıcı varsa, ya da Türkçede **ekle** olumsuzlanmışsa
+      (`öngör|eme|z` — hiçbir kelime listesi bunu yakalamaz, ayrı bir kalıp
+      gerekti), tahmin saymıyor. **12 → 3.** Kalan üçü kelimenin piyasa dışı
+      anlamları ("öngörülemeyen gelir", "ne zaman ihtiyaç duyacaksın") ve
+      hiçbiri filtreden geçen metin değil, statik çeviri.
+
+      Pencere bir cümlecik: "kimse bilemez **ama** analistler bekliyor"
+      geçmiyor, o da test edildi.
+
+- [x] **Chat'te ölçüyor, uygulamıyorum — ve fark bilinçli.** İki ölçülmüş
+      sebep:
+
+      1. **Maliyet kıyaslanamaz.** Düşen bir haber cümlesi, zaten cümlesiz
+         render edilen bir kartı bırakır. Düşen bir chat cevabı, soru soran
+         birini **elinde hiçbir şey olmadan** bırakır — eksik bir cevaptan
+         kötü.
+      2. **Kural uzun nesir için yeterince hassas değil.** %1 artık hata
+         payı tek cümlelik bir digest maddesinde kabul edilebilir; bir chat
+         cevabı çok cümleli, yani takılma şansı cevabın uzunluğuyla
+         büyüyor — **en uzun, en özenli cevaplar yok edilmeye en yatkın
+         olanlar olurdu.**
+
+      O yüzden loglanıyor (`_note_if_predictive`, yalnızca belirteçler,
+      asla metin). Prompt'un kuralı artık yalnızca beyan değil **ölçülebilir**;
+      sık ateşlendiği görülürse uygulamaya geçme kararı veriye dayanır.
+
+- [x] **Yedi AI çağrı yeri, nihai durum** — `ai_coach_message` silindiği
+      için sekiz değil yedi. Kayıt testi hepsini hangi kuralla **ve neden o
+      kural** tutuyor; chat satırları artık "kural yok" değil "ölçülüyor,
+      uygulanmıyor, sebebi şu" diyor.
