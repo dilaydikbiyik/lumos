@@ -2,6 +2,20 @@
   "version": "0.0.1",
   "configurations": [
     {
+      "name": "lumos-backend",
+      "runtimeExecutable": "env",
+      "runtimeArgs": [
+        "DATABASE_URL=sqlite+aiosqlite:////private/tmp/claude-501/-Users-dilaydikbiyik-Projeler-AI-lumos/dd48e47d-478f-4214-8f2d-48034bc863aa/scratchpad/e2e.db",
+        "./venv/bin/python",
+        "-m",
+        "uvicorn",
+        "backend.main:app",
+        "--port",
+        "8000"
+      ],
+      "port": 8000
+    },
+    {
       "name": "lumos-frontend",
       "runtimeExecutable": "npm",
       "runtimeArgs": [
@@ -11,10 +25,6 @@
       "port": 5173,
       "cwd": "frontend",
       "autoPort": true
-    },
-    {
-      "name": "sensesign",
-      "url": "http://localhost:5173"
     }
   ]
 }

@@ -25,6 +25,17 @@ class HealthResponse(BaseModel):
     # only way to find that out was to sign in and be refused. A boolean, not
     # a count or an id: "is this deployment manageable" is the whole question.
     has_admin: bool
+    # Whether this deployment can send push notifications. A BOOLEAN, like
+    # every other keyed source: the VAPID private key never leaves the
+    # environment, and "can it send" is the whole operational question.
+    #
+    # Declared here because response_model FILTERS the response — the
+    # handler returned this key for several commits and FastAPI dropped it
+    # silently, so it reached no client at all. The absence then read as
+    # "production is running an older build", which is the wrong diagnosis
+    # to act on. A field added to the handler and not to the model is
+    # invisible, not late.
+    push: bool = False
     # Whether the cache's durable tier is live. The last-known-good data that
     # carries the app through a provider outage lives on an EPHEMERAL disk
     # unless this is true, so "is the fallback actually going to be there"

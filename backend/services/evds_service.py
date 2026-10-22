@@ -29,29 +29,6 @@ BASE_URL = "https://evds3.tcmb.gov.tr/igmevdsms-dis"
 # to the previous month.
 CPI_SERIES = "TP.TUFE1YI.T1"
 
-# NUTS2 housing index series -> human-readable region (province list)
-KFE_REGIONS = {
-    "TP.KFE.TR10": "İstanbul",
-    "TP.KFE.TR51": "Ankara",
-    "TP.KFE.TR31": "İzmir",
-    "TP.KFE.TR21": "Tekirdağ, Edirne, Kırklareli",
-    "TP.KFE.TR22": "Balıkesir, Çanakkale",
-    "TP.KFE.TR32": "Aydın, Denizli, Muğla",
-    "TP.KFE.TR33": "Manisa, Afyonkarahisar, Kütahya, Uşak",
-    "TP.KFE.TR41": "Bursa, Eskişehir, Bilecik",
-    "TP.KFE.TR42": "Kocaeli, Sakarya, Düzce, Bolu, Yalova",
-    "TP.KFE.TR52": "Konya, Karaman",
-    "TP.KFE.TR61": "Antalya, Isparta, Burdur",
-    "TP.KFE.TR62": "Adana, Mersin",
-    "TP.KFE.TR63": "Hatay, Kahramanmaraş, Osmaniye",
-    "TP.KFE.TR7": "İç Anadolu (Kayseri, Sivas, Konya çevresi)",
-    "TP.KFE.TR8": "Batı Karadeniz",
-    "TP.KFE.TR9": "Doğu Karadeniz (Trabzon çevresi)",
-    "TP.KFE.TRA": "Kuzeydoğu Anadolu (Erzurum çevresi)",
-    "TP.KFE.TRB": "Ortadoğu Anadolu (Malatya, Van çevresi)",
-    "TP.KFE.TRC": "Güneydoğu Anadolu (Gaziantep, Diyarbakır çevresi)",
-}
-
 _CACHE_TTL = 60 * 60 * 24  # EVDS publishes monthly; daily refresh is plenty
 
 
@@ -104,26 +81,6 @@ def get_live_cpi_index(start: str = "01-01-2020") -> Optional[dict[str, float]]:
     except Exception as exc:
         logger.warning("EVDS CPI fetch failed (%s) — falling back to static index", exc)
         return None
-
-
-def get_regional_housing_indices(start: str = "01-01-2023") -> dict[str, dict]:
-    """
-    Housing price index history for every NUTS2 region.
-    Returns {series_code: {"region": name, "index": {month: value}}}.
-    Regions whose fetch fails are skipped (partial data beats no data).
-    """
-    from datetime import date
-    end = date.today().strftime("%d-%m-%Y")
-
-    out: dict[str, dict] = {}
-    for code, region in KFE_REGIONS.items():
-        try:
-            index = fetch_series(code, start, end)
-            if index:
-                out[code] = {"region": region, "index": index}
-        except Exception as exc:
-            logger.warning("EVDS KFE fetch failed for %s: %s", code, exc)
-    return out
 
 
 # ── Per-province housing unit prices (TL/m², quarterly, 2010→today) ─────────

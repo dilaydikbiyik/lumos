@@ -25,7 +25,7 @@ them differently would show someone one phrase while asking and a different
 one while explaining their score.
 """
 
-from typing import Optional
+
 
 from backend.i18n import t
 
@@ -95,11 +95,3 @@ def questions(lang: str = "tr", currency: str = "TRY") -> list[dict]:
         ask("income_stability", "choice", False,
             options=_options("income_stability", lang)),
     ]
-
-
-def required_fields() -> set[str]:
-    return {q["field"] for q in questions("en") if q["required"]}
-
-
-def choice_values(field: str) -> Optional[list[str]]:
-    return _CHOICES.get(field)

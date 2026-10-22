@@ -141,13 +141,6 @@ def get_national_hpi(since: str = "2000-01-01") -> Optional[dict[str, float]]:
     return _observations(NATIONAL_SERIES, since)
 
 
-def get_state_hpi(state_code: str, since: str = "2000-01-01") -> Optional[dict[str, float]]:
-    """One state's house price index keyed by YYYY-MM."""
-    if state_code.upper() not in STATES:
-        return None
-    return _observations(series_id(state_code), since)
-
-
 def get_all_state_hpi(since: str = "2000-01-01") -> dict[str, dict]:
     """
     Every state's index, shaped like the TR province payload:

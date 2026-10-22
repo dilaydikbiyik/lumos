@@ -929,7 +929,7 @@
   },
   "legal": {
     "updated": "Last updated: {{date}}",
-    "updatedDate": "20 September 2026",
+    "updatedDate": "23 October 2026",
     "backHome": "Back to Lumos",
     "contact": "Questions about any of this: dilaydikbiyik@gmail.com.",
     "privacy": {
@@ -942,6 +942,10 @@
         {
           "h": "What Lumos stores about you",
           "p": "Your sign-in identity — email address and name — is held by Clerk, our authentication provider, and your email is copied into our database so the app can tell accounts apart.\n\nYour risk profile: the answers you give during onboarding — age, monthly income, savings rate, investment horizon, loss tolerance, experience, goal, income stability, and any high-interest debt you report — plus the risk score derived from them.\n\nYour holdings: for each asset you add, its type, name, ticker, purchase date and amount, currency, quantity, any current value you enter by hand, your note, and the optional emotion tag.\n\nYour choices: chosen market, chosen language, investment path, and the fear you picked at check-in.\n\nAnything you write in the feedback box, together with the page you were on."
+        },
+        {
+          "h": "What is stored if you allow notifications",
+          "p": "When you turn notifications on, your browser issues a subscription address (an endpoint); we store that, the two encryption keys specific to your device, and the language you were using. They exist only so a notification can reach you: the address identifies a browser, not you — it carries no identity, no location and nothing about your behaviour elsewhere, it is not an advertising identifier, and it is shared with nobody. Turn notifications off and the record is deleted, not flagged. The only notification we send is the steadying message that follows a significant move in your own portfolio; we send no marketing."
         },
         {
           "h": "What Lumos never collects",

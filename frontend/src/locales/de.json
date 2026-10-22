@@ -929,7 +929,7 @@
   },
   "legal": {
     "updated": "Zuletzt aktualisiert: {{date}}",
-    "updatedDate": "20. September 2026",
+    "updatedDate": "23. Oktober 2026",
     "backHome": "Zurück zu Lumos",
     "contact": "Fragen zu all dem: dilaydikbiyik@gmail.com.",
     "privacy": {
@@ -942,6 +942,10 @@
         {
           "h": "Was Lumos über dich speichert",
           "p": "Deine Anmeldeidentität — E-Mail-Adresse und Name — liegt bei Clerk, unserem Authentifizierungsdienst; deine E-Mail-Adresse wird zusätzlich in unsere Datenbank kopiert, damit die App Konten unterscheiden kann.\n\nDein Risikoprofil: die Antworten aus dem Einstieg — Alter, monatliches Einkommen, Sparquote, Anlagehorizont, Verlusttoleranz, Erfahrung, Ziel, Einkommensstabilität und angegebene hochverzinste Schulden — sowie der daraus berechnete Risikowert.\n\nDeine Positionen: je Position Art, Name, Kürzel, Kaufdatum und -betrag, Währung, Stückzahl, ein selbst eingetragener aktueller Wert, deine Notiz und das optionale Gefühls-Label.\n\nDeine Einstellungen: gewählter Markt, gewählte Sprache, Anlageweg und die beim Check-in gewählte Sorge.\n\nAlles, was du ins Feedback-Feld schreibst, zusammen mit der Seite, auf der du warst."
+        },
+        {
+          "h": "Was gespeichert wird, wenn du Benachrichtigungen erlaubst",
+          "p": "Wenn du Benachrichtigungen aktivierst, erzeugt dein Browser eine Abonnementadresse (einen Endpoint); wir speichern diese, die zwei gerätespezifischen Verschlüsselungsschlüssel und die von dir gewählte Sprache. Sie existieren nur, damit eine Benachrichtigung dich erreichen kann: die Adresse identifiziert einen Browser, nicht dich — sie trägt keine Identität, keinen Standort und nichts über dein Verhalten anderswo, sie ist keine Werbekennung und wird an niemanden weitergegeben. Schaltest du Benachrichtigungen ab, wird der Eintrag gelöscht, nicht markiert. Die einzige Benachrichtigung, die wir senden, ist die beruhigende Nachricht nach einer deutlichen Bewegung in deinem eigenen Portfolio; Marketing senden wir nicht."
         },
         {
           "h": "Was Lumos nie erhebt",

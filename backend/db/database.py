@@ -53,9 +53,3 @@ async def get_db():
         except Exception:
             await session.rollback()
             raise
-
-
-async def create_tables():
-    """Create all tables on startup (dev only)."""
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)

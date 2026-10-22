@@ -929,7 +929,7 @@
   },
   "legal": {
     "updated": "Son güncelleme: {{date}}",
-    "updatedDate": "20 Eylül 2026",
+    "updatedDate": "23 Ekim 2026",
     "backHome": "Lumos'a dön",
     "contact": "Buradaki her şeyle ilgili sorular için: dilaydikbiyik@gmail.com.",
     "privacy": {
@@ -942,6 +942,10 @@
         {
           "h": "Lumos senin hakkında neleri saklıyor",
           "p": "Giriş kimliğin — e-posta adresin ve adın — kimlik doğrulama sağlayıcımız Clerk'te tutulur; e-postan hesapları birbirinden ayırabilmek için bizim veritabanımıza da kopyalanır.\n\nRisk profilin: başlangıçta verdiğin cevaplar — yaş, aylık gelir, birikim oranı, yatırım vadesi, kayıp toleransı, deneyim, hedef, gelir istikrarı ve bildirdiğin yüksek faizli borç — ve bunlardan hesaplanan risk skoru.\n\nVarlıkların: eklediğin her varlık için tür, ad, sembol, alış tarihi ve tutarı, para birimi, adet, elle girdiğin güncel değer, notun ve isteğe bağlı duygu etiketi.\n\nTercihlerin: seçtiğin pazar, seçtiğin dil, yatırım yolun ve yoklamada işaretlediğin korku.\n\nGeri bildirim kutusuna yazdıkların ve o sırada hangi sayfada olduğun."
+        },
+        {
+          "h": "Bildirimlere izin verirsen ne saklanıyor",
+          "p": "Bildirimleri açtığında tarayıcın bir abonelik adresi (endpoint) üretir; bunu, cihazına özel iki şifreleme anahtarını ve o anki dil seçimini saklarız. Bunlar yalnızca sana bildirim gönderebilmek içindir: adres cihazını tanımlar ama kimliğini, konumunu veya başka uygulamalardaki davranışını taşımaz, reklam kimliği değildir ve kimseyle paylaşılmaz. Bildirimleri kapattığında kayıt silinir — işaretlenmez, silinir. Gönderdiğimiz tek bildirim, kendi portföyün belirgin biçimde hareket ettiğinde gelen sakinleştirici mesajdır; pazarlama bildirimi göndermeyiz."
         },
         {
           "h": "Lumos'un asla toplamadıkları",

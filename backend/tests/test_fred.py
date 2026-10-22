@@ -140,11 +140,6 @@ def test_a_complete_state_map_is_cached():
     assert cache_service.get("fred:states:2000-01-01") is not None
 
 
-def test_unknown_state_code_returns_nothing():
-    with patch.object(fred_service.settings, "FRED_API_KEY", "k"):
-        assert fred_service.get_state_hpi("XX") is None
-
-
 def test_state_map_is_fetched_in_parallel():
     """51 sequential round-trips on a cold cache is the difference between a
     page that loads and one that times out on a free-tier instance."""

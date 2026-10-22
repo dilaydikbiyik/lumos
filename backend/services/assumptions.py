@@ -264,14 +264,6 @@ def gross_rental_yield(market: str = "TR") -> float:
     return _pack(market).gross_rental_yield
 
 
-def real_rate_pct(nominal_pct: float, inflation_pct: float | None = None,
-                  market: str = "TR") -> float:
-    """Fisher real rate: what a nominal growth rate is worth after inflation."""
-    if inflation_pct is None:
-        inflation_pct = annual_inflation_pct(market)
-    return round(((1 + nominal_pct / 100) / (1 + inflation_pct / 100) - 1) * 100, 2)
-
-
 def real_value(nominal_amount: float, years: float,
                inflation_pct: float | None = None, market: str = "TR") -> float:
     """Today's purchasing power of a future nominal amount."""
@@ -279,3 +271,18 @@ def real_value(nominal_amount: float, years: float,
         inflation_pct = annual_inflation_pct(market)
     return nominal_amount / (1 + inflation_pct / 100) ** years
 
+
+def real_rate_pct(nominal_pct: float, inflation_pct: float | None = None,
+                  market: str = "TR") -> float:
+    """
+    Fisher real rate: what a nominal growth rate is worth after inflation.
+
+    Used by the invariant test asserting that portfolio growth beats
+    inflation by exactly the documented real spread. It was briefly deleted
+    as dead code — nothing in production calls it — which would have
+    removed that check along with it. A helper only a test calls is not
+    clutter when the test it serves verifies something real.
+    """
+    if inflation_pct is None:
+        inflation_pct = annual_inflation_pct(market)
+    return round(((1 + nominal_pct / 100) / (1 + inflation_pct / 100) - 1) * 100, 2)
