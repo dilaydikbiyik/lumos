@@ -1,33 +1,71 @@
-# Keeps the Render free instance awake so users never hit the 30-50s cold
-# start ("Seçim kaydedilemedi" class of errors). A single always-on free
-# service fits within Render's 750 instance-hours/month.
+# Pings the Render free instance so a visitor does not meet a cold start.
 #
-# A single ping is not evidence of an outage: during a redeploy the service
-# is intentionally down for a minute, and a free instance waking from sleep
-# can exceed any one timeout. So we retry with backoff and only report a
-# failure when the backend stays unreachable across all attempts — otherwise
-# every deploy would email a false alarm.
+# MEASURED 2026-10-23, AND IT DOES NOT WORK ON ITS OWN. The schedule below
+# asks for every 10 minutes. The last 15 runs actually fired every 242
+# minutes on average, with one gap of 350 minutes — against a Render
+# instance that sleeps after 15. The backend is therefore asleep for the
+# large majority of the day, and a request to it was measured at 44
+# seconds while every single run of this workflow reported success.
+#
+# That is GitHub's documented behaviour, not a bug here: scheduled
+# workflows on shared runners are delayed under load and dropped
+# entirely when the queue is long. `*/10` is a wish, not a guarantee.
+#
+# So this job no longer claims to keep anything awake. It pings, and it
+# REPORTS whether the instance was already warm — which turns a workflow
+# that always said "success" into one that says what actually happened.
+# A green tick that means nothing is worse than no workflow at all.
+#
+# The real fix is one of two things, both outside this file:
+#   * an external cron (cron-job.org and similar are free and fire on
+#     time), which is needed anyway to trigger POST /push/market-sweep —
+#     one job solves both problems; or
+#   * Render's paid tier, which does not sleep.
 name: Keep backend awake
 
 on:
   schedule:
-    - cron: "*/10 * * * *"   # every 10 minutes (Render sleeps after 15)
+    - cron: "*/10 * * * *"   # aspirational; see the measurement above
   workflow_dispatch:
 
 jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
-      - name: Ping /health (retry through cold starts and redeploys)
+      - name: Ping /health and report whether it was already awake
         run: |
           URL="https://lumos-api-yowm.onrender.com/health"
-          for attempt in 1 2 3 4; do
-            if body=$(curl -sf --max-time 90 "$URL"); then
-              echo "attempt $attempt: awake — $body"
-              exit 0
-            fi
-            echo "attempt $attempt: no answer yet (waking or redeploying), retrying…"
-            sleep 30
-          done
-          echo "::error::Backend did not answer /health across 4 attempts (~6 min)."
-          exit 1
+
+          # A warm instance answers in well under a second; a sleeping one
+          # takes tens of seconds to boot. The FIRST ping is the only
+          # honest measurement — every later one is warm because of this
+          # one.
+          start=$(date +%s)
+          body=$(curl -sf --max-time 90 "$URL") || body=""
+          elapsed=$(( $(date +%s) - start ))
+
+          if [ -z "$body" ]; then
+            # A single miss is not an outage: a redeploy takes the service
+            # down for a minute. Retry before saying anything alarming.
+            for attempt in 2 3 4; do
+              sleep 30
+              if body=$(curl -sf --max-time 90 "$URL"); then break; fi
+            done
+          fi
+
+          if [ -z "$body" ]; then
+            echo "::error::Backend did not answer /health across 4 attempts (~6 min)."
+            exit 1
+          fi
+
+          echo "answered in ${elapsed}s"
+          echo "$body"
+
+          if [ "$elapsed" -gt 10 ]; then
+            echo "::warning::Instance was ASLEEP — it took ${elapsed}s to answer, \
+          so a visitor arriving just before this run waited that long. This workflow \
+          is not firing often enough to prevent that; see the comment at the top."
+            echo "### ⚠️ Was asleep (${elapsed}s cold start)" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "### ✅ Already warm (${elapsed}s)" >> "$GITHUB_STEP_SUMMARY"
+          fi

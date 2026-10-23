@@ -59,13 +59,62 @@ saniyeye kadar sürebiliyor.
 ret sebebidir. Ayrıca ilk izlenimi bozar — LinkedIn'den gelen biri boş ekranla
 karşılaşabilir.
 
-**Şu an ne yapılıyor:** GitHub Actions her 10 dakikada bir `/health` çağırarak
-servisi ayakta tutmaya çalışıyor (`.github/workflows/keepalive.yml`), frontend
-de açılışta sessiz bir uyandırma isteği gönderiyor. Bunlar palyatif; GitHub'ın
-cron zamanlaması garanti değildir.
+**Şu an ne yapılıyor — ve ÖLÇÜLDÜĞÜNDE çalışmıyor (2026-10-23):** GitHub
+Actions iş akışı `*/10` yazıyor. Son 15 çalışmanın gerçek aralığı **ortalama
+242 dakika**, en uzun boşluk **350 dakika** — Render 15 dakikada uyuyor. Yani
+backend günün büyük kısmında uykuda, ve bu sırada **her çalışma "success"
+raporluyordu**. Canlı ölçüm: uyandırma isteği **44 saniye** sürdü.
 
-**Kalıcı çözüm:** Render'da ücretli katmana geçmek (aylık birkaç dolar
-mertebesinde). Geçildiğinde keepalive iş akışı silinebilir.
+Bu GitHub'ın belgelenmiş davranışı: paylaşımlı runner'larda zamanlanmış iş
+akışları yük altında gecikir, kuyruk uzunsa tamamen düşer. `*/10` bir dilek.
+İş akışı artık bunu gizlemiyor — ilk ping'in süresini ölçüp 10 saniyeyi
+aşarsa iş özetine **"⚠️ Was asleep"** yazıyor.
+
+**Ücretsiz çözüm — bunu yapmak 2 dakika sürüyor:** harici bir cron servisi
+(cron-job.org gibi) zamanında ateşler. Zaten push bildirimleri için de
+gerekiyor, yani **tek iş iki sorunu çözüyor**:
+
+| Alan | Değer |
+|---|---|
+| URL | `https://lumos-api-yowm.onrender.com/push/market-sweep` |
+| Yöntem | `POST` |
+| Başlık | `X-Lumos-Cron: <CRON_SECRET>` |
+| Aralık | 10 dakika |
+
+`CRON_SECRET` yerel `.env` dosyanda hazır (üretildi, hiçbir sohbete
+girmedi). Aynı değeri Render dashboard'a da gir. Bu uç hem örneği uyanık
+tutar hem de piyasa hareketi bildirimlerini gönderir; kimse bildirim
+açmamışsa `{"checked": 0, "notified": 0}` döner ve hiçbir şey göndermez.
+
+**Kalıcı çözüm:** Render'da ücretli katman (aylık birkaç dolar). Geçildiğinde
+keepalive iş akışı silinebilir.
+
+---
+
+## 2b. Push bildirimleri: Render'a girilecek dört değer
+
+Kod tarafı bitti ve anahtarlar **üretildi** — yerel `.env` dosyanda duruyorlar,
+hiçbir sohbete yazılmadılar. Çift doğrulandı: özel anahtardan türetilen açık
+anahtar, saklanan açık anahtarla **birebir eşleşiyor**. (Eşleşmeyen bir çift
+sessizce başarısız olur: kimsenin elinde olmayan bir anahtara şifrelenmiş
+bildirimler, hiçbir yerde hata vermeden.)
+
+Render dashboard → Environment → şu dördünü `.env`'den kopyala:
+
+```
+VAPID_PUBLIC_KEY
+VAPID_PRIVATE_KEY
+VAPID_SUBJECT
+CRON_SECRET
+```
+
+`render.yaml` dördünü de `sync: false` ile tanımlıyor, yani hiçbiri repoda
+değil ve blueprint senkronizasyonu dashboard'daki değeri ezmez.
+
+**Özel anahtarı BİR KEZ üret.** Değiştirmek rotasyon değil sıfırlamadır:
+mevcut her aboneliği, kimseye hata göstermeden geçersiz kılar.
+
+Girildikten sonra `/health` uçu `"push": true` döner — doğrulaman bu.
 
 ---
 

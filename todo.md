@@ -3234,10 +3234,35 @@ AST taradım. **Üç gerçek açık, bir ölü kod, ve taramamda bir kör nokta.
 
 ### Mağazaya koymadan önce SENDE kalanlar
 
-- [ ] **[you — ÖNCELİK] Render cold start 44 saniye.** Ölçtüm. İnceleyen kişi
-      44 saniye bekleyip "bozuk" der. Ücretsiz uptime pinger'ı başvurudan
-      ÖNCE kur — zaten push sweep'i için gerekiyordu, tek iş iki sorunu
-      çözüyor.
+- [x] **Cold start'ın SEBEBİ bulundu: keepalive iş akışı çalışmıyormuş.**
+      `*/10` yazıyor ama son 15 çalışmanın gerçek aralığı **ortalama 242
+      dakika**, en uzun boşluk **350 dakika** — Render 15 dakikada uyuyor.
+      Backend günün büyük kısmında uykuda, ve **her çalışma "success"
+      raporluyordu**. Tam olarak istemediğin şey: var olan, yeşil tik veren,
+      hiçbir şey yapmayan bir yapı.
+
+      GitHub'ın belgelenmiş davranışı — paylaşımlı runner'larda zamanlanmış
+      işler yük altında gecikir, kuyruk uzunsa düşer. İş akışı artık bunu
+      **gizlemiyor**: ilk ping'in süresini ölçüyor, 10 saniyeyi aşarsa iş
+      özetine "⚠️ Was asleep (Ns cold start)" yazıyor. Ölçüm yorumun içine
+      tarihli olarak kaydedildi, ki bir sonraki okuyan ona güvenmesin.
+
+- [x] **VAPID anahtarları ve CRON_SECRET üretildi** — doğrudan `.env`'e,
+      hiçbiri sohbete girmeden. Çift doğrulandı: özel anahtardan türetilen
+      açık anahtar saklananla **birebir eşleşiyor** (eşleşmeyen çift sessizce
+      başarısız olur). Gerçek sırlarla uçtan uca test edildi: `/health` →
+      `push: true`, `/push/public-key` `.env` ile aynı, yanlış sır → 404,
+      doğru sır → 200.
+
+- [x] **Dağıtım reçetesi yazıldı** (`docs/production-readiness.md`): Render'a
+      girilecek dört değer, ve cron-job.org için URL/yöntem/başlık/aralık
+      tablosu. Tek cron işi hem örneği uyanık tutuyor hem bildirimleri
+      gönderiyor.
+
+- [ ] **[you — 2 dakika] Dördü Render dashboard'a yapıştır** (`.env`'den
+      kopyala) ve cron-job.org'da işi kur. Hesap açma gerektirdiği için
+      bunu senin yapman gerekiyor; gerisi hazır. Doğrulaman: `/health`
+      `"push": true` dönecek.
 - [ ] **[you] CSP'yi `Report-Only`'den yükselt.** Kasıtlı ve belgeli bir
       aşama; yazılı çıkış koşulu: *"Vercel logları hiç rapor göstermediğinde
       header adını değiştir."* Logları kontrol et, temizse `vercel.json`'da
