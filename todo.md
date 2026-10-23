@@ -3176,3 +3176,74 @@ AST taradım. **Üç gerçek açık, bir ölü kod, ve taramamda bir kör nokta.
       için sekiz değil yedi. Kayıt testi hepsini hangi kuralla **ve neden o
       kural** tutuyor; chat satırları artık "kural yok" değil "ölçülüyor,
       uygulanmıyor, sebebi şu" diyor.
+
+## Mağaza öncesi uçtan uca denetim (2026-10-23)
+
+### Düzeltilenler
+
+- [x] **Gizlilik politikası push verisini beyan etmiyordu — mağaza blocker'ı.**
+      Uygulama abonelik endpoint'i, iki cihaz anahtarı ve dili saklıyor; Apple
+      App Privacy ve Play Data Safety bunu zorunlu kılıyor. Üç dilde bölüm
+      eklendi, tarih güncellendi, ve `docs/store-submission.md`'ye hem Data
+      Safety satırı hem de "push opt-in, pazarlama yok, kapatınca kayıt
+      SİLİNİR" notu girdi.
+
+- [x] **`/health`'teki `push` alanı hiçbir istemciye ulaşmıyormuş.**
+      `response_model` yanıtı filtreliyor ve alan modelde tanımlı değildi.
+      Üretimde yokluğunu "deployment bayat" diye okumuştum — **teşhis
+      yanlıştı**, alan geç değil görünmezdi. Artık tanımlı, ve
+      `test_health_reports_what_it_computes.py` kaynak üzerinden iki yönlü
+      kural koyuyor: handler'ın döndürdüğü her anahtar modelde olmalı, ve
+      model handler'ın hiç doldurmadığı alan tanımlamamalı (varsayılanıyla
+      servis edilen bir alan ölçüm gibi okunur).
+
+- [x] **Dokunma hedefleri 44pt altındaydı.** 375px'te ölçtüm: onboarding
+      altbilgisindeki gizlilik/koşullar linkleri **118×15, sıfır padding** —
+      incelemecinin ilk dokunduğu iki link. Legal sayfasının kendi dönüş
+      linkleri 20px. İkisi de 44'e çıkarıldı (metin boyutu değişmedi, hedefi
+      padding taşıyor) ve tarayıcıda doğrulandı. `cards.test.js`'e kural
+      eklendi: `<nav>` içindeki bir link `minHeight` beyan etmiyorsa fail —
+      bozup kırmızıya döndüğünü teyit ettim.
+
+- [x] **Ölü kod temizlendi** (önceki commit) ve `launch.json`'dan başka
+      projeden kalma `sensesign` girdisi kaldırıldı; backend girdisi scratch
+      veritabanına bakacak şekilde eklendi, çünkü `.env`'deki DATABASE_URL
+      production Postgres'e bakıyor.
+
+### Temiz çıkanlar (ölçüldü)
+
+- TODO/FIXME/NotImplementedError **yok**. Ölü frontend bileşeni **yok**, ölü
+  backend servisi **yok**.
+- **Yatay taşma yok**: 3 rota × 3 dil = 9 kombinasyon, 375px'te hepsi 0px.
+- **Sızan ham i18n anahtarı yok** — aynı 9 kombinasyonda.
+- Manifest ikonlarının hepsi diskte var, `apple-touch-icon` var.
+- Güvenlik başlıkları tam: HSTS 2 yıl, `X-Frame-Options: DENY`, nosniff,
+  referrer-policy, permissions-policy, ve tam bir CSP.
+- Repoda gerçek sır yok; `.env` commit'li değil.
+- İlk yük ~469 KB ham (gzip ~130 KB), 24 chunk'a bölünmüş. 56 KB'lık
+  "LanguageSwitcher" chunk'ı aslında react-i18next vendor kodu — Vite grubun
+  ilk modülüne göre adlandırmış, şişkin bileşen değil.
+
+### Taramalarımın iki kez yanıldığı yerler (bildirmeden yakalandı)
+
+- Dört hata yöneticisi ölü göründü; dekoratörle `register_error_handlers`
+  içinde kayıtlılar. **Dört hayali hata bildirmeye çok yaklaştım.**
+- İlk taşma ölçümüm dokuz rotada da "taşma var" dedi; pane gizli olduğu için
+  `window.innerWidth` **0**'dı ve her öğe sıfır genişlikte bir viewport'u
+  aşıyordu. Gerçek mobil viewport'ta taşma sıfır.
+
+### Mağazaya koymadan önce SENDE kalanlar
+
+- [ ] **[you — ÖNCELİK] Render cold start 44 saniye.** Ölçtüm. İnceleyen kişi
+      44 saniye bekleyip "bozuk" der. Ücretsiz uptime pinger'ı başvurudan
+      ÖNCE kur — zaten push sweep'i için gerekiyordu, tek iş iki sorunu
+      çözüyor.
+- [ ] **[you] CSP'yi `Report-Only`'den yükselt.** Kasıtlı ve belgeli bir
+      aşama; yazılı çıkış koşulu: *"Vercel logları hiç rapor göstermediğinde
+      header adını değiştir."* Logları kontrol et, temizse `vercel.json`'da
+      `Content-Security-Policy-Report-Only` → `Content-Security-Policy`.
+- [ ] **[you] Kimlik doğrulamalı akışlar gezilmedi.** Clerk oturumu
+      gerekiyordu ve sırları sohbete getirmek doğru olmazdı.
+      `RUN_JOURNEYS=1 ./scripts/check.sh` ile onboarding → risk quiz →
+      portföy → holdings yolunu sen doğrula.
+- [ ] **[you] Push'u canlıya al** (VAPID anahtarları + cron) — hâlâ açık.

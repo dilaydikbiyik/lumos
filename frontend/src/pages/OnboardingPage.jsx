@@ -248,12 +248,24 @@ export default function OnboardingPage() {
         {/* Both stores fetch these from the signed-out landing page during
             review, and someone deciding whether to sign up at all should be
             able to read them before handing over anything. */}
+        {/* The links were 118x15 with no padding — measured, not guessed.
+            Apple asks for 44x44pt and Google for 48dp, and these are the two
+            links a store reviewer taps first. The text stays 12px; the
+            PADDING carries the target, so nothing about the design changes
+            except that a thumb can hit it. gap shrinks to keep the two from
+            drifting apart now that each one is taller. */}
         <nav style={{
-          display: 'flex', justifyContent: 'center', gap: '1.25rem',
-          marginTop: 18, fontSize: 12, flexWrap: 'wrap',
+          display: 'flex', justifyContent: 'center', gap: '0.5rem',
+          marginTop: 10, fontSize: 12, flexWrap: 'wrap',
         }}>
-          <Link to="/privacy" style={{ color: 'var(--text-dim)' }}>{t('legal.privacy.title')}</Link>
-          <Link to="/terms" style={{ color: 'var(--text-dim)' }}>{t('legal.terms.title')}</Link>
+          <Link to="/privacy" style={{
+            color: 'var(--text-dim)', padding: '14px 12px',
+            display: 'inline-flex', alignItems: 'center', minHeight: 44,
+          }}>{t('legal.privacy.title')}</Link>
+          <Link to="/terms" style={{
+            color: 'var(--text-dim)', padding: '14px 12px',
+            display: 'inline-flex', alignItems: 'center', minHeight: 44,
+          }}>{t('legal.terms.title')}</Link>
         </nav>
       </div>
 

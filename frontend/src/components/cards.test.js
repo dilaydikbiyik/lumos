@@ -86,3 +86,34 @@ describe('percent signs come from the formatter', () => {
       .toEqual([])
   })
 })
+
+// ── touch targets ───────────────────────────────────────────────────────────
+//
+// Apple asks for 44x44pt and Google for 48dp. The onboarding footer's privacy
+// and terms links were 118x15 with no padding at all — MEASURED in a 375px
+// viewport, not guessed — and they are the two links a store reviewer taps
+// first. The legal page's own back-links were 20px tall for the same reason.
+//
+// There is no DOM in this suite, so the rendered height cannot be asserted
+// here. What CAN be asserted is the thing whose absence caused it: a link
+// inside a <nav> that declares no minHeight is one nobody sized on purpose.
+describe('navigation links are sized for a thumb', () => {
+  const PAGES = join(process.cwd(), 'src', 'pages')
+  const pages = readdirSync(PAGES).filter(f => f.endsWith('.jsx'))
+
+  for (const file of pages) {
+    const code = readFileSync(join(PAGES, file), 'utf8')
+    const navs = [...code.matchAll(/<nav[\s\S]*?<\/nav>/g)].map(m => m[0])
+    if (!navs.length) continue
+
+    it(`${file} sizes every nav link`, () => {
+      const unsized = []
+      for (const nav of navs) {
+        for (const link of nav.match(/<(?:Link|a)\b[\s\S]*?>/g) || []) {
+          if (!/minHeight/.test(link)) unsized.push(link.replace(/\s+/g, ' ').slice(0, 70))
+        }
+      }
+      expect(unsized, 'nav links with no declared minHeight').toEqual([])
+    })
+  }
+})

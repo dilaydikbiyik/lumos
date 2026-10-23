@@ -47,9 +47,16 @@ export default function LegalPage({ doc }) {
         {t('legal.contact')}
       </p>
 
-      <nav style={{ marginTop: '2rem', display: 'flex', gap: '1.25rem', flexWrap: 'wrap' }}>
-        <Link to={`/${other}`}>{t(`legal.${other}.title`)}</Link>
-        <Link to="/">{t('legal.backHome')}</Link>
+      {/* Same 44pt minimum as the onboarding footer: these were 20px tall
+          with no padding, and they are how a reader gets back out of a
+          policy page on a phone. */}
+      <nav style={{ marginTop: '2rem', display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+        <Link to={`/${other}`} style={{
+          padding: '12px 10px', display: 'inline-flex', alignItems: 'center', minHeight: 44,
+        }}>{t(`legal.${other}.title`)}</Link>
+        <Link to="/" style={{
+          padding: '12px 10px', display: 'inline-flex', alignItems: 'center', minHeight: 44,
+        }}>{t('legal.backHome')}</Link>
       </nav>
     </div>
   )

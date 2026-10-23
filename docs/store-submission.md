@@ -92,12 +92,27 @@ third-party analytics.
 | Financial info — *other financial info* | Yes | Yes | No | App functionality (the profile and holdings the user types in) |
 | User content — *other user content* | Yes | Yes | No | App functionality, support (feedback messages, advisor chat) |
 | Diagnostics / crash data | Yes (if Sentry enabled) | No | No | Diagnostics |
+| Device identifier — *push subscription endpoint* | Yes (only if the user allows notifications) | Yes | No | App functionality — delivering the market-move notification |
 | Identifiers — advertising | **No** | — | — | — |
 | Location | **No** | — | — | — |
 | Contacts, photos, health, browsing history | **No** | — | — | — |
 
 Notes both forms have a field for:
 
+- **Push notifications are opt-in and carry no marketing.** The only
+  notification the app sends is a steadying message after a significant move
+  in the user's *own* portfolio, written against the loss tolerance they
+  stated. Permission is requested from a tap, never on load, and only after
+  the app is installed to the home screen — which on iOS is the only state in
+  which web push works at all. Turning notifications off **deletes** the
+  subscription row rather than flagging it.
+
+  What is stored is the browser's subscription endpoint, the two
+  device-specific encryption keys and the chosen language. The endpoint
+  identifies a browser, not a person: it carries no identity, no location and
+  nothing about behaviour elsewhere, it is not an advertising identifier, and
+  it is shared with nobody. This is disclosed in the privacy policy under
+  "What is stored if you allow notifications".
 - **No payment or banking data is collected.** The app never asks for card
   numbers, bank credentials or brokerage logins. Holdings are figures the user
   types by hand; there is no account linking of any kind.
