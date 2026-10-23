@@ -98,7 +98,9 @@ describe('percent signs come from the formatter', () => {
 // here. What CAN be asserted is the thing whose absence caused it: a link
 // inside a <nav> that declares no minHeight is one nobody sized on purpose.
 describe('navigation links are sized for a thumb', () => {
-  const PAGES = join(process.cwd(), 'src', 'pages')
+  // Relative, like DIR above — this file already runs from the frontend
+  // root, and process.cwd() is not a global eslint allows here.
+  const PAGES = 'src/pages'
   const pages = readdirSync(PAGES).filter(f => f.endsWith('.jsx'))
 
   for (const file of pages) {
