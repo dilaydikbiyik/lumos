@@ -3247,3 +3247,23 @@ AST taradım. **Üç gerçek açık, bir ölü kod, ve taramamda bir kör nokta.
       `RUN_JOURNEYS=1 ./scripts/check.sh` ile onboarding → risk quiz →
       portföy → holdings yolunu sen doğrula.
 - [ ] **[you] Push'u canlıya al** (VAPID anahtarları + cron) — hâlâ açık.
+
+### Geçit kendi hatasını gizliyordu (2026-10-23)
+
+- [x] **CI iki kez, yerel geçidin ZATEN yakaladığı bir şeyde kırmızı oldu.**
+      Sebep testlerin değil, benim okuma biçimimdi: çıktıyı
+      `grep -E "passed|failed" | head -3` ile kırpıyordum. ruff ve pytest
+      önce yazdığı için üç satır doluyor, altındaki eslint hatasına hiç
+      sıra gelmiyordu. Üç satıra indirgenmiş bir geçit, geçit değildir.
+
+      Betik zaten ilk hatada sıfırdan farklı çıkıyor — asıl sözleşme o. Ama
+      bir insan (ben dahil) skim'lemek için filtreliyor, o yüzden **verdict
+      artık SON satır** ve betik erken ölürse o satır kırmızı **GATE
+      FAILED** yazıyor. `tail` her zaman doğruyu söylüyor, `grep`
+      söylemese bile.
+
+      İlk denemem işe yaramadı ve sebebi öğreticiydi: trap'i başarı
+      mesajının yanına, dosyanın SONUNA yazmıştım. Bir trap ancak
+      tanımlandığı satırdan sonra vardır; betik o satıra gelmeden ölüyor,
+      yani hiçbir şey basılmıyordu. Artık `set -E`'nin hemen altında.
+      Kasten bozup her iki hâli de doğruladım.
