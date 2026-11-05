@@ -324,6 +324,14 @@ _C: dict[str, dict[str, str]] = {
         "tr": "dengeli profilinde %{vol} oynaklık orta ağırlık aldı",
         "en": "in your balanced profile, {vol}% volatility earned a middling weight",
         "de": "in deinem ausgewogenen Profil erhielt {vol}% Volatilität ein mittleres Gewicht"},
+    "weight.gold_diversifier": {
+        "tr": "Rolü: {role}. Ağırlığın gerekçesi: altın, risk seviyen ne olursa olsun büyüme diliminin sabit %{share}'ini alır — kâr ya da temettü üretmediği için oynaklığı büyüme vaadi sayılmaz; hisseler düşerken çoğu zaman ayakta kaldığı için çeşitlendirici olarak tutulur → %{pct}.",
+        "en": "Its role: {role}. Why this weight: gold takes a fixed {share}% of the growth sleeve at every risk level — it produces no earnings or dividends, so its volatility is not a promise of growth; it is held as a diversifier because it often holds up while stocks fall → {pct}%.",
+        "de": "Seine Rolle: {role}. Warum dieses Gewicht: Gold erhält auf jeder Risikostufe feste {share}% des Wachstumsteils — es erwirtschaftet weder Gewinne noch Dividenden, daher ist seine Volatilität kein Wachstumsversprechen; es wird als Diversifizierer gehalten, weil es oft stabil bleibt, wenn Aktien fallen → {pct}%."},
+    "weight.gold_diversifier_capped": {
+        "tr": "Rolü: {role}. Ağırlığın gerekçesi: altın normalde büyüme diliminin sabit %{share}'idir — kâr ya da temettü üretmediği için oynaklığı büyüme vaadi sayılmaz, çeşitlendirici olarak tutulur. Bu küçük portföyde diğer pozisyonlar yoğunlaşma sınırına dayandığı için payı %{actual} oldu → %{pct}.",
+        "en": "Its role: {role}. Why this weight: gold normally takes a fixed {share}% of the growth sleeve — it produces no earnings or dividends, so its volatility is not a promise of growth, and it is held as a diversifier. In this small portfolio the other positions reached the concentration limit, so its share came to {actual}% → {pct}%.",
+        "de": "Seine Rolle: {role}. Warum dieses Gewicht: Gold erhält normalerweise feste {share}% des Wachstumsteils — es erwirtschaftet weder Gewinne noch Dividenden, daher ist seine Volatilität kein Wachstumsversprechen, und es wird als Diversifizierer gehalten. In diesem kleinen Portfolio erreichten die anderen Positionen die Konzentrationsgrenze, daher liegt sein Anteil bei {actual}% → {pct}%."},
     "weight.growth": {
         "tr": "Rolü: {role}. Ağırlığın gerekçesi: {tilt} → %{pct}.",
         "en": "Its role: {role}. Why this weight: {tilt} → {pct}%.",

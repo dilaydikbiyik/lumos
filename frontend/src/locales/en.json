@@ -256,10 +256,10 @@
         "why": "Where the calm part of the portfolio waits. Reachable in a day, and not exposed to the stock market at all.",
         "risk": "It follows the central bank's rate. When that rate is below inflation, you are losing purchasing power quietly."
       },
-      "EUNA_DE": {
-        "type": "Euro Government Bond ETF (UCITS)",
-        "what": "iShares Core Euro Government Bond — loans to euro-area governments, held in one fund.",
-        "why": "The traditional counterweight to stocks: when shares fall in a panic, government bonds are what people buy instead.",
+      "EXHA_DE": {
+        "type": "German Government Bond ETF (UCITS)",
+        "what": "iShares eb.rexx Government Germany — loans to the German state, every maturity, held in one fund. Denominated in euros, with no extra currency layer.",
+        "why": "The traditional counterweight to stocks: when shares fall in a panic, government bonds are what people buy instead — and Germany is treated as the euro area's most reliable borrower.",
         "risk": "2022 showed the counterweight can fail — stocks and bonds fell together when rates rose fast. Longer bonds fall hardest."
       }
     },

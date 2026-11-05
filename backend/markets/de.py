@@ -193,7 +193,15 @@ DE = MarketPack(
         {"ticker": "IQQP.DE", "name": "iShares European Property Yield UCITS ETF", "category": "reit"},
     ],
     cash_asset={"ticker": "XEON.DE", "name": "Xtrackers EUR Overnight Rate UCITS ETF", "category": "cash"},
-    bond_asset={"ticker": "EUNA.DE", "name": "iShares Core EUR Aggregate Bond UCITS ETF", "category": "bond"},
+    # German government bonds. This was EUNA.DE, labelled here as a "EUR
+    # Aggregate" fund and in the explainer card as a euro-government fund —
+    # it is neither: the data source names it the Global Aggregate Bond, EUR
+    # hedged. It also had nine years of history, so no five-year portfolio
+    # band could ever be drawn for a German reader (three independent periods
+    # need fifteen). EXHA has nineteen, and the same volatility as the fund it
+    # replaces (4.5% against 4.7% over five years), so the defensive sleeve
+    # behaves as it did — measured 2026-11-06.
+    bond_asset={"ticker": "EXHA.DE", "name": "iShares eb.rexx Government Germany UCITS ETF", "category": "bond"},
 
     transfer_cost_note={
         "tr": "Bu oran tek bir vergi değil: eyalete göre %3,5–6,5 arasında değişen devir vergisi (Grunderwerbsteuer) ile noter ve tapu sicili ücretlerinin toplamıdır. Devir vergisini uygulamada alıcı öder; Berlin'de alıcı, Bavyera'da olduğundan daha fazlasını öder.",

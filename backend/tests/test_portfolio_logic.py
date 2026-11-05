@@ -49,9 +49,16 @@ def test_risk_score_actually_changes_allocation():
 
 
 def test_cautious_profile_overweights_calm_assets():
+    """
+    Within the volatility blend: the calmer equity outweighs the more
+    volatile one. This compared GLD with the BIST 100, which tested gold as
+    a "calm asset" weighted by its volatility — the premise v5 removed: gold
+    now has a fixed share whatever its volatility, so it no longer belongs in
+    a test of how the blend tilts.
+    """
     p = build_portfolio(risk_score=2, budget=300000)
-    assert _weight(p, "GLD") > _weight(p, "XU100.IS"), (
-        "muhafazakâr profilde sakin varlık (GLD) oynak varlıktan (XU100) ağır olmalı"
+    assert _weight(p, "SPY") > _weight(p, "XU100.IS"), (
+        "muhafazakâr profilde sakin hisse fonu (SPY) oynak olandan (XU100) ağır olmalı"
     )
 
 
@@ -296,3 +303,58 @@ def test_volatility_is_measured_over_five_years_and_cached_per_window():
 
     assert seen["period"] == "5y"
     assert "5y" in keys[0], keys
+
+
+def test_gold_is_a_fixed_share_of_the_growth_sleeve_in_every_scenario():
+    """
+    v5: gold takes GOLD_GROWTH_SHARE of the growth sleeve at every risk
+    level, because its volatility is not a promise of growth — it earns no
+    profits and pays no dividends. The rationale card states the share, so
+    the weight must actually BE that share everywhere the card is shown; the
+    first version printed "a fixed 15%" beside 16.4% when the concentration
+    guard spilled a capped equity's excess onto gold.
+    """
+    from backend.services.portfolio_engine import (
+        GOLD_GROWTH_SHARE,
+        build_portfolio,
+        effective_position_cap,
+    )
+
+    checked = 0
+    for market in ("TR", "US", "DE"):
+        for budget in (20_000, 250_000, 2_000_000):
+            for score in (1.0, 3.0, 5.0, 7.0, 9.0, 10.0):
+                al = build_portfolio(risk_score=score, budget=budget, market=market).allocations
+                growth = [a for a in al if a.category not in ("cash", "bond")]
+                gold = sum(a.weight for a in growth if a.category == "gold")
+                if not gold:
+                    continue
+                assert len(growth) > 1, (market, budget, score, "gold alone in the growth sleeve")
+                share = gold / sum(a.weight for a in growth)
+                gold_row = next(a for a in growth if a.category == "gold")
+                if abs(share - GOLD_GROWTH_SHARE) >= 0.005:
+                    # Allowed ONLY where the concentration cap leaves the
+                    # growth sleeve no other home for its excess: every
+                    # non-gold growth position pinned at the cap. The excess
+                    # could go to cash instead, but that would make the
+                    # reader more defensive than their risk score — the
+                    # primary rule — so the secondary one gives, and the card
+                    # must then say so instead of claiming the fixed share.
+                    cap = effective_position_cap(len(al))
+                    others = [a for a in growth if a.category != "gold"]
+                    assert all(abs(a.weight - cap) < 0.002 for a in others), (
+                        market, budget, score, round(share, 4), "off-share without the cap forcing it")
+                    assert "15" in gold_row.explanation and str(round(share * 100)) in gold_row.explanation
+                    continue
+                checked += 1
+    assert checked > 20, "the scan found too few portfolios holding gold to mean anything"
+
+
+def test_the_most_aggressive_profile_is_led_by_equities_not_gold():
+    """The symptom that started this: up to half the money in gold at risk 10."""
+    from backend.services.portfolio_engine import build_portfolio
+
+    for market in ("TR", "US", "DE"):
+        al = build_portfolio(risk_score=10.0, budget=250_000, market=market).allocations
+        top = max(al, key=lambda a: a.weight)
+        assert top.category != "gold", (market, top.ticker, top.weight)

@@ -3465,13 +3465,28 @@ hep SPY çıkıyor". İkisi ayrı sorunmuş.
 - [x] `legal-review-brief.md`'ye 9. soru: keşif sayfası avukata özellikle
       sorulmalı.
 
-- [ ] **Almanya'da 5 yıllık portföy senaryosu hiç çizilmiyor** — sebep bu
-      değişiklik değil: tahvil fonu EUNA.DE'nin geçmişi yalnızca 9 yıl ve
-      değişiklikten önce de portföydeydi. Daha uzun geçmişli bir Euro
-      tahvil UCITS fonu araştırılmalı; körlemesine değiştirilmedi.
-- [ ] **Agresif profilde altın hâlâ yüksek** (ABD %33). Artık bir veri
-      artefaktı değil, formülün kendi özelliği: agresif profil büyüme
-      varlıklarını oynaklıkla ağırlıklandırıyor. Bu bir ürün kararı —
-      değiştirmeden önce konuşalım.
+- [x] **Almanya'da 5 yıllık portföy senaryosu artık çiziliyor.** Tahvil
+      fonu EUNA.DE (9 yıl geçmiş) yerine **EXHA.DE** (iShares eb.rexx
+      Government Germany, 19 yıl). Adaylar canlı ölçüldü; EXHA'nın 5 yıllık
+      oynaklığı %4,5 — eskisinin %4,7'sine neredeyse eşit, yani savunma
+      dilimi aynı davranıyor. Bant artık üç risk seviyesinde de açılıyor.
+      **Yol üstünde bulunan yanlışlık:** uygulama bu fonu pakette "EUR
+      Aggregate Bond", açıklama kartında "Euro Government Bond" diye
+      anlatıyordu; veri kaynağına göre gerçek adı Global Aggregate Bond, EUR
+      hedged. Aynı fona üç farklı kimlik — düzeltildi.
+- [x] **Altın artık büyüme diliminin sabit %15'i (motor v5).** Agresif
+      profilin öncülü "daha oynak varlık daha çok büyüme" — şirketler için
+      makul (oynaklığın arkasında kâr ve temettü var), altın için değil.
+      Sonuç: altın temkinli profilde ~%7,6, en agresifte %15 (eskiden %33).
+      Seçim değişmedi, yalnızca ağırlık. En agresif profilin en büyük
+      kalemi artık her pazarda hisse — testle sabit.
+      Tutarlılık: yoğunlaşma tavanı bir hisseyi kestiğinde fazlalık altına
+      akıyordu ve kart "sabit %15" derken %16,4 gösteriyordu; fazlalık artık
+      sabit paylı varlığa gitmiyor. Küçük portföylerde (3 pozisyon, %45
+      tavan) %15 matematiksel olarak imkânsızsa kart bunu açıkça yazıyor;
+      test sapmaya YALNIZCA bu geometrik durumda izin veriyor.
+- [ ] **Kullanıcıya seçenek sun** (öneri: "kullanıcıya seçenekler sunmuş
+      oluruz öğretirken") — her dilimde aynı rolü oynayabilecek fonları ve
+      ölçülmüş farklarını göstermek. Sıradaki iş.
 - [ ] Keşif listesi tarihli (2026-11) bir seçki; yılda bir piyasa
       değerlerine göre gözden geçirilmeli.

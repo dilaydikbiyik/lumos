@@ -661,10 +661,10 @@
         "why": "Hier wartet der ruhige Teil des Portfolios. Binnen eines Tages verfügbar und dem Aktienmarkt überhaupt nicht ausgesetzt.",
         "risk": "Er folgt dem Leitzins. Liegt der unter der Inflation, verlierst du still an Kaufkraft."
       },
-      "EUNA_DE": {
-        "type": "Euro-Staatsanleihen-ETF (UCITS)",
-        "what": "iShares Core Euro Government Bond — Kredite an Staaten des Euroraums, gebündelt in einem Fonds.",
-        "why": "Das klassische Gegengewicht zu Aktien: Fallen die Kurse in einer Panik, kaufen die Leute stattdessen Staatsanleihen.",
+      "EXHA_DE": {
+        "type": "Bundesanleihen-ETF (UCITS)",
+        "what": "iShares eb.rexx Government Germany — Kredite an den deutschen Staat, alle Laufzeiten, gebündelt in einem Fonds. In Euro, ohne zusätzliche Währungsebene.",
+        "why": "Das klassische Gegengewicht zu Aktien: Fallen die Kurse in einer Panik, kaufen die Leute stattdessen Staatsanleihen — und Deutschland gilt als verlässlichster Schuldner des Euroraums.",
         "risk": "2022 zeigte, dass dieses Gegengewicht versagen kann — bei schnell steigenden Zinsen fielen Aktien und Anleihen gemeinsam. Lang laufende Anleihen am stärksten."
       }
     },

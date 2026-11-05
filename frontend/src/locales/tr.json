@@ -256,10 +256,10 @@
         "why": "Portföyün sakin kısmının beklediği yer. Bir günde erişilebilir ve borsaya hiç maruz değil.",
         "risk": "Merkez bankasının faizini izler. O faiz enflasyonun altındayken sessizce alım gücü kaybedersin."
       },
-      "EUNA_DE": {
-        "type": "Euro Devlet Tahvili ETF'i (UCITS)",
-        "what": "iShares Core Euro Government Bond — euro bölgesi devletlerine verilen borçlar, tek fonda.",
-        "why": "Hisselerin klasik karşı ağırlığı: panikte hisseler düşerken insanların onun yerine aldığı şey devlet tahvilidir.",
+      "EXHA_DE": {
+        "type": "Alman Devlet Tahvili ETF'i (UCITS)",
+        "what": "iShares eb.rexx Government Germany — Alman devletine verilen borçlar, tüm vadeler, tek fonda. Euro cinsinden; ek bir kur katmanı yok.",
+        "why": "Hisselerin klasik karşı ağırlığı: panikte hisseler düşerken insanların onun yerine aldığı şey devlet tahvilidir — ve Almanya, Euro bölgesinin en güvenilir borçlusu sayılır.",
         "risk": "2022 bu karşı ağırlığın işlemeyebileceğini gösterdi — faizler hızla artarken hisse ve tahvil birlikte düştü. Uzun vadeli tahviller en sert düşer."
       }
     },

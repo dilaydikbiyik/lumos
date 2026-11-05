@@ -28,7 +28,7 @@ const ASSET_META = {
   '4GLD.DE':  { icon: '🥇', color: 'var(--firefly)' },
   'IQQP.DE':  { icon: '🏢', color: 'var(--green)' },
   'XEON.DE':  { icon: '💶', color: 'var(--text-dim)' },
-  'EUNA.DE':  { icon: '🏛️', color: 'var(--text-dim)' },
+  'EXHA.DE':  { icon: '🏛️', color: 'var(--text-dim)' },
 }
 
 // A category with no entry here fell through to 'stocks', so a German BOND

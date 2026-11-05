@@ -28,6 +28,17 @@ explainable in one sentence.
 
 Cash/bond are sized directly (not fetched), so compute_volatility is only ever
 called on the real, fetchable growth tickers.
+
+WHY v5 (2026-11-06): gold has a FIXED role in the growth sleeve. The blend's
+premise for a bold profile is that a more volatile asset is a bigger growth
+engine — reasonable for a company, whose swings come with earnings and
+dividends that pay for the risk. Gold produces neither, so its volatility is
+not a promise of growth, and treating it as one put a third of the most
+aggressive American portfolio into gold. Gold now takes GOLD_GROWTH_SHARE of
+the growth sleeve at every risk level, as a diversifier — it often holds up
+while stocks fall, which is a real benefit and the reason it stays. Which
+assets are SELECTED is unchanged; only gold's weight stopped following its
+volatility.
 """
 
 import json
@@ -43,6 +54,8 @@ _ASSET_UNIVERSE_PATH = Path(__file__).parent.parent / "data" / "asset_universe.j
 
 MIN_WEIGHT_PCT = 5          # below this is "dust" — pruned and reported
 MAX_POSITION_PCT = 45       # no single asset may exceed this (concentration guard)
+# Gold's share of the growth sleeve, whatever the risk score. See "WHY v5".
+GOLD_GROWTH_SHARE = 0.15
 _BUDGET_POSITION_CAPS = [   # (budget upper bound, max positions)
     (75_000, 3),
     (200_000, 4),
@@ -137,7 +150,8 @@ def effective_position_cap(n_positions: int) -> float:
 
 
 def _apply_max_position(weights: dict[str, float],
-                        defensive: set[str] | None = None) -> dict[str, float]:
+                        defensive: set[str] | None = None,
+                        fixed: set[str] | None = None) -> dict[str, float]:
     """
     Cap any position at MAX_POSITION_PCT, redistributing the excess
     proportionally onto the uncapped positions (iterated to convergence).
@@ -153,8 +167,14 @@ def _apply_max_position(weights: dict[str, float],
     Only if a sleeve cannot absorb its own excess — every member already at
     the cap — does it fall back to the other one, because the weights must
     still sum to 1.0.
+
+    `fixed` positions do not take excess either, for the same reason one
+    level down. Gold's share of the growth sleeve is a stated rule; when the
+    guard capped QQQ in the most aggressive American portfolio, the spill
+    landed partly on gold and the card said "a fixed 15%" beside 16.4%.
     """
     defensive = defensive or set()
+    fixed = fixed or set()
     w = dict(weights)
     # A cap of 45% is unreachable with two positions: they must still sum to
     # 1.0, so one of them is 55% whatever the guard says. Rather than publish
@@ -179,6 +199,9 @@ def _apply_max_position(weights: dict[str, float],
             preferred = [t for t in candidates if (t in defensive) is sleeve]
             if preferred and sum(w[t] for t in preferred) > 0:
                 candidates = preferred
+        movable = [t for t in candidates if t not in fixed]
+        if movable and sum(w[t] for t in movable) > 0:
+            candidates = movable
 
         under_sum = sum(w[t] for t in candidates)
         if under_sum <= 0:
@@ -279,6 +302,11 @@ def build_portfolio(risk_score: float, budget: float, market: str = "TR",
     growth_w = {t: v / total_raw for t, v in raw.items()}
 
     ranked = sorted(growth_w, key=growth_w.get, reverse=True)
+    is_gold = {a["ticker"] for a in growth_universe if a["category"] == "gold"}
+    if growth_slots == 1:
+        # A diversifier needs something to diversify. With room for one
+        # growth asset, a fixed 15% role would become the whole sleeve.
+        ranked = [t for t in ranked if t not in is_gold] or ranked
     kept = _pick_diversified(ranked, growth_universe, growth_slots)
 
     category_of = {a["ticker"]: a["category"] for a in growth_universe}
@@ -304,8 +332,17 @@ def build_portfolio(risk_score: float, budget: float, market: str = "TR",
                 "reason": reason,
             })
     growth_w = {t: growth_w[t] for t in kept}
-    gsum = sum(growth_w.values()) or 1.0
-    weights = {t: (v / gsum) * growth_target for t, v in growth_w.items()}
+    gold_kept = [t for t in kept if t in is_gold]
+    others = [t for t in kept if t not in is_gold]
+    if gold_kept and others:
+        # Gold's share is fixed; the volatility blend divides the rest.
+        osum = sum(growth_w[t] for t in others) or 1.0
+        shares = {t: growth_w[t] / osum * (1 - GOLD_GROWTH_SHARE) for t in others}
+        shares.update({t: GOLD_GROWTH_SHARE / len(gold_kept) for t in gold_kept})
+    else:
+        gsum = sum(growth_w.values()) or 1.0
+        shares = {t: v / gsum for t, v in growth_w.items()}
+    weights = {t: share * growth_target for t, share in shares.items()}
 
     # ── Defensive sleeve: sized directly, split cash/bond by risk ──
     defensive_categories: dict[str, str] = {}
@@ -348,7 +385,8 @@ def build_portfolio(risk_score: float, budget: float, market: str = "TR",
     total = sum(weights.values()) or 1.0
     weights = {t: w / total for t, w in weights.items()}
     # sum-preserving; final cap wins, and the excess stays in its own sleeve
-    weights = _apply_max_position(weights, set(defensive_categories))
+    weights = _apply_max_position(weights, set(defensive_categories),
+                                  fixed=set(gold_kept) if others else set())
 
     # ── Assemble allocations with per-asset rationale ──
     by_ticker = {a["ticker"]: a for a in growth_universe}
@@ -361,6 +399,23 @@ def build_portfolio(risk_score: float, budget: float, market: str = "TR",
         category = asset.get("category", "other")
         if t in defensive_categories:
             explanation = _defensive_rationale(category, weight, defensive_target, lang)
+        elif category == "gold" and t in is_gold and len(kept) > 1:
+            # The stated rule, or an honest note of why it does not hold here.
+            # With three positions under a 45% cap, two capped positions
+            # leave the third whatever is left; a small portfolio can force
+            # gold off its share, and the card must then say so rather than
+            # print "a fixed 15%" beside another number.
+            growth_total = sum(w for tk, w in weights.items()
+                               if tk not in defensive_categories) or 1.0
+            actual = weight / growth_total
+            key = ("weight.gold_diversifier"
+                   if abs(actual - GOLD_GROWTH_SHARE) < 0.005
+                   else "weight.gold_diversifier_capped")
+            explanation = _t(key, lang,
+                             role=_role(category, lang),
+                             share=round(GOLD_GROWTH_SHARE * 100),
+                             actual=round(actual * 100),
+                             pct=round(weight * 100, 1))
         else:
             vol = volatilities.get(t, 0.15)
             explanation = _growth_rationale(category, vol, weight, alpha, lang)
@@ -399,7 +454,7 @@ def build_portfolio(risk_score: float, budget: float, market: str = "TR",
         allocations=allocations,
         plain_explanation="",  # filled by explainer service
         includes_reits=include_reits and any(a.category == "reit" for a in allocations),
-        formula_used="glide-path-defensive-sleeve-v4",
+        formula_used="glide-path-defensive-sleeve-v5",
         metadata={
             "volatilities": {k: round(v, 4) for k, v in volatilities.items()},
             "allocation_logic": {
