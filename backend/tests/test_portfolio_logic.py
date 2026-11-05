@@ -305,49 +305,71 @@ def test_volatility_is_measured_over_five_years_and_cached_per_window():
     assert "5y" in keys[0], keys
 
 
-def test_gold_is_a_fixed_share_of_the_growth_sleeve_in_every_scenario():
+@pytest.mark.parametrize("category", ["gold", "reit"])
+def test_diversifiers_take_a_fixed_share_of_the_growth_sleeve_in_every_scenario(category):
     """
     v5: gold takes GOLD_GROWTH_SHARE of the growth sleeve at every risk
     level, because its volatility is not a promise of growth — it earns no
-    profits and pays no dividends. The rationale card states the share, so
-    the weight must actually BE that share everywhere the card is shown; the
-    first version printed "a fixed 15%" beside 16.4% when the concentration
-    guard spilled a capped equity's excess onto gold.
+    profits and pays no dividends. v6: a REIT takes REIT_GROWTH_SHARE, because
+    its volatility is mostly interest-rate sensitivity; sized by the blend it
+    was 16–26% of every portfolio, about as much as the S&P 500. The
+    rationale card states the share, so the weight must actually BE that
+    share everywhere the card is shown; the first version printed "a fixed
+    15%" beside 16.4% when the concentration guard spilled a capped equity's
+    excess onto gold.
     """
     from backend.services.portfolio_engine import (
-        GOLD_GROWTH_SHARE,
+        FIXED_GROWTH_SHARES,
         build_portfolio,
         effective_position_cap,
     )
 
+    target = FIXED_GROWTH_SHARES[category]
     checked = 0
     for market in ("TR", "US", "DE"):
         for budget in (20_000, 250_000, 2_000_000):
             for score in (1.0, 3.0, 5.0, 7.0, 9.0, 10.0):
                 al = build_portfolio(risk_score=score, budget=budget, market=market).allocations
                 growth = [a for a in al if a.category not in ("cash", "bond")]
-                gold = sum(a.weight for a in growth if a.category == "gold")
-                if not gold:
+                held = sum(a.weight for a in growth if a.category == category)
+                if not held:
                     continue
-                assert len(growth) > 1, (market, budget, score, "gold alone in the growth sleeve")
-                share = gold / sum(a.weight for a in growth)
-                gold_row = next(a for a in growth if a.category == "gold")
-                if abs(share - GOLD_GROWTH_SHARE) >= 0.005:
+                assert len(growth) > 1, (market, budget, score, f"{category} alone in the growth sleeve")
+                share = held / sum(a.weight for a in growth)
+                row = next(a for a in growth if a.category == category)
+                if abs(share - target) >= 0.005:
                     # Allowed ONLY where the concentration cap leaves the
                     # growth sleeve no other home for its excess: every
-                    # non-gold growth position pinned at the cap. The excess
-                    # could go to cash instead, but that would make the
-                    # reader more defensive than their risk score — the
+                    # blend-sized growth position pinned at the cap. The
+                    # excess could go to cash instead, but that would make
+                    # the reader more defensive than their risk score — the
                     # primary rule — so the secondary one gives, and the card
                     # must then say so instead of claiming the fixed share.
                     cap = effective_position_cap(len(al))
-                    others = [a for a in growth if a.category != "gold"]
+                    others = [a for a in growth if a.category not in FIXED_GROWTH_SHARES]
                     assert all(abs(a.weight - cap) < 0.002 for a in others), (
                         market, budget, score, round(share, 4), "off-share without the cap forcing it")
-                    assert "15" in gold_row.explanation and str(round(share * 100)) in gold_row.explanation
+                    assert str(round(target * 100)) in row.explanation
+                    assert str(round(share * 100)) in row.explanation
                     continue
                 checked += 1
-    assert checked > 20, "the scan found too few portfolios holding gold to mean anything"
+    # REITs are only held below each market's property entry point, so the
+    # grid holds fewer of them than of gold.
+    assert checked > {"gold": 20, "reit": 12}[category], (
+        f"the scan found too few portfolios holding {category} to mean anything")
+
+
+def test_property_is_never_the_biggest_growth_position():
+    """The symptom that started v6: a REIT fund level with the S&P 500."""
+    from backend.services.portfolio_engine import build_portfolio
+
+    for market in ("TR", "US", "DE"):
+        for score in (2.0, 5.5, 9.0):
+            al = build_portfolio(risk_score=score, budget=20_000, market=market).allocations
+            reit = [a for a in al if a.category == "reit"]
+            equity = [a for a in al if a.category not in ("cash", "bond", "gold", "reit")]
+            if reit and equity:
+                assert max(r.weight for r in reit) < max(e.weight for e in equity), (market, score)
 
 
 def test_the_most_aggressive_profile_is_led_by_equities_not_gold():
@@ -376,6 +398,7 @@ def test_the_formula_shown_to_the_reader_quotes_the_engine_s_own_numbers(lang):
     from backend.services import volatility
     from backend.services.portfolio_engine import (
         GOLD_GROWTH_SHARE,
+        REIT_GROWTH_SHARE,
         MAX_POSITION_PCT,
         MIN_WEIGHT_PCT,
     )
@@ -385,6 +408,7 @@ def test_the_formula_shown_to_the_reader_quotes_the_engine_s_own_numbers(lang):
     for number, what in ((MAX_POSITION_PCT, "position cap"),
                          (MIN_WEIGHT_PCT, "dust floor"),
                          (round(GOLD_GROWTH_SHARE * 100), "gold's fixed share"),
+                         (round(REIT_GROWTH_SHARE * 100), "the REIT's fixed share"),
                          (window_years, "volatility window")):
         assert str(number) in text, f"[{lang}] formula text does not state the {what} ({number})"
 

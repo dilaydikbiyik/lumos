@@ -3542,6 +3542,16 @@ hep SPY çıkıyor". İkisi ayrı sorunmuş.
       anındaki dilde ad taşıyordu ("Nakit / Kısa Vade"); uygulamanın kendi
       etiketiyse okuyucunun şimdiki dilinde gösteriliyor, okuyucunun
       yazdığı ada dokunulmuyor. Üçü de testli.
+- [x] **Gerçekçilik taraması: gayrimenkul fonu payı (motor v6).** Her
+      pazarda ve her profilde GYO fonu portföyün %16–26'sıydı — S&P 500
+      kadar. Listelenmiş gayrimenkul dünya borsasının ~%3'ü; model
+      portföyler %5–10 tutar. Sebep altındakiyle aynı: oynaklık büyüme
+      vaadi sayılıyordu, oysa GYO oynaklığı çoğunlukla faiz hassasiyeti.
+      Artık büyüme diliminin sabit %10'u → portföyde %5–9; her portföyün
+      en büyük kalemi hisse fonu (test). Yan bulgu: temkinli profilde GYO
+      %5 tabanının altında kalıp sonradan atılınca ağırlığı altına
+      dağılıyor, altın "sabit %15" derken %17 çıkıyordu; sabit rol artık
+      bölüşümden ÖNCE eleniyor. Formül metni sabitlere testle bağlı.
 - [ ] Almanya'da hazine bonosu satırı yok (para piyasası fonu var);
       ABD bonosunun EUR karşılığı istenirse USDEUR=X ile eklenebilir.
 - [ ] Keşif listesi tarihli (2026-11) bir seçki; yılda bir piyasa
