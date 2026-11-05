@@ -1,5 +1,6 @@
 import i18n from 'i18next'
 import { initReactI18next } from 'react-i18next'
+import { withRetry } from './utils/retry'
 
 /**
  * Language is a DEVICE preference, deliberately separate from the market:
@@ -57,7 +58,7 @@ const loaded = new Set()
 
 async function loadLocale(code) {
   if (loaded.has(code)) return
-  const module = await LOADERS[code]()
+  const module = await withRetry(LOADERS[code])
   i18n.addResourceBundle(code, 'translation', module.default, true, true)
   loaded.add(code)
 }
@@ -71,7 +72,7 @@ async function loadLocale(code) {
  */
 export async function initI18n() {
   const lng = initialLanguage()
-  const { default: resources } = await LOADERS[lng]()
+  const { default: resources } = await withRetry(LOADERS[lng])
 
   await i18n.use(initReactI18next).init({
     resources: { [lng]: { translation: resources } },

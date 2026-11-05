@@ -1,6 +1,6 @@
 /* Lumos service worker — app-shell cache with network-first strategy.
    API calls are never cached (financial data must be fresh). */
-const CACHE = 'lumos-shell-v2'  // v2: cross-origin skip — clears any v1-cached API data
+const CACHE = 'lumos-shell-v3'  // v3: hashed assets cache-first; HTML fallback for navigations only
 const SHELL = ['/', '/manifest.webmanifest', '/favicon.svg']
 
 self.addEventListener('install', event => {
@@ -32,15 +32,38 @@ self.addEventListener('fetch', event => {
     return
   }
 
-  // Network-first, cache fallback (offline shell)
+  // Hashed build files never change under the same name, so a cached copy
+  // is always right and needs no network — which also keeps a locale chunk
+  // loadable on a flaky connection once it has been fetched.
+  if (url.pathname.startsWith('/assets/')) {
+    event.respondWith(
+      caches.match(event.request).then(hit => hit || fetch(event.request).then(res => {
+        if (res.ok) {
+          const copy = res.clone()
+          caches.open(CACHE).then(c => c.put(event.request, copy)).catch(() => {})
+        }
+        return res
+      }))
+    )
+    return
+  }
+
+  // Everything else: network-first, cache fallback. Only a NAVIGATION may
+  // fall back to the app shell. Falling back to '/' for any request used to
+  // answer a failed script or JSON import with index.html, so the import
+  // failed with a parse error instead of a network error, and the app came
+  // up with raw translation keys.
   event.respondWith(
     fetch(event.request)
       .then(res => {
-        const copy = res.clone()
-        caches.open(CACHE).then(c => c.put(event.request, copy)).catch(() => {})
+        if (res.ok) {
+          const copy = res.clone()
+          caches.open(CACHE).then(c => c.put(event.request, copy)).catch(() => {})
+        }
         return res
       })
-      .catch(() => caches.match(event.request).then(hit => hit || caches.match('/')))
+      .catch(() => caches.match(event.request).then(hit =>
+        hit || (event.request.mode === 'navigate' ? caches.match('/') : Response.error())))
   )
 })
 

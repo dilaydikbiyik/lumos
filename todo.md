@@ -3519,6 +3519,15 @@ hep SPY çıkıyor". İkisi ayrı sorunmuş.
       Bonolar ve uzun tahvil için bugünkü faiz canlı (^IRX, ^TNX).
       Kişiye bağlı değil, sıralama öğretim sırası. 10 test, metinlerin
       her dilde her sınıf için var olduğu dahil.
+- [x] **Telefonda ham çeviri anahtarları** ("onboarding.heroPrefix",
+      "common.start"). Dil dosyası yüklenemeyince uygulama bilerek yine de
+      çiziliyordu; service worker da başarısız bir JS isteğine index.html
+      dönüyordu, yani zayıf bağlantıda tek bir düşen istek bütün ekranı
+      anahtara çeviriyordu. Şimdi: dil dosyası 3 kez deneniyor, olmazsa
+      sayfa bir kez yenileniyor, o da olmazsa üç dilde "Bağlantı
+      kurulamadı" ve yeniden dene düğmesi — ham anahtar asla. Service
+      worker: hash'li dosyalar önbellekten, kabuk yalnızca sayfa
+      gezinmelerine. Gerçek build'de dil dosyası silinerek denendi.
 - [ ] Almanya'da hazine bonosu satırı yok (para piyasası fonu var);
       ABD bonosunun EUR karşılığı istenirse USDEUR=X ile eklenebilir.
 - [ ] Keşif listesi tarihli (2026-11) bir seçki; yılda bir piyasa
