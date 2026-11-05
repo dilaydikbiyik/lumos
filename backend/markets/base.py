@@ -158,6 +158,16 @@ class MarketPack:
     # included — for the companies AND the benchmark, always together.
     explorer_benchmark: dict = field(default_factory=dict)
 
+    # ── Alternatives for a role ──
+    # Funds that could play the same part as one the engine chose, shown
+    # beside it so a reader learns how small — or how large — the difference
+    # between "the same kind of fund" really is. Funds on the same holdings
+    # in the universe (SPY and QQQ, VNQ and SCHH) are found automatically
+    # from their overlap group; this adds the ones the universe does not
+    # hold, for the defensive sleeve and gold. Each was checked against live
+    # prices when added, and must be buyable in this market.
+    role_alternatives: dict = field(default_factory=dict)
+
     # ── Educational, locale-specific content (NOT advice) ──
     #
     # Language and market are INDEPENDENT axes. Someone reading the English UI

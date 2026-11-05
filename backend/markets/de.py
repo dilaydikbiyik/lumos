@@ -189,6 +189,10 @@ DE = MarketPack(
     explorer_as_of="2026-11",
     # The DAX is a performance index: dividends are already reinvested.
     explorer_benchmark={"ticker": "^GDAXI", "total_return": True},
+    role_alternatives={
+        "EXHA.DE": [{"ticker": "EUNH.DE", "name": "iShares Core € Govt Bond UCITS ETF"},
+                    {"ticker": "EUNA.DE", "name": "iShares Core Global Aggregate Bond UCITS ETF EUR Hedged"}],
+    },
     reit_assets=[
         {"ticker": "IQQP.DE", "name": "iShares European Property Yield UCITS ETF", "category": "reit"},
     ],

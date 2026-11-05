@@ -332,6 +332,78 @@ _C: dict[str, dict[str, str]] = {
         "tr": "Rolü: {role}. Ağırlığın gerekçesi: altın normalde büyüme diliminin sabit %{share}'idir — kâr ya da temettü üretmediği için oynaklığı büyüme vaadi sayılmaz, çeşitlendirici olarak tutulur. Bu küçük portföyde diğer pozisyonlar yoğunlaşma sınırına dayandığı için payı %{actual} oldu → %{pct}.",
         "en": "Its role: {role}. Why this weight: gold normally takes a fixed {share}% of the growth sleeve — it produces no earnings or dividends, so its volatility is not a promise of growth, and it is held as a diversifier. In this small portfolio the other positions reached the concentration limit, so its share came to {actual}% → {pct}%.",
         "de": "Seine Rolle: {role}. Warum dieses Gewicht: Gold erhält normalerweise feste {share}% des Wachstumsteils — es erwirtschaftet weder Gewinne noch Dividenden, daher ist seine Volatilität kein Wachstumsversprechen, und es wird als Diversifizierer gehalten. In diesem kleinen Portfolio erreichten die anderen Positionen die Konzentrationsgrenze, daher liegt sein Anteil bei {actual}% → {pct}%."},
+    "holds.SPY": {
+        "tr": "S&P 500 — ABD'nin en büyük 500 şirketi.",
+        "en": 'S&P 500 — the 500 largest US companies.',
+        "de": 'S&P 500 — die 500 größten US-Unternehmen.'},
+    "holds.QQQ": {
+        "tr": "Nasdaq 100 — Nasdaq'ın finans dışı en büyük 100 şirketi; teknolojiye çok yoğun.",
+        "en": 'Nasdaq-100 — the 100 largest non-financial companies on Nasdaq, heavily weighted to technology.',
+        "de": 'Nasdaq-100 — die 100 größten Nicht-Finanzunternehmen an der Nasdaq, stark auf Technologie gewichtet.'},
+    "holds.VNQ": {
+        "tr": "ABD gayrimenkul şirketleri ve GYO'ları, geniş bir sepette.",
+        "en": 'US real-estate companies and REITs, in one broad basket.',
+        "de": 'US-Immobilienunternehmen und REITs in einem breiten Korb.'},
+    "holds.SCHH": {
+        "tr": "Yalnızca ABD GYO'ları (REIT).",
+        "en": 'US REITs only.',
+        "de": 'Nur US-REITs.'},
+    "holds.GLD": {
+        "tr": "Fiziksel altın — ABD'de işlem gören bir fon, kasada gerçek külçe tutar.",
+        "en": 'Physical gold — a US-listed fund that holds real bullion in a vault.',
+        "de": 'Physisches Gold — ein in den USA gehandelter Fonds, der echte Barren im Tresor hält.'},
+    "holds.IAU": {
+        "tr": "Fiziksel altın — ABD'de işlem gören başka bir fon, o da kasada külçe tutar.",
+        "en": 'Physical gold — another US-listed fund that also holds bullion in a vault.',
+        "de": 'Physisches Gold — ein weiterer in den USA gehandelter Fonds, der ebenfalls Barren im Tresor hält.'},
+    "holds.BND": {
+        "tr": 'ABD tahvil piyasasının geneli — devlet ve şirket tahvilleri, tüm vadeler.',
+        "en": 'The whole US bond market — government and corporate bonds, every maturity.',
+        "de": 'Der gesamte US-Anleihenmarkt — Staats- und Unternehmensanleihen, alle Laufzeiten.'},
+    "holds.AGG": {
+        "tr": 'ABD tahvil piyasasının geneli — devlet ve şirket tahvilleri, tüm vadeler.',
+        "en": 'The whole US bond market — government and corporate bonds, every maturity.',
+        "de": 'Der gesamte US-Anleihenmarkt — Staats- und Unternehmensanleihen, alle Laufzeiten.'},
+    "holds.IEF": {
+        "tr": 'Yalnızca 7–10 yıl vadeli ABD hazine tahvilleri — vadesi uzun olduğu için faizler yükselince daha sert düşer.',
+        "en": 'Only US Treasuries maturing in 7–10 years — longer maturities fall harder when interest rates rise.',
+        "de": 'Nur US-Staatsanleihen mit 7–10 Jahren Laufzeit — längere Laufzeiten fallen stärker, wenn die Zinsen steigen.'},
+    "holds.BIL": {
+        "tr": '1–3 ay vadeli ABD hazine bonoları — nakde en yakın şey.',
+        "en": 'US Treasury bills maturing in 1–3 months — the closest thing to cash.',
+        "de": 'US-Schatzwechsel mit 1–3 Monaten Laufzeit — so nah an Bargeld wie möglich.'},
+    "holds.SHV": {
+        "tr": '1 yıla kadar vadeli ABD hazine bonoları — o da nakde çok yakın.',
+        "en": 'US Treasuries maturing within a year — also very close to cash.',
+        "de": 'US-Staatsanleihen mit bis zu einem Jahr Laufzeit — ebenfalls sehr nah an Bargeld.'},
+    "holds.EUNL_DE": {
+        "tr": "MSCI World — gelişmiş ülkelerin büyük şirketleri; ağırlığın çoğu ABD'de.",
+        "en": 'MSCI World — large companies across developed countries; most of the weight is in the US.',
+        "de": 'MSCI World — große Unternehmen aus Industrieländern; der Großteil des Gewichts liegt in den USA.'},
+    "holds.IUSA_DE": {
+        "tr": "S&P 500 — ABD'nin en büyük 500 şirketi, Avrupa'da işlem gören (UCITS) bir fonda.",
+        "en": 'S&P 500 — the 500 largest US companies, in a fund traded in Europe (UCITS).',
+        "de": 'S&P 500 — die 500 größten US-Unternehmen, in einem in Europa gehandelten Fonds (UCITS).'},
+    "holds.EXHA_DE": {
+        "tr": 'Alman devlet tahvilleri, tüm vadeler — Euro cinsinden.',
+        "en": 'German government bonds, every maturity — in euros.',
+        "de": 'Bundesanleihen, alle Laufzeiten — in Euro.'},
+    "holds.EUNH_DE": {
+        "tr": "Euro bölgesi devletlerinin tahvilleri — Almanya'nın yanında Fransa, İtalya, İspanya gibi ülkeler.",
+        "en": 'Bonds of euro-area governments — France, Italy and Spain alongside Germany.',
+        "de": 'Anleihen der Euro-Staaten — neben Deutschland etwa Frankreich, Italien und Spanien.'},
+    "holds.EUNA_DE": {
+        "tr": "Dünya geneli devlet ve şirket tahvilleri, kur riski Euro'ya karşı korunmuş (hedge).",
+        "en": 'Government and corporate bonds worldwide, with the currency risk hedged back to euros.',
+        "de": 'Staats- und Unternehmensanleihen weltweit, mit gegen den Euro abgesicherter Währung.'},
+    "alternatives.same_holdings": {
+        "tr": "Bu fonlar büyük ölçüde aynı şirketleri tutar. Uygulama ikisini birlikte tutmaz — aynı şeyi iki kez almak çeşitlendirme değildir; aralarında oynaklık sıralaması karar verdi.",
+        "en": "These funds hold largely the same companies. The app never holds two of them together — buying the same thing twice is not diversification; the volatility ranking decided between them.",
+        "de": "Diese Fonds halten weitgehend dieselben Unternehmen. Die App hält nie zwei davon zugleich — dasselbe zweimal zu kaufen ist keine Streuung; die Volatilitätsrangfolge hat zwischen ihnen entschieden."},
+    "alternatives.same_role": {
+        "tr": "Bu fonlar aynı rolü oynayabilir; uygulama birini seçmek zorunda. Aşağıdaki rakamlar, farkın gerçekte ne kadar küçük ya da büyük olduğunu gösteriyor.",
+        "en": "These funds can play the same role; the app has to pick one. The figures below show how small — or how large — the difference really is.",
+        "de": "Diese Fonds können dieselbe Rolle spielen; die App muss einen auswählen. Die Zahlen unten zeigen, wie klein — oder wie groß — der Unterschied wirklich ist."},
     "weight.growth": {
         "tr": "Rolü: {role}. Ağırlığın gerekçesi: {tilt} → %{pct}.",
         "en": "Its role: {role}. Why this weight: {tilt} → {pct}%.",
@@ -357,9 +429,10 @@ _C: dict[str, dict[str, str]] = {
 
     # ── portfolio engine: the formula ──
     "formula.allocation": {
-        "tr": "Güvenli pay = 60 − (5,5 × risk skoru), en az %0 en fazla %60 (nakit + tahvil). Sonuç %10'un altına düşerse sıfıra çekilir: %3'lük bir nakit dilimi portföyü korumaz, sadece takip yükü yaratır — bu yüzden 9,1 üstü skorlarda savunma payı tamamen kapanır. Kalan pay büyüme varlıklarına dağıtılır: her varlığın ağırlığı = (1 − α) × (1 / oynaklık) + α × oynaklık. α risk skorunun onda biridir; yani α büyüdükçe oynak varlıklar daha fazla, küçüldükçe sakin varlıklar daha fazla pay alır. Hiçbir pozisyon %45'i geçemez ve %5'in altında kalan pozisyonlar elenir.",
-        "en": "Defensive share = 60 − (5.5 × risk score), floored at 0% and capped at 60% (cash + bonds). If the result falls below 10% it is set to zero: a 3% cash sleeve protects nothing and only adds something to track — so above a score of 9.1 the defensive side closes entirely. What's left is spread across the growth assets: each weight = (1 − α) × (1 / volatility) + α × volatility. α is one tenth of the risk score — so the larger α gets, the more the volatile assets take, and the smaller it gets, the more the calm ones do. No position may exceed 45%, and anything under 5% is dropped.",
-        "de": "Defensiver Anteil = 60 − (5,5 × Risikowert), mindestens 0% und höchstens 60% (Bargeld + Anleihen). Fällt das Ergebnis unter 10%, wird es auf null gesetzt: ein Barbestand von 3% schützt nichts und macht nur Arbeit — ab einem Wert über 9,1 entfällt die defensive Seite daher ganz. Der Rest verteilt sich auf die Wachstumsanlagen: Gewicht je Anlage = (1 − α) × (1 / Volatilität) + α × Volatilität. α ist ein Zehntel des Risikowerts — je größer α, desto mehr erhalten die schwankungsreichen Anlagen, je kleiner, desto mehr die ruhigen. Keine Position darf 45% überschreiten, und alles unter 5% entfällt."},
+        "tr": "Güvenli pay = 60 − (5,5 × risk skoru), en az %0 en fazla %60 (nakit + tahvil). Sonuç %10'un altına düşerse sıfıra çekilir: %3'lük bir nakit dilimi portföyü korumaz, sadece takip yükü yaratır — bu yüzden 9,1 üstü skorlarda savunma payı tamamen kapanır. Kalan pay büyüme varlıklarına dağıtılır. Altın, risk skorundan bağımsız olarak büyüme payının sabit %15'ini alır: kâr ya da temettü üretmediği için oynaklığı büyüme vaadi sayılmaz. Geri kalanında her varlığın ağırlığı = (1 − α) × (1 / oynaklık) + α × oynaklık; oynaklık son 5 yılın fiyatlarından ölçülür. α risk skorunun onda biridir; yani α büyüdükçe oynak varlıklar daha fazla, küçüldükçe sakin varlıklar daha fazla pay alır. Hiçbir pozisyon %45'i geçemez ve %5'in altında kalan pozisyonlar elenir.",
+        "en": "Defensive share = 60 − (5.5 × risk score), floored at 0% and capped at 60% (cash + bonds). If the result falls below 10% it is set to zero: a 3% cash sleeve protects nothing and only adds something to track — so above a score of 9.1 the defensive side closes entirely. What's left goes to the growth assets. Gold takes a fixed 15% of the growth share whatever the risk score: it produces no earnings or dividends, so its volatility is not a promise of growth. For the rest, each weight = (1 − α) × (1 / volatility) + α × volatility, with volatility measured over the last 5 years of prices. α is one tenth of the risk score — so the larger α gets, the more the volatile assets take, and the smaller it gets, the more the calm ones do. No position may exceed 45%, and anything under 5% is dropped.",
+        "de": "Defensiver Anteil = 60 − (5,5 × Risikowert), mindestens 0% und höchstens 60% (Bargeld + Anleihen). Fällt das Ergebnis unter 10%, wird es auf null gesetzt: ein Barbestand von 3% schützt nichts und macht nur Arbeit — ab einem Wert über 9,1 entfällt die defensive Seite daher ganz. Der Rest geht an die Wachstumsanlagen. Gold erhält unabhängig vom Risikowert feste 15% des Wachstumsanteils: Es erwirtschaftet weder Gewinne noch Dividenden, daher ist seine Volatilität kein Wachstumsversprechen. Für den Rest gilt: Gewicht je Anlage = (1 − α) × (1 / Volatilität) + α × Volatilität, wobei die Volatilität aus den Kursen der letzten 5 Jahre gemessen wird. α ist ein Zehntel des Risikowerts — je größer α, desto mehr erhalten die schwankungsreichen Anlagen, je kleiner, desto mehr die ruhigen. Keine Position darf 45% überschreiten, und alles unter 5% entfällt."},
+
 
     # ── health score ──
     "health.none": {

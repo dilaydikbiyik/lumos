@@ -574,3 +574,20 @@ async def crypto_facts(
         "available": facts is not None,
         "facts": facts or [],
     }
+
+
+@router.get("/alternatives")
+async def role_alternatives(
+    user_id: str = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+    lang: str = Depends(language),
+):
+    """
+    For each fund the portfolio can hold, the funds that could have played
+    the same role and what measurably differs. Reads the market and the
+    language — nothing about the reader. See services/role_alternatives.py.
+    """
+    from backend.services import role_alternatives as service
+
+    user = await user_repository.get_or_create(db, user_id)
+    return await asyncio.to_thread(service.alternatives, user.market or "TR", lang)

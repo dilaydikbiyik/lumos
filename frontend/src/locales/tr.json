@@ -143,7 +143,11 @@
     "alphaNote": "α = {{alpha}} (risk skorun ÷ 10)",
     "droppedTitle": "Neden {{count}} pozisyon? Şunlar bilinçli olarak elendi:",
     "wouldBe": "(%{{pct}} olurdu)",
-    "footer": "Bütçen {{budget}} · en fazla {{cap}} varlığa bölündü · payı %{{minPct}}'in altında kalanlar elendi (çok küçük paylar takibi zorlaştırır, getiriye katkısı ise ihmal edilebilir)"
+    "footer": "Bütçen {{budget}} · en fazla {{cap}} varlığa bölündü · payı %{{minPct}}'in altında kalanlar elendi (çok küçük paylar takibi zorlaştırır, getiriye katkısı ise ihmal edilebilir)",
+    "alternativesTitle": "Aynı rolü oynayabilecek fonlar ({{count}})",
+    "inPortfolio": "portföyünde",
+    "altFacts": "oynaklık {{vol}} · en kötü düşüş {{drop}} · {{years}} yıllık geçmiş",
+    "altWindow": "Oynaklık ve en kötü düşüş son {{years}} yıldan, temettüler dahil; geçmiş, fonun var olduğu süre. Hiçbiri öneri değil — farkın ne kadar olduğunu görmen için."
   },
   "categories": {
     "stocks": "Hisse Senetleri",

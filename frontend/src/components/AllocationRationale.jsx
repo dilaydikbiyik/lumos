@@ -1,4 +1,7 @@
+import { useEffect, useState } from 'react'
 import useMarket from '../hooks/useMarket'
+import api from '../utils/api'
+import RoleAlternatives from './RoleAlternatives'
 import { Trans, useTranslation } from 'react-i18next'
 import { percentFromWeight } from '../utils/format'
 
@@ -11,6 +14,16 @@ export default function AllocationRationale({ portfolio }) {
   const { t } = useTranslation()
   const { money } = useMarket()
   const logic = portfolio?.metadata?.allocation_logic
+  const [alternatives, setAlternatives] = useState(null)
+
+  useEffect(() => {
+    let cancelled = false
+    api.get('/planning/alternatives')
+      .then(res => { if (!cancelled) setAlternatives(res.data) })
+      .catch(() => { /* supporting content; the allocation stands without it */ })
+    return () => { cancelled = true }
+  }, [])
+
   if (!portfolio?.allocations?.length) return null
 
   return (
@@ -92,9 +105,10 @@ export default function AllocationRationale({ portfolio }) {
             }}>
               {percentFromWeight(a.weight)}
             </span>
-            <div style={{ fontSize: 13, lineHeight: 1.5 }}>
+            <div style={{ fontSize: 13, lineHeight: 1.5, minWidth: 0 }}>
               <strong>{a.name}</strong>
               <div style={{ fontSize: 12, opacity: 0.7 }}>{a.explanation}</div>
+              <RoleAlternatives role={alternatives?.roles?.[a.ticker]} ticker={a.ticker} />
             </div>
           </div>
         ))}

@@ -358,3 +358,32 @@ def test_the_most_aggressive_profile_is_led_by_equities_not_gold():
         al = build_portfolio(risk_score=10.0, budget=250_000, market=market).allocations
         top = max(al, key=lambda a: a.weight)
         assert top.category != "gold", (market, top.ticker, top.weight)
+
+
+@pytest.mark.parametrize("lang", ["tr", "en", "de"])
+def test_the_formula_shown_to_the_reader_quotes_the_engine_s_own_numbers(lang):
+    """
+    The recommendation page offers "show the formula", and the text it shows
+    described the v4 engine after v5 shipped: every growth asset by the
+    volatility blend, no word about gold's fixed share or the five-year
+    window. A reader checking the arithmetic would have checked a
+    calculation the app no longer performs.
+
+    So the numbers in the text are asserted against the constants the
+    engine actually uses. Change one without the other and this fails.
+    """
+    from backend.i18n import t
+    from backend.services import volatility
+    from backend.services.portfolio_engine import (
+        GOLD_GROWTH_SHARE,
+        MAX_POSITION_PCT,
+        MIN_WEIGHT_PCT,
+    )
+
+    text = t("formula.allocation", lang)
+    window_years = int(volatility.VOLATILITY_WINDOW.rstrip("y"))
+    for number, what in ((MAX_POSITION_PCT, "position cap"),
+                         (MIN_WEIGHT_PCT, "dust floor"),
+                         (round(GOLD_GROWTH_SHARE * 100), "gold's fixed share"),
+                         (window_years, "volatility window")):
+        assert str(number) in text, f"[{lang}] formula text does not state the {what} ({number})"

@@ -3485,8 +3485,21 @@ hep SPY çıkıyor". İkisi ayrı sorunmuş.
       sabit paylı varlığa gitmiyor. Küçük portföylerde (3 pozisyon, %45
       tavan) %15 matematiksel olarak imkânsızsa kart bunu açıkça yazıyor;
       test sapmaya YALNIZCA bu geometrik durumda izin veriyor.
-- [ ] **Kullanıcıya seçenek sun** (öneri: "kullanıcıya seçenekler sunmuş
-      oluruz öğretirken") — her dilimde aynı rolü oynayabilecek fonları ve
-      ölçülmüş farklarını göstermek. Sıradaki iş.
+- [x] **Kullanıcıya seçenek sun** ("kullanıcıya seçenekler sunmuş oluruz
+      öğretirken"). Portföydeki her dilimin altında "aynı rolü oynayabilecek
+      fonlar": yan yana, aynı temelde ölçülmüş (5 yıllık oynaklık, en kötü
+      düşüş, temettü dahil; fonun yaşı). Canlı veride dersler kendiliğinden
+      çıkıyor: GLD/IAU, BND/AGG, BIL/SHV neredeyse özdeş; QQQ, SPY'den
+      belirgin oynak (%23,2 / %17,2); IEF (7–10 yıl hazine) uzun vadeli
+      olduğu için tahvil piyasasının genelinden sert düşmüş. Aynı gruptaki
+      alternatifler motorun kendi örtüşme kuralından türetiliyor (test:
+      tablo motorla çelişemez). Almanya'daki her alternatif Avrupa'da
+      alınabilir (UCITS) — test. Kişiye bağlı değil, sıralama yok, "daha
+      iyi" yok — test. Almanya için altın alternatifi (Xetra listeli
+      fiziksel altın ETC'si) doğrulanamadığı için eklenmedi.
+- [x] **Ekranda gösterilen formül motordan ayrışmıştı.** "Formülü göster"
+      v5'ten sonra hâlâ v4'ü anlatıyordu (altının sabit payı ve 5 yıllık
+      pencere yoktu). Güncellendi, ve artık metindeki her sayı motorun
+      sabitleriyle testle bağlı: biri değişip diğeri değişmezse kırmızı.
 - [ ] Keşif listesi tarihli (2026-11) bir seçki; yılda bir piyasa
       değerlerine göre gözden geçirilmeli.

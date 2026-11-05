@@ -143,7 +143,11 @@
     "alphaNote": "α = {{alpha}} (your risk score ÷ 10)",
     "droppedTitle": "Why {{count}} positions? These were deliberately dropped:",
     "wouldBe": "(would have been {{pct}}%)",
-    "footer": "Your budget {{budget}} · split across at most {{cap}} assets · anything below {{minPct}}% was dropped (tiny positions are hard to track and contribute next to nothing)"
+    "footer": "Your budget {{budget}} · split across at most {{cap}} assets · anything below {{minPct}}% was dropped (tiny positions are hard to track and contribute next to nothing)",
+    "alternativesTitle": "Funds that could play the same role ({{count}})",
+    "inPortfolio": "in your portfolio",
+    "altFacts": "volatility {{vol}} · worst fall {{drop}} · {{years}} years of history",
+    "altWindow": "Volatility and worst fall over the last {{years}} years, dividends included; history is how long the fund has existed. None of these is a recommendation — they are here so you can see how big the difference is."
   },
   "categories": {
     "stocks": "Stocks",

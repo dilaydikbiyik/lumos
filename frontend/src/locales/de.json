@@ -148,7 +148,11 @@
     "alphaNote": "α = {{alpha}} (dein Risikowert ÷ 10)",
     "droppedTitle": "Warum {{count}} Positionen? Diese wurden bewusst weggelassen:",
     "wouldBe": "(wären {{pct}}% gewesen)",
-    "footer": "Dein Budget {{budget}} · auf höchstens {{cap}} Anlagen verteilt · alles unter {{minPct}}% wurde weggelassen (winzige Positionen sind schwer zu verfolgen und tragen kaum bei)"
+    "footer": "Dein Budget {{budget}} · auf höchstens {{cap}} Anlagen verteilt · alles unter {{minPct}}% wurde weggelassen (winzige Positionen sind schwer zu verfolgen und tragen kaum bei)",
+    "alternativesTitle": "Fonds, die dieselbe Rolle spielen könnten ({{count}})",
+    "inPortfolio": "in deinem Portfolio",
+    "altFacts": "Volatilität {{vol}} · stärkster Rückgang {{drop}} · {{years}} Jahre Historie",
+    "altWindow": "Volatilität und stärkster Rückgang über die letzten {{years}} Jahre, Dividenden inklusive; Historie ist, wie lange es den Fonds gibt. Keiner davon ist eine Empfehlung — sie stehen hier, damit du siehst, wie groß der Unterschied ist."
   },
   "categories": {
     "stocks": "Aktien",

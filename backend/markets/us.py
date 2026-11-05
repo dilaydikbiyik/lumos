@@ -120,6 +120,12 @@ US = MarketPack(
     # ^GSPC is a price index. SPY tracks the S&P 500 with dividends
     # reinvested, which is how the companies are measured.
     explorer_benchmark={"ticker": "SPY", "total_return": True},
+    role_alternatives={
+        "GLD": [{"ticker": "IAU", "name": "iShares Gold Trust"}],
+        "BND": [{"ticker": "AGG", "name": "iShares Core U.S. Aggregate Bond ETF"},
+                {"ticker": "IEF", "name": "iShares 7-10 Year Treasury Bond ETF"}],
+        "BIL": [{"ticker": "SHV", "name": "iShares 0-1 Year Treasury Bond ETF"}],
+    },
     reit_assets=[
         {"ticker": "VNQ", "name": "Vanguard Real Estate ETF", "category": "reit"},
         {"ticker": "SCHH", "name": "Schwab US REIT ETF", "category": "reit"},
