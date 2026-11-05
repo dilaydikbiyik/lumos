@@ -3396,3 +3396,18 @@ maddeler günler süren onaylar başlatıyor, o yüzden bugün yapılmalı.
       tek gönderici) ve cihazda doğrulanacaklar listesi eklendi;
       **`store-submission.md`**'ye 4.2 ve 4.8 bölümleri eklendi — neyin
       iddia edilebilir, neyin henüz edilemez olduğu ayrı ayrı.
+
+### CI yine kırıldı — ve neden yerel gate göremedi (2026-11-05)
+
+- [x] **Benim yazdığım CORS testi yerelde geçip CI'da kırıldı.** Test
+      `settings.FRONTEND_URL`'i olduğu gibi okuyordu: bu Mac'te `.env` onu
+      Vercel adresi yapıyor, CI'da ise varsayılan `http://localhost:5173`
+      kalıyor — ve test tam bu adresin REDDEDİLMESİNİ bekliyordu. Ürün kodu
+      doğruydu; test, çalıştığı laptopu test ediyordu.
+
+      Asıl düzeltme sınıfa: **test paketi artık geliştiricinin `.env`'ini hiç
+      okumuyor** (`LUMOS_IGNORE_DOTENV`, conftest'te her backend import'undan
+      önce). Yerel sonuç artık CI ile birebir aynı — aynı test atlanıyor,
+      aynı sayı geçiyor. Bir koruma testi `.env` yeniden okunmaya başlarsa
+      fail ediyor. Ayarlar farklıyken yeşil bir yerel gate CI hakkında hiçbir
+      şey söylemiyordu, ki onu çalıştırmanın tek sebebi bu.

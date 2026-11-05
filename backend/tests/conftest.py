@@ -4,6 +4,13 @@ Shared test fixtures.
 - client:  FastAPI TestClient — Clerk auth bypassed, isolated in-memory DB
 - mock_ai: patches the AI dispatch so no provider is ever called
 """
+# Before ANY backend import: settings are built at import time, and they must
+# not read the developer's .env — CI has none, and a suite that sees
+# different settings locally cannot vouch for CI. See backend/config.py.
+import os
+
+os.environ.setdefault("LUMOS_IGNORE_DOTENV", "1")
+
 import pytest
 from unittest.mock import patch
 from fastapi.testclient import TestClient

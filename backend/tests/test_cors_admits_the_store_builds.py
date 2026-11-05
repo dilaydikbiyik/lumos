@@ -19,6 +19,19 @@ from backend.config import settings
 from backend.main import NATIVE_APP_ORIGINS, production_origins
 
 
+# A fixed production value, not whatever this machine's .env says. The first
+# version read settings.FRONTEND_URL as found: on the author's machine that
+# was the Vercel URL and every case passed; in CI it is the default,
+# http://localhost:5173, which this file then asserted must be REFUSED. A
+# CORS test whose verdict depends on the laptop it runs on tests the laptop.
+PROD_FRONTEND = "https://lumos.example.app"
+
+
+@pytest.fixture(autouse=True)
+def _production_frontend(monkeypatch):
+    monkeypatch.setattr(settings, "FRONTEND_URL", PROD_FRONTEND)
+
+
 @pytest.fixture
 def prod_app():
     app = FastAPI()
@@ -38,7 +51,7 @@ def _preflight(client, origin):
     })
 
 
-@pytest.mark.parametrize("origin", [*NATIVE_APP_ORIGINS, settings.FRONTEND_URL])
+@pytest.mark.parametrize("origin", [*NATIVE_APP_ORIGINS, PROD_FRONTEND])
 def test_the_web_and_both_store_builds_are_admitted(prod_app, origin):
     res = _preflight(prod_app, origin)
     assert res.status_code == 200, origin

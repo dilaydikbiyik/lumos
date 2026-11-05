@@ -1,3 +1,5 @@
+import os
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -81,7 +83,14 @@ class Settings(BaseSettings):
     ADMIN_CLERK_IDS: str = ""
 
     model_config = SettingsConfigDict(
-        env_file=".env",
+        # The test suite sets LUMOS_IGNORE_DOTENV (backend/tests/conftest.py)
+        # so it reads exactly what CI reads: the process environment and
+        # nothing from the developer's .env. It used to read .env, so a test
+        # could pass on this machine and fail in CI — which one CORS test did,
+        # because .env set FRONTEND_URL to the Vercel address and CI left it at
+        # the localhost default. The local gate cannot vouch for CI while the
+        # two run against different settings.
+        env_file=None if os.environ.get("LUMOS_IGNORE_DOTENV") else ".env",
         extra="ignore",
     )
 
