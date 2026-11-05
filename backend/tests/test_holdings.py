@@ -150,3 +150,20 @@ def test_the_ticker_refusal_speaks_the_readers_language(client, lang, word):
     })
     assert res.status_code == 422
     assert word in res.json()["detail"], res.json()
+
+
+def test_engine_named_holding_follows_the_readers_language(client):
+    """A holding recorded from a Turkish portfolio is labelled "Nakit / Kısa
+    Vade"; after switching to English the reader must not see Turkish under
+    "What you own". A name the reader typed is never rewritten."""
+    from backend.i18n import t
+
+    for name in (t("asset.cash.name", "tr"), "Kasadaki dolar"):
+        res = client.post("/holdings", json={"asset_type": "cash", "name": name,
+                                             "purchase_amount": 1000})
+        assert res.status_code == 201, res.text
+
+    names = {h["name"] for h in client.get("/holdings", headers={"X-Lumos-Lang": "en"}).json()}
+    assert t("asset.cash.name", "en") in names
+    assert t("asset.cash.name", "tr") not in names
+    assert "Kasadaki dolar" in names

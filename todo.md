@@ -3528,6 +3528,20 @@ hep SPY çıkıyor". İkisi ayrı sorunmuş.
       kurulamadı" ve yeniden dene düğmesi — ham anahtar asla. Service
       worker: hash'li dosyalar önbellekten, kabuk yalnızca sayfa
       gezinmelerine. Gerçek build'de dil dosyası silinerek denendi.
+- [x] **"Dengeli profilim, dashboard'da yine 3 şey var" (DE/en).** Üç ayrı
+      hata üst üste: (1) pozisyon sayısını belirleyen bütçe eşikleri
+      (75.000 / 200.000) lira rakamlarıydı ve her pazara aynen
+      uygulanıyordu — 50.000 € (≈2,5 milyon TL) bütçeli Alman okuyucu,
+      75.000 TL altı için düşünülmüş 3 pozisyonu alıyordu. Eşikler artık
+      pazar paketinde, kendi para biriminde (TR 75k/200k TL, ABD
+      1.500/4.000 $, DE 1.500/3.500 € — bugünkü kurla aynı reel para).
+      DE dengeli 50.000 € artık 6 pozisyon. (2) Dashboard portföyü yalnızca
+      cihazdaki kopyadan çiziyordu, sunucuya hiç sormuyordu; pazar/dil
+      değişse, motor güncellense eski portföy kalıyordu. Artık kopya varsa
+      arka planda yenileniyor. (3) Portföyden kaydedilen varlık, kayıt
+      anındaki dilde ad taşıyordu ("Nakit / Kısa Vade"); uygulamanın kendi
+      etiketiyse okuyucunun şimdiki dilinde gösteriliyor, okuyucunun
+      yazdığı ada dokunulmuyor. Üçü de testli.
 - [ ] Almanya'da hazine bonosu satırı yok (para piyasası fonu var);
       ABD bonosunun EUR karşılığı istenirse USDEUR=X ile eklenebilir.
 - [ ] Keşif listesi tarihli (2026-11) bir seçki; yılda bir piyasa

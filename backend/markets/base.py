@@ -121,6 +121,13 @@ class MarketPack:
     # small to justify interrupting someone's first investment. A raw number,
     # so it has to be denominated in this market's own currency.
     material_debt: float = 5_000.0
+    # Budget bands for how many positions a portfolio holds: (upper bound,
+    # max positions), in THIS market's currency. They were one list of lira
+    # amounts applied to every market, so a German with EUR 50,000 (about
+    # 2.5 million lira) was given the three positions meant for a Turkish
+    # reader with under 75,000 lira, while a Turk with 100,000 lira got four.
+    # Each market states its own bands, at roughly the same real money.
+    position_bands: tuple = ((75_000.0, 3), (200_000.0, 4))
     # Real (above-inflation) spreads for the planning projections.
     housing_real_spread_pct: float = 0.0
     rent_real_spread_pct: float = 0.0

@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from 'react'
+import { useEffect, useCallback, useRef } from 'react'
 import FireflyMark from '../components/FireflyMark'
 import Icon from '../components/Icon'
 import { useNavigate } from 'react-router-dom'
@@ -81,10 +81,23 @@ export default function DashboardPage() {
     }
   }, [getToken])
 
+  // The portfolio on this page comes from the copy saved on the device, and
+  // it used to be the ONLY source: nothing here asked the server again. A
+  // reader who changed market or language, or came back after the engine
+  // changed, kept the portfolio of that earlier day — three Turkish-labelled
+  // positions for a German reader whose current portfolio has six. When a
+  // saved copy exists it is now refreshed in the background (the copy stays
+  // on screen meanwhile, and the prose is cached server-side for the day).
+  // Without one, nothing is built unasked: the "build" card stays.
+  const hadSavedPortfolio = useRef(Boolean(portfolio))
   /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
-    loadProfile()
+    loadProfile().then(p => {
+      if (p && hadSavedPortfolio.current) recommend(p.risk_score, p.budget || 100_000)
+    })
     loadSummary()
+  // recommend is a fresh function every render; this runs once per mount.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loadProfile, loadSummary])
   /* eslint-enable react-hooks/set-state-in-effect */
 

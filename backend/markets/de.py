@@ -145,6 +145,7 @@ DE = MarketPack(
     # cardholder overstates the cost of their debt by roughly six times.
     card_monthly_rate_pct=0.95,
     material_debt=500.0,
+    position_bands=((1_500.0, 3), (3_500.0, 4)),
     housing_real_spread_pct=0.0,
     rent_real_spread_pct=0.0,
     portfolio_real_spread_pct=4.0,

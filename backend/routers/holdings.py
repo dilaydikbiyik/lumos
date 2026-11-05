@@ -72,8 +72,20 @@ def _currency_of(user) -> str:
     return get_market_pack(getattr(user, "market", None)).currency
 
 
-def _serialize(holding, enrichment: dict) -> HoldingRead:
+# Names the portfolio engine writes from a translation key. A holding
+# recorded from a recommendation stores the name in the language the reader
+# had THEN, so a reader who switched to English kept seeing "Nakit / Kısa
+# Vade" under "What you own". A stored name that is exactly one of these
+# translations is the app's label, not the reader's, and is shown in their
+# current language. Anything the reader typed themselves is left alone.
+_ENGINE_NAME_KEYS = ("asset.cash.name", "asset.bond.name")
+_ENGINE_NAMES = {t(key, lang): key for key in _ENGINE_NAME_KEYS for lang in ("tr", "en", "de")}
+
+
+def _serialize(holding, enrichment: dict, lang: str = "tr") -> HoldingRead:
     read = HoldingRead.model_validate(holding)
+    if read.name in _ENGINE_NAMES:
+        read.name = t(_ENGINE_NAMES[read.name], lang)
     info = enrichment.get(holding.id)
     read.current_value = info["value"] if info else holding.purchase_amount
     read.value_source = info["source"] if info else "purchase"
@@ -87,13 +99,14 @@ async def list_holdings(
     request: Request,
     user_id: str = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
+    lang: str = Depends(language),
 ):
     user = await user_repository.get_or_create(db, user_id)
     holdings = await holding_repository.list_for_user(db, user.id)
     # enrich_holdings calls yfinance (sync HTTP) — run in thread pool
     enrichment = await asyncio.to_thread(enrich_holdings, holdings, _currency_of(user),
                                          user.market or "TR")
-    return [_serialize(h, enrichment) for h in holdings]
+    return [_serialize(h, enrichment, lang) for h in holdings]
 
 
 @router.post("", response_model=HoldingRead, status_code=201)

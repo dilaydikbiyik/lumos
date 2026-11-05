@@ -66,6 +66,7 @@ TR = MarketPack(
     # periodically, so shown as an assumption and never as the statutory rate.
     card_monthly_rate_pct=4.25,
     material_debt=5_000.0,
+    position_bands=((75_000.0, 3), (200_000.0, 4)),
     housing_real_spread_pct=0.0,
     rent_real_spread_pct=0.0,
     portfolio_real_spread_pct=3.0,

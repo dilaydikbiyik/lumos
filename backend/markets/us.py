@@ -73,6 +73,7 @@ US = MarketPack(
     # actually applies.
     card_monthly_rate_pct=1.75,
     material_debt=500.0,
+    position_bands=((1_500.0, 3), (4_000.0, 4)),
     housing_real_spread_pct=1.0,
     rent_real_spread_pct=0.0,
     portfolio_real_spread_pct=4.5,

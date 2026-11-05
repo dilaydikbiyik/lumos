@@ -56,11 +56,8 @@ MIN_WEIGHT_PCT = 5          # below this is "dust" — pruned and reported
 MAX_POSITION_PCT = 45       # no single asset may exceed this (concentration guard)
 # Gold's share of the growth sleeve, whatever the risk score. See "WHY v5".
 GOLD_GROWTH_SHARE = 0.15
-_BUDGET_POSITION_CAPS = [   # (budget upper bound, max positions)
-    (75_000, 3),
-    (200_000, 4),
-    (float("inf"), 6),
-]
+# Above every market's budget bands (MarketPack.position_bands).
+MAX_POSITIONS = 6
 
 # Defensive sleeve — sized by the glide path, but REAL fetchable tickers so
 # every downstream feature (projection, time-machine, backtest, what-if) can
@@ -126,11 +123,12 @@ def _overlap_group(asset: dict) -> str:
     return asset.get("overlap", asset["category"])
 
 
-def _position_cap(budget: float) -> int:
-    for limit, cap in _BUDGET_POSITION_CAPS:
+def _position_cap(budget: float, bands) -> int:
+    """Max positions for a budget, with the bands in the budget's own currency."""
+    for limit, cap in bands:
         if budget < limit:
             return cap
-    return _BUDGET_POSITION_CAPS[-1][1]
+    return MAX_POSITIONS
 
 
 def _clamp(x: float, lo: float, hi: float) -> float:
@@ -288,7 +286,7 @@ def build_portfolio(risk_score: float, budget: float, market: str = "TR",
 
     # How many SLOTS the budget supports — distinct from the per-position
     # WEIGHT cap below, which used to reuse this same name.
-    slot_cap = _position_cap(budget)
+    slot_cap = _position_cap(budget, pack.position_bands)
     n_defensive = 0 if defensive_target == 0 else min(2, max(slot_cap - 2, 1))
     growth_slots = max(slot_cap - n_defensive, 1)
 

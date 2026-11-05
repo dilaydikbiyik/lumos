@@ -387,3 +387,22 @@ def test_the_formula_shown_to_the_reader_quotes_the_engine_s_own_numbers(lang):
                          (round(GOLD_GROWTH_SHARE * 100), "gold's fixed share"),
                          (window_years, "volatility window")):
         assert str(number) in text, f"[{lang}] formula text does not state the {what} ({number})"
+
+
+def test_position_bands_are_in_each_markets_own_currency(monkeypatch):
+    """The bands were lira amounts applied to every market: EUR 50,000 (about
+    2.5 million lira) got the three positions meant for under 75,000 lira.
+    Each market now states its bands in its own currency."""
+    from backend.markets import MARKET_PACKS
+    from backend.services.portfolio_engine import _position_cap, MAX_POSITIONS
+
+    tr = MARKET_PACKS["TR"].position_bands
+    for code, pack in MARKET_PACKS.items():
+        bands = pack.position_bands
+        assert [cap for _, cap in bands] == sorted(cap for _, cap in bands)
+        assert all(cap < MAX_POSITIONS for _, cap in bands)
+        if pack.currency != "TRY":
+            assert bands != tr, f"{code} reuses lira amounts"
+    assert _position_cap(50_000, MARKET_PACKS["DE"].position_bands) == MAX_POSITIONS
+    assert _position_cap(50_000, MARKET_PACKS["US"].position_bands) == MAX_POSITIONS
+    assert _position_cap(50_000, MARKET_PACKS["TR"].position_bands) == 3
