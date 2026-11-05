@@ -111,4 +111,6 @@ jobs:
         run: npm run build
         env:
           VITE_CLERK_PUBLISHABLE_KEY: pk_test_placeholder
-          VITE_API_BASE_URL: https://example.onrender.com
+          # The variable the app actually reads. This was VITE_API_BASE_URL,
+          # a name nothing reads, so CI built a bundle pointing at localhost.
+          VITE_BACKEND_URL: https://example.onrender.com

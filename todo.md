@@ -1390,7 +1390,7 @@ method, a legal identity, or a signature.
 - [x] Persistent cache: diskcache → a small Neon table. Render's disk is — done. `cache_store.py` mirrors every cached value into a `cache_entries` table through a SYNC psycopg engine (the data adapters are sync and run in thread pools). Reads fall back to it and warm the local tier on the way past. It matters for the `ttl=None` last-known-good tier, which exists for provider outages and was being discarded on every deploy. Entirely optional — no Postgres means no durable tier and identical behaviour — and hard-disabled under pytest, because a developer's .env holds the production URL. `/health` now reports `durable_cache`.
       ephemeral, so every deploy currently wipes last-known-good — the tier that
       keeps the app honest when a source is down.
-- [ ] **[you — dashboard; same item as above]** `SENTRY_DSN` on Render and Vercel (the code is already wired). Store
+- **Tekrar → 'SENİN LİSTEN' madde 7.** `SENTRY_DSN` on Render and Vercel (the code is already wired). Store
       review surfaces crashes you never see locally.
 
 #### 3. Legal pages — both stores reject without them
@@ -2840,7 +2840,7 @@ meta'ları yerinde, **`sw.js` içinde push handler zaten yazılmış** (satır 6
         başlığı backend render ediyor, frontend kopyası gerçekten ölüydü.
         Bu testin bu oturumda yakaladığı üçüncü gerçek sonuç.
 
-- [ ] **[you — Render dashboard + ücretsiz cron]** Push'u canlıya almak:
+- **Tekrar → 'SENİN LİSTEN' madde 5–6.** Push'u canlıya almak:
       `./venv/bin/python scripts/generate_vapid_keys.py` çalıştır, dört
       değeri (`VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT`,
       `CRON_SECRET`) Render dashboard'a gir — `render.yaml` dördünü de
@@ -2922,7 +2922,7 @@ ettiği gerçek bir açık vardı, sadece başka yerde.
       yanlış sebeple kırmızı kalır ve birisi onu korumayı zayıflatarak
       "düzeltirdi".
 
-- [ ] **Hazır finans modeli — değerlendirildi, reddedildi.** Nedenleri:
+- **Karar — bilerek yapılmadı.** **Hazır finans modeli — değerlendirildi, reddedildi.** Nedenleri:
       FinBERT sınıfı modeller **İngilizce**, üç dilli bir app için sert
       engel. FinGPT sınıfı açık ağırlıklar **self-host → GPU sunucu**
       gerektirir ve tüm ücretsiz mimariyi yok eder. BloombergGPT erişilebilir
@@ -3271,7 +3271,7 @@ AST taradım. **Üç gerçek açık, bir ölü kod, ve taramamda bir kör nokta.
       gerekiyordu ve sırları sohbete getirmek doğru olmazdı.
       `RUN_JOURNEYS=1 ./scripts/check.sh` ile onboarding → risk quiz →
       portföy → holdings yolunu sen doğrula.
-- [ ] **[you] Push'u canlıya al** (VAPID anahtarları + cron) — hâlâ açık.
+- **Tekrar → 'SENİN LİSTEN' madde 5–6.** Push'u canlıya al (VAPID anahtarları + cron).
 
 ### Geçit kendi hatasını gizliyordu (2026-10-23)
 
@@ -3292,3 +3292,107 @@ AST taradım. **Üç gerçek açık, bir ölü kod, ve taramamda bir kör nokta.
       tanımlandığı satırdan sonra vardır; betik o satıra gelmeden ölüyor,
       yani hiçbir şey basılmıyordu. Artık `set -E`'nin hemen altında.
       Kasten bozup her iki hâli de doğruladım.
+
+## SENİN LİSTEN — mağazaya giden yol, sırayla (2026-11-05)
+
+Her şey kodda hazır olana kadar yapıldı. Kalanların hepsi bir hesap, bir
+ödeme, bir şifre ya da bir karar gerektiriyor. **Sıra önemli**: üstteki
+maddeler günler süren onaylar başlatıyor, o yüzden bugün yapılmalı.
+
+**Bugün başlat (onayları günler sürebilir)**
+
+- [ ] **1. Apple Developer Program'a kaydol** — ~1.029 TL/yıl (Türkiye yerel
+      fiyatı, Apple forumlarındaki bildirimlerden; kesin tutar kayıt
+      ekranında). Türkiye'den ödemede kartın son adımda reddedildiği ve
+      paranın çekildiği halde üyeliğin günlerce açılmadığı bildiriliyor —
+      erken başla. Şahıslar için muafiyet yok.
+- [ ] **2. Xcode'u indir** — Mac App Store'dan ücretsiz, büyük bir indirme.
+      Bu Mac'te şu an sadece Command Line Tools var. Kurduktan sonra
+      terminalde bir kez: `sudo xcode-select -s /Applications/Xcode.app`
+      (şifreni ister, o yüzden sende).
+- [ ] **3. Google Play Console** — $25 tek sefer. Kimlik doğrulaması da
+      günler sürebilir.
+
+**Kararlar (kod onları bekliyor)**
+
+- [ ] **4. Clerk dashboard'da hangi giriş yöntemleri açık, bak.** Google
+      açıksa iki sonucu var: native uygulamada Google girişi WebView'da
+      çalışmaz (sistem tarayıcısına yönlendirilmeli ya da kapatılmalı), ve
+      Apple 4.8 gereği **Sign in with Apple** da eklenmeli. Bana hangilerinin
+      açık olduğunu söyle, ona göre hazırlarım.
+- [ ] **İlk sürümü ücretsiz çıkar** (önerim). iOS'ta dijital bir şey satmak
+      Apple'ın uygulama içi satın almasını zorunlu kılıyor (%15), ve kişiye
+      özel öneri için para almak hukuki inceleme sorusunu ağırlaştırıyor.
+
+**Dashboard'lar (birer dakika)**
+
+- [ ] **5. Render → Environment:** `.env`'deki dört değeri yapıştır —
+      `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT`,
+      `CRON_SECRET`. Doğrulama: `/health` → `"push": true`.
+- [ ] **6. cron-job.org'da iş kur:** `POST
+      https://lumos-api-yowm.onrender.com/push/market-sweep`, başlık
+      `X-Lumos-Cron: <CRON_SECRET>`, 10 dakikada bir. Tek iş iki sorunu
+      çözüyor: bildirimler gider, ve Render 44 saniyelik soğuk başlangıca
+      düşmez (GitHub keepalive'ın ölçülen ortalaması 242 dakika).
+- [ ] **7. `SENTRY_DSN`** Render ve Vercel'e (kod hazır).
+- [ ] **8. CSP'yi yükselt:** Vercel loglarında rapor yoksa `vercel.json`'da
+      `Content-Security-Policy-Report-Only` → `Content-Security-Policy`.
+
+**Xcode kurulunca (sırayla, her biri bir sonrakini engelliyor)**
+
+- [ ] **9.** `cd frontend && npm run build && npx cap sync && npx cap open ios`
+      → Xcode'da Signing & Capabilities'te Team'ini seç → telefonunda çalıştır.
+- [ ] **10. Telefonda dört kontrol** (`docs/packaging.md` → "Verify on the
+      first TestFlight build"): giriş çalışıyor mu (app-bound domains),
+      Google girişi (açıksa), API istekleri (CORS düzeltildi ama cihazda
+      teyit), uçak modunda açılış.
+- [ ] **11. TestFlight'a yükle**, kendi telefonunda bir gün kullan.
+- [ ] **12. Apple hesabı açılınca bana söyle** — native push'u (APNs)
+      bağlarım. 4.2 reddine karşı en güçlü argüman bu; o olmadan da
+      gönderebilirsin ama daha zayıf.
+
+**Bağımsız, ama başvurudan önce**
+
+- [ ] **13. Kimlik doğrulamalı tarayıcı testleri:** uygulamada kendine
+      atılabilir bir hesap aç, Clerk'teki kullanıcı kimliğini `.env`'e
+      `DEMO_USER_ID=...` olarak yaz, sonra `RUN_JOURNEYS=1 ./scripts/check.sh`.
+      Ben bunu yapamadım: canlı uygulama hâlâ Clerk dev instance'ında,
+      kullanıcı listesinde arkadaşlarının hesapları var.
+- [ ] **14. Hukuki inceleme** — `docs/legal-review-brief.md` hazır.
+- [ ] **15. Clerk production instance + domain** — dev instance mağaza
+      sürümü için uygun değil.
+
+### Bu turda kodda yapılanlar (2026-11-05)
+
+- [x] **Canlı smoke testi** (`scripts/live_smoke.py`): 66 ucun hepsi × 3
+      pazar × 3 dil, gerçek piyasa verisi, gerçek istatistik kurumları ve
+      gerçek AI zinciriyle — production veritabanına ve Clerk'e dokunmadan.
+      Son çalıştırma: **669 çağrı, 0 başarısızlık.** Bir test her ucun bu
+      script'te olmasını zorluyor; yeni bir uç eklenip girmezse fail.
+- [x] **Smoke'un bulduğu dört gerçek hata, hiçbir birim testin göremediği:**
+      fiziksel altın ve sembolsüz kripto **hiç kaydedilemiyordu** (her
+      pazarda, çevrilmemiş İngilizce hatayla); Alman pazarındaki Türk
+      okuyucu haberleri **tamamen Almanca** alıyordu; AI kotası bitince
+      **portföy önerisinin kendisi** kayboluyordu (formül modele hiç ihtiyaç
+      duymadığı halde); AI kesinti mesajı **her okuyucuya Türkçe**
+      gidiyordu. Dördü düzeltildi ve testle sabitlendi; sessiz dil
+      varsayılanı artık pazar varsayılanı gibi AST ile yakalanıyor.
+- [x] **Mağaza uygulaması API'ye ulaşamazdı:** production CORS yalnızca web
+      adresine izin veriyordu, native kökenler (`capacitor://localhost`,
+      `https://localhost`) reddedilecekti. Tam eşleşmeyle eklendi.
+- [x] **Mağaza uygulaması kendini kurdurmaya çalışırdı:** iOS tespiti
+      Capacitor'ün kendi WebView'ı, LinkedIn ve Instagram için de "Safari"
+      diyordu. `Safari/` işareti zorunlu oldu, native kabukta kurulum kartı
+      ve web push kapalı.
+- [x] **Production bağımlılıklarında 6 yüksek seviye açık** (`@clerk/shared`,
+      `axios`, `react-router`, `js-cookie`, …) — kırıcı olmayan düzeltmeyle
+      **sıfıra** indi. Kalanlar yalnızca eslint/vitest'te, orta seviye.
+- [x] **Play Store simgesinin %98,6'sı şeffaftı** — yalnızca ön plan katmanı.
+      Google'ın kendi spec'ine göre üreteç kaynağında düzeltildi.
+- [x] **Capacitor 8 kuruldu, `android/` ve `ios/` üretildi**, Lumos simgeleri
+      ve splash ekranları yerleştirildi (iOS simgesi alfa kanalsız
+      doğrulandı), eslint native klasörleri artık lint'lemiyor.
+- [x] **`packaging.md`** bayat push bölümü yeniden yazıldı (iki taşıyıcı,
+      tek gönderici) ve cihazda doğrulanacaklar listesi eklendi;
+      **`store-submission.md`**'ye 4.2 ve 4.8 bölümleri eklendi — neyin
+      iddia edilebilir, neyin henüz edilemez olduğu ayrı ayrı.

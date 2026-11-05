@@ -66,6 +66,55 @@ is rejected on the category alone, whatever the quality of the build.
 > demo account below rather than the deletion flow if you would like the
 > account to remain available for a second review pass.
 
+### Apple 4.2 — minimum functionality (iOS only)
+
+The second most likely rejection, and the one this build is most exposed to:
+4.2 rejects apps that are "a repackaged website". Lumos IS a web build in a
+Capacitor shell, so the notes must show what the native app does that the
+site cannot — and the build must actually do those things, because a
+reviewer checks.
+
+What is true of the iOS build today, and safe to claim:
+
+- **The web build is bundled, not loaded.** `capacitor.config.ts` has no
+  `server.url`; the app opens offline to its own UI and only the API is
+  remote. A shell pointing at the live site is the textbook 4.2 rejection.
+- **It behaves as an installed app.** Inside the shell there is no "add to
+  home screen" card and no web-permission prompt — `utils/platform.js`
+  switches them off — and the splash and status bar are native.
+- **Account deletion works in-app** (5.1.1(v)), privacy and terms are
+  reachable without signing in.
+
+What would make the case strong, and is NOT built yet — do not claim it:
+
+- **Native push** through APNs. This is the real argument against 4.2: the
+  behavioural coach reaches a reader at the moment of a market drop, which
+  a website cannot do from a closed tab. It needs the Apple Developer
+  account first (see `packaging.md` → Push notifications). Submitting
+  before it exists is possible but noticeably weaker against 4.2.
+
+Paste, once native push is live:
+
+> Lumos is installed rather than visited for one reason: it reaches the
+> reader when the market moves. When their own portfolio falls sharply, the
+> app sends one notification — written against the loss tolerance they
+> stated — at the moment they are most likely to sell in panic. A website
+> cannot do that from a closed tab. The interface is bundled with the app
+> and opens offline; only market data and the explanations are fetched.
+
+### Sign-in (Apple 4.8)
+
+If the sign-in screen offers Google (or any third-party login), Apple 4.8
+requires an equivalent privacy-preserving option, in practice **Sign in with
+Apple**, alongside it. Which methods are on is set in the Clerk dashboard,
+not in this repository — check it before submitting.
+
+Separately, Google refuses OAuth inside an embedded WebView
+("disallowed_useragent"), which is what a Capacitor app is. Google sign-in
+must go through the system browser in the native build, or be left off it.
+Verify sign-in on a real device in TestFlight before submitting — it is the
+flow most likely to work on the web and fail in the shell.
+
 ## Demo account for reviewers
 
 **[you]** Create a dedicated reviewer account — do not hand over a personal

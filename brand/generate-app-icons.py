@@ -81,8 +81,18 @@ def main() -> None:
         write(resize(opaque, size), f"ios/AppIcon-{size}.png")
 
     print("Android")
-    # Play Store listing icon: 512, alpha permitted here.
-    write(resize(alpha, 512), "android/play-store-icon-512.png")
+    # Play Store listing icon: 512, OPAQUE, full square.
+    #
+    # It was written from the alpha source because alpha is "permitted" for
+    # this asset — and permitted is not correct. The alpha source is the
+    # foreground layer alone, so the file was 98.6% transparent: a small
+    # firefly floating on nothing. Google's spec (developer.android.com,
+    # icon-design-specifications) says "Shape: Full square — Google Play
+    # dynamically handles masking" and "Transparent assets will display the
+    # background color of Google Play UI", i.e. on a white or dark card
+    # rather than on this brand's night sky. Play applies the rounded mask
+    # and the shadow itself, so the asset must be the full opaque square.
+    write(resize(opaque, 512), "android/play-store-icon-512.png")
     # Adaptive icon: 108dp canvas, only the centre 72dp is safe from masking.
     for density, size in (("mdpi", 108), ("hdpi", 162), ("xhdpi", 216),
                           ("xxhdpi", 324), ("xxxhdpi", 432)):

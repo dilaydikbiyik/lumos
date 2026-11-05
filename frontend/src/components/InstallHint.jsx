@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { isIosSafari, isStandaloneDisplay } from '../utils/install'
 import { pushSupported, subscribeToPush } from '../utils/push'
+import { isNativeApp } from '../utils/platform'
 
 /**
  * The one piece missing from a free route to people's phones.
@@ -97,7 +98,10 @@ export default function InstallHint() {
     } catch { /* a dismissed OS dialog is not an error */ }
   }
 
-  if (dismissed) return null
+  // Inside the store build there is nothing to install and no Web Push to
+  // ask for. Native push arrives with the APNs/FCM work, which needs the
+  // store accounts — until then the honest card here is no card.
+  if (dismissed || isNativeApp()) return null
 
   // Installed, and that is where the old version stopped — which left the
   // feature one step short of working. Being on the home screen is what

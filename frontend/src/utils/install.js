@@ -26,12 +26,29 @@ export function isStandaloneDisplay(matchMedia, nav) {
   return Boolean(nav && nav.standalone === true)
 }
 
-/** iOS Safari specifically — the only iOS browser that can install. */
+/**
+ * iOS Safari specifically — the only iOS browser that can install.
+ *
+ * Requires the `Safari/` token, which only real Safari carries. The first
+ * version tested only for "not Chrome or Firefox", and measured against
+ * real user agents it returned true for three things that cannot add to the
+ * home screen at all:
+ *
+ *   - this app's OWN native shell (Capacitor's WKWebView), so the App Store
+ *     build would have told an installed user to go and install it;
+ *   - LinkedIn's in-app browser, where most of this app's portfolio
+ *     traffic arrives;
+ *   - Instagram's in-app browser.
+ *
+ * None of them carries `Safari/`. The in-app markers are excluded as well,
+ * because some in-app browsers do append it.
+ */
 export function isIosSafari(nav) {
   if (!nav || typeof nav.userAgent !== 'string') return false
   const ua = nav.userAgent
   const iPadAsMac = /Macintosh/.test(ua) && (nav.maxTouchPoints || 0) > 1
   if (!/iPhone|iPad|iPod/.test(ua) && !iPadAsMac) return false
-  // The WebKit-wrapped third-party browsers, by their own UA tokens.
-  return !/CriOS|FxiOS|EdgiOS|OPiOS/.test(ua)
+  if (!/Safari\//.test(ua)) return false
+  // WebKit-wrapped third-party browsers and in-app browsers, by their tokens.
+  return !/CriOS|FxiOS|EdgiOS|OPiOS|FBAN|FBAV|Instagram|LinkedInApp|Line\//.test(ua)
 }

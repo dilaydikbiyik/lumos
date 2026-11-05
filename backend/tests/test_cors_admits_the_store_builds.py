@@ -1,0 +1,58 @@
+"""
+The store builds can reach the API.
+
+A Capacitor app serves its bundled UI from its own origin —
+capacitor://localhost on iOS, https://localhost on Android — not from the
+website. Production CORS allowed only FRONTEND_URL, so every request from
+the App Store and Play Store builds would have been refused while the web
+build worked: a blank app on a reviewer's phone.
+
+Checked against a real CORS preflight through Starlette's own middleware,
+built with the production rule, rather than by reading the list back.
+"""
+import pytest
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.testclient import TestClient
+
+from backend.config import settings
+from backend.main import NATIVE_APP_ORIGINS, production_origins
+
+
+@pytest.fixture
+def prod_app():
+    app = FastAPI()
+    app.add_middleware(CORSMiddleware, allow_origins=production_origins(),
+                       allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
+
+    @app.get("/ping")
+    def ping():
+        return {"ok": True}
+
+    return TestClient(app)
+
+
+def _preflight(client, origin):
+    return client.options("/ping", headers={
+        "Origin": origin, "Access-Control-Request-Method": "GET",
+    })
+
+
+@pytest.mark.parametrize("origin", [*NATIVE_APP_ORIGINS, settings.FRONTEND_URL])
+def test_the_web_and_both_store_builds_are_admitted(prod_app, origin):
+    res = _preflight(prod_app, origin)
+    assert res.status_code == 200, origin
+    assert res.headers.get("access-control-allow-origin") == origin
+
+
+@pytest.mark.parametrize("origin", [
+    # The development convenience must not leak into production: a dev
+    # server on some port is not the store build.
+    "http://localhost:5173",
+    "https://localhost:8443",
+    "http://localhost",
+    "https://evil.example.com",
+])
+def test_nothing_else_is(prod_app, origin):
+    res = _preflight(prod_app, origin)
+    assert res.headers.get("access-control-allow-origin") != origin, origin

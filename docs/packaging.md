@@ -22,12 +22,19 @@ Done in the repo:
   `STORE=1 LANG_UI=en node demo/capture.mjs` → `demo/screens/en/store/`.
 - Public `/privacy` and `/terms`, and in-app account deletion — the three
   things both stores reject an app for not having.
+- `@capacitor/*` 8.x installed (core, ios, android, push-notifications,
+  splash-screen, status-bar) with TypeScript as a dev dependency, which
+  `capacitor.config.ts` needs. The config existed for a while with none of
+  the packages behind it.
+- **`android/` generated** by `npx cap add android`.
+- The web build behaves correctly inside the shell: no install card, no
+  Web Push offer (`utils/platform.js`).
 
 Not done, and **not doable from the repo**, because each needs a paid account
 or native tooling:
 
-- `npx cap add ios` / `npx cap add android` — these download platform SDKs and
-  generate Xcode/Gradle projects. Run them on a Mac with Xcode installed.
+- `npx cap add ios` — needs **Xcode**, which this Mac does not have yet (only
+  the Command Line Tools). Install Xcode from the Mac App Store, then run it.
 - APNs and FCM credentials. APNs requires the $99 Apple Developer account;
   FCM requires a Firebase project linked to the Play account. Push cannot be
   built or tested before those exist, which is why there is no device-token
@@ -109,19 +116,76 @@ app, which looks like nothing is wrong.
 
 ---
 
-## Push notifications
+## Verify on the first TestFlight build — cannot be checked without Xcode
 
-Blocked on the store accounts. When they exist, the shape is:
+These are configured but have never run on a device. Test them first, in
+this order, because each one blocks the next:
 
-1. `PushNotifications.requestPermissions()` on a screen that explains *why*
-   first. Asking cold is how you get a permanent denial — and for this app the
-   permission is the feature, so it is worth a sentence of context.
-2. Register the returned token against the signed-in user (`POST
-   /users/me/devices`, a new table keyed on user + token + platform).
-3. Send from the backend when the coach has something timely to say. The
-   trigger already exists in `behavior_coach`; only the transport is missing.
-4. Delete tokens on sign-out and on account deletion — the deletion endpoint
-   will need to take the device rows with it, exactly as it takes feedback.
+1. **Sign-in.** `capacitor.config.ts` sets `limitsNavigationsToAppBoundDomains:
+   true`, and `ios/App/App/Info.plist` has **no** `WKAppBoundDomains` list.
+   That setting restricts the WebView to the domains in that list, and Clerk's
+   sign-in reaches out to its own domain. If sign-in hangs or fails on the
+   device, either set the flag to `false`, or add `WKAppBoundDomains` with the
+   API host and the Clerk frontend host (exact domains, at most ten). Do not
+   change it before seeing the failure — it is also what keeps the shell from
+   being navigated to arbitrary sites.
+2. **Google sign-in, if enabled in Clerk.** Google refuses OAuth inside an
+   embedded WebView. It must open in the system browser, or be off in the
+   native build — and if it stays on, Sign in with Apple is required (4.8).
+3. **The API.** The bundled app's origin is `capacitor://localhost` on iOS and
+   `https://localhost` on Android. Production CORS allowed only the website,
+   so every request from the store builds would have failed while the web
+   build kept working. **Fixed** — both are now exact-match allowed
+   (`NATIVE_APP_ORIGINS` in `backend/main.py`, tested with a real preflight).
+   Still worth confirming on the device, because it only bites there.
+4. **Offline launch.** Turn on airplane mode and open the app: it must show
+   its own UI, not a blank page. This is the 4.2 argument.
+
+## Push notifications — two carriers, one sender
+
+Push reaches a reader by one of two routes, and the store build cannot use
+the one the web uses:
+
+| Where the app runs | Carrier | Status |
+|---|---|---|
+| Browser, added to the home screen (PWA) | **Web Push / VAPID** — `sw.js`, `utils/push.js`, `routers/push.py` | **Built and verified.** Needs the four values from `.env` in the Render dashboard (see `production-readiness.md`). |
+| App Store / Play Store build (Capacitor) | **APNs / FCM** — `@capacitor/push-notifications` | Not built. Needs the store accounts. |
+
+Why two: the Web Push API exists in Safari for home-screen web apps, but
+**not inside the WKWebView a Capacitor app runs in**. So the VAPID work
+reaches PWA readers and nobody in the store build. Inside the native shell
+the web path is switched off on purpose — `utils/platform.js`'
+`isNativeApp()` hides the install card and makes `pushSupported()` false,
+so the store build never offers a permission it cannot use (and never tells
+an installed user to "add to home screen").
+
+**The sender already exists.** `POST /push/market-sweep` decides WHO is told
+WHAT: per reader, only on a move of 5% or more in their own portfolio, the
+coach's sentence keyed to their stated loss tolerance, a 20-hour cooldown.
+Native delivery is a second transport behind that same decision, not a
+second feature.
+
+When the accounts exist, the native half is:
+
+1. **Credentials.** APNs: an auth key (`.p8`) from the Apple Developer
+   account. FCM: a Firebase project linked to the Play account.
+2. **Register.** In the native shell, `PushNotifications.requestPermissions()`
+   from a tap on a screen that explains why first — asking cold earns a
+   permanent denial, and here the permission IS the feature. Then
+   `register()` and send the token to the backend.
+3. **Store the token.** A `device_tokens` table keyed on user + token +
+   platform, upserted on the token exactly like `push_subscriptions` is on
+   the endpoint (browsers and devices both reissue them).
+4. **Send.** `push_service.send_to_user` dispatches to both tables: VAPID
+   rows through pywebpush, device rows through APNs/FCM. The retire-on-
+   404/410 rule applies to both, for the same bandwidth reason.
+5. **Delete** tokens on sign-out and on account deletion — the deletion
+   endpoint already cascades `push_subscriptions`; device rows must follow.
+
+It is deliberately not written yet: it cannot be exercised end to end
+without the credentials, and an untestable transport is exactly the kind of
+structure that reports success while delivering nothing — which is how the
+keepalive workflow behaved until it was measured.
 
 A notification this app sends should never be a nudge to trade. The whole
 premise is the opposite: it exists to say *don't*.

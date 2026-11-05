@@ -186,9 +186,26 @@ app.add_middleware(LanguageMiddleware)
 _DEV_ORIGIN_PATTERN = r"^https?://(localhost|127\.0\.0\.1)(:\d+)?$"
 _is_dev = settings.APP_ENV == "development"
 
+# The store builds. A Capacitor app does not load from the website; it serves
+# its bundled UI from its own origin — capacitor://localhost on iOS and
+# https://localhost on Android (Capacitor's default androidScheme). With only
+# FRONTEND_URL allowed, every API request from the App Store and Play Store
+# builds would have been refused by CORS while the web build kept working:
+# a blank app on a reviewer's phone with nothing pointing at the cause.
+#
+# Exact strings, NOT the development regex: the bare origins the shell uses,
+# no ports. Auth is a bearer token in a header rather than a cookie, so an
+# origin match grants nothing on its own.
+NATIVE_APP_ORIGINS = ("capacitor://localhost", "https://localhost")
+
+
+def production_origins() -> list[str]:
+    return [settings.FRONTEND_URL, *NATIVE_APP_ORIGINS]
+
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[] if _is_dev else [settings.FRONTEND_URL],
+    allow_origins=[] if _is_dev else production_origins(),
     allow_origin_regex=_DEV_ORIGIN_PATTERN if _is_dev else None,
     allow_credentials=True,
     allow_methods=["*"],

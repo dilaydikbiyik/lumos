@@ -1,4 +1,5 @@
 import api from './api'
+import { isNativeApp } from './platform'
 
 /**
  * Turning a granted permission into a subscription the backend can send to.
@@ -30,8 +31,12 @@ export function urlBase64ToUint8Array(base64String) {
   return output
 }
 
-/** Can this browser receive push at all? */
+/**
+ * Can this browser receive WEB push at all? False inside the native shell,
+ * whose WebView has no Push API — the store build uses APNs/FCM instead.
+ */
 export function pushSupported() {
+  if (isNativeApp()) return false
   return typeof window !== 'undefined'
     && 'serviceWorker' in window.navigator
     && 'PushManager' in window

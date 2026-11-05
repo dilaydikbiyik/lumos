@@ -10,6 +10,12 @@ const UA = {
   ipadOS: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Safari/605.1.15',
   macSafari: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Safari/605.1.15',
   androidChrome: 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Mobile Safari/537.36',
+  // No `Safari/` token: a WKWebView, which is what this app's own Capacitor
+  // shell and most in-app browsers are.
+  capacitorShell: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148',
+  linkedinInApp: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 [LinkedInApp]/9.29.6545',
+  instagramInApp: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 Instagram 320.0.2.30.98',
+  facebookInApp: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 Safari/604.1 [FBAN/FBIOS;FBAV/450.0]',
 }
 
 describe('iOS Safari detection', () => {
@@ -35,6 +41,16 @@ describe('iOS Safari detection', () => {
     // item that does not exist.
     expect(isIosSafari({ userAgent: UA.iphoneChrome, maxTouchPoints: 5 })).toBe(false)
     expect(isIosSafari({ userAgent: UA.iphoneFirefox, maxTouchPoints: 5 })).toBe(false)
+  })
+
+  it('is false inside this app\'s own native shell and in in-app browsers', () => {
+    // All four returned true before the Safari/ token was required: the App
+    // Store build would have told an installed user to install it, and a
+    // reader arriving from LinkedIn would have been sent hunting for a
+    // Share-sheet item their browser does not have.
+    for (const key of ['capacitorShell', 'linkedinInApp', 'instagramInApp', 'facebookInApp']) {
+      expect(isIosSafari({ userAgent: UA[key], maxTouchPoints: 5 }), key).toBe(false)
+    }
   })
 
   it('is false on Android, which gets the real prompt instead', () => {
