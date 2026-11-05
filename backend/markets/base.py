@@ -168,6 +168,16 @@ class MarketPack:
     # prices when added, and must be buyable in this market.
     role_alternatives: dict = field(default_factory=dict)
 
+    # ── Asset classes, compared side by side ──
+    # One liquid proxy per kind of investment a reader here can actually
+    # make — from cash under the mattress to bitcoin — each measured over the
+    # same five years, in THIS market's currency, inflation-adjusted. A
+    # dollar instrument held by a Turkish reader earns its yield AND the
+    # lira's fall against the dollar, so it is converted before it is
+    # measured. `total_return` says whether dividends/coupons are included;
+    # `yield_ticker` names a live yield shown beside the row.
+    asset_classes: list[dict] = field(default_factory=list)
+
     # ── Educational, locale-specific content (NOT advice) ──
     #
     # Language and market are INDEPENDENT axes. Someone reading the English UI
@@ -226,3 +236,12 @@ EXPLORER_SECTORS = frozenset({
     "energy", "financials", "health_care", "industrials", "materials",
     "real_estate", "utilities", "conglomerate",
 })
+
+
+# The asset-class vocabulary, in the order the page lists them: roughly from
+# the calmest to the most volatile. A teaching order, not a ranking — no row
+# is recommended, and the crypto row says why the app does not recommend it.
+ASSET_CLASS_KEYS = (
+    "cash", "money_market", "tbill", "short_bond", "bonds", "long_bond",
+    "gold", "real_estate", "equity_home", "equity_us", "equity_world", "crypto",
+)

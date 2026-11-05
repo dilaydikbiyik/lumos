@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import AppHeader from '../components/AppHeader'
+import AssetClasses from '../components/AssetClasses'
 import Disclaimer from '../components/Disclaimer'
 import api from '../utils/api'
 import { percent } from '../utils/format'
@@ -28,6 +29,32 @@ import { percent } from '../utils/format'
  * page, made by the reader's own scrolling rather than by the app's say-so.
  */
 export default function StocksPage() {
+  const { t } = useTranslation()
+  // Kinds of investment first: before a single company means anything, a
+  // beginner needs to see where cash, bonds, gold and stocks sit next to
+  // each other. The explorer only fetches when its tab is opened.
+  const [tab, setTab] = useState('classes')
+  return (
+    <div className="page">
+      <AppHeader />
+      <div className="page-content" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <div role="tablist" style={{ display: 'flex', gap: 8 }}>
+          {['classes', 'stocks'].map(k => (
+            <button key={k} type="button" role="tab" aria-selected={tab === k}
+                    className={tab === k ? 'btn btn-primary' : 'btn btn-ghost'}
+                    style={{ flex: 1, minHeight: 44 }} onClick={() => setTab(k)}>
+              {t(k === 'classes' ? 'assetClasses.tabClasses' : 'assetClasses.tabStocks')}
+            </button>
+          ))}
+        </div>
+        {tab === 'classes' ? <AssetClasses /> : <CompanyExplorer />}
+        <Disclaimer />
+      </div>
+    </div>
+  )
+}
+
+function CompanyExplorer() {
   const { t, i18n } = useTranslation()
   const [data, setData] = useState(null)
   const [error, setError] = useState(false)
@@ -61,9 +88,7 @@ export default function StocksPage() {
   const harder = index ? shown.filter(s => s.worst_drop_pct < index.worst_drop_pct).length : 0
 
   return (
-    <div className="page">
-      <AppHeader />
-      <div className="page-content" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
         <div>
           <h2>{t('stocks.title')}</h2>
           <p style={{ fontSize: 13, marginTop: 4 }}>{t('stocks.subtitle')}</p>
@@ -171,9 +196,6 @@ export default function StocksPage() {
             )
           })}
         </div>
-
-        <Disclaimer />
-      </div>
     </div>
   )
 }

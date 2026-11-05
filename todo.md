@@ -3501,5 +3501,25 @@ hep SPY çıkıyor". İkisi ayrı sorunmuş.
       v5'ten sonra hâlâ v4'ü anlatıyordu (altının sabit payı ve 5 yıllık
       pencere yoktu). Güncellendi, ve artık metindeki her sayı motorun
       sabitleriyle testle bağlı: biri değişip diğeri değişmezse kırmızı.
+- [x] **Varlık türleri karşılaştırması** ("devlete borç veriyorduk, garanti
+      getiri… midastaki gibi yatırıma dair her şey olsun, eğitici ve
+      karşılaştırmalı"). `/stocks` artık iki sekmeli; varsayılanı "Varlık
+      türleri": nakit, para piyasası, **ABD hazine bonosu**, kısa/uzun
+      vadeli devlet tahvili, tahvil piyasası, altın, GYO, ülke borsası,
+      ABD/dünya borsası, Bitcoin — **aynı 5 yılda, okuyucunun para
+      biriminde, enflasyondan arındırılmış**, faiz/temettü dahil. Dolar
+      varlıkları günlük kurla çevriliyor; kur verisi yoksa satır
+      gösterilmiyor (dolar getirisi asla TL getirisi gibi yazılmıyor).
+      Pencere tarihe göre tam 5 yıl (enflasyon penceresiyle aynı); her seri
+      iş günü takvimine hizalı (hafta sonu işlem gören Bitcoin'in yıllık
+      oynaklığı doğru). Canlı veride dersler: "garantili" hazine bonosu
+      ABD'li için 5 yılda en kötü −%0,3, **Türk okuyucu için TL bazında
+      −%34,9** (garanti dolar cinsinden ve vadeye kadar); uzun vadeli
+      tahvil ABD'de −%43,7 düşmüş; faizsiz nakit TR'de reel −%85,7.
+      Bonolar ve uzun tahvil için bugünkü faiz canlı (^IRX, ^TNX).
+      Kişiye bağlı değil, sıralama öğretim sırası. 10 test, metinlerin
+      her dilde her sınıf için var olduğu dahil.
+- [ ] Almanya'da hazine bonosu satırı yok (para piyasası fonu var);
+      ABD bonosunun EUR karşılığı istenirse USDEUR=X ile eklenebilir.
 - [ ] Keşif listesi tarihli (2026-11) bir seçki; yılda bir piyasa
       değerlerine göre gözden geçirilmeli.

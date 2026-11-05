@@ -1273,5 +1273,82 @@
     },
     "basisTotal": "Şirketler ve endeks aynı şekilde ölçüldü: temettüler dahil.",
     "basisPrice": "Şirketler ve endeks aynı şekilde ölçüldü: temettüler hariç, çünkü bu endeksin temettülü sürümü veri kaynağımızda yok. Temettü dağıtan şirketlerin gerçek getirisi bundan biraz yüksektir."
+  },
+  "assetClasses": {
+    "tabClasses": "Varlık türleri",
+    "tabStocks": "Şirketler",
+    "title": "Yatırım türlerini karşılaştır",
+    "subtitle": "Nakitten Bitcoin'e, bir yatırımcının yapabileceği her şey — aynı beş yılda, aynı ölçüyle.",
+    "basis": "Tüm rakamlar {{currency}} cinsinden ve enflasyondan arındırılmış. Yabancı para birimindeki varlıklar günlük kurla çevrildi; faiz ve temettüler dahil. Bu bir öneri değil: her türü aynı ölçüyle yan yana görmen için.",
+    "headlineCash": "Aynı beş yılda hiçbir şey yapmamak — parayı nakit tutmak — reel olarak {{cash}} kaybettirdi.",
+    "headlineDrop": "En sert düşüş: {{name}}, {{drop}}.",
+    "real": "Reel 5 yıl",
+    "worst": "En kötü düşüş",
+    "vol": "Oynaklık",
+    "liveYield": "Bugünkü yıllık faiz: {{y}} ({{currency}}).",
+    "noDividends": "Bu satırda temettüler hariç — veri kaynağında temettülü sürüm yok.",
+    "unavailable": "Bu pazar için piyasa verisi şu an okunamadı.",
+    "k": {
+      "cash": {
+        "name": "Nakit (faizsiz)",
+        "what": "Kasada, cüzdanda ya da faizsiz hesapta duran para.",
+        "lesson": "Fiyatı hiç düşmez — ama enflasyon onu her ay eritir. Reel rakam, hiçbir şey yapmamanın bedeli."
+      },
+      "money_market": {
+        "name": "Para piyasası fonu",
+        "what": "Gecelik faizi kazanan, nakde en yakın fon.",
+        "lesson": "Neredeyse hiç düşmez; getirisi o günkü kısa vadeli faiz kadardır."
+      },
+      "tbill": {
+        "name": "ABD hazine bonosu (1–3 ay)",
+        "what": "ABD devletine birkaç aylığına borç vermek — \"garantili getiri\" diye bilinen şey.",
+        "lesson": "Kendi para biriminde neredeyse hiç düşmez ve faiz kadar kazandırır. Ama garanti, bononun para biriminde ve vadeye kadar geçerli: senin paran başka bir para birimiyse kur da işin içine girer — en kötü düşüş rakamı bunu gösteriyor."
+      },
+      "short_bond": {
+        "name": "Kısa vadeli devlet tahvili",
+        "what": "Devlete 1–3 yıllığına borç vermek.",
+        "lesson": "Faizler değişince biraz oynar; vadesi kısa olduğu için az."
+      },
+      "bonds": {
+        "name": "Tahvil piyasası geneli",
+        "what": "Devlet ve şirket tahvillerinden oluşan geniş bir sepet.",
+        "lesson": "Hisselerin klasik karşı ağırlığı — ama faizler hızla yükseldiğinde o da düşebilir."
+      },
+      "long_bond": {
+        "name": "Uzun vadeli devlet tahvili",
+        "what": "Devlete on yıldan uzun süreliğine borç vermek.",
+        "lesson": "\"Devlet borcu\" olduğu için güvenli sanılır; ama faizler yükselince fiyatı sert düşer. En kötü düşüş rakamına bak."
+      },
+      "gold": {
+        "name": "Altın",
+        "what": "Kasada tutulan fiziksel altına dayanan bir fon.",
+        "lesson": "Kâr ya da temettü üretmez; krizlerde çoğu zaman ayakta kalır ama kendisi de sert düşebilir."
+      },
+      "real_estate": {
+        "name": "Gayrimenkul fonları (GYO)",
+        "what": "Kira geliri olan binaların sahibi şirketlerden bir sepet.",
+        "lesson": "Ev almadan gayrimenkule ortak olmak. Faizlere duyarlıdır: borçlanma pahalanınca düşer."
+      },
+      "equity_home": {
+        "name": "Ülke borsası",
+        "what": "Bu pazarın büyük şirketlerinden oluşan endeks.",
+        "lesson": "Uzun vadede büyümenin ana motoru; kısa vadede sert düşüşleri var."
+      },
+      "equity_us": {
+        "name": "ABD borsası (S&P 500)",
+        "what": "ABD'nin en büyük 500 şirketi.",
+        "lesson": "Getiri hem şirketlerden hem de doların senin para birimine karşı değişiminden gelir."
+      },
+      "equity_world": {
+        "name": "Dünya borsaları",
+        "what": "Birçok ülkenin büyük şirketleri, tek fonda.",
+        "lesson": "Tek bir ülkeye bağlı kalmamak — çeşitlendirmenin en geniş hâli."
+      },
+      "crypto": {
+        "name": "Bitcoin",
+        "what": "Merkezi bir ihraççısı olmayan dijital varlık.",
+        "lesson": "Uygulama önermez. En kötü düşüş ve oynaklık nedenini gösteriyor — ve geçmişi, bir senaryo bandı çizmeye yetecek kadar uzun değil."
+      }
+    }
   }
 }

@@ -1273,5 +1273,82 @@
     },
     "basisTotal": "Unternehmen und Index werden gleich gemessen: Dividenden inklusive.",
     "basisPrice": "Unternehmen und Index werden gleich gemessen: ohne Dividenden, weil unsere Datenquelle keine Version dieses Index mit Dividenden hat. Bei Unternehmen, die Dividenden zahlen, ist die tatsächliche Rendite etwas höher."
+  },
+  "assetClasses": {
+    "tabClasses": "Anlagearten",
+    "tabStocks": "Unternehmen",
+    "title": "Anlagearten vergleichen",
+    "subtitle": "Von Bargeld bis Bitcoin, alles, was man anlegen kann — über dieselben fünf Jahre, gleich gemessen.",
+    "basis": "Alle Zahlen in {{currency}} und inflationsbereinigt. Anlagen in anderer Währung wurden zum Tageskurs umgerechnet; Zinsen und Dividenden inklusive. Das ist keine Empfehlung: es ist jede Art nebeneinander, mit einem Maß.",
+    "headlineCash": "In denselben fünf Jahren hat Nichtstun — Bargeld halten — real {{cash}} gekostet.",
+    "headlineDrop": "Der stärkste Rückgang: {{name}}, {{drop}}.",
+    "real": "Real 5 Jahre",
+    "worst": "Stärkster Rückgang",
+    "vol": "Volatilität",
+    "liveYield": "Heutiger Jahreszins: {{y}} ({{currency}}).",
+    "noDividends": "In dieser Zeile ohne Dividenden — die Datenquelle hat keine Version mit Dividenden.",
+    "unavailable": "Marktdaten für diesen Markt ließen sich gerade nicht lesen.",
+    "k": {
+      "cash": {
+        "name": "Bargeld (ohne Zinsen)",
+        "what": "Geld im Tresor, in der Geldbörse oder auf einem Konto ohne Zinsen.",
+        "lesson": "Sein Preis fällt nie — aber die Inflation frisst es jeden Monat. Die reale Zahl ist der Preis des Nichtstuns."
+      },
+      "money_market": {
+        "name": "Geldmarktfonds",
+        "what": "Ein Fonds, der den Tageszins verdient — so nah an Bargeld wie möglich.",
+        "lesson": "Er fällt kaum je; er verdient den kurzfristigen Zins des Tages."
+      },
+      "tbill": {
+        "name": "US-Schatzwechsel (1–3 Monate)",
+        "what": "Dem US-Staat für ein paar Monate Geld leihen — was man eine \"garantierte Rendite\" nennt.",
+        "lesson": "In der eigenen Währung fällt er kaum je und bringt den Zins. Aber die Garantie gilt in der Währung des Papiers und bis zur Fälligkeit: Liegt dein Geld in einer anderen Währung, spielt der Wechselkurs mit — die Zahl zum stärksten Rückgang zeigt es."
+      },
+      "short_bond": {
+        "name": "Kurzfristige Staatsanleihen",
+        "what": "Dem Staat für 1–3 Jahre Geld leihen.",
+        "lesson": "Bewegt sich etwas, wenn sich die Zinsen ändern; nur wenig, weil die Laufzeit kurz ist."
+      },
+      "bonds": {
+        "name": "Der gesamte Anleihenmarkt",
+        "what": "Ein breiter Korb aus Staats- und Unternehmensanleihen.",
+        "lesson": "Das klassische Gegengewicht zu Aktien — aber auch er kann fallen, wenn die Zinsen schnell steigen."
+      },
+      "long_bond": {
+        "name": "Langfristige Staatsanleihen",
+        "what": "Dem Staat für mehr als zehn Jahre Geld leihen.",
+        "lesson": "Gilt als sicher, weil es Staatsschulden sind; aber wenn die Zinsen steigen, fällt der Kurs stark. Sieh dir den stärksten Rückgang an."
+      },
+      "gold": {
+        "name": "Gold",
+        "what": "Ein Fonds, gedeckt durch physisches Gold im Tresor.",
+        "lesson": "Es erwirtschaftet weder Gewinne noch Dividenden; in Krisen hält es oft stand, kann aber selbst stark fallen."
+      },
+      "real_estate": {
+        "name": "Immobilienfonds (REITs)",
+        "what": "Ein Korb aus Unternehmen, denen vermietete Gebäude gehören.",
+        "lesson": "An Immobilien beteiligt sein, ohne ein Haus zu kaufen. Zinsempfindlich: fällt, wenn Kredite teurer werden."
+      },
+      "equity_home": {
+        "name": "Der heimische Aktienmarkt",
+        "what": "Ein Index der großen Unternehmen dieses Marktes.",
+        "lesson": "Langfristig der wichtigste Wachstumsmotor; kurzfristig mit starken Rückgängen."
+      },
+      "equity_us": {
+        "name": "Der US-Aktienmarkt (S&P 500)",
+        "what": "Die 500 größten US-Unternehmen.",
+        "lesson": "Die Rendite kommt sowohl von den Unternehmen als auch von der Bewegung des Dollars gegenüber deiner Währung."
+      },
+      "equity_world": {
+        "name": "Weltweite Aktienmärkte",
+        "what": "Große Unternehmen aus vielen Ländern in einem Fonds.",
+        "lesson": "Nicht an ein Land gebunden — die breiteste Form der Streuung."
+      },
+      "crypto": {
+        "name": "Bitcoin",
+        "what": "Ein digitaler Wert ohne zentralen Emittenten.",
+        "lesson": "Die App empfiehlt ihn nicht. Der stärkste Rückgang und die Volatilität zeigen, warum — und seine Historie ist zu kurz für ein Szenarioband."
+      }
+    }
   }
 }

@@ -78,6 +78,11 @@ will ask for each one.
    outside "investment advice" in all three markets, and whether anything
    about putting it inside an app that ALSO builds a personal portfolio
    changes that answer.
+   The same page now opens on a comparison of **asset classes** (cash,
+   Treasury bills, bonds, gold, property funds, stock markets, Bitcoin),
+   each represented by a named fund and measured the same way. Same
+   properties: impersonal, fixed teaching order, no "buy". Worth asking
+   whether naming a representative fund per class changes anything.
 10. **KVKK / GDPR:** the app stores income, debts and holdings. That is
    personal financial data. What does it oblige beyond the privacy policy
    already published — a data controller registration (VERBİS), a DPIA, a

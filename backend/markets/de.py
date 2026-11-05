@@ -193,6 +193,18 @@ DE = MarketPack(
         "EXHA.DE": [{"ticker": "EUNH.DE", "name": "iShares Core € Govt Bond UCITS ETF"},
                     {"ticker": "EUNA.DE", "name": "iShares Core Global Aggregate Bond UCITS ETF EUR Hedged"}],
     },
+    asset_classes=[
+        {"key": "cash", "ticker": None, "currency": "EUR", "total_return": True},
+        {"key": "money_market", "ticker": "XEON.DE", "currency": "EUR", "total_return": True},
+        {"key": "short_bond", "ticker": "EXHB.DE", "currency": "EUR", "total_return": True},
+        {"key": "bonds", "ticker": "EXHA.DE", "currency": "EUR", "total_return": True},
+        {"key": "long_bond", "ticker": "EXX6.DE", "currency": "EUR", "total_return": True},
+        {"key": "gold", "ticker": "4GLD.DE", "currency": "EUR", "total_return": True},
+        {"key": "real_estate", "ticker": "IQQP.DE", "currency": "EUR", "total_return": True},
+        {"key": "equity_home", "ticker": "EXS1.DE", "currency": "EUR", "total_return": True},
+        {"key": "equity_world", "ticker": "EUNL.DE", "currency": "EUR", "total_return": True},
+        {"key": "crypto", "ticker": "BTC-EUR", "currency": "EUR", "total_return": True},
+    ],
     reit_assets=[
         {"ticker": "IQQP.DE", "name": "iShares European Property Yield UCITS ETF", "category": "reit"},
     ],

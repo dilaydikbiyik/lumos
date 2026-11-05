@@ -1273,5 +1273,82 @@
     },
     "basisTotal": "Companies and index are measured the same way: dividends included.",
     "basisPrice": "Companies and index are measured the same way: dividends excluded, because our data source has no dividend-inclusive version of this index. For companies that pay dividends the true return is somewhat higher."
+  },
+  "assetClasses": {
+    "tabClasses": "Kinds of investment",
+    "tabStocks": "Companies",
+    "title": "Compare the kinds of investment",
+    "subtitle": "From cash to Bitcoin, everything an investor can do — over the same five years, measured the same way.",
+    "basis": "Every figure is in {{currency}} and inflation-adjusted. Assets in another currency were converted at the daily rate; interest and dividends included. This is not a recommendation: it is every kind side by side on one measure.",
+    "headlineCash": "Over the same five years, doing nothing — holding cash — lost {{cash}} in real terms.",
+    "headlineDrop": "The sharpest fall: {{name}}, {{drop}}.",
+    "real": "Real 5 years",
+    "worst": "Worst fall",
+    "vol": "Volatility",
+    "liveYield": "Today's annual yield: {{y}} ({{currency}}).",
+    "noDividends": "Dividends excluded in this row — the data source has no dividend-inclusive version.",
+    "unavailable": "Market data for this market could not be read right now.",
+    "k": {
+      "cash": {
+        "name": "Cash (no interest)",
+        "what": "Money in a safe, a wallet or an account that pays nothing.",
+        "lesson": "Its price never falls — but inflation erodes it every month. The real figure is the cost of doing nothing."
+      },
+      "money_market": {
+        "name": "Money-market fund",
+        "what": "A fund earning the overnight rate — the closest thing to cash.",
+        "lesson": "It barely ever falls; it earns whatever the short-term rate is that day."
+      },
+      "tbill": {
+        "name": "US Treasury bills (1–3 months)",
+        "what": "Lending to the US government for a few months — what people call a \"guaranteed return\".",
+        "lesson": "In its own currency it barely ever falls and earns the interest rate. But the guarantee is in the bill's currency and to maturity: if your money is in another currency, the exchange rate comes in too — the worst-fall figure shows it."
+      },
+      "short_bond": {
+        "name": "Short-term government bonds",
+        "what": "Lending to the government for 1–3 years.",
+        "lesson": "It moves a little when interest rates change; only a little, because the term is short."
+      },
+      "bonds": {
+        "name": "The whole bond market",
+        "what": "A broad basket of government and corporate bonds.",
+        "lesson": "The classic counterweight to stocks — but it can fall too when rates rise fast."
+      },
+      "long_bond": {
+        "name": "Long-term government bonds",
+        "what": "Lending to the government for more than ten years.",
+        "lesson": "Thought safe because it is government debt; but when rates rise its price falls hard. Look at the worst-fall figure."
+      },
+      "gold": {
+        "name": "Gold",
+        "what": "A fund backed by physical gold held in a vault.",
+        "lesson": "It produces no profits or dividends; it often holds up in a crisis but can fall hard itself."
+      },
+      "real_estate": {
+        "name": "Property funds (REITs)",
+        "what": "A basket of companies that own rent-earning buildings.",
+        "lesson": "Owning a share of property without buying a home. Sensitive to interest rates: it falls when borrowing gets expensive."
+      },
+      "equity_home": {
+        "name": "The home stock market",
+        "what": "An index of this market's large companies.",
+        "lesson": "The main engine of growth over the long run; sharp falls in the short run."
+      },
+      "equity_us": {
+        "name": "The US stock market (S&P 500)",
+        "what": "The 500 largest US companies.",
+        "lesson": "The return comes both from the companies and from the dollar's move against your currency."
+      },
+      "equity_world": {
+        "name": "World stock markets",
+        "what": "Large companies from many countries, in one fund.",
+        "lesson": "Not tied to one country — the broadest form of diversification."
+      },
+      "crypto": {
+        "name": "Bitcoin",
+        "what": "A digital asset with no central issuer.",
+        "lesson": "The app does not recommend it. The worst-fall and volatility figures show why — and its history is too short to draw a scenario band."
+      }
+    }
   }
 }

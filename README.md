@@ -315,6 +315,18 @@ to someone* is the line the legal review is about:
 - Returns are inflation-adjusted, like every figure in the app: the BIST 100 rose 615.7% in lira
   over those five years and **2.4%** after inflation.
 
+### 🧭 Every kind of investment, side by side
+
+The same page opens on the **kinds** of investment before any single company: cash, a
+money-market fund, US Treasury bills (the "lend to the US government for a guaranteed return"
+people ask about), short and long government bonds, the bond market, gold, property funds, the
+home market, US or world stocks, and Bitcoin. Every row is measured the same way — the same five
+years, **in the reader's own currency** at the daily exchange rate, inflation-adjusted, interest
+and dividends included — so the lessons come out of the numbers: a Treasury bill's worst fall
+was −0.3% for an American and **−34.9% in lira** for a Turkish saver (the guarantee is in dollars
+and to maturity), long-dated government bonds fell 43.7%, and idle cash lost 85.7% of its real
+value in Türkiye. Impersonal like the explorer, in teaching order rather than ranked.
+
 ### 📲 Installable, because push is the coach's only carrier
 
 "The market dropped, here is what you said you would do" is worthless an hour later, so the

@@ -121,6 +121,20 @@ TR = MarketPack(
                 {"ticker": "IEF", "name": "iShares 7-10 Year Treasury Bond ETF"}],
         "BIL": [{"ticker": "SHV", "name": "iShares 0-1 Year Treasury Bond ETF"}],
     },
+    asset_classes=[
+        {"key": "cash", "ticker": None, "currency": "TRY", "total_return": True},
+        {"key": "tbill", "ticker": "BIL", "currency": "USD", "total_return": True, "yield_ticker": "^IRX"},
+        {"key": "short_bond", "ticker": "SHY", "currency": "USD", "total_return": True},
+        {"key": "bonds", "ticker": "BND", "currency": "USD", "total_return": True},
+        {"key": "long_bond", "ticker": "TLT", "currency": "USD", "total_return": True, "yield_ticker": "^TNX"},
+        {"key": "gold", "ticker": "GLD", "currency": "USD", "total_return": True},
+        {"key": "real_estate", "ticker": "VNQ", "currency": "USD", "total_return": True},
+        # BIST 100 is a price index on the data source; no total-return
+        # version is available, so this row excludes dividends and says so.
+        {"key": "equity_home", "ticker": "XU100.IS", "currency": "TRY", "total_return": False},
+        {"key": "equity_us", "ticker": "SPY", "currency": "USD", "total_return": True},
+        {"key": "crypto", "ticker": "BTC-USD", "currency": "USD", "total_return": True},
+    ],
     reit_assets=[
         {"ticker": "VNQ", "name": "Vanguard Real Estate ETF", "category": "reit"},
         {"ticker": "SCHH", "name": "Schwab US REIT ETF", "category": "reit"},
