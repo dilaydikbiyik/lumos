@@ -34,9 +34,10 @@ same language as the user's question.
 End with the standard educational disclaimer."""
 
 
-def _extract_change(question: str) -> dict:
+def _extract_change(question: str, lang: str = "tr") -> dict:
     raw = _dispatch(
         [{"role": "user", "content": question}], _EXTRACT_PROMPT, max_tokens=200,
+        language=lang,
         # Pulling a number and a field name out of one sentence does not need
         # the model that later has to explain the result.
         model_filter=lambda m: any(
@@ -71,12 +72,12 @@ def _diff_summary(before: PortfolioRecommendResponse, after: PortfolioRecommendR
 
 
 def answer_what_if(question: str, current_risk_score: float, current_budget: float,
-                   market: str = "TR") -> dict:
+                   market: str = "TR", lang: str = "tr") -> dict:
     """
     Returns {"understood": bool, "answer": str|None, "diff": dict|None}.
     When not understood, the caller should fall back to normal chat.
     """
-    change = _extract_change(question)
+    change = _extract_change(question, lang)
     if not change.get("understood"):
         return {"understood": False, "answer": None, "diff": None}
 
@@ -89,8 +90,9 @@ def answer_what_if(question: str, current_risk_score: float, current_budget: flo
     # numbers came from the portfolio engine, which they did, for the wrong
     # country.
     before = build_portfolio(risk_score=current_risk_score, budget=current_budget,
-                             market=market)
-    after = build_portfolio(risk_score=new_risk, budget=new_budget, market=market)
+                             market=market, lang=lang)
+    after = build_portfolio(risk_score=new_risk, budget=new_budget, market=market,
+                            lang=lang)
     diff = _diff_summary(before, after)
 
     context = (

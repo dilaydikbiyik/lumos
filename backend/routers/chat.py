@@ -222,4 +222,5 @@ async def what_if_endpoint(
 
     user = await user_repository.get_or_create(db, user_id)
     return await asyncio.to_thread(answer_what_if, body.question, body.risk_score,
-                                   body.budget, user.market or "TR")
+                                   body.budget, user.market or "TR",
+                                   get_language(request))

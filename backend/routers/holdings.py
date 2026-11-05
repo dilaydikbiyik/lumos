@@ -12,6 +12,7 @@ from backend.middleware.verify_clerk import get_current_user
 from backend.repositories import holding_repository, user_repository
 from backend.schemas.holding import (
     OFF_EXCHANGE_TYPES,
+    VALUE_INSTEAD_OF_TICKER,
     CashErosion,
     HoldingCreate,
     HoldingRead,
@@ -100,12 +101,22 @@ async def create_holding(
     body: HoldingCreate,
     user_id: str = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
+    lang: str = Depends(language),
 ):
+    # Gold and crypto are the two exchange types a reader often holds OFF an
+    # exchange: metal in a drawer, a bank gold account, coins in their own
+    # wallet. Requiring a ticker for those meant the most common holding of
+    # a Turkish beginner — physical gold — could not be recorded as gold at
+    # all, on the same screen the gold card explains that drawer gold is its
+    # own thing. A value the reader states is enough; valuation already
+    # prefers a manual value over everything and skips ticker-less holdings.
+    #
+    # The message used to be hard-coded English, so a Turkish or German
+    # reader who hit it was told why in a language they had not chosen.
     if body.asset_type not in OFF_EXCHANGE_TYPES and not body.ticker:
-        raise HTTPException(
-            status_code=422,
-            detail="Exchange-traded assets (stock/fund/etf/gold/crypto) require a ticker.",
-        )
+        stated_value = body.asset_type in VALUE_INSTEAD_OF_TICKER and body.manual_current_value
+        if not stated_value:
+            raise HTTPException(status_code=422, detail=t("holdings.tickerRequired", lang))
     user = await user_repository.get_or_create(db, user_id)
     payload = body.model_dump()
     # Amounts are always entered in the currency the UI is showing, which is

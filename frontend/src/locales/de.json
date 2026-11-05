@@ -234,7 +234,8 @@
     "lookupConverted": "≈ {{price}} {{currency}}",
     "selectType": "Anlageart",
     "confirmDelete": "Löschen?",
-    "deleteLabel2": "Löschen bestätigen"
+    "deleteLabel2": "Löschen bestätigen",
+    "offExchangeHint": "Für physisches Gold, ein Bank-Goldkonto oder deine eigene Wallet kannst du das Symbol leer lassen; trag dann hier den heutigen Wert ein."
   },
   "goal": {
     "title": "🎯 Mein Ziel",

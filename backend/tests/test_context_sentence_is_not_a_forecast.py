@@ -254,3 +254,53 @@ def test_a_calm_digest_item_is_not_dropped_as_a_forecast(monkeypatch):
     monkeypatch.setattr(cache_service, "set", lambda key, value, ttl=None: None)
 
     assert news_service.get_daily_digest() == items, "a calm item was dropped"
+
+
+# ── the reader's language, enforced on the digest ───────────────────────────
+#
+# scripts/live_smoke.py measured a Turkish reader on the German market
+# receiving all three digest items in German: the model followed the language
+# of the headlines it was handed, not the instruction. These pin the fix.
+
+def _digest_env(monkeypatch, replies):
+    from backend.services import cache as cache_service
+    from backend.services import news_service
+
+    calls = []
+
+    def fake_generate(prompt, **kw):
+        calls.append(prompt)
+        return replies[min(len(calls), len(replies)) - 1]
+
+    monkeypatch.setattr(news_service, "fetch_headlines", lambda market="TR": [{"title": "x"}])
+    monkeypatch.setattr(news_service, "generate_text", fake_generate)
+    monkeypatch.setattr(cache_service, "get", lambda key: None)
+    monkeypatch.setattr(cache_service, "set", lambda key, value, ttl=None: None)
+    return news_service, calls
+
+
+_GERMAN = ('[{"headline": "Die Börse steigt", "why_it_matters": "Das betrifft dein '
+           'Portfolio nur indirekt.", "calmness_note": "Es gibt nichts zu tun."}]')
+_TURKISH = ('[{"headline": "Borsa yükseldi", "why_it_matters": "Bu, portföyünü '
+            'dolaylı olarak etkiler.", "calmness_note": "Şu an yapman gereken bir şey yok."}]')
+
+
+def test_a_digest_in_the_wrong_language_is_asked_for_again(monkeypatch):
+    news_service, calls = _digest_env(monkeypatch, [_GERMAN, _TURKISH])
+    digest = news_service.get_daily_digest(market="DE", lang="tr")
+    assert len(calls) == 2, "the wrong-language digest was not retried"
+    assert "translate" in calls[1], "the retry did not restate the instruction"
+    assert digest and digest[0]["headline"] == "Borsa yükseldi"
+
+
+def test_what_is_still_in_the_wrong_language_is_dropped(monkeypatch):
+    """German prose for a Turkish reader never reaches the card."""
+    news_service, calls = _digest_env(monkeypatch, [_GERMAN, _GERMAN])
+    assert news_service.get_daily_digest(market="DE", lang="tr") == []
+    assert len(calls) == 2
+
+
+def test_a_digest_already_in_the_right_language_costs_one_call(monkeypatch):
+    news_service, calls = _digest_env(monkeypatch, [_TURKISH])
+    assert news_service.get_daily_digest(market="DE", lang="tr")
+    assert len(calls) == 1, "a correct digest was regenerated for nothing"

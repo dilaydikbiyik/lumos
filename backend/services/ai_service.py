@@ -447,8 +447,20 @@ def _dispatch(
     tier: Optional[str] = None,
     providers: Optional[set] = None,
     model_filter=None,
-    language: str = "tr",
+    language: Optional[str] = None,
 ) -> str:
+    # The REQUEST's language when the caller gives none — not a hard-coded
+    # "tr". generate_text calls this without a language, so whenever the
+    # whole provider chain was down, every reader got the outage message in
+    # Turkish: a German reader asking a what-if question was told
+    # "Yapay zeka servisine şu an ulaşılamıyor". Found by scripts/
+    # live_smoke.py. The middleware already holds the request language in
+    # a ContextVar, and asyncio.to_thread copies the context into the
+    # worker thread, so this is right for every present caller and every
+    # future one that forgets.
+    if language is None:
+        from backend.middleware.language import current_language
+        language = current_language()
     tier_name, tier_cfg = _resolve_tier(tier)
     steps = _provider_chain(tier_cfg)
     if providers:

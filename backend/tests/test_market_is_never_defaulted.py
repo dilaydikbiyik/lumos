@@ -32,6 +32,8 @@ the source rather than an instance in a fixture.
 import ast
 import pathlib
 
+import pytest
+
 BACKEND = pathlib.Path(__file__).resolve().parent.parent
 
 # Functions whose own body RESOLVES the market before dispatching, so an
@@ -44,9 +46,24 @@ FORWARDING_OK = {
 }
 
 
-def _market_defaulting_functions() -> dict[str, tuple[str, int]]:
-    """name -> ("pos"|"kw", index of the market parameter)."""
-    sigs: dict[str, tuple[str, int]] = {}
+# The two axes this app has broken repeatedly, each with the value that a
+# forgotten argument silently becomes. Market and language are independent,
+# and both default to Turkish — so a call that forgets either one returns a
+# confident Turkish answer instead of failing.
+#
+# The language axis was added after scripts/live_smoke.py caught a German
+# reader receiving the AI-outage message in Turkish: generate_text called
+# _dispatch without a language. The market axis had already been fixed the
+# same way; the identical bug was sitting one parameter over.
+AXES = {
+    "market": (("market",), "TR"),
+    "language": (("lang", "language"), "tr"),
+}
+
+
+def _defaulting_functions(params, value) -> dict[str, tuple[str, int, str]]:
+    """name -> ("pos"|"kw", index, parameter name) for a param defaulting to value."""
+    sigs: dict[str, tuple[str, int, str]] = {}
     for path in BACKEND.rglob("*.py"):
         if "tests" in path.parts:
             continue
@@ -59,32 +76,35 @@ def _market_defaulting_functions() -> dict[str, tuple[str, int]]:
                 continue
             pos = [a.arg for a in node.args.posonlyargs + node.args.args]
             kwo = [a.arg for a in node.args.kwonlyargs]
-            if "market" in pos:
-                i = pos.index("market")
-                ndef = len(node.args.defaults)
-                if i >= len(pos) - ndef:
-                    default = node.args.defaults[i - (len(pos) - ndef)]
-                    if isinstance(default, ast.Constant) and default.value == "TR":
-                        sigs[node.name] = ("pos", i)
-            elif "market" in kwo:
-                i = kwo.index("market")
-                default = node.args.kw_defaults[i]
-                if isinstance(default, ast.Constant) and default.value == "TR":
-                    sigs[node.name] = ("kw", i)
+            for param in params:
+                if param in pos:
+                    i = pos.index(param)
+                    ndef = len(node.args.defaults)
+                    if i >= len(pos) - ndef:
+                        default = node.args.defaults[i - (len(pos) - ndef)]
+                        if isinstance(default, ast.Constant) and default.value == value:
+                            sigs[node.name] = ("pos", i, param)
+                elif param in kwo:
+                    i = kwo.index(param)
+                    default = node.args.kw_defaults[i]
+                    if isinstance(default, ast.Constant) and default.value == value:
+                        sigs[node.name] = ("kw", i, param)
     return sigs
 
 
-def test_the_backend_has_market_defaulting_functions_to_check():
+@pytest.mark.parametrize("axis", sorted(AXES))
+def test_the_backend_has_defaulting_functions_to_check(axis):
     """Guards the guard: if the scan finds nothing, the test below is vacuous."""
-    sigs = _market_defaulting_functions()
+    sigs = _defaulting_functions(*AXES[axis])
     assert len(sigs) > 20, (
-        f"only {len(sigs)} market-defaulting functions found — the scan is "
+        f"only {len(sigs)} {axis}-defaulting functions found — the scan is "
         "probably broken, which would make the real test below pass for free"
     )
 
 
-def test_no_call_site_takes_the_silent_turkish_default():
-    sigs = _market_defaulting_functions()
+@pytest.mark.parametrize("axis", sorted(AXES))
+def test_no_call_site_takes_the_silent_turkish_default(axis):
+    sigs = _defaulting_functions(*AXES[axis])
     offenders: list[str] = []
 
     for path in BACKEND.rglob("*.py"):
@@ -103,17 +123,17 @@ def test_no_call_site_takes_the_silent_turkish_default():
                 continue
             if (path.name, name) in FORWARDING_OK:
                 continue
-            kind, index = sigs[name]
-            if any(kw.arg == "market" for kw in node.keywords):
+            kind, index, param = sigs[name]
+            if any(kw.arg == param for kw in node.keywords):
                 continue
             if kind == "pos" and len(node.args) > index:
                 continue
             offenders.append(
                 f"{path.relative_to(BACKEND.parent)}:{node.lineno} "
-                f"calls {name}() without a market"
+                f"calls {name}() without a {axis}"
             )
 
     assert not offenders, (
-        "these call sites fall back to Turkish for every reader:\n  "
+        f"these call sites fall back to Turkish ({axis}) for every reader:\n  "
         + "\n  ".join(offenders)
     )

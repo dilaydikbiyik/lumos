@@ -545,7 +545,8 @@
     "lookupConverted": "≈ {{price}} {{currency}}",
     "selectType": "Varlık tipi",
     "confirmDelete": "Silinsin mi?",
-    "deleteLabel2": "Silmeyi onayla"
+    "deleteLabel2": "Silmeyi onayla",
+    "offExchangeHint": "Fiziksel altın, banka altın hesabı ya da kendi cüzdanın için sembolü boş bırakabilirsin; o zaman bugünkü değerini buraya yaz."
   },
   "fx": {
     "title": "Kur Dağılımı",

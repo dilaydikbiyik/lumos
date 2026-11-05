@@ -38,9 +38,12 @@ REGISTER = {
         "reit_explain_prompt.txt instructs the 90% distribution requirement "
         "and ~8-10% historical returns, which are not portfolio weights; the "
         "portfolio rule deleted every correct REIT explanation.",
-    ("news_service.py", "get_daily_digest"):
-        "forecast_language, per item. No portfolio is in scope, so there is "
-        "nothing to compare figures against; what it must not do is predict.",
+    ("news_service.py", "_generate_digest"):
+        "forecast_language AND language_check, per item, applied by its "
+        "caller get_daily_digest. No portfolio is in scope, so there is "
+        "nothing to compare figures against; it must not predict, and it "
+        "must be in the reader's language — the model drifted into the "
+        "language of the headlines it was given until that was enforced.",
     ("what_if.py", "answer_what_if"):
         "explanation_check.whatif_verified_or_dropped — a DIFFERENT allowed "
         "set from the portfolio rule, because a what-if answer legitimately "

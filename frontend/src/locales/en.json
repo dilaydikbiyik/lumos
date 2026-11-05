@@ -545,7 +545,8 @@
     "lookupConverted": "≈ {{price}} {{currency}}",
     "selectType": "Asset type",
     "confirmDelete": "Delete?",
-    "deleteLabel2": "Confirm delete"
+    "deleteLabel2": "Confirm delete",
+    "offExchangeHint": "For physical gold, a bank gold account or your own wallet you can leave the symbol empty; then enter today's value here."
   },
   "fx": {
     "title": "Currency Split",

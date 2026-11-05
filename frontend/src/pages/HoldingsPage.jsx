@@ -18,6 +18,11 @@ import { percent } from '../utils/format'
 
 const TYPE_KEYS = ['stock', 'fund', 'etf', 'real_estate', 'land', 'vehicle', 'gold', 'crypto', 'cash', 'other']
 const OFF_EXCHANGE = ['real_estate', 'land', 'vehicle', 'cash', 'other']
+// Held as often off an exchange as on one: physical gold, a bank gold account,
+// coins in a wallet. A symbol is optional for these; without one, the value
+// the reader states is what the holding is worth. Mirrors the backend's
+// VALUE_INSTEAD_OF_TICKER, so the form never offers a path the API refuses.
+const VALUE_INSTEAD_OF_TICKER = ['gold', 'crypto']
 
 const EMPTY_FORM = {
   asset_type: 'stock', name: '', ticker: '', quantity: '',
@@ -186,6 +191,11 @@ export default function HoldingsPage() {
   useEffect(() => () => clearTimeout(confirmTimer.current), [])
 
   const needsTicker = !OFF_EXCHANGE.includes(form.asset_type)
+  const tickerOptional = VALUE_INSTEAD_OF_TICKER.includes(form.asset_type)
+  // No symbol on gold or crypto means the stated value IS the valuation, so
+  // it stops being optional — otherwise the holding would sit at its
+  // purchase price forever and read as a measurement.
+  const valueRequired = tickerOptional && !form.ticker.trim()
   const isVehicle = form.asset_type === 'vehicle'
 
   return (
@@ -394,7 +404,7 @@ export default function HoldingsPage() {
             {needsTicker && (
               <>
                 <div style={{ display: 'flex', gap: 8 }}>
-                  <input className="input" style={{ flex: 1 }} required
+                  <input className="input" style={{ flex: 1 }} required={!tickerOptional}
                          placeholder={t('holdings.tickerPlaceholder', { example: pack.example_ticker })}
                          value={form.ticker}
                          onChange={e => { setForm({ ...form, ticker: e.target.value }); setLookup({ state: 'idle', data: null }) }}
@@ -473,7 +483,13 @@ export default function HoldingsPage() {
                 })}
               </p>
             )}
+            {valueRequired && (
+              <p style={{ fontSize: 'var(--t-micro)', color: 'var(--text-dim)', margin: '-4px 0 0', lineHeight: 1.5 }}>
+                {t('holdings.offExchangeHint')}
+              </p>
+            )}
             <input className="input" type="number" placeholder={t('holdings.currentPlaceholder')} min="1"
+                   required={valueRequired}
                    value={form.manual_current_value} onChange={e => setForm({ ...form, manual_current_value: e.target.value })} />
             <select className="input" value={form.emotion_tag}
                     aria-label={t('holdings.emotions.prompt')}

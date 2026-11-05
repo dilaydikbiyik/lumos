@@ -11,6 +11,12 @@ AssetType = Literal[
 # Assets that cannot be priced from an exchange — user provides valuations
 OFF_EXCHANGE_TYPES = {"real_estate", "land", "vehicle", "cash", "other"}
 
+# Exchange types that are just as often held off an exchange — physical gold,
+# a bank gold account, coins in a self-custody wallet. They accept a value the
+# reader states in place of a ticker. Stocks, funds and ETFs do not: there is
+# no drawer version of an index fund.
+VALUE_INSTEAD_OF_TICKER = {"gold", "crypto"}
+
 
 # Optional 1-tap emotion tag at purchase time — feeds the monthly behavior report
 EmotionTag = Literal["plan", "fomo", "tuyo", "panik"]

@@ -1,6 +1,7 @@
 """
 Holdings router tests — CRUD, wealth summary, remaining-budget math.
 """
+import pytest
 
 LAND = {
     "asset_type": "land",
@@ -97,3 +98,55 @@ def test_summary_no_erosion_when_fully_invested(client):
     s = client.get("/holdings/summary").json()
     assert s["remaining_budget"] == 0
     assert s["cash_erosion"] is None
+
+
+# ── gold and crypto held off an exchange ────────────────────────────────────
+#
+# Found by scripts/live_smoke.py on every market and language at once: a
+# reader could not record physical gold as gold. The form required a ticker
+# and the API refused without one, on the same screen whose gold card
+# explains that metal in a drawer is its own kind of holding. And the
+# refusal was hard-coded English.
+
+@pytest.mark.parametrize("asset_type", ["gold", "crypto"])
+def test_gold_and_crypto_accept_a_stated_value_instead_of_a_ticker(client, asset_type):
+    res = client.post("/holdings", json={
+        "asset_type": asset_type, "name": "Drawer", "purchase_amount": 20_000,
+        "manual_current_value": 23_000,
+    })
+    assert res.status_code == 201, res.text
+    # Read back the way the page does: the create response is not valued,
+    # the list is — and the stated value must win over the purchase price.
+    listed = {h["id"]: h for h in client.get("/holdings").json()}
+    assert listed[res.json()["id"]]["current_value"] == 23_000
+
+
+@pytest.mark.parametrize("asset_type", ["gold", "crypto"])
+def test_gold_without_ticker_or_value_is_still_refused(client, asset_type):
+    """
+    Neither a symbol nor a value means the holding would sit at its purchase
+    price forever and read as a measurement. That stays a 422.
+    """
+    res = client.post("/holdings", json={
+        "asset_type": asset_type, "name": "Drawer", "purchase_amount": 20_000,
+    })
+    assert res.status_code == 422
+
+
+@pytest.mark.parametrize("asset_type", ["stock", "fund", "etf"])
+def test_listed_assets_still_need_a_ticker_even_with_a_value(client, asset_type):
+    """There is no drawer version of an index fund."""
+    res = client.post("/holdings", json={
+        "asset_type": asset_type, "name": "X", "purchase_amount": 1_000,
+        "manual_current_value": 1_100,
+    })
+    assert res.status_code == 422
+
+
+@pytest.mark.parametrize("lang,word", [("tr", "sembol"), ("en", "symbol"), ("de", "Symbol")])
+def test_the_ticker_refusal_speaks_the_readers_language(client, lang, word):
+    res = client.post("/holdings", headers={"X-Lumos-Lang": lang}, json={
+        "asset_type": "etf", "name": "X", "purchase_amount": 1_000,
+    })
+    assert res.status_code == 422
+    assert word in res.json()["detail"], res.json()

@@ -68,3 +68,53 @@ def test_recommend_rejects_out_of_range_risk_score(client):
 def test_recommend_rejects_zero_budget(client):
     res = client.post("/recommend", json={"risk_score": 5, "budget": 0})
     assert res.status_code == 422
+
+
+# ── the recommendation survives the AI being down ───────────────────────────
+#
+# scripts/live_smoke.py ran out of free-tier AI quota partway through and
+# /recommend began returning 503: the deterministic portfolio, which needs no
+# model at all, was lost because the sentence beside it could not be written.
+
+def test_the_portfolio_is_served_when_every_ai_provider_is_down(client):
+    from unittest.mock import patch
+
+    from fastapi import HTTPException
+
+    down = HTTPException(status_code=503, detail="all providers down")
+    with patch("backend.routers.recommend.explain_portfolio", side_effect=down), \
+         patch("backend.routers.recommend.explain_reit_inclusion", side_effect=down):
+        res = client.post("/recommend", json={"risk_score": 6.0, "budget": 250000})
+
+    assert res.status_code == 200, res.text
+    body = res.json()
+    assert body["allocations"], "the portfolio itself must survive the outage"
+    assert body["plain_explanation"] == ""
+
+
+def test_the_portfolio_is_served_when_the_ai_raises_its_own_error(client):
+    from unittest.mock import patch
+
+    from backend.exceptions import AIServiceError
+
+    with patch("backend.routers.recommend.explain_portfolio",
+               side_effect=AIServiceError("quota")), \
+         patch("backend.routers.recommend.explain_reit_inclusion",
+               side_effect=AIServiceError("quota")):
+        res = client.post("/recommend", json={"risk_score": 6.0, "budget": 250000})
+
+    assert res.status_code == 200, res.text
+    assert res.json()["allocations"]
+
+
+def test_a_programming_error_in_the_explainer_still_surfaces(client):
+    """Only the outage is absorbed. A bug must not hide as a missing paragraph."""
+    from unittest.mock import patch
+
+    with patch("backend.routers.recommend.explain_portfolio",
+               side_effect=TypeError("broken")):
+        try:
+            res = client.post("/recommend", json={"risk_score": 6.0, "budget": 250000})
+        except TypeError:
+            return                      # raised through the test client: surfaced
+    assert res.status_code == 500

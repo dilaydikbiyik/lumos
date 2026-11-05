@@ -408,6 +408,12 @@ _C: dict[str, dict[str, str]] = {
     "category.cash": {"tr": "nakit", "en": "cash", "de": "Bargeld"},
     "category.other": {"tr": "diğer", "en": "other", "de": "Sonstiges"},
 
+    # ── holdings ──
+    "holdings.tickerRequired": {
+        "tr": "Borsada işlem gören varlıklar için bir sembol gerekiyor. Altın ve kripto için sembol yerine bugünkü değeri de yazabilirsin.",
+        "en": "Exchange-traded holdings need a symbol. For gold and crypto you can enter today's value instead.",
+        "de": "Börsengehandelte Positionen brauchen ein Symbol. Für Gold und Krypto kannst du stattdessen den heutigen Wert eintragen."},
+
     # ── push notification titles ──
     # A title, not a figure. The body is the coach's own message, keyed to
     # the reader's stated loss tolerance; a percentage in the title would

@@ -1,10 +1,11 @@
 import asyncio
 import logging
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.db.database import get_db
+from backend.exceptions import AIServiceError
 from backend.limiter import limiter
 from backend.middleware.verify_clerk import get_current_user
 from backend.repositories import user_repository
@@ -18,6 +19,33 @@ from backend.services.explainer import explain_portfolio, explain_reit_inclusion
 router = APIRouter()
 logger = logging.getLogger("lumos.recommend")
 
+
+
+async def _prose_or_nothing(fn, *args) -> str:
+    """
+    The model's sentence, or an empty string when the model is unavailable.
+
+    The portfolio is a formula and needs no model; only the sentence beside
+    it does. But the whole AI chain being down raised a 503 straight through
+    this endpoint, so when the free-tier quota ran out — measured by
+    scripts/live_smoke.py — the reader lost their RECOMMENDATION, not just
+    its explanation. The one feature built to not depend on a model was
+    taken down by the model being unavailable.
+
+    Narrow on purpose: only the outage itself is absorbed. A 503 from the
+    provider chain and AIServiceError mean "no sentence today"; anything
+    else is a bug and still raises. The page already renders without the
+    paragraph, the same way it does when explanation_check drops one.
+    """
+    try:
+        return await asyncio.to_thread(fn, *args)
+    except AIServiceError as exc:
+        logger.warning("explanation skipped — AI unavailable: %s", exc)
+    except HTTPException as exc:
+        if exc.status_code != 503:
+            raise
+        logger.warning("explanation skipped — every AI provider unavailable")
+    return ""
 
 @router.post("", response_model=PortfolioRecommendResponse)
 @limiter.limit("10/minute")
@@ -50,7 +78,7 @@ async def recommend(
 
     # explain_portfolio / explain_reit_inclusion call generate_text() which is
     # synchronous blocking I/O — run in a thread so the event loop stays free.
-    explanation = await asyncio.to_thread(
+    explanation = await _prose_or_nothing(
         explain_portfolio, portfolio, user_profile, lang, pack.currency, market
     )
     # Checked against the figures it was given before it reaches the reader.
@@ -70,7 +98,7 @@ async def recommend(
     )
 
     if portfolio.includes_reits:
-        reit_text = await asyncio.to_thread(
+        reit_text = await _prose_or_nothing(
             explain_reit_inclusion, portfolio, user_profile, lang
         )
         # The REIT-specific checker, NOT the portfolio one. Its prompt

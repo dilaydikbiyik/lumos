@@ -14,7 +14,7 @@ from typing import Optional
 import httpx
 
 from backend.services import cache as cache_service
-from backend.services import forecast_language
+from backend.services import forecast_language, language_check
 from backend.services.ai_service import generate_text
 
 logger = logging.getLogger("lumos.news")
@@ -86,23 +86,25 @@ def get_daily_digest(investment_path: str = "hybrid", market: str = "TR",
         return []
 
     titles = "\n".join(f"- {h['title']}" for h in headlines[:25])
-    raw = generate_text(
-        f"Investment path: {investment_path}\n\nHeadlines:\n{titles}",
-        system=_DIGEST_SYSTEM.format(
-            language=_LANGUAGE_NAMES.get(lang, _LANGUAGE_NAMES["tr"])
-        ),
-        # Summarising headlines into calm one-liners is mechanical work. Run
-        # it on a small fast model rather than the one the advisor uses.
-        job="light",
-    )
-    from backend.services.json_extract import extract_json_array
+    language_name = _LANGUAGE_NAMES.get(lang, _LANGUAGE_NAMES["tr"])
+    digest = _generate_digest(investment_path, titles, language_name)
 
-    digest = extract_json_array(raw)
-    if digest is None:
-        logger.warning("News digest JSON parse failed; returning empty digest")
-        digest = []
-
-    digest = digest[:3]
+    # The reader's language, ENFORCED rather than requested.
+    #
+    # The prompt says every field must be in the reader's language and that
+    # headlines in another language are to be translated. Measured by
+    # scripts/live_smoke.py, a Turkish reader on the German market got all
+    # three items in German — formal "Ihnen" and all — because the model
+    # followed the language of the headlines it was handed. So when an item
+    # comes back in the wrong language the digest is asked for once more,
+    # with the instruction restated where the model last looked; whatever is
+    # STILL in the wrong language is dropped. Dropping everything on the
+    # first miss would leave that reader with no news on any day.
+    if any(_item_wrong_language(item, lang) for item in digest):
+        logger.info("news digest: wrong language for %s/%s, asking again", market, lang)
+        retry = _generate_digest(investment_path, titles, language_name, insist=True)
+        if retry:
+            digest = retry
 
     # The forecast rule applied to the digest ITSELF, not only to the one
     # sentence context_sentence pulls out of it.
@@ -117,13 +119,50 @@ def get_daily_digest(investment_path: str = "hybrid", market: str = "TR",
     # The ITEM is dropped rather than the field, because an item whose
     # "why it matters" had to be removed has nothing left to say — the
     # headline alone is what this app set out not to be.
-    kept = [item for item in digest if not _item_predicts(item)]
+    kept = [item for item in digest
+            if not _item_predicts(item) and not _item_wrong_language(item, lang)]
     if len(kept) != len(digest):
-        logger.info("news digest: %s of %s items dropped as forecasts",
+        logger.info("news digest: %s of %s items dropped (forecast or wrong language)",
                     len(digest) - len(kept), len(digest))
 
     cache_service.set(cache_key, kept, ttl=_DIGEST_TTL)
     return kept
+
+
+def _generate_digest(investment_path: str, titles: str, language_name: str,
+                     insist: bool = False) -> list[dict]:
+    """One model call, parsed, capped at three items."""
+    from backend.services.json_extract import extract_json_array
+
+    prompt = f"Investment path: {investment_path}\n\nHeadlines:\n{titles}"
+    if insist:
+        # Restated at the END, after the headlines — the position the model
+        # attended to when it drifted into their language the first time.
+        prompt += (f"\n\nWrite EVERY field in {language_name}. The headlines above "
+                   f"are in another language; translate them. Do not answer in "
+                   f"the headlines' language.")
+    raw = generate_text(
+        prompt,
+        system=_DIGEST_SYSTEM.format(language=language_name),
+        # Summarising headlines into calm one-liners is mechanical work. Run
+        # it on a small fast model rather than the one the advisor uses.
+        job="light",
+    )
+    digest = extract_json_array(raw)
+    if digest is None:
+        logger.warning("News digest JSON parse failed; returning empty digest")
+        return []
+    return digest[:3]
+
+
+def _item_wrong_language(item: object, lang: str) -> bool:
+    """Whether any prose in one digest item reads as another language."""
+    if not isinstance(item, dict):
+        return False
+    return any(
+        language_check.wrong_language(str(item.get(field) or ""), lang)
+        for field in ("headline", "why_it_matters", "calmness_note")
+    )
 
 
 def _item_predicts(item: object) -> bool:
