@@ -48,6 +48,7 @@ TR = MarketPack(
     },
     rent_index_source="none",          # no separate rent index — spread off CPI
     default_index_ticker="XU100.IS",
+    default_index_name="BIST 100",
 
     # ── Planning inputs ──
     # These were global constants in assumptions.py until US and DE arrived
@@ -76,11 +77,44 @@ TR = MarketPack(
     # Turkish broker can reach only with overseas-market access — a caveat the
     # first-investment guide spells out.
     asset_universe=[
-        {"ticker": "XU100.IS", "name": "BIST 100", "category": "stocks"},
-        {"ticker": "SPY", "name": "S&P 500 ETF", "category": "stocks"},
-        {"ticker": "QQQ", "name": "Nasdaq 100 ETF", "category": "stocks"},
+        {"ticker": "XU100.IS", "name": "BIST 100", "category": "stocks", "overlap": "equity_tr"},
+        {"ticker": "SPY", "name": "S&P 500 ETF", "category": "stocks", "overlap": "equity_us"},
+        {"ticker": "QQQ", "name": "Nasdaq 100 ETF", "category": "stocks", "overlap": "equity_us"},
         {"ticker": "GLD", "name": "Gold ETF", "category": "gold"},
     ],
+    explorer_stocks=[
+        {"ticker": "AEFES.IS", "name": "Anadolu Efes", "sector": "consumer_staples"},
+        {"ticker": "AKBNK.IS", "name": "Akbank", "sector": "financials"},
+        {"ticker": "ARCLK.IS", "name": "Arçelik", "sector": "consumer_discretionary"},
+        {"ticker": "ASELS.IS", "name": "Aselsan", "sector": "industrials"},
+        {"ticker": "BIMAS.IS", "name": "BİM", "sector": "consumer_staples"},
+        {"ticker": "EKGYO.IS", "name": "Emlak Konut GYO", "sector": "real_estate"},
+        {"ticker": "ENKAI.IS", "name": "Enka İnşaat", "sector": "industrials"},
+        {"ticker": "EREGL.IS", "name": "Ereğli Demir ve Çelik", "sector": "materials"},
+        {"ticker": "FROTO.IS", "name": "Ford Otosan", "sector": "consumer_discretionary"},
+        {"ticker": "GARAN.IS", "name": "Garanti BBVA", "sector": "financials"},
+        {"ticker": "ISCTR.IS", "name": "Türkiye İş Bankası", "sector": "financials"},
+        {"ticker": "KCHOL.IS", "name": "Koç Holding", "sector": "conglomerate"},
+        {"ticker": "KRDMD.IS", "name": "Kardemir", "sector": "materials"},
+        {"ticker": "MGROS.IS", "name": "Migros", "sector": "consumer_staples"},
+        {"ticker": "PETKM.IS", "name": "Petkim", "sector": "materials"},
+        {"ticker": "PGSUS.IS", "name": "Pegasus", "sector": "industrials"},
+        {"ticker": "SAHOL.IS", "name": "Sabancı Holding", "sector": "conglomerate"},
+        {"ticker": "SISE.IS", "name": "Şişecam", "sector": "materials"},
+        {"ticker": "TAVHL.IS", "name": "TAV Havalimanları", "sector": "industrials"},
+        {"ticker": "TCELL.IS", "name": "Turkcell", "sector": "communication"},
+        {"ticker": "THYAO.IS", "name": "Türk Hava Yolları", "sector": "industrials"},
+        {"ticker": "TOASO.IS", "name": "Tofaş", "sector": "consumer_discretionary"},
+        {"ticker": "TTKOM.IS", "name": "Türk Telekom", "sector": "communication"},
+        {"ticker": "TUPRS.IS", "name": "Tüpraş", "sector": "energy"},
+        {"ticker": "YKBNK.IS", "name": "Yapı Kredi", "sector": "financials"},
+    ],
+    explorer_as_of="2026-11",
+    # BIST 100 is published as a PRICE index on the data source and no
+    # total-return version is available there, so Turkish companies are
+    # measured on prices too — dividends excluded on both sides, and the
+    # page says so.
+    explorer_benchmark={"ticker": "XU100.IS", "total_return": False},
     reit_assets=[
         {"ticker": "VNQ", "name": "Vanguard Real Estate ETF", "category": "reit"},
         {"ticker": "SCHH", "name": "Schwab US REIT ETF", "category": "reit"},

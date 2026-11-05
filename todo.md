@@ -3411,3 +3411,67 @@ maddeler günler süren onaylar başlatıyor, o yüzden bugün yapılmalı.
       aynı sayı geçiyor. Bir koruma testi `.env` yeniden okunmaya başlarsa
       fail ediyor. Ayarlar farklıyken yeşil bir yerel gate CI hakkında hiçbir
       şey söylemiyordu, ki onu çalıştırmanın tek sebebi bu.
+
+## "Midas gibi çok hisse" — çeşitlilik, gerçekçi ve tutarlı (2026-11-05)
+
+İstek: Midas'taki gibi çok çeşitli olsun ama eğitici kalsın; "dashboard'da
+hep SPY çıkıyor". İkisi ayrı sorunmuş.
+
+- [x] **"Hep SPY" motordaki bir kural yüzündenmiş, frontend'de değil.**
+      Kategori başına tek fon seçiliyordu ve BIST 100, S&P 500, Nasdaq aynı
+      "stocks" kovasındaydı. 36 senaryoluk ölçüm: Türk portföyü maksimum
+      risk dışında **hiç Türk şirketi tutmuyordu**; ABD evrenindeki
+      uluslararası fon VXUS **hiç seçilmiyordu**; Almanya'da DAX yoktu. Kural
+      aslında doğru bir şeyi koruyor (VNQ+SCHH, SPY+QQQ aynı şeyi tutar) —
+      yalnızca birimi yanlıştı. Artık **örtüşme grubu**: aynı varlıkları
+      tutan fonlar tek, farklı ülkeler ayrı. BIST 100 artık 250 bin+
+      bütçelerde her risk seviyesinde SPY'nin yanında; VXUS ve DAX geldi.
+      Eski kuralın asıl koruması (aynı endeksi izleyen iki fon asla birlikte
+      değil) testle korunuyor.
+
+- [x] **En agresif profilin en büyük kalemi altındı — 1 yıllık oynaklık
+      yüzünden.** Altın son bir yılda %29 oynaklık göstermiş (BIST %24,6,
+      Nasdaq %21); motor agresif profilde oynaklığa göre ağırlık verdiği için
+      parayı altına yığıyordu. 5 yılda altın %19,2, BIST %29,2; 10 yılda
+      %16,6 / %25,6. Tek bir sıra dışı yıl varlıkların sırasını ters
+      çeviriyordu. Pencere **5 yıl**; önbellek anahtarı pencereyi içeriyor
+      (yoksa production eski değerleri servis ederdi).
+
+- [x] **Piyasayı keşfet** (`/stocks`): TR 25, ABD 30, Almanya 26 büyük
+      şirket. Her sembol 5 yıllık canlı fiyatla, her şirket canlı piyasa
+      değeriyle doğrulandı (ABD'nin en küçüğü 195 milyar $). **Tavsiye
+      sınırı tasarıma gömülü ve testle zorlanıyor**: liste herkese aynı
+      (endpoint profili hiç okumuyor — iki zıt profil birebir aynı yanıtı
+      alıyor), isme göre sıralı (getiriye göre sıralama bir liderlik
+      tablosu, yani sıralamayla öneri olurdu), puan/sıra/"sana uygun" alanı
+      yok. Her satırın dersi ölçülmüş bir karşılaştırma: aynı beş yılda bu
+      şirket ne kadar düştü, endeks ne kadar düştü. Canlı veri: **Türkiye
+      25/25, ABD 25/30, Almanya 25/26** şirket endeksten sert düştü. Getiri
+      enflasyondan arındırılmış — BIST 100 nominal **%615,7**, reel **%2,4**.
+
+- [x] **Tutarlılık hatası, kendi kodumda bulundu:** şirketler temettülü,
+      ABD ve Türk endeksleri temettüsüz ölçülüyordu. Ölçülen fark: S&P 500
+      fiyat endeksi 5 yılda %56,8, temettülü %67,6; Tüpraş temettülü
+      %2.424, temettüsüz %1.498. Artık her pazarda şirketler ve endeks **tek
+      çağrıda, aynı temelde** ölçülüyor (ABD'de SPY, DAX zaten getiri
+      endeksi, Türkiye'de temettülü BIST 100 veri kaynağında olmadığı için
+      iki taraf da temettüsüz) ve sayfa hangi temeli kullandığını yazıyor.
+      S&P 500'ün reel getirisi %29,4 değil **%38,3**'müş.
+
+- [x] Türkçe alfabetik sıra: Unicode sırası Şişecam ve THY'yi "Z"nin
+      arkasına atıyordu; frontend okuyucunun dilinde (`Intl.Collator`)
+      sıralıyor. Endeks satırı sembol (`^GSPC`) değil ad (S&P 500) gösteriyor.
+
+- [x] `legal-review-brief.md`'ye 9. soru: keşif sayfası avukata özellikle
+      sorulmalı.
+
+- [ ] **Almanya'da 5 yıllık portföy senaryosu hiç çizilmiyor** — sebep bu
+      değişiklik değil: tahvil fonu EUNA.DE'nin geçmişi yalnızca 9 yıl ve
+      değişiklikten önce de portföydeydi. Daha uzun geçmişli bir Euro
+      tahvil UCITS fonu araştırılmalı; körlemesine değiştirilmedi.
+- [ ] **Agresif profilde altın hâlâ yüksek** (ABD %33). Artık bir veri
+      artefaktı değil, formülün kendi özelliği: agresif profil büyüme
+      varlıklarını oynaklıkla ağırlıklandırıyor. Bu bir ürün kararı —
+      değiştirmeden önce konuşalım.
+- [ ] Keşif listesi tarihli (2026-11) bir seçki; yılda bir piyasa
+      değerlerine göre gözden geçirilmeli.

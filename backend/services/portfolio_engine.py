@@ -78,19 +78,39 @@ def _pick_diversified(ranked: list[str], universe: list[dict], slots: int) -> li
     dropping an asset says so in as many words. So a second asset from an
     already-represented category is not filled in at all.
     """
-    category_of = {a["ticker"]: a["category"] for a in universe}
+    group_of = {a["ticker"]: _overlap_group(a) for a in universe}
     kept: list[str] = []
     used: set[str] = set()
 
-    for ticker in ranked:                       # first pass: one per category
+    for ticker in ranked:                       # one per overlap group
         if len(kept) >= slots:
             break
-        category = category_of.get(ticker)
-        if category not in used:
+        group = group_of.get(ticker)
+        if group not in used:
             kept.append(ticker)
-            used.add(category)
+            used.add(group)
 
     return kept
+
+
+def _overlap_group(asset: dict) -> str:
+    """
+    What a fund actually holds, for the one-per-exposure rule.
+
+    The rule used to key on `category`, and "stocks" was too coarse to be the
+    unit of overlap. Two funds on the same index ARE one exposure — VNQ and
+    SCHH, SPY and QQQ, the S&P 500 and an MSCI World that is mostly the
+    S&P 500 — and the rule is right to keep only one. But BIST 100 and the
+    S&P 500 are different countries, currencies and companies, and they
+    shared the "stocks" bucket, so a Turkish portfolio held SPY in every
+    scenario measured and never a single Turkish company; an American one
+    never held VXUS, the international fund already in its own universe;
+    and the most aggressive Turkish profile put HALF its money in gold,
+    because one stocks slot left the growth sleeve nothing else to fill
+    with. Assets declare their `overlap`; anything that does not falls back
+    to its category, so the REIT pair keeps working exactly as before.
+    """
+    return asset.get("overlap", asset["category"])
 
 
 def _position_cap(budget: float) -> int:
@@ -262,14 +282,17 @@ def build_portfolio(risk_score: float, budget: float, market: str = "TR",
     kept = _pick_diversified(ranked, growth_universe, growth_slots)
 
     category_of = {a["ticker"]: a["category"] for a in growth_universe}
-    kept_categories = {category_of[t] for t in kept}
+    group_of = {a["ticker"]: _overlap_group(a) for a in growth_universe}
+    kept_groups = {group_of[t] for t in kept}
     dropped: list[dict] = []
     for t in growth_w:
         if t not in kept:
             # Two funds tracking the same market are one exposure wearing two
             # names. Say which, so a dropped-but-higher-ranked asset doesn't
             # look arbitrary.
-            if category_of[t] in kept_categories:
+            # Keyed on the overlap group, like the picker: a fund dropped
+            # only for lack of slots must not be told it duplicated another.
+            if group_of[t] in kept_groups:
                 reason = _t("drop.same_category", lang,
                            category=_t(f"category.{category_of[t]}", lang))
             else:

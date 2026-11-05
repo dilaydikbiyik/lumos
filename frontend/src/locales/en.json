@@ -1230,5 +1230,44 @@
   "homeRoutes": {
     "title": "Other ways into a home",
     "subtitle": "What exists besides renting and a mortgage — and what each one protects."
+  },
+  "stocks": {
+    "title": "Explore the market",
+    "subtitle": "The largest companies on the exchange — what they are and how they behaved over the last five years.",
+    "notAdviceTitle": "This is not a list of picks",
+    "notAdvice": "The list is the same for everyone and sorted by name; it was not chosen for you and nothing in it means \"buy\". Beside each company we teach one thing: over the same five years, how far did that company fall, and how far did the whole index fall?",
+    "asOf": "A selection of large companies as of {{date}}, not an official index membership. Figures come from the last {{years}} years of prices.",
+    "error": "Market data could not be read right now. Try again shortly.",
+    "unavailable": "There is no market data for this market right now.",
+    "lessonHeadline": "{{harder}} of the {{total}} companies in this list fell harder than the index over the last five years.",
+    "indexLine": "The index ({{index}}) fell {{drop}} at its worst; its five-year return after inflation is {{real}}. The funds on the portfolio page hold baskets like this index, not a single company.",
+    "search": "Search a company or symbol",
+    "sectorFilter": "Sector",
+    "allSectors": "All sectors",
+    "empty": "No company matches this search.",
+    "worstDrop": "worst drop",
+    "lessonHarder": "At its worst it fell {{drop}}; over the same period the index fell {{index}}. A single company swings harder than the basket that contains it.",
+    "lessonCalmer": "It fell less than the index in this period ({{drop}}, index {{index}}) — but one company's past does not tell its future, and for most companies in this list it went the other way.",
+    "swing": "Its price swings about {{times}} times as much as the index.",
+    "realReturn": "Five-year return after inflation {{real}} (nominal {{nominal}}).",
+    "nominalOnly": "Five-year nominal return {{change}}; inflation data for the period could not be read, so the real return cannot be shown.",
+    "cta": "Explore the largest companies on the market",
+    "ctaSub": "How do the companies inside these funds behave on their own?",
+    "sector": {
+      "technology": "Technology",
+      "communication": "Communication",
+      "consumer_discretionary": "Consumer discretionary",
+      "consumer_staples": "Consumer staples",
+      "energy": "Energy",
+      "financials": "Financials",
+      "health_care": "Health care",
+      "industrials": "Industrials",
+      "materials": "Materials",
+      "real_estate": "Real estate",
+      "utilities": "Utilities",
+      "conglomerate": "Conglomerate"
+    },
+    "basisTotal": "Companies and index are measured the same way: dividends included.",
+    "basisPrice": "Companies and index are measured the same way: dividends excluded, because our data source has no dividend-inclusive version of this index. For companies that pay dividends the true return is somewhat higher."
   }
 }

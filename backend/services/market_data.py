@@ -47,6 +47,7 @@ DEFAULT_TICKERS = [
 def fetch_price_history(
     tickers: Optional[list] = None,
     period: str = "1y",
+    adjusted: bool = True,
 ) -> dict[str, pd.Series]:
     """
     Download adjusted close prices for the given tickers.
@@ -56,7 +57,13 @@ def fetch_price_history(
         dict mapping ticker → pd.Series of daily adjusted close prices.
     """
     tickers = tickers or DEFAULT_TICKERS
+    # `adjusted=False` returns plain prices with no dividends folded in. Every
+    # existing caller wants adjusted (total-return) prices and keeps its old
+    # cache key; the unadjusted series gets its own, so the two can never be
+    # served for each other.
     cache_key = f"price_history:{'_'.join(sorted(tickers))}:{period}"
+    if not adjusted:
+        cache_key += ":unadjusted"
     stale_key = f"stale:{cache_key}"
     lkg_key = f"lkg:{cache_key}"  # last-known-good: never-expiring last resort
 
@@ -68,7 +75,7 @@ def fetch_price_history(
         raw = yf.download(
             tickers=tickers,
             period=period,
-            auto_adjust=True,
+            auto_adjust=adjusted,
             progress=False,
             threads=True,
         )
@@ -95,7 +102,7 @@ def fetch_price_history(
             try:
                 single = yf.download(
                     tickers=ticker, period=period,
-                    auto_adjust=True, progress=False, threads=False,
+                    auto_adjust=adjusted, progress=False, threads=False,
                 )
                 if single is None or single.empty:
                     continue

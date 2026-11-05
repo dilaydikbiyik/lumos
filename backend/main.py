@@ -26,7 +26,7 @@ from backend.middleware.language import LanguageMiddleware
 from backend.middleware.request_id import RequestIDMiddleware
 from backend.routers import (admin, backtest, chat, client_errors, coach, feedback,
                              health, holdings, news, planning, practice, profile,
-                             push, recommend, users)
+                             push, recommend, stocks, users)
 
 
 @asynccontextmanager
@@ -248,6 +248,7 @@ _ROUTERS = [
     (feedback.router, "/feedback", ["Feedback"]),
     (client_errors.router, "/client-errors", ["Client"]),
     (push.router, "/push", ["Push"]),
+    (stocks.router, "/stocks", ["Stocks"]),
 ]
 
 for _router, _prefix, _tags in _ROUTERS:

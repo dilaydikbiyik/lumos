@@ -1230,5 +1230,44 @@
   "homeRoutes": {
     "title": "Andere Wege ins Eigenheim",
     "subtitle": "Was es neben Miete und Finanzierung gibt — und was jeweils geschützt ist."
+  },
+  "stocks": {
+    "title": "Den Markt entdecken",
+    "subtitle": "Die größten Unternehmen an der Börse — was sie sind und wie sie sich in den letzten fünf Jahren verhalten haben.",
+    "notAdviceTitle": "Das ist keine Empfehlungsliste",
+    "notAdvice": "Die Liste ist für alle gleich und nach Namen sortiert; sie wurde nicht für dich ausgewählt, und nichts darin bedeutet \"kaufen\". Neben jedem Unternehmen zeigen wir eine Sache: Wie stark fiel es in denselben fünf Jahren, und wie stark fiel der ganze Index?",
+    "asOf": "Eine Auswahl großer Unternehmen, Stand {{date}}, keine offizielle Indexzugehörigkeit. Die Zahlen stammen aus den Kursen der letzten {{years}} Jahre.",
+    "error": "Marktdaten konnten gerade nicht gelesen werden. Versuch es gleich noch einmal.",
+    "unavailable": "Für diesen Markt gibt es gerade keine Marktdaten.",
+    "lessonHeadline": "{{harder}} von {{total}} Unternehmen dieser Liste fielen in den letzten fünf Jahren stärker als der Index.",
+    "indexLine": "Der Index ({{index}}) fiel im schlimmsten Moment um {{drop}}; seine inflationsbereinigte Fünfjahresrendite liegt bei {{real}}. Die Fonds auf der Portfolio-Seite halten Körbe wie diesen Index, kein einzelnes Unternehmen.",
+    "search": "Unternehmen oder Symbol suchen",
+    "sectorFilter": "Branche",
+    "allSectors": "Alle Branchen",
+    "empty": "Kein Unternehmen passt zu dieser Suche.",
+    "worstDrop": "stärkster Rückgang",
+    "lessonHarder": "Im schlimmsten Moment fiel es um {{drop}}; im selben Zeitraum fiel der Index um {{index}}. Ein einzelnes Unternehmen schwankt stärker als der Korb, in dem es steckt.",
+    "lessonCalmer": "In diesem Zeitraum fiel es weniger als der Index ({{drop}}, Index {{index}}) — aber die Vergangenheit eines Unternehmens sagt nichts über seine Zukunft, und bei den meisten in dieser Liste war es umgekehrt.",
+    "swing": "Sein Kurs schwankt etwa {{times}}-mal so stark wie der Index.",
+    "realReturn": "Fünfjahresrendite nach Inflation {{real}} (nominal {{nominal}}).",
+    "nominalOnly": "Nominale Fünfjahresrendite {{change}}; Inflationsdaten für den Zeitraum ließen sich nicht lesen, daher keine reale Rendite.",
+    "cta": "Die größten Unternehmen am Markt entdecken",
+    "ctaSub": "Wie verhalten sich die Unternehmen in diesen Fonds für sich allein?",
+    "sector": {
+      "technology": "Technologie",
+      "communication": "Kommunikation",
+      "consumer_discretionary": "Zyklischer Konsum",
+      "consumer_staples": "Basiskonsum",
+      "energy": "Energie",
+      "financials": "Finanzen",
+      "health_care": "Gesundheit",
+      "industrials": "Industrie",
+      "materials": "Grundstoffe",
+      "real_estate": "Immobilien",
+      "utilities": "Versorger",
+      "conglomerate": "Mischkonzern"
+    },
+    "basisTotal": "Unternehmen und Index werden gleich gemessen: Dividenden inklusive.",
+    "basisPrice": "Unternehmen und Index werden gleich gemessen: ohne Dividenden, weil unsere Datenquelle keine Version dieses Index mit Dividenden hat. Bei Unternehmen, die Dividenden zahlen, ist die tatsächliche Rendite etwas höher."
   }
 }

@@ -30,6 +30,7 @@ US = MarketPack(
     regional_housing_source="fred",   # 50 states + DC, same series family
     rent_index_source="bls",       # rent of primary residence
     default_index_ticker="^GSPC",
+    default_index_name="S&P 500",
 
     news_feeds=[
         # Public RSS, no key. CNBC's own finance feed and Yahoo Finance.
@@ -78,11 +79,47 @@ US = MarketPack(
     inflation_fallback_pct=3.0,
 
     asset_universe=[
-        {"ticker": "SPY", "name": "S&P 500 ETF", "category": "stocks"},
-        {"ticker": "QQQ", "name": "Nasdaq 100 ETF", "category": "stocks"},
-        {"ticker": "VXUS", "name": "Total International Stock ETF", "category": "stocks"},
+        {"ticker": "SPY", "name": "S&P 500 ETF", "category": "stocks", "overlap": "equity_us"},
+        {"ticker": "QQQ", "name": "Nasdaq 100 ETF", "category": "stocks", "overlap": "equity_us"},
+        {"ticker": "VXUS", "name": "Total International Stock ETF", "category": "stocks", "overlap": "equity_intl"},
         {"ticker": "GLD", "name": "Gold ETF", "category": "gold"},
     ],
+    explorer_stocks=[
+        {"ticker": "AAPL", "name": "Apple", "sector": "technology"},
+        {"ticker": "AMD", "name": "Advanced Micro Devices", "sector": "technology"},
+        {"ticker": "AMZN", "name": "Amazon", "sector": "consumer_discretionary"},
+        {"ticker": "AVGO", "name": "Broadcom", "sector": "technology"},
+        {"ticker": "BAC", "name": "Bank of America", "sector": "financials"},
+        {"ticker": "BRK-B", "name": "Berkshire Hathaway", "sector": "financials"},
+        {"ticker": "COST", "name": "Costco", "sector": "consumer_staples"},
+        {"ticker": "CVX", "name": "Chevron", "sector": "energy"},
+        {"ticker": "DIS", "name": "Walt Disney", "sector": "communication"},
+        {"ticker": "GOOGL", "name": "Alphabet", "sector": "communication"},
+        {"ticker": "HD", "name": "Home Depot", "sector": "consumer_discretionary"},
+        {"ticker": "JNJ", "name": "Johnson & Johnson", "sector": "health_care"},
+        {"ticker": "JPM", "name": "JPMorgan Chase", "sector": "financials"},
+        {"ticker": "KO", "name": "Coca-Cola", "sector": "consumer_staples"},
+        {"ticker": "LLY", "name": "Eli Lilly", "sector": "health_care"},
+        {"ticker": "MA", "name": "Mastercard", "sector": "financials"},
+        {"ticker": "MCD", "name": "McDonald's", "sector": "consumer_discretionary"},
+        {"ticker": "META", "name": "Meta Platforms", "sector": "communication"},
+        {"ticker": "MRK", "name": "Merck & Co.", "sector": "health_care"},
+        {"ticker": "MSFT", "name": "Microsoft", "sector": "technology"},
+        {"ticker": "NFLX", "name": "Netflix", "sector": "communication"},
+        {"ticker": "NVDA", "name": "Nvidia", "sector": "technology"},
+        {"ticker": "ORCL", "name": "Oracle", "sector": "technology"},
+        {"ticker": "PEP", "name": "PepsiCo", "sector": "consumer_staples"},
+        {"ticker": "PG", "name": "Procter & Gamble", "sector": "consumer_staples"},
+        {"ticker": "TSLA", "name": "Tesla", "sector": "consumer_discretionary"},
+        {"ticker": "UNH", "name": "UnitedHealth Group", "sector": "health_care"},
+        {"ticker": "V", "name": "Visa", "sector": "financials"},
+        {"ticker": "WMT", "name": "Walmart", "sector": "consumer_staples"},
+        {"ticker": "XOM", "name": "Exxon Mobil", "sector": "energy"},
+    ],
+    explorer_as_of="2026-11",
+    # ^GSPC is a price index. SPY tracks the S&P 500 with dividends
+    # reinvested, which is how the companies are measured.
+    explorer_benchmark={"ticker": "SPY", "total_return": True},
     reit_assets=[
         {"ticker": "VNQ", "name": "Vanguard Real Estate ETF", "category": "reit"},
         {"ticker": "SCHH", "name": "Schwab US REIT ETF", "category": "reit"},

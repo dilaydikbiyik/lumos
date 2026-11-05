@@ -196,16 +196,58 @@ def test_picker_holds_fewer_positions_rather_than_a_duplicate():
     assert picked == ["VNQ", "GLD"]
 
 
-def test_no_recommended_portfolio_doubles_up_on_a_category():
-    """The invariant, checked end to end rather than on the picker alone."""
+def test_no_recommended_portfolio_doubles_up_on_an_exposure():
+    """
+    The invariant, checked end to end rather than on the picker alone.
+
+    It used to be "no doubled-up CATEGORY", and "stocks" was too coarse to be
+    the unit: it treated the BIST 100 and the S&P 500 as the same exposure,
+    so a Turkish portfolio never held a Turkish company. What must never
+    happen is two funds on the same holdings — VNQ with SCHH, SPY with QQQ,
+    the S&P 500 with an MSCI World that is mostly the S&P 500. That is what
+    the overlap group names, and it is what this now checks, in every market.
+    """
+    from backend.markets import get_market_pack
+    from backend.services.portfolio_engine import _overlap_group, build_portfolio
+
+    for market in ("TR", "US", "DE"):
+        pack = get_market_pack(market)
+        group_of = {a["ticker"]: _overlap_group(a)
+                    for a in [*pack.asset_universe, *pack.reit_assets]}
+        for score in (1.0, 3.0, 5.0, 7.0, 9.0, 10.0):
+            for budget in (5_000, 50_000, 200_000, 1_000_000):
+                portfolio = build_portfolio(risk_score=score, budget=budget, market=market)
+                groups = [group_of[a.ticker] for a in portfolio.allocations
+                          if a.ticker in group_of]
+                assert len(groups) == len(set(groups)), (market, score, budget, groups)
+
+
+@pytest.mark.parametrize("market,home", [("TR", "XU100.IS"), ("US", "VXUS"), ("DE", "EXS1.DE")])
+def test_a_second_market_reaches_the_portfolio_once_there_is_room(market, home):
+    """
+    What the overlap groups are for. Measured before the change: across
+    every budget and risk level, a Turkish portfolio held SPY and never the
+    BIST 100 below the maximum score; an American one never held VXUS, the
+    international fund already in its universe; a German one held MSCI World
+    without the DAX. With enough budget for a full growth sleeve, the second
+    market now appears at ordinary risk levels.
+    """
     from backend.services.portfolio_engine import build_portfolio
 
-    for score in (1.0, 3.0, 5.0, 7.0, 9.0, 10.0):
-        for budget in (5_000, 50_000, 200_000, 1_000_000):
-            portfolio = build_portfolio(risk_score=score, budget=budget, market="TR")
-            growth = [a.category for a in portfolio.allocations
-                      if a.category not in ("cash", "bond")]
-            assert len(growth) == len(set(growth)), (score, budget, growth)
+    p = build_portfolio(risk_score=5.0, budget=250_000, market=market)
+    assert home in {a.ticker for a in p.allocations}, (market, [a.ticker for a in p.allocations])
+
+
+def test_two_funds_on_the_same_index_still_never_appear_together():
+    """The original reason for the rule must survive the change."""
+    from backend.services.portfolio_engine import build_portfolio
+
+    for market in ("TR", "US"):
+        for score in (1.0, 5.0, 10.0):
+            tickers = {a.ticker for a in build_portfolio(
+                risk_score=score, budget=1_000_000, market=market).allocations}
+            assert not {"SPY", "QQQ"} <= tickers, (market, score, tickers)
+            assert not {"VNQ", "SCHH"} <= tickers, (market, score, tickers)
 
 
 def test_picker_keeps_rank_order_within_a_category():
@@ -224,3 +266,33 @@ def test_picker_never_exceeds_the_slot_count():
     universe = [{"ticker": t, "category": c} for t, c in
                 [("A", "stocks"), ("B", "gold"), ("C", "reit"), ("D", "bond")]]
     assert len(_pick_diversified(["A", "B", "C", "D"], universe, 2)) == 2
+
+
+def test_volatility_is_measured_over_five_years_and_cached_per_window():
+    """
+    One year let a single unusual year reorder the assets: gold measured 29%
+    over twelve months, above the BIST 100 and the Nasdaq, and the most
+    aggressive portfolios — which weight growth assets BY volatility — put
+    up to half their money into it. And the window was missing from the
+    cache key, so changing it would have left production serving the old
+    numbers.
+    """
+    from unittest.mock import patch
+
+    from backend.services import volatility
+
+    seen = {}
+
+    def fake_history(tickers, period="1y"):
+        seen["period"] = period
+        return {}
+
+    keys = []
+    with patch.object(volatility, "fetch_price_history", side_effect=fake_history), \
+         patch.object(volatility.cache_service, "get",
+                      side_effect=lambda k: keys.append(k) or None), \
+         patch.object(volatility.cache_service, "set"):
+        volatility.compute_volatility(["SPY"])
+
+    assert seen["period"] == "5y"
+    assert "5y" in keys[0], keys

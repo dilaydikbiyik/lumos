@@ -65,7 +65,20 @@ will ask for each one.
    fund structures, a real sector event. Any defamation or
    financial-promotion exposure in describing, for example, how a fund
    liquidation worked?
-9. **KVKK / GDPR:** the app stores income, debts and holdings. That is
+9. **The stock explorer.** The app now shows the largest companies on each
+   market — 25 in Türkiye, 30 in the US, 26 in Germany — with five years of
+   measured facts each: worst fall, volatility, inflation-adjusted return,
+   and the index's same figures beside them. It is built to be IMPERSONAL:
+   the same list for every reader on a market, the endpoint never reads the
+   profile, sorted by name rather than by return, no score or "suits you",
+   and every row's lesson is that the single company fell harder than the
+   index (measured: 25 of 25 in Türkiye). Tests enforce each of those
+   properties. Ask whether general, impersonal information about named
+   listed companies — of the kind a financial news site publishes — stays
+   outside "investment advice" in all three markets, and whether anything
+   about putting it inside an app that ALSO builds a personal portfolio
+   changes that answer.
+10. **KVKK / GDPR:** the app stores income, debts and holdings. That is
    personal financial data. What does it oblige beyond the privacy policy
    already published — a data controller registration (VERBİS), a DPIA, a
    retention schedule?

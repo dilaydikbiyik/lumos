@@ -97,6 +97,7 @@ DE = MarketPack(
     },
     rent_index_source="bundesbank",    # HICP actual rentals, same lineage
     default_index_ticker="^GDAXI",     # DAX
+    default_index_name="DAX",
 
     news_feeds=[
         # Public RSS, no key.
@@ -152,11 +153,42 @@ DE = MarketPack(
     # UCITS only — see the module docstring. Cash and bonds too: a German
     # investor cannot buy BIL or BND any more than they can buy SPY.
     asset_universe=[
-        {"ticker": "EXS1.DE", "name": "iShares Core DAX UCITS ETF", "category": "stocks"},
-        {"ticker": "IUSA.DE", "name": "iShares S&P 500 UCITS ETF", "category": "stocks"},
-        {"ticker": "EUNL.DE", "name": "iShares Core MSCI World UCITS ETF", "category": "stocks"},
+        {"ticker": "EXS1.DE", "name": "iShares Core DAX UCITS ETF", "category": "stocks", "overlap": "equity_de"},
+        {"ticker": "IUSA.DE", "name": "iShares S&P 500 UCITS ETF", "category": "stocks", "overlap": "equity_developed"},
+        {"ticker": "EUNL.DE", "name": "iShares Core MSCI World UCITS ETF", "category": "stocks", "overlap": "equity_developed"},
         {"ticker": "4GLD.DE", "name": "Xetra-Gold", "category": "gold"},
     ],
+    explorer_stocks=[
+        {"ticker": "ADS.DE", "name": "Adidas", "sector": "consumer_discretionary"},
+        {"ticker": "AIR.DE", "name": "Airbus", "sector": "industrials"},
+        {"ticker": "ALV.DE", "name": "Allianz", "sector": "financials"},
+        {"ticker": "BAS.DE", "name": "BASF", "sector": "materials"},
+        {"ticker": "BAYN.DE", "name": "Bayer", "sector": "health_care"},
+        {"ticker": "BEI.DE", "name": "Beiersdorf", "sector": "consumer_staples"},
+        {"ticker": "BMW.DE", "name": "BMW", "sector": "consumer_discretionary"},
+        {"ticker": "CBK.DE", "name": "Commerzbank", "sector": "financials"},
+        {"ticker": "DB1.DE", "name": "Deutsche Börse", "sector": "financials"},
+        {"ticker": "DBK.DE", "name": "Deutsche Bank", "sector": "financials"},
+        {"ticker": "DHL.DE", "name": "DHL Group", "sector": "industrials"},
+        {"ticker": "DTE.DE", "name": "Deutsche Telekom", "sector": "communication"},
+        {"ticker": "EOAN.DE", "name": "E.ON", "sector": "utilities"},
+        {"ticker": "HEI.DE", "name": "Heidelberg Materials", "sector": "materials"},
+        {"ticker": "HEN3.DE", "name": "Henkel", "sector": "consumer_staples"},
+        {"ticker": "IFX.DE", "name": "Infineon", "sector": "technology"},
+        {"ticker": "MBG.DE", "name": "Mercedes-Benz Group", "sector": "consumer_discretionary"},
+        {"ticker": "MRK.DE", "name": "Merck KGaA", "sector": "health_care"},
+        {"ticker": "MUV2.DE", "name": "Munich Re", "sector": "financials"},
+        {"ticker": "RHM.DE", "name": "Rheinmetall", "sector": "industrials"},
+        {"ticker": "RWE.DE", "name": "RWE", "sector": "utilities"},
+        {"ticker": "SAP.DE", "name": "SAP", "sector": "technology"},
+        {"ticker": "SHL.DE", "name": "Siemens Healthineers", "sector": "health_care"},
+        {"ticker": "SIE.DE", "name": "Siemens", "sector": "industrials"},
+        {"ticker": "VNA.DE", "name": "Vonovia", "sector": "real_estate"},
+        {"ticker": "VOW3.DE", "name": "Volkswagen", "sector": "consumer_discretionary"},
+    ],
+    explorer_as_of="2026-11",
+    # The DAX is a performance index: dividends are already reinvested.
+    explorer_benchmark={"ticker": "^GDAXI", "total_return": True},
     reit_assets=[
         {"ticker": "IQQP.DE", "name": "iShares European Property Yield UCITS ETF", "category": "reit"},
     ],

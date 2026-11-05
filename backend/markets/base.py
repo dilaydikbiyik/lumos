@@ -32,6 +32,9 @@ class MarketPack:
     inflation_source: str         # "tcmb_evds" | "bls" | "eurostat" | "bundesbank" | "none"
     housing_index_source: str     # "tcmb_evds" | "eurostat" | "none"
     default_index_ticker: str     # yfinance ticker for the local blue-chip index
+    # What a reader calls that index. The explorer printed "^GSPC" where a
+    # person writes "S&P 500"; a symbol is data, a name is copy.
+    default_index_name: str = ""
     rent_index_source: str = "none"   # "bls" | "eurostat" | "bundesbank" | "none"
     # A NATIONAL house-price index and a SUB-NATIONAL breakdown are different
     # data products, and they need not come from the same provider: Germany's
@@ -138,6 +141,23 @@ class MarketPack:
     cash_asset: dict = field(default_factory=dict)
     bond_asset: dict = field(default_factory=dict)
 
+    # ── Stock explorer ──
+    # The largest companies on this market's exchange, for the explorer page
+    # — a browsable list that DESCRIBES and never recommends. A dated
+    # selection of large caps, not an official index membership, and every
+    # ticker was checked against five years of live prices when it was added.
+    # `sector` is one of EXPLORER_SECTORS so a typo cannot pass silently.
+    explorer_stocks: list[dict] = field(default_factory=list)
+    explorer_as_of: str = ""
+    # What each company is compared WITH, and on which basis. The companies
+    # and the benchmark must be measured the same way or the comparison is
+    # the lesson's opposite: prices with dividends folded in against a
+    # price-only index flatter every company. Measured: the S&P 500 price
+    # index gained 56.8% over five years where the same index with
+    # dividends gained 67.6%. `total_return` says whether dividends are
+    # included — for the companies AND the benchmark, always together.
+    explorer_benchmark: dict = field(default_factory=dict)
+
     # ── Educational, locale-specific content (NOT advice) ──
     #
     # Language and market are INDEPENDENT axes. Someone reading the English UI
@@ -187,3 +207,12 @@ class MarketPack:
             key: (labels.get(lang) or labels.get("en") or next(iter(labels.values()), ""))
             for key, labels in self.fear_options.items()
         }
+
+
+# The sector vocabulary of the stock explorer. Fixed, so each key is
+# translated once in every language and a pack cannot invent one.
+EXPLORER_SECTORS = frozenset({
+    "technology", "communication", "consumer_discretionary", "consumer_staples",
+    "energy", "financials", "health_care", "industrials", "materials",
+    "real_estate", "utilities", "conglomerate",
+})

@@ -92,6 +92,7 @@ def test_a_pack_declares_everything_the_app_asks_it_for(market):
     assert pack.currency_symbol
     assert re.fullmatch(r"[a-z]{2}-[A-Z]{2}", pack.locale), pack.locale
     assert pack.default_index_ticker
+    assert pack.default_index_name, "a reader sees the index's name, not its symbol"
 
     # Enumerations the code branches on, so a typo cannot pass silently.
     assert pack.inflation_source in {"tcmb_evds", "bls", "eurostat", "bundesbank", "none"}

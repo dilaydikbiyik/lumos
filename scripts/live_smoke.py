@@ -327,6 +327,7 @@ def journey(run: Run, client: TestClient, market: str, lang: str, ai_chat: bool)
     c("listing links", "POST", "/planning/listing-links", expect="any",
       json={"il": _CITY[market]})
     c("practice", "POST", "/practice/snapshot", json={"weights": weights})
+    c("stock explorer", "GET", "/stocks/explore")
 
     # ── news and coach ──────────────────────────────────────────────────────
     c("news digest", "GET", "/news/digest")
@@ -374,7 +375,7 @@ def journey(run: Run, client: TestClient, market: str, lang: str, ai_chat: bool)
     # translated answer, never a 5xx.
     c("admin set plan", "PATCH", f"/admin/users/{uid}/plan", expect="any",
       json={"plan": "free"})
-    c("admin self-demote", "PATCH", f"/admin/users/{uid}/role", expect="any",
+    c("admin self-demote", "PATCH", f"/admin/users/{uid}/role", expect={409},
       json={"role": "user"})
 
     # ── leaving ─────────────────────────────────────────────────────────────

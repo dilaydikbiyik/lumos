@@ -24,6 +24,7 @@ const ProfilePage = lazy(() => import('./pages/ProfilePage'))
 const HoldingsPage = lazy(() => import('./pages/HoldingsPage'))
 const ExplorePage = lazy(() => import('./pages/ExplorePage'))
 const RecommendPage = lazy(() => import('./pages/RecommendPage'))
+const StocksPage = lazy(() => import('./pages/StocksPage'))
 const DashboardPage = lazy(() => import('./pages/DashboardPage'))
 const AdminPage = lazy(() => import('./pages/AdminPage'))
 const LegalPage = lazy(() => import('./pages/LegalPage'))
@@ -114,6 +115,7 @@ export default function App() {
           <Route path="/holdings"  element={<ProtectedRoute><HoldingsPage /></ProtectedRoute>} />
           <Route path="/explore"   element={<ProtectedRoute><ExplorePage /></ProtectedRoute>} />
           <Route path="/recommend" element={<ProtectedRoute><RecommendPage /></ProtectedRoute>} />
+          <Route path="/stocks"    element={<ProtectedRoute><StocksPage /></ProtectedRoute>} />
           <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
           <Route path="/admin"     element={<ProtectedRoute><AdminPage /></ProtectedRoute>} />
           {/* Public on purpose: both app stores fetch these from a

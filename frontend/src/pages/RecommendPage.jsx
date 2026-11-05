@@ -8,6 +8,7 @@ import { sliceColor } from '../utils/palette'
 import ReitCard from '../components/ReitCard'
 import AssetExplainer from '../components/AssetExplainer'
 import Section from '../components/Section'
+import StocksLink from '../components/StocksLink'
 import ReferenceFacts from '../components/ReferenceFacts'
 import TimeMachine from '../components/TimeMachine'
 import FutureScenarios from '../components/FutureScenarios'
@@ -179,6 +180,10 @@ export default function RecommendPage() {
         )}
 
         {portfolio.includes_reits && <ReitCard explanation={portfolio.metadata?.reit_explanation} />}
+
+        {/* Right after the funds: the question a reader has on seeing fund
+            names is "which companies are in these?" */}
+        <StocksLink />
 
         {/* ONE band, not three stacked cards.
             Funds, gold and crypto each had their own card with its own

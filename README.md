@@ -292,6 +292,29 @@ needs the *structure* explained, and naming one issuer would turn reference mate
 recommendation this app is not licensed to make. Volatile figures (spreads, tax rates, custody
 percentages) are kept out by another test — the copy says what to **ask**, not what the answer is.
 
+### 🔎 Explore the market — many companies, described and never recommended
+
+The portfolio only ever names funds, and a reader who has heard of THYAO, Apple or SAP wants to
+see them. The explorer lists the largest companies on each market — 25 in Türkiye, 30 in the US,
+26 in Germany, each ticker verified against five years of live prices and live market caps —
+and is built so it **cannot** become a recommendation, because naming instruments *personalised
+to someone* is the line the legal review is about:
+
+- **The same for everyone.** The endpoint reads the reader's market and nothing else; a test
+  gives two readers with opposite profiles the same market and asserts identical answers.
+- **Sorted by name**, never by return — a list ordered by last year's winners is a recommendation
+  by ordering. No score, rank, rating or "suits you" anywhere in the payload.
+- **One lesson per company, measured:** over the same five years, how far did it fall at its
+  worst, and how far did the whole index fall? On live data, 25 of 25 Turkish companies, 25 of 30
+  American and 25 of 26 German fell harder than their index — the argument for the funds, made by
+  the reader's own scrolling.
+- **Like for like.** Companies and benchmark come from one fetch on one basis: with dividends where
+  the benchmark has them (SPY, the DAX), without where it does not (BIST 100), and the page says
+  which. Mixing the two had flattered every company — the S&P 500 gained 56.8% over five years as a
+  price index and 67.6% with dividends.
+- Returns are inflation-adjusted, like every figure in the app: the BIST 100 rose 615.7% in lira
+  over those five years and **2.4%** after inflation.
+
 ### 📲 Installable, because push is the coach's only carrier
 
 "The market dropped, here is what you said you would do" is worthless an hour later, so the
@@ -657,8 +680,8 @@ market.
 
 ```bash
 ./scripts/check.sh                     # everything CI runs, with exit codes that propagate
-python -m pytest backend/tests/ -q     # 1076 tests
-cd frontend && npm test                # 191 vitest tests
+python -m pytest backend/tests/ -q     # 1140 tests
+cd frontend && npm test                # 197 vitest tests
 ```
 
 ### Running the journey tests

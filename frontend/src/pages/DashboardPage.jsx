@@ -12,6 +12,7 @@ import PathInvitation from '../components/PathInvitation'
 import BehaviorMirror from '../components/BehaviorMirror'
 import Disclaimer from '../components/Disclaimer'
 import Section from '../components/Section'
+import StocksLink from '../components/StocksLink'
 import InstallHint from '../components/InstallHint'
 import PathSuggestion from '../components/PathSuggestion'
 import BudgetSplit from '../components/BudgetSplit'
@@ -271,6 +272,7 @@ export default function DashboardPage() {
                  subtitle={t('section.whatsHappeningSub')}>
           <NewsDigest />
           <HeadlineEducation />
+          <StocksLink />
         </Section>
 
         {/* Each card hides itself when it has nothing to say, so this band

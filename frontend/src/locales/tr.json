@@ -1230,5 +1230,44 @@
   "homeRoutes": {
     "title": "Eve giden başka yollar",
     "subtitle": "Kira ve kredi dışında ne var — ve hangisi neyi koruyor?"
+  },
+  "stocks": {
+    "title": "Piyasayı keşfet",
+    "subtitle": "Borsanın en büyük şirketleri — ne olduklarını ve son beş yılda nasıl davrandıklarını gör.",
+    "notAdviceTitle": "Bu bir öneri listesi değil",
+    "notAdvice": "Liste herkese aynı, isme göre sıralı; sana göre seçilmedi ve hiçbiri \"al\" anlamına gelmiyor. Her şirketin yanında tek bir şey öğretiyoruz: aynı beş yılda o şirket ne kadar düştü, bütün endeks ne kadar düştü.",
+    "asOf": "{{date}} itibarıyla büyük şirketlerden bir seçki, resmî endeks üyeliği değil. Rakamlar son {{years}} yılın fiyatlarından.",
+    "error": "Piyasa verisi şu an okunamadı. Biraz sonra tekrar dene.",
+    "unavailable": "Bu pazar için piyasa verisi şu an yok.",
+    "lessonHeadline": "Bu listedeki {{total}} şirketin {{harder}} tanesi, son beş yılda endeksten daha sert düştü.",
+    "indexLine": "Endeks ({{index}}) en kötü anında {{drop}} düştü; enflasyondan arındırılmış beş yıllık getirisi {{real}}. Portföy sayfasındaki fonlar tek bir şirketi değil, bu endeks gibi sepetleri tutuyor.",
+    "search": "Şirket ya da sembol ara",
+    "sectorFilter": "Sektör",
+    "allSectors": "Tüm sektörler",
+    "empty": "Bu aramaya uyan şirket yok.",
+    "worstDrop": "en kötü düşüş",
+    "lessonHarder": "En kötü anında {{drop}} düştü; aynı dönemde endeks {{index}} düştü. Tek bir şirket, onu da içeren sepetten daha sert sallanır.",
+    "lessonCalmer": "Bu dönemde endeksten daha az düştü ({{drop}}, endeks {{index}}) — ama tek bir şirketin geçmişi geleceğini söylemez, ve listedeki çoğu şirket için tersi oldu.",
+    "swing": "Fiyatı, endeksin yaklaşık {{times}} katı oynak.",
+    "realReturn": "Enflasyondan arındırılmış beş yıllık getiri {{real}} (nominal {{nominal}}).",
+    "nominalOnly": "Beş yıllık nominal getiri {{change}}; bu dönem için enflasyon verisi okunamadığı için reel getiriyi gösteremiyoruz.",
+    "cta": "Piyasadaki büyük şirketleri keşfet",
+    "ctaSub": "Bu fonların içindeki şirketler tek başına nasıl davranıyor?",
+    "sector": {
+      "technology": "Teknoloji",
+      "communication": "İletişim",
+      "consumer_discretionary": "Tüketici (dayanıklı)",
+      "consumer_staples": "Temel tüketim",
+      "energy": "Enerji",
+      "financials": "Finans",
+      "health_care": "Sağlık",
+      "industrials": "Sanayi",
+      "materials": "Malzeme",
+      "real_estate": "Gayrimenkul",
+      "utilities": "Altyapı ve enerji dağıtımı",
+      "conglomerate": "Holding"
+    },
+    "basisTotal": "Şirketler ve endeks aynı şekilde ölçüldü: temettüler dahil.",
+    "basisPrice": "Şirketler ve endeks aynı şekilde ölçüldü: temettüler hariç, çünkü bu endeksin temettülü sürümü veri kaynağımızda yok. Temettü dağıtan şirketlerin gerçek getirisi bundan biraz yüksektir."
   }
 }

@@ -38,6 +38,21 @@ BASELINE_VOLATILITY = {
 _DEFAULT_VOL = 0.2
 
 
+# Five years, not one.
+#
+# Measured 2026-11-05: over ONE year gold's volatility was 29.0% — above the
+# BIST 100 (24.6%) and the Nasdaq 100 (21.0%) — because gold had an unusually
+# violent year. Over five years it is 19.2% and the BIST 100 29.2%; over ten,
+# 16.6% and 25.6%. A single unusual year was flipping the order of the
+# assets, and since an aggressive profile weights growth assets BY volatility,
+# the most aggressive portfolios put 43-50% of the money into gold — while
+# the app's own projection guard refuses to draw anything from fewer than
+# three independent periods. One year is not a description of an asset; it
+# is a description of last year. Five years covers a full cycle and still
+# moves when the world does.
+VOLATILITY_WINDOW = "5y"
+
+
 def compute_volatility(tickers: list[str]) -> dict[str, float]:
     """
     Return annualised volatility for each ticker.
@@ -45,13 +60,16 @@ def compute_volatility(tickers: list[str]) -> dict[str, float]:
     Returns:
         dict: { ticker: annualised_vol }   e.g. {"SPY": 0.18, "GLD": 0.14}
     """
-    cache_key = f"volatility:{'_'.join(sorted(tickers))}"
+    # The window is part of the key. It used to be absent, so changing the
+    # window would have left the durable cache serving last week's one-year
+    # numbers in production as if nothing had changed.
+    cache_key = f"volatility:{VOLATILITY_WINDOW}:{'_'.join(sorted(tickers))}"
     cached = cache_service.get(cache_key)
     if cached is not None:
         return cached
 
     try:
-        price_history = fetch_price_history(tickers, period="1y")
+        price_history = fetch_price_history(tickers, period=VOLATILITY_WINDOW)
     except MarketDataError as exc:
         # Data source and every cache tier are down: continue with
         # historical baseline volatilities — never show the user an error page.
