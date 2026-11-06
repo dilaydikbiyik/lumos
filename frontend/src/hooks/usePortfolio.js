@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useAuth } from '@clerk/clerk-react'
 import api, { setAuthToken } from '../utils/api'
 import { readJSON, writeJSON, userKey } from '../utils/storage'
+import { rememberProfile } from '../utils/homeRoute'
 
 // The recommendation is deterministic for a given (risk, budget) — cache it
 // per user so revisiting the portfolio page renders instantly instead of
@@ -84,6 +85,8 @@ export default function usePortfolio() {
       await ensureAuth()
       const res = await api.post('/profile', answers)
       setProfile(res.data)
+      // The next open goes straight to the dashboard (utils/homeRoute).
+      rememberProfile(userId)
       return res.data
     } catch (err) {
       setError(err.response?.data?.detail || t('quiz.saveError'))

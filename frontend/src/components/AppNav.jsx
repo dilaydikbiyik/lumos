@@ -6,6 +6,7 @@ import api, { setAuthToken } from '../utils/api'
 import LumosLogo from './LumosLogo'
 import MarketSwitcher from './MarketSwitcher'
 import LanguageSwitcher from './LanguageSwitcher'
+import { NAV_ITEMS } from './navItems'
 
 /* ── Inline SVG icons — lightweight, crisp alternative to emoji ── */
 const icons = {
@@ -44,15 +45,6 @@ const icons = {
   ),
 }
 
-// Labels are i18n KEYS — resolved at render time so a language switch
-// re-labels the nav without a reload.
-const NAV_ITEMS = [
-  { path: '/explore',   icon: 'explore',   label: 'nav.explore'   },
-  { path: '/profile',   icon: 'chat',      label: 'nav.profile'   },
-  { path: '/recommend', icon: 'portfolio', label: 'nav.portfolio' },
-  { path: '/holdings',  icon: 'holdings',  label: 'nav.holdings'  },
-  { path: '/dashboard', icon: 'dashboard', label: 'nav.dashboard' },
-]
 
 /**
  * One nav component, two surfaces: bottom bar on mobile, left sidebar on

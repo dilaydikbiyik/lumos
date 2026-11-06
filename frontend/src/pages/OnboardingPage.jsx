@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '@clerk/clerk-react'
 import api from '../utils/api'
+import { hasRememberedProfile, homeRoute, rememberProfile } from '../utils/homeRoute'
 import LumosLogo from '../components/LumosLogo'
 import { SignInButton, SignedIn, SignedOut, UserButton } from '@clerk/clerk-react'
 import DisclaimerModal from '../components/DisclaimerModal'
@@ -41,33 +42,51 @@ export default function OnboardingPage() {
   const { pack } = useMarket()
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const { userId } = useAuth()
+  const { userId, isLoaded, isSignedIn } = useAuth()
 
-  // A returning user with a finished risk profile must not walk the
-  // 3-step intro (path → fear check-in → quiz) again: straight to the
-  // dashboard. Cache answers instantly; the server confirms in the rare
-  // cache-miss case.
+  // Where this reader belongs (utils/homeRoute): a finished profile goes
+  // home, an unfinished intro resumes at its first open step. The device
+  // flag answers at once; the server is asked only when it is missing.
+  async function resolveHome({ timeoutMs }) {
+    if (hasRememberedProfile(userId)) return '/dashboard'
+    const res = await Promise.race([
+      api.get('/users/me'),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('slow')), timeoutMs)),
+    ])
+    if (res.data?.risk_score != null) rememberProfile(userId)
+    return homeRoute(res.data)
+  }
+
+  // A signed-in reader opening the app does not see the marketing page:
+  // they go straight to where they belong. The page stays for signed-out
+  // visitors, and for the first open on a device that has not yet accepted
+  // the disclaimer — it is shown there and must be agreed to once.
+  const [gaveUp, setGaveUp] = useState(false)
+  const disclaimerAccepted = (() => {
+    try { return localStorage.getItem('lumos-disclaimer-ok') === '1' } catch { return false }
+  })()
+  const routing = isLoaded && isSignedIn && disclaimerAccepted && !gaveUp
+  useEffect(() => {
+    if (!routing) return
+    let cancelled = false
+    // Longer than the button's wait: nothing else is on screen, and a free
+    // instance waking from sleep can take this long. If it gives up, the
+    // landing page and its Start button are the honest fallback.
+    resolveHome({ timeoutMs: 8000 })
+      .then(dest => { if (!cancelled) navigate(dest, { replace: true }) })
+      .catch(() => { if (!cancelled) setGaveUp(true) })
+    return () => { cancelled = true }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [routing])
+
   async function continueFromHero() {
-    if (userId && localStorage.getItem(`lumos-profile-${userId}`)) {
-      navigate('/dashboard')
-      return
-    }
     // The button used to await this request with no pending state, so on a
     // free instance waking from sleep it sat dead for the better part of a
     // minute. Two changes: it says it is working, and it stops waiting.
     setChecking(true)
     try {
-      const res = await Promise.race([
-        api.get('/profile'),
-        new Promise((_, reject) =>
-          setTimeout(() => reject(new Error('slow')), PROFILE_CHECK_TIMEOUT_MS)),
-      ])
-      if (res.data?.risk_score != null) {
-        // Remember it, so the next visit short-circuits above.
-        try { localStorage.setItem(`lumos-profile-${userId}`, '1') } catch { /* fine */ }
-        navigate('/dashboard')
-        return
-      }
+      navigate(await resolveHome({ timeoutMs: PROFILE_CHECK_TIMEOUT_MS }))
+      return
     } catch {
       // Either the backend is cold or it genuinely cannot say. The intro is
       // the safe destination: it is where a user with no profile belongs, and
@@ -86,6 +105,14 @@ export default function OnboardingPage() {
   const acceptDisclaimer = () => {
     localStorage.setItem('lumos-disclaimer-ok', '1')
     setShowDisclaimer(false)
+  }
+
+  if (routing) {
+    return (
+      <div className="page" style={{ alignItems: 'center', justifyContent: 'center' }}>
+        <div className="light-loader" style={{ width: 20, height: 20 }} />
+      </div>
+    )
   }
 
   return (

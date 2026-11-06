@@ -3624,6 +3624,17 @@ hep SPY çıkıyor". İkisi ayrı sorunmuş.
       aynı fonksiyondan geçiyor (`services/path_portfolio.py`), birbirleriyle
       çelişemezler. Emlak-mülkü kıyası GYO'suz portföyle (iki tarafta da
       emlak olmasın). 22 test.
+- [x] **Uygulama açılış akışı.** Uygulama `/` (tanıtım sayfası) ile açılıyor
+      ve oturum açmış, profili bitmiş okuyucu bile her açılışta "Başlayalım"a
+      basıp sunucu cevabını bekliyordu. Artık oturum açıksa doğrudan yerine
+      gidiyor (`utils/homeRoute.js`, testli): profil bitmiş → Panel; yol
+      seçilmemiş → /path; korku sorusu yok → /fear-check-in; quiz yok →
+      /profile. Cihaz bayrağı varsa anında, yoksa sunucuya 8 sn soruyor,
+      cevap gelmezse tanıtım sayfası + Başla. Sorumluluk reddi bir cihazda
+      ilk kez kabul edilene kadar tanıtım sayfası gösteriliyor. Profil
+      kaydedilince bayrak hemen yazılıyor. Yönlendirme `replace` — geri tuşu
+      tanıtım sayfasına sektirmiyor. Alt menü: Panel ilk sırada (açılış
+      ekranı), risk quizi son. Oturumsuz akış tarayıcıda denendi.
 - [ ] Almanya'da hazine bonosu satırı yok (para piyasası fonu var);
       ABD bonosunun EUR karşılığı istenirse USDEUR=X ile eklenebilir.
 - [ ] Keşif listesi tarihli (2026-11) bir seçki; yılda bir piyasa
