@@ -21,7 +21,7 @@ FAKE_PORTFOLIO = PortfolioRecommendResponse(
 
 def _patches():
     return (
-        patch("backend.routers.recommend.build_portfolio", return_value=FAKE_PORTFOLIO.model_copy(deep=True)),
+        patch("backend.services.path_portfolio.build_portfolio", return_value=FAKE_PORTFOLIO.model_copy(deep=True)),
         patch("backend.routers.recommend.explain_portfolio", return_value="Sade açıklama."),
         patch("backend.routers.recommend.explain_reit_inclusion", return_value="REIT açıklaması."),
     )
@@ -32,6 +32,9 @@ def test_recommend_returns_portfolio_with_explanations(client):
     # language suggests, so "TR" is a default rather than a constant — and a
     # test that asserts the threading should set what it asserts.
     client.patch("/users/me/market", json={"market": "TR"})
+    # Stocks-only: the whole budget is the portfolio, so the threading
+    # below is exact (a hybrid reader's portfolio is the split's market part).
+    client.patch("/users/me/investment-path", json={"investment_path": "stocks"})
     p_engine, p_explain, p_reit = _patches()
     with p_engine as m_engine, p_explain, p_reit:
         res = client.post("/recommend", json={"risk_score": 6.0, "budget": 100000})
@@ -45,13 +48,13 @@ def test_recommend_returns_portfolio_with_explanations(client):
     # market selects the investable universe (EU users cannot legally hold the
     # US-domiciled default set), the language selects the wording of the
     # rationale. A default request is the Turkish market read in Turkish.
-    m_engine.assert_called_once_with(6.0, 100000, "TR", "tr")
+    m_engine.assert_called_once_with(6.0, 100000, "TR", "tr", include_reits=False)
 
 
 def test_recommend_skips_reit_explanation_when_no_reits(client):
     no_reit = FAKE_PORTFOLIO.model_copy(deep=True)
     no_reit.includes_reits = False
-    with patch("backend.routers.recommend.build_portfolio", return_value=no_reit), \
+    with patch("backend.services.path_portfolio.build_portfolio", return_value=no_reit), \
          patch("backend.routers.recommend.explain_portfolio", return_value="Sade açıklama."), \
          patch("backend.routers.recommend.explain_reit_inclusion") as m_reit:
         res = client.post("/recommend", json={"risk_score": 3.0, "budget": 20000})

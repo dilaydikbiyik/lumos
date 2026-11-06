@@ -268,6 +268,9 @@ def test_a_contradicting_reit_explanation_never_reaches_the_client(client):
     """
     from unittest.mock import patch
 
+    # A property fund is only part of the portfolio on the real-estate path:
+    # stocks-only holds none, and a hybrid reader's property is the split's.
+    client.patch("/users/me/investment-path", json={"investment_path": "real_estate"})
     with patch("backend.routers.recommend.explain_reit_inclusion",
                return_value="GYO tarafını ARKK ile kurduk."):
         res = client.post("/recommend", json={"risk_score": 6.0, "budget": 250000})
@@ -285,6 +288,9 @@ def test_a_correct_reit_explanation_is_served_end_to_end(client):
     """
     from unittest.mock import patch
 
+    # A property fund is only part of the portfolio on the real-estate path:
+    # stocks-only holds none, and a hybrid reader's property is the split's.
+    client.patch("/users/me/investment-path", json={"investment_path": "real_estate"})
     with patch("backend.routers.recommend.explain_reit_inclusion",
                return_value=_reit_prose()):
         res = client.post("/recommend", json={"risk_score": 6.0, "budget": 250000})

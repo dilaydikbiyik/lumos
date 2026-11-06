@@ -199,8 +199,8 @@ async def portfolio_drift(
 ):
     """Has the portfolio drifted away from what the risk profile called for?
     The target is recomputed from the saved risk score, so nothing is stored."""
+    from backend.services import path_portfolio
     from backend.services.drift import compute_drift
-    from backend.services.portfolio_engine import build_portfolio
 
     user = await user_repository.get_or_create(db, user_id)
     if user.risk_score is None:
@@ -216,9 +216,14 @@ async def portfolio_drift(
     # The market picks the investable universe, so the drift target has to be
     # built against the user's own market — comparing a German portfolio to a
     # Turkish target would invent drift that isn't there.
-    target = await asyncio.to_thread(
-        build_portfolio, user.risk_score, user.budget or sum(values.values()),
-        user.market or "TR", lang,
+    # The same portfolio the recommendation shows — for the reader's path.
+    committed = await path_portfolio.committed_property(db, user)
+    target, _plan = await asyncio.to_thread(
+        lambda: path_portfolio.build_for_path(
+            user.investment_path, user.risk_score, user.budget or sum(values.values()),
+            user.market or "TR", lang,
+            monthly_outgoings=user.monthly_outgoings, committed_property=committed,
+        )
     )
     return compute_drift(holdings, values, target.allocations, lang)
 

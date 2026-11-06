@@ -194,7 +194,7 @@ async def extract_profile_endpoint(
     except ValidationError:
         raise HTTPException(
             status_code=422,
-            detail="Extracted profile is incomplete — please continue the conversation.",
+            detail=t("profile.extractIncomplete", get_language(request)),
         )
 
 
@@ -223,4 +223,4 @@ async def what_if_endpoint(
     user = await user_repository.get_or_create(db, user_id)
     return await asyncio.to_thread(answer_what_if, body.question, body.risk_score,
                                    body.budget, user.market or "TR",
-                                   get_language(request))
+                                   get_language(request), user.investment_path)

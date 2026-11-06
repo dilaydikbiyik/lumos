@@ -12,7 +12,6 @@ from backend.repositories import user_repository
 from backend.schemas.portfolio import PortfolioRecommendRequest, PortfolioRecommendResponse
 from backend.markets import get_market_pack
 from backend.middleware.language import language
-from backend.services.portfolio_engine import build_portfolio
 from backend.services import explanation_check
 from backend.services.explainer import explain_portfolio, explain_reit_inclusion
 
@@ -63,8 +62,19 @@ async def recommend(
     user = await user_repository.get_by_clerk_id(db, user_id)
     market = (user.market if user else None) or "TR"
     pack = get_market_pack(market)
-    portfolio = await asyncio.to_thread(
-        build_portfolio, body.risk_score, body.budget, market, lang
+    # Built for the reader's chosen path: a stocks-only reader gets no
+    # property fund, and a hybrid reader's portfolio is the market part of
+    # their budget split rather than a second plan for the whole budget.
+    from backend.services import path_portfolio
+
+    committed = await path_portfolio.committed_property(db, user) if user else 0.0
+    portfolio, _plan = await asyncio.to_thread(
+        lambda: path_portfolio.build_for_path(
+            user.investment_path if user else None, body.risk_score, body.budget,
+            market, lang,
+            monthly_outgoings=user.monthly_outgoings if user else None,
+            committed_property=committed,
+        )
     )
 
     user_profile = {}

@@ -62,7 +62,7 @@ def test_full_journey(client, scenario):
         assert score >= scenario["min_risk_score"]
 
     # 4) Portfolio recommendation (engine + mocked explainer)
-    with patch("backend.routers.recommend.build_portfolio",
+    with patch("backend.services.path_portfolio.build_portfolio",
                return_value=_fake_portfolio(score, scenario["answers"]["budget"])), \
          patch("backend.routers.recommend.explain_portfolio", return_value="Açıklama."):
         res = client.post("/recommend", json={

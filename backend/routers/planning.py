@@ -323,14 +323,9 @@ async def budget_split_plan(
     # somebody who has just bought a flat to put another 40% into property —
     # the moment a plan stops being believable, and the moment they most need
     # the rest of it replanned.
-    from backend.repositories import holding_repository
-    from backend.services.holdings_valuation import REAL_ESTATE_TYPES
+    from backend.services.path_portfolio import committed_property
 
-    holdings = await holding_repository.list_for_user(db, user.id)
-    committed = sum(
-        (h.manual_current_value or h.purchase_amount or 0)
-        for h in holdings if h.asset_type in REAL_ESTATE_TYPES
-    )
+    committed = await committed_property(db, user)
 
     result = split_service.split(
         budget=user.budget or 0,
@@ -378,8 +373,11 @@ async def property_vs_portfolio_compare(
 
     # The portfolio side is the reader's OWN allocation, not a generic index:
     # the question is "this amount in property or in MY portfolio".
+    # Without property funds: the comparison is property against the
+    # market portfolio, and a REIT inside it would put property on both sides.
     portfolio = await asyncio.to_thread(
-        build_portfolio, user.risk_score or 5.0, amount, market, lang
+        lambda: build_portfolio(user.risk_score or 5.0, amount, market, lang,
+                                include_reits=False)
     )
     weights = {a.ticker: a.weight for a in portfolio.allocations}
 

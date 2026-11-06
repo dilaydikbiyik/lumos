@@ -128,7 +128,14 @@
     "howtoLayerHint": "Aracı kurum hesabı açmaktan ilk emri vermeye kadar adım adım rehber.",
     "disclaimer": "Bu bilgiler yalnızca eğitim amaçlıdır. Geçmiş performans, gelecek sonuçların garantisi değildir. Yatırım kararlarınız için lisanslı bir finansal danışmana başvurun.",
     "backToDashboard": "Panele dön →",
-    "error": "Portföy önerisi alınamadı"
+    "error": "Portföy önerisi alınamadı",
+    "planPart": "Bu portföy, planının piyasa kısmı: {{total}} bütçenin {{market}} kadarı. {{reserve}} acil durum yedeği olarak kenarda, {{property}} gayrimenkule ({{vehicle}}) ayrıldı — dağılım Panel'deki bütçe planında.",
+    "planPartNoProperty": "Bu portföy, planının piyasa kısmı: {{total}} bütçenin {{market}} kadarı. {{reserve}} acil durum yedeği olarak kenarda — dağılım Panel'deki bütçe planında.",
+    "planVehicle": {
+      "physical": "konut",
+      "reit": "gayrimenkul fonu",
+      "none": "—"
+    }
   },
   "rationale": {
     "title": "Neden bu dağılım?",

@@ -63,7 +63,7 @@ def test_no_endpoint_returns_a_raw_exception_message(client):
     """
     payload = {"risk_score": 6.0, "budget": 100000}
 
-    with patch("backend.routers.recommend.build_portfolio",
+    with patch("backend.services.path_portfolio.build_portfolio",
                side_effect=ValueError(f"connection failed: key={FAKE_KEY}")) as engine:
         res = client.post("/api/v1/recommend", json=payload)
 

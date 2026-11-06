@@ -260,7 +260,8 @@ def _defensive_rationale(category: str, weight: float, defensive_target: float,
 
 
 def build_portfolio(risk_score: float, budget: float, market: str = "TR",
-                    lang: str = "tr") -> PortfolioRecommendResponse:
+                    lang: str = "tr",
+                    include_reits: bool | None = None) -> PortfolioRecommendResponse:
     """
     Compute a glide-path portfolio: a risk-sized defensive sleeve (cash + bonds)
     plus a volatility-blended growth sleeve (equities + gold + REIT).
@@ -273,7 +274,11 @@ def build_portfolio(risk_score: float, budget: float, market: str = "TR",
         PortfolioRecommendResponse with per-asset weights, per-asset rationale,
         and fully transparent allocation logic in metadata.
     """
-    include_reits = should_include_reits(budget, market)
+    # None = decide by budget (below the property entry point, a REIT is the
+    # property exposure). A reader's investment path overrides it: see
+    # services/path_portfolio.py.
+    if include_reits is None:
+        include_reits = should_include_reits(budget, market)
     # The investable universe is a legal fact, not a preference: EU retail
     # investors cannot buy US-domiciled ETFs (no PRIIPs Key Information
     # Document), so a market that defines its own universe always wins over

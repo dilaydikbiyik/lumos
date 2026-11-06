@@ -420,6 +420,10 @@ _C: dict[str, dict[str, str]] = {
         "tr": "Ağırlıkların toplamı yaklaşık 1 olmalı (şu an {total}).",
         "en": "Weights must sum to about 1 (got {total}).",
         "de": "Die Gewichte müssen sich zu etwa 1 summieren (aktuell {total})."},
+    "profile.extractIncomplete": {
+        "tr": "Profilin henüz tamamlanmadı — sohbete biraz daha devam edelim.",
+        "en": "Your profile isn't complete yet — let's continue the conversation a little.",
+        "de": "Dein Profil ist noch nicht vollständig — lass uns das Gespräch noch etwas fortsetzen."},
     "holdings.notFound": {
         "tr": "Varlık bulunamadı.",
         "en": "Holding not found.",

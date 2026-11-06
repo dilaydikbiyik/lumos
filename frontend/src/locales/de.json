@@ -133,7 +133,14 @@
     "howtoLayerHint": "Schritt für Schritt: vom Depot eröffnen bis zur ersten Order.",
     "disclaimer": "Diese Informationen dienen nur der Bildung. Vergangene Wertentwicklung ist keine Garantie für die Zukunft. Wende dich für Anlageentscheidungen an eine lizenzierte Fachperson.",
     "backToDashboard": "Zurück zur Übersicht →",
-    "error": "Der Portfoliovorschlag konnte nicht geladen werden"
+    "error": "Der Portfoliovorschlag konnte nicht geladen werden",
+    "planPart": "Dieses Portfolio ist der Marktteil deines Plans: {{market}} von {{total}} Budget. {{reserve}} bleiben als Notreserve beiseite, {{property}} gehen in Immobilien ({{vehicle}}) — die Aufteilung steht im Budgetplan in der Übersicht.",
+    "planPartNoProperty": "Dieses Portfolio ist der Marktteil deines Plans: {{market}} von {{total}} Budget. {{reserve}} bleiben als Notreserve beiseite — die Aufteilung steht im Budgetplan in der Übersicht.",
+    "planVehicle": {
+      "physical": "eine Wohnung",
+      "reit": "ein Immobilienfonds",
+      "none": "—"
+    }
   },
   "rationale": {
     "title": "Warum diese Aufteilung?",

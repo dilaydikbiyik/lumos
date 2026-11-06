@@ -128,7 +128,14 @@
     "howtoLayerHint": "A step-by-step guide, from opening a brokerage account to placing the first order.",
     "disclaimer": "This information is educational only. Past performance does not guarantee future results. Consult a licensed financial advisor for your investment decisions.",
     "backToDashboard": "Back to dashboard →",
-    "error": "The portfolio suggestion couldn't be loaded"
+    "error": "The portfolio suggestion couldn't be loaded",
+    "planPart": "This portfolio is the market part of your plan: {{market}} of your {{total}} budget. {{reserve}} stays aside as an emergency reserve and {{property}} goes to property ({{vehicle}}) — the split is in the budget plan on the Dashboard.",
+    "planPartNoProperty": "This portfolio is the market part of your plan: {{market}} of your {{total}} budget. {{reserve}} stays aside as an emergency reserve — the split is in the budget plan on the Dashboard.",
+    "planVehicle": {
+      "physical": "a home",
+      "reit": "a property fund",
+      "none": "—"
+    }
   },
   "rationale": {
     "title": "Why this split?",

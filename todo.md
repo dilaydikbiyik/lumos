@@ -3616,10 +3616,14 @@ hep SPY çıkıyor". İkisi ayrı sorunmuş.
       - "Holding not found." / "Weights must sum…" İngilizce sabitti → i18n.
       - Pratik modu her pazarda 100.000 (TR ~2.000 $, ABD 100.000 $) → TR
         100.000 TL, ABD/DE 2.000.
-- [ ] **Açık (tasarım kararı):** /recommend yatırım yolunu bilmiyor —
-      yalnızca hisse yolunda GYO çıkıyor; hibritte bütçe bölüşümünün GYO'su
-      ve nakdi, bütçenin %100'üyle kurulan portföyün GYO'su ve nakdinin
-      ÜSTÜNE ekleniyor (DE hibrit: efektif GYO ~%21).
+- [x] **Portföy artık yatırım yolunu biliyor** (onaylandı). Yalnızca hisse:
+      bütün bütçe, GYO yok. Hibrit/kararsız: portföy bütçe bölüşümünün
+      piyasa kısmıyla kuruluyor, içinde GYO yok — gayrimenkul payı yalnızca
+      bölüşümden (konut ya da GYO). Öneri sayfası bunun planın hangi kısmı
+      olduğunu yazıyor. Öneri, sapma (drift) hedefi ve "ya şöyle olsaydı"
+      aynı fonksiyondan geçiyor (`services/path_portfolio.py`), birbirleriyle
+      çelişemezler. Emlak-mülkü kıyası GYO'suz portföyle (iki tarafta da
+      emlak olmasın). 22 test.
 - [ ] Almanya'da hazine bonosu satırı yok (para piyasası fonu var);
       ABD bonosunun EUR karşılığı istenirse USDEUR=X ile eklenebilir.
 - [ ] Keşif listesi tarihli (2026-11) bir seçki; yılda bir piyasa

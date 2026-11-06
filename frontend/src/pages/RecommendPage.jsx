@@ -144,6 +144,20 @@ export default function RecommendPage() {
             </span>
             {portfolio.includes_reits && <span className="badge badge-green">{t('recommend.reitBadge')}</span>}
           </div>
+          {/* A hybrid reader's portfolio is one part of a plan, and the page
+              says which part — otherwise it reads as a second plan for the
+              whole budget, which is what it used to be. */}
+          {portfolio.metadata?.plan && (
+            <p style={{ fontSize: 12.5, lineHeight: 1.6, marginTop: 10, color: 'var(--text-muted)' }}>
+              {t(portfolio.metadata.plan.property_amount > 0 ? 'recommend.planPart' : 'recommend.planPartNoProperty', {
+                market: money(portfolio.metadata.plan.market_amount),
+                total: money(portfolio.metadata.plan.total_budget),
+                reserve: money(portfolio.metadata.plan.reserve),
+                property: money(portfolio.metadata.plan.property_amount),
+                vehicle: t(`recommend.planVehicle.${portfolio.metadata.plan.property_vehicle}`),
+              })}
+            </p>
+          )}
         </div>
 
         {/* ── Layer 1: YOUR PORTFOLIO — what you got and why (always visible) ── */}

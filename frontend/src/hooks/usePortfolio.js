@@ -47,7 +47,11 @@ export default function usePortfolio() {
   async function recommend(riskScore, budget) {
     // Instant render from cache; the fresh copy replaces it silently below.
     const cached = readCachedPortfolio(userId)
-    const hasCache = cached && cached.risk_score === riskScore && cached.budget === budget
+    // A hybrid reader's portfolio is built on the market part of their
+    // budget split, so its own `budget` is smaller than the one requested;
+    // the plan carries the requested total.
+    const cachedFor = cached?.metadata?.plan?.total_budget ?? cached?.budget
+    const hasCache = cached && cached.risk_score === riskScore && cachedFor === budget
     if (hasCache) setPortfolio(cached)
     setIsLoading(!hasCache)
     setError(null)

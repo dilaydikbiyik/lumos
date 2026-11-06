@@ -72,7 +72,7 @@ def _diff_summary(before: PortfolioRecommendResponse, after: PortfolioRecommendR
 
 
 def answer_what_if(question: str, current_risk_score: float, current_budget: float,
-                   market: str = "TR", lang: str = "tr") -> dict:
+                   market: str = "TR", lang: str = "tr", path: str | None = None) -> dict:
     """
     Returns {"understood": bool, "answer": str|None, "diff": dict|None}.
     When not understood, the caller should fall back to normal chat.
@@ -89,10 +89,14 @@ def answer_what_if(question: str, current_risk_score: float, current_budget: flo
     # changes if they add money was shown BIST instruments and told the
     # numbers came from the portfolio engine, which they did, for the wrong
     # country.
+    # The budget here is the portfolio's own (for a hybrid reader, the market
+    # part of their split), so the path's property rule applies as-is: no
+    # property fund unless the reader is on the real-estate path.
+    reits = None if path == "real_estate" else False
     before = build_portfolio(risk_score=current_risk_score, budget=current_budget,
-                             market=market, lang=lang)
+                             market=market, lang=lang, include_reits=reits)
     after = build_portfolio(risk_score=new_risk, budget=new_budget, market=market,
-                            lang=lang)
+                            lang=lang, include_reits=reits)
     diff = _diff_summary(before, after)
 
     context = (
