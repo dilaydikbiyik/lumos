@@ -416,6 +416,10 @@ _C: dict[str, dict[str, str]] = {
         "tr": "Rolü: {role}. Ağırlığın gerekçesi: {tilt} → %{pct}.",
         "en": "Its role: {role}. Why this weight: {tilt} → {pct}%.",
         "de": "Seine Rolle: {role}. Warum dieses Gewicht: {tilt} → {pct}%."},
+    "weight.defensive_capped": {
+        "tr": "Rolü: {role}. Ağırlığın gerekçesi: risk profilin portföyün ~%{defensive}'ünü savunmaya (nakit/tahvil) ayırmayı gerektiriyor; ama bu kadar az pozisyonlu bir portföyde tek bir pozisyon %{cap}'i geçemediği için savunma payı burada %{actual} oldu → %{pct}.",
+        "en": "Its role: {role}. Why this weight: your risk profile calls for roughly {defensive}% of the portfolio on the defensive side (cash/bonds); in a portfolio with this few positions no single one may exceed {cap}%, so the defensive side is {actual}% here → {pct}%.",
+        "de": "Seine Rolle: {role}. Warum dieses Gewicht: dein Risikoprofil verlangt rund {defensive}% des Portfolios auf der defensiven Seite (Bargeld/Anleihen); in einem Portfolio mit so wenigen Positionen darf keine einzelne {cap}% überschreiten, daher liegt die defensive Seite hier bei {actual}% → {pct}%."},
     "weight.defensive": {
         "tr": "Rolü: {role}. Ağırlığın gerekçesi: risk profilin portföyün ~%{defensive}'ünü savunmaya (nakit/tahvil) ayırmayı gerektiriyor → %{pct}.",
         "en": "Its role: {role}. Why this weight: your risk profile calls for roughly {defensive}% of the portfolio to sit on the defensive side (cash/bonds) → {pct}%.",

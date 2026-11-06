@@ -3552,6 +3552,21 @@ hep SPY çıkıyor". İkisi ayrı sorunmuş.
       %5 tabanının altında kalıp sonradan atılınca ağırlığı altına
       dağılıyor, altın "sabit %15" derken %17 çıkıyordu; sabit rol artık
       bölüşümden ÖNCE eleniyor. Formül metni sabitlere testle bağlı.
+- [x] **Release öncesi tarama (2026-11-06).** Canlı smoke 714 çağrı / 0
+      hata; motor 1.296 kombinasyonda (3 pazar × 12 bütçe × 12 risk × 3 dil)
+      değişmezlerle tarandı. Bulunan ve düzeltilen gerçekçilik hataları:
+      küçük portföyde sabit paylı çeşitlendirici (altın/GYO) tek hisse
+      fonunun yanında kalınca tavanın fazlası ona akıyordu — "sabit %10"
+      GYO %25, altın %33 çıkıyordu. Artık çeşitlendirici yalnızca iki hisse
+      fonuna yer kaldığında aday; küçük portföy dünya + ülke borsası + nakit.
+      Taban altında kalacak sabit rol seçilip sonra atılarak slot
+      harcıyordu (temkinli 20.000 TL portföy 3 yerine 2 pozisyon, %50
+      S&P 500). Çok temkinli küçük portföy artık nakit + tahvil + bir hisse
+      fonu. Savunma kartı tavan yüzünden kırpılan payı açıkça yazıyor
+      ("~%55 gerekir, burada %50") — kart ile grafik çelişmesin diye her
+      pazarda testli. Hesap denetimi testleri artık üç pazarda.
+      **Senin listen için:** production `/health` → `push: false`; VAPID
+      anahtarları Render env'de yok, push production'da çalışmıyor.
 - [ ] Almanya'da hazine bonosu satırı yok (para piyasası fonu var);
       ABD bonosunun EUR karşılığı istenirse USDEUR=X ile eklenebilir.
 - [ ] Keşif listesi tarihli (2026-11) bir seçki; yılda bir piyasa

@@ -10,6 +10,7 @@ Portfolio engine v4 logic tests — keeping the realism filter alive in code:
    a real capital-preservation weight; it shrinks monotonically as risk rises;
    no single position exceeds the concentration cap.
 """
+import math
 from unittest.mock import patch
 
 import pytest
@@ -430,3 +431,27 @@ def test_position_bands_are_in_each_markets_own_currency(monkeypatch):
     assert _position_cap(50_000, MARKET_PACKS["DE"].position_bands) == MAX_POSITIONS
     assert _position_cap(50_000, MARKET_PACKS["US"].position_bands) == MAX_POSITIONS
     assert _position_cap(50_000, MARKET_PACKS["TR"].position_bands) == 3
+
+
+@pytest.mark.parametrize("lang", ["tr", "en", "de"])
+def test_the_defensive_card_states_the_share_the_chart_shows(lang):
+    """A cautious 20,000 TL portfolio's cash card said "about 54% defensive"
+    beside a chart showing 50%, because the concentration cap had trimmed
+    the sleeve. Wherever a card states a defensive share, it is the one the
+    portfolio actually holds."""
+    from backend.services.portfolio_engine import build_portfolio
+
+    for market, budgets in (("TR", (5_000, 20_000, 150_000, 1_000_000)),
+                            ("US", (500, 1_000, 3_000, 50_000)),
+                            ("DE", (500, 1_000, 3_000, 50_000))):
+        for budget in budgets:
+            for score in (1.0, 1.5, 2.0, 3.0, 5.0, 7.0):
+                al = build_portfolio(risk_score=score, budget=budget, market=market, lang=lang).allocations
+                defensive = [a for a in al if a.category in ("cash", "bond")]
+                if not defensive:
+                    continue
+                pct = sum(a.weight for a in defensive) * 100
+                accepted = {str(math.floor(pct)), str(math.ceil(pct))}   # 43.5 may print as 43 or 44
+                for a in defensive:
+                    assert any(n in a.explanation for n in accepted), (
+                        market, budget, score, round(pct, 1), a.explanation)

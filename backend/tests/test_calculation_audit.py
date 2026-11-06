@@ -37,6 +37,12 @@ from backend.services.risk_engine import _WEIGHTS, compute_risk_score
 
 RISK_SCORES = [round(x * 0.5, 1) for x in range(2, 21)]
 BUDGETS = (5_000, 50_000, 200_000, 1_000_000)
+# The same audit in every market, with budgets in that market's currency:
+# position bands are per-market since they stopped being lira everywhere,
+# so a TR-only audit would leave two thirds of the engine's paths unread.
+MARKET_BUDGETS = {"TR": BUDGETS, "US": (500, 2_000, 5_000, 50_000),
+                  "DE": (500, 2_000, 5_000, 50_000)}
+MARKET_CASES = [(m, b) for m, budgets in MARKET_BUDGETS.items() for b in budgets]
 
 
 # ── Mortgage ──────────────────────────────────────────────────────────────────
@@ -90,8 +96,8 @@ def test_cash_erosion_is_the_purchasing_power_lost_not_the_price_rise():
 
 @pytest.mark.parametrize("score", RISK_SCORES)
 def test_weights_sum_to_one_and_respect_both_bounds(score):
-    for budget in BUDGETS:
-        portfolio = build_portfolio(risk_score=score, budget=budget, market="TR")
+    for market, budget in MARKET_CASES:
+        portfolio = build_portfolio(risk_score=score, budget=budget, market=market)
         weights = [a.weight for a in portfolio.allocations]
 
         assert sum(weights) == pytest.approx(1.0, abs=1e-9), (score, budget)
@@ -138,8 +144,8 @@ def test_concentration_guard_does_not_inflate_the_defensive_sleeve(score):
     the growth sleeve was small enough for one asset to reach the cap, which
     a TRY-denominated REIT threshold had been hiding.
     """
-    for budget in BUDGETS:
-        portfolio = build_portfolio(risk_score=score, budget=budget, market="TR")
+    for market, budget in MARKET_CASES:
+        portfolio = build_portfolio(risk_score=score, budget=budget, market=market)
         actual = sum(a.weight for a in portfolio.allocations
                      if a.category in ("cash", "bond")) * 100
         published = portfolio.metadata["allocation_logic"]["defensive_target_pct"]
@@ -148,7 +154,7 @@ def test_concentration_guard_does_not_inflate_the_defensive_sleeve(score):
         # position hits the position cap before the sleeve is full, and a
         # concentration limit has to win over a sleeve target — but nothing
         # may push weight INTO the sleeve behind the formula's back.
-        assert actual <= published + 0.6, (score, budget, actual, published)
+        assert actual <= published + 0.6, (market, score, budget, actual, published)
 
 
 def test_defensive_share_never_rises_as_risk_rises():

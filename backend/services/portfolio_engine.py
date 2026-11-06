@@ -244,10 +244,18 @@ def _growth_rationale(category: str, vol: float, weight: float, alpha: float, la
               pct=round(weight * 100, 1))
 
 
-def _defensive_rationale(category: str, weight: float, defensive_target: float, lang: str) -> str:
-    return _t("weight.defensive", lang,
+def _defensive_rationale(category: str, weight: float, defensive_target: float,
+                         defensive_actual: float, cap: float, lang: str) -> str:
+    """The sleeve's share as the formula set it — or, when the concentration
+    cap trimmed it, both numbers and why. The card used to say "about 54%
+    defensive" beside a chart showing 50%."""
+    key = ("weight.defensive" if abs(defensive_actual - defensive_target) < 0.005
+           else "weight.defensive_capped")
+    return _t(key, lang,
               role=_role(category, lang),
               defensive=round(defensive_target * 100),
+              actual=round(defensive_actual * 100),
+              cap=round(cap * 100),
               pct=round(weight * 100, 1))
 
 
@@ -299,7 +307,21 @@ def build_portfolio(risk_score: float, budget: float, market: str = "TR",
     # How many SLOTS the budget supports — distinct from the per-position
     # WEIGHT cap below, which used to reuse this same name.
     slot_cap = _position_cap(budget, pack.position_bands)
-    n_defensive = 0 if defensive_target == 0 else min(2, max(slot_cap - 2, 1))
+    if defensive_target == 0:
+        n_defensive = 0
+    elif (slot_cap >= 3 and defensive_target > MAX_POSITION_PCT / 100.0
+          and growth_target <= MAX_POSITION_PCT / 100.0):
+        # A defensive side larger than one position may hold needs two
+        # positions, when the growth side fits in the one that is left:
+        # with a single cash position the cap trimmed a very cautious
+        # profile's 55% to 50%. Cash, a bond fund and one stock fund is also
+        # what a careful adviser would hand a cautious beginner with a small
+        # sum. When growth would NOT fit in one fund, its excess would be
+        # pushed into the defensive side behind the formula's back, so the
+        # sleeve keeps one position and the card states the trimmed share.
+        n_defensive = 2
+    else:
+        n_defensive = min(2, max(slot_cap - 2, 1))
     growth_slots = max(slot_cap - n_defensive, 1)
 
     # ── Growth sleeve: volatility blend, keep the top `growth_slots` ──
@@ -314,10 +336,29 @@ def build_portfolio(risk_score: float, budget: float, market: str = "TR",
     ranked = sorted(growth_w, key=growth_w.get, reverse=True)
     fixed_category = {a["ticker"]: a["category"] for a in growth_universe
                       if a["category"] in FIXED_GROWTH_SHARES}
-    if growth_slots == 1:
-        # A diversifier needs something to diversify. With room for one
-        # growth asset, a fixed role would become the whole sleeve.
-        ranked = [t for t in ranked if t not in fixed_category] or ranked
+    # Fixed-share diversifiers (gold, property) need stock funds beside them
+    # to diversify AND to absorb the concentration cap's excess. With fewer
+    # than two stock funds, the one beside them hits the 45% cap and the
+    # excess lands on the diversifier: a "fixed 10%" property fund came out
+    # at 25% and gold at 33% in small portfolios. So a diversifier is only a
+    # candidate while two growth slots remain for stock funds — in a small
+    # portfolio those slots go to the world and home markets, which is also
+    # what an adviser would do with a small sum. A role whose share would
+    # fall under the dust floor is not a candidate at all: picking it and
+    # dropping it later wasted the slot.
+    room = max(growth_slots - 2, 0)
+    taken: list[str] = []
+    candidates = []
+    for t in ranked:
+        cat = fixed_category.get(t)
+        if cat is None:
+            candidates.append(t)
+        elif (len(taken) < room
+              and FIXED_GROWTH_SHARES[cat] * growth_target >= MIN_WEIGHT_PCT / 100.0
+              and cat not in {fixed_category[x] for x in taken}):
+            taken.append(t)
+            candidates.append(t)
+    ranked = candidates or ranked
     kept = _pick_diversified(ranked, growth_universe, growth_slots)
 
     category_of = {a["ticker"]: a["category"] for a in growth_universe}
@@ -428,7 +469,10 @@ def build_portfolio(risk_score: float, budget: float, market: str = "TR",
         asset = by_ticker[t]
         category = asset.get("category", "other")
         if t in defensive_categories:
-            explanation = _defensive_rationale(category, weight, defensive_target, lang)
+            explanation = _defensive_rationale(
+                category, weight, defensive_target,
+                sum(w for tk, w in weights.items() if tk in defensive_categories),
+                effective_position_cap(len(weights)), lang)
         elif t in fixed_share and others:
             # The stated rule, or an honest note of why it does not hold here.
             # With three positions under a 45% cap, two capped positions
