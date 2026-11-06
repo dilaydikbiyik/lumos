@@ -416,6 +416,14 @@ _C: dict[str, dict[str, str]] = {
         "tr": "Rolü: {role}. Ağırlığın gerekçesi: {tilt} → %{pct}.",
         "en": "Its role: {role}. Why this weight: {tilt} → {pct}%.",
         "de": "Seine Rolle: {role}. Warum dieses Gewicht: {tilt} → {pct}%."},
+    "projection.weights_sum": {
+        "tr": "Ağırlıkların toplamı yaklaşık 1 olmalı (şu an {total}).",
+        "en": "Weights must sum to about 1 (got {total}).",
+        "de": "Die Gewichte müssen sich zu etwa 1 summieren (aktuell {total})."},
+    "holdings.notFound": {
+        "tr": "Varlık bulunamadı.",
+        "en": "Holding not found.",
+        "de": "Position nicht gefunden."},
     "weight.defensive_capped": {
         "tr": "Rolü: {role}. Ağırlığın gerekçesi: risk profilin portföyün ~%{defensive}'ünü savunmaya (nakit/tahvil) ayırmayı gerektiriyor; ama bu kadar az pozisyonlu bir portföyde tek bir pozisyon %{cap}'i geçemediği için savunma payı burada %{actual} oldu → %{pct}.",
         "en": "Its role: {role}. Why this weight: your risk profile calls for roughly {defensive}% of the portfolio on the defensive side (cash/bonds); in a portfolio with this few positions no single one may exceed {cap}%, so the defensive side is {actual}% here → {pct}%.",

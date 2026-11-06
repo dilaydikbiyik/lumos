@@ -9,7 +9,9 @@ import logging
 
 import pandas as pd
 
+from backend.markets import get_market_pack
 from backend.services import inflation_service
+from backend.services.fx_history import in_home_currency
 from backend.services.market_data import fetch_price_history
 from backend.services.portfolio_series import build_normalized_series
 
@@ -73,7 +75,9 @@ def run_backtest(weights: dict[str, float], budget: float, period: str = "5y",
         dict with final value, total return, per-asset character metrics,
         and a downsampled value series for charting.
     """
-    history = fetch_price_history(list(weights), period=period)
+    # In the reader's currency before anything is combined: see fx_history.
+    history = in_home_currency(fetch_price_history(list(weights), period=period),
+                               get_market_pack(market).currency, period)
 
     # Renormalized, coverage-guarded portfolio series (starts at 1.0) —
     # prevents partial yfinance data from misrepresenting the return.

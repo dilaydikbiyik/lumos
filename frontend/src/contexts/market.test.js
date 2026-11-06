@@ -22,7 +22,7 @@ describe('a market switch reaches every page', () => {
 
   it('the routed pages are remounted per market', () => {
     const app = code('../App.jsx')
-    expect(app).toMatch(/<Fragment key=\{market\}>/)
+    expect(app).toMatch(/<Fragment key=\{`\$\{market\}\|\$\{i18n\.language\}`\}>/)
     const routes = app.indexOf('<Routes>')
     expect(app.lastIndexOf('<MarketScoped>', routes)).toBeGreaterThan(-1)
   })

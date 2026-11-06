@@ -146,11 +146,12 @@ async def update_holding(
     body: HoldingUpdate,
     user_id: str = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
+    lang: str = Depends(language),
 ):
     user = await user_repository.get_or_create(db, user_id)
     holding = await holding_repository.get_for_user(db, user.id, holding_id)
     if holding is None:
-        raise HTTPException(status_code=404, detail="Holding not found.")
+        raise HTTPException(status_code=404, detail=t("holdings.notFound", lang))
     changes = body.model_dump(exclude_unset=True)
     return await holding_repository.update(db, holding, changes)
 
@@ -160,11 +161,12 @@ async def delete_holding(
     holding_id: int,
     user_id: str = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
+    lang: str = Depends(language),
 ):
     user = await user_repository.get_or_create(db, user_id)
     holding = await holding_repository.get_for_user(db, user.id, holding_id)
     if holding is None:
-        raise HTTPException(status_code=404, detail="Holding not found.")
+        raise HTTPException(status_code=404, detail=t("holdings.notFound", lang))
     await holding_repository.delete(db, holding)
 
 

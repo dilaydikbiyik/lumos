@@ -99,15 +99,19 @@ function ProtectedRoute({ children }) {
 }
 
 /**
- * Every page's server data belongs to one market. When the saved market
- * changes, the page on screen is mounted afresh so everything it fetched —
- * regions, funds, prices, the portfolio — is fetched again for the new one,
- * instead of each page having to remember to list the market among its
- * effect dependencies (none of them did).
+ * Every page's server data belongs to one market and one language. When the
+ * saved market changes, the page on screen is mounted afresh so everything
+ * it fetched — regions, funds, prices, the portfolio — is fetched again for
+ * the new one, instead of each page having to remember to list the market
+ * among its effect dependencies (none of them did). The same holds for the
+ * language: rationale cards, reasons and notes are written by the server in
+ * the request's language, so after EN→DE a page mixed German labels with
+ * English sentences until the reader navigated away.
  */
 function MarketScoped({ children }) {
   const { market } = useMarket()
-  return <Fragment key={market}>{children}</Fragment>
+  const { i18n } = useTranslation()
+  return <Fragment key={`${market}|${i18n.language}`}>{children}</Fragment>
 }
 
 export default function App() {

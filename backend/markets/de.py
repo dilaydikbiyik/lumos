@@ -145,6 +145,7 @@ DE = MarketPack(
     # the Q1 2026 median asking price for existing flats (EUR 3,532, as
     # reported by Global Property Guide), and 80 m² a
     # typical flat. Reviewed yearly (todo.md).
+    practice_budget=2_000.0,
     typical_home={"source": "static", "source_name": "Global Property Guide", "price_per_m2": 3_500.0, "m2": 80,
                   "fallback": 280_000.0, "as_of": "2026-03"},
     # German revolving card and Dispokredit rates sit around 11-12% a year,

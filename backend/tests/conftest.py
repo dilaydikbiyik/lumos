@@ -103,6 +103,21 @@ def _no_network_chat_context():
 
 
 @pytest.fixture(autouse=True)
+def _flat_exchange_rates():
+    """Currency conversion never hits the network in tests: every rate is a
+    flat 1.0, so mocked dollar prices keep their shape for a lira reader.
+    test_fx_history patches this narrowly to test the conversion itself."""
+    import pandas as pd
+
+    def flat(tickers, period="1y", adjusted=True):
+        idx = pd.bdate_range("1990-01-01", "2030-12-31")
+        return {t: pd.Series(1.0, index=idx) for t in tickers}
+
+    with patch("backend.services.fx_history.fetch_price_history", side_effect=flat):
+        yield
+
+
+@pytest.fixture(autouse=True)
 def _no_network_valuation():
     """Holding valuation never hits yfinance/EVDS in tests — purchase basis.
     Valuation-specific tests patch these narrowly themselves."""

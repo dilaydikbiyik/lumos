@@ -163,31 +163,47 @@ def monthly_cash_erosion(cash_amount: float, reference_month: Optional[str] = No
                          market: str = "TR") -> dict:
     """
     "Is my money melting?" — how much real purchasing power idle cash loses
-    per month at the most recent known inflation rate.
+    in a typical month at the current inflation rate.
+
+    The rate is the last twelve months' inflation as a monthly equivalent,
+    (1 + annual)^(1/12) - 1, not the single latest month. One month is
+    noise: Germany's October 2026 HICP fell, so the card read "eroding
+    -€25 per month" under a heading about money melting, while the goal
+    planner for the same reader used 2.8% a year. The bundled Turkish file
+    also had gaps, and "the previous key" was five months back, so a
+    five-month change was printed as monthly inflation. Twelve months from
+    the same index the planner reads keeps the two pages on one number.
 
     The loss is the purchasing power that disappears, not the price rise:
     after a month of 3% inflation, 10,000 buys what 9,708.74 bought, so
-    291.26 of value is gone — not 300. Multiplying the balance by the
-    inflation rate overstates it, slightly but always in the same direction,
-    and the whole point of this number is that it is the honest one.
+    291.26 of value is gone — not 300.
     """
     index = _get_index(market)
     if len(index) < 2:
         return {"monthly_inflation_pct": 0.0, "erosion_amount": 0.0}
     sorted_months = sorted(index)
-    reference_month = reference_month or sorted_months[-1]
-    idx = sorted_months.index(reference_month) if reference_month in sorted_months else len(sorted_months) - 1
-    if idx == 0:
+    end = reference_month if reference_month in index else sorted_months[-1]
+    year, month = end.split("-")
+    start = f"{int(year) - 1}-{month}"
+    if start < sorted_months[0]:
+        # Less than a year of history: the span there is, per month.
+        start = sorted_months[0]
+    span = _months_between(start, end)
+    if span <= 0:
         return {"monthly_inflation_pct": 0.0, "erosion_amount": 0.0}
-
-    prev_month = sorted_months[idx - 1]
-    curr_month = sorted_months[idx]
-    monthly_pct = cpi_change_pct(prev_month, curr_month, market)
+    change = cpi_change_pct(start, end, market) / 100
+    monthly_pct = ((1 + change) ** (1 / span) - 1) * 100
     erosion = cash_amount - cash_amount / (1 + monthly_pct / 100)
     return {
         "monthly_inflation_pct": round(monthly_pct, 2),
         "erosion_amount": round(erosion, 2),
     }
+
+
+def _months_between(start: str, end: str) -> int:
+    sy, sm = map(int, start.split("-"))
+    ey, em = map(int, end.split("-"))
+    return (ey - sy) * 12 + (em - sm)
 
 
 def years_to_months_ago(years: float, today: Optional[date] = None) -> str:

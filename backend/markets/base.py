@@ -119,6 +119,10 @@ class MarketPack:
     # a dated published figure. "fallback" is the price used when a live
     # source cannot be read, with the date it was true.
     typical_home: dict = field(default_factory=dict)
+    # Practice mode's virtual money. It was 100,000 in every currency:
+    # about $2,000 in Türkiye and $100,000 in the US. A beginner's first
+    # sum, at roughly the same real money in each market.
+    practice_budget: float = 100_000.0
     # Credit-card debt: the two facts needed to tell someone honestly whether
     # to clear it before investing. Both were Turkish constants applied to
     # everybody — a 4.25%/month ceiling is the TCMB's, and quoting it to a

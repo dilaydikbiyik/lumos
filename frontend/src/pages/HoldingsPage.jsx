@@ -236,7 +236,7 @@ export default function HoldingsPage() {
                      values={{
                        idle: money(summary.cash_erosion.idle_cash ?? 0),
                        amount: money(summary.cash_erosion.erosion_amount),
-                       pct: summary.cash_erosion.monthly_inflation_pct,
+                       pct: percent(summary.cash_erosion.monthly_inflation_pct, { decimals: 2 }),
                      }}
                      components={[<strong key="a" />, <strong key="b" />]} />
             </p>
@@ -254,7 +254,7 @@ export default function HoldingsPage() {
                      components={[<strong key="a" />]} /></div>
               <div style={{ marginTop: 2 }}>
                 {t('holdings.erosionFormula', {
-                  pct: summary.cash_erosion.monthly_inflation_pct,
+                  pct: percent(summary.cash_erosion.monthly_inflation_pct, { decimals: 2 }),
                   amount: money(summary.cash_erosion.erosion_amount),
                 })}
               </div>

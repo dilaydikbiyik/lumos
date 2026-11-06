@@ -312,8 +312,18 @@ to someone* is the line the legal review is about:
   the benchmark has them (SPY, the DAX), without where it does not (BIST 100), and the page says
   which. Mixing the two had flattered every company — the S&P 500 gained 56.8% over five years as a
   price index and 67.6% with dividends.
-- Returns are inflation-adjusted, like every figure in the app: the BIST 100 rose 615.7% in lira
-  over those five years and **2.4%** after inflation.
+- Returns are inflation-adjusted, like every figure in the app: the BIST 100 rose 613.9% in lira
+  over those five years and **lost 3.6%** after inflation.
+
+### 🧾 Inflation is consumer prices, checked against what TÜİK published
+
+Every "real" figure for Türkiye is deflated by TÜFE, the consumer price index, chained from
+TCMB's archive series (2003=100) and the rebased one (2025=100). For a stretch of 2026 the app
+read the domestic *producer* price index by mistake — a series that stays current was picked for
+being current — and a test now holds the index to TÜİK's published December-on-December rates
+(36.08% for 2021, 64.27%, 64.77%, 44.38%, 30.89% for 2025). Every return shown to a Turkish reader
+is also measured **in lira**: dollar assets are converted at the daily rate before anything is
+combined, in the backtest, the scenario bands and practice mode alike.
 
 ### 🧭 Every kind of investment, side by side
 
@@ -324,7 +334,7 @@ home market, US or world stocks, and Bitcoin. Every row is measured the same way
 years, **in the reader's own currency** at the daily exchange rate, inflation-adjusted, interest
 and dividends included — so the lessons come out of the numbers: a Treasury bill's worst fall
 was −0.3% for an American and **−34.9% in lira** for a Turkish saver (the guarantee is in dollars
-and to maturity), long-dated government bonds fell 43.7%, and idle cash lost 85.7% of its real
+and to maturity), long-dated government bonds fell 43.7%, and idle cash lost 86.5% of its real
 value in Türkiye. Impersonal like the explorer, in teaching order rather than ranked.
 
 ### 📲 Installable, because push is the coach's only carrier

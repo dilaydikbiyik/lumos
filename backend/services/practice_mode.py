@@ -9,19 +9,25 @@ alignment) — practice mode only needs recent daily performance.
 import logging
 
 from backend.exceptions import MarketDataError
+from backend.markets import get_market_pack
+from backend.services.fx_history import in_home_currency
 from backend.services.market_data import fetch_price_history
 
 logger = logging.getLogger("lumos.practice")
 
-DEFAULT_PRACTICE_BUDGET = 100000.0
-
-
-def practice_snapshot(weights: dict[str, float], virtual_budget: float = DEFAULT_PRACTICE_BUDGET) -> dict:
+def practice_snapshot(weights: dict[str, float], virtual_budget: float | None = None,
+                      market: str = "TR") -> dict:
     """
     Current-state snapshot of a practice portfolio: what it would be worth
     today, and this week's change with a plain-language 'why'.
     """
-    history = fetch_price_history(list(weights), period="1mo")
+    pack = get_market_pack(market)
+    # The market's own practice sum, and every price in the reader's currency:
+    # a lira practice portfolio moved by dollar prices showed SPY's week in
+    # dollars as the lira week (see fx_history).
+    virtual_budget = virtual_budget or pack.practice_budget
+    history = in_home_currency(fetch_price_history(list(weights), period="1mo"),
+                               pack.currency, "1mo")
 
     per_asset = {}
     total_value = 0.0

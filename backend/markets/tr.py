@@ -64,6 +64,7 @@ TR = MarketPack(
     property_entry_threshold=1_000_000.0,
     # TCMB's national unit price was 53,887 TL/m² in 2026-Q3; a 100 m² home
     # is the usual unit TÜİK sales statistics describe.
+    practice_budget=100_000.0,
     typical_home={"source": "evds", "source_name": "TCMB", "series": "TP.BIRIMFIYAT.TR", "m2": 100,
                   "fallback": 5_400_000.0, "as_of": "2026-09"},
     # TCMB's published monthly ceiling on TRY card balances. Revised

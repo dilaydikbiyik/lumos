@@ -194,7 +194,7 @@ export default function DashboardPage() {
                     : '—'
                   }
                 </div>
-                {holdingsSummary.cash_erosion && holdingsSummary.remaining_budget > 0 && (
+                {holdingsSummary.cash_erosion?.erosion_amount > 0 && holdingsSummary.remaining_budget > 0 && (
                   <div style={{ fontSize: 11, color: 'var(--red)', marginTop: 3 }}>
                     ↓ {t('dashboard.erodingPerMonth', { amount: money(holdingsSummary.cash_erosion.erosion_amount) })}
                   </div>

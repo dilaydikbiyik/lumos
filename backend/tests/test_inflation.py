@@ -19,10 +19,10 @@ _NO_LIVE = patch("backend.services.evds_service.get_live_cpi_index", return_valu
 
 
 def test_cpi_change_reflects_static_checkpoints_on_fallback():
-    # 2020-01 = 100.0, 2020-12 = 114.3 per the bundled static dataset
+    # TÜİK TÜFE, January to December 2020, per the bundled static dataset
     with _NO_LIVE:
         pct = cpi_change_pct("2020-01", "2020-12")
-    assert pct == pytest.approx(14.3, abs=0.1)
+    assert pct == pytest.approx(13.07, abs=0.1)
 
 
 def test_real_return_below_nominal_during_high_inflation():

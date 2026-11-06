@@ -23,11 +23,21 @@ logger = logging.getLogger("lumos.evds")
 
 BASE_URL = "https://evds3.tcmb.gov.tr/igmevdsms-dis"
 
-# TÜFE. TP.FG.J0 was the original choice but TCMB stopped publishing it at
-# 2026-01 while its other series kept updating, so the app's flagship
-# inflation number quietly went eight months stale. This series is current
-# to the previous month.
-CPI_SERIES = "TP.TUFE1YI.T1"
+# TÜFE — consumer prices, chained from two series.
+#
+# TP.FG.J0 (2003=100) stopped at 2026-01 when TÜİK rebased the CPI to
+# 2025=100. It was replaced with TP.TUFE1YI.T1 on the strength of being
+# current — but that series is the DOMESTIC PRODUCER price index (EVDS
+# names it "1. Domestic PPI general"), so from then on every Turkish "real
+# return" was deflated by producer prices: 79.9% for 2021 against a CPI of
+# 36.1%, 44.2% for 2023 against 64.8%. The rebased CPI lives in
+# TP.TUKFIY2025.GENEL (from 2024-01). The archive series is used through
+# CPI_SPLICE_MONTH and the new one's month-on-month changes after it, so the
+# index is one continuous consumer-price series. A test checks the chained
+# index against TÜİK's published December-on-December rates.
+CPI_ARCHIVE_SERIES = "TP.FG.J0"
+CPI_CURRENT_SERIES = "TP.TUKFIY2025.GENEL"
+CPI_SPLICE_MONTH = "2025-12"
 
 _CACHE_TTL = 60 * 60 * 24  # EVDS publishes monthly; daily refresh is plenty
 
@@ -66,6 +76,21 @@ def fetch_series(series_code: str, start: str, end: str) -> dict[str, float]:
     return result
 
 
+def chain_cpi(archive: dict[str, float], current: dict[str, float]) -> dict[str, float]:
+    """The archive CPI through CPI_SPLICE_MONTH, then the rebased series'
+    month-on-month changes applied to it. Without the rebased series (or
+    the splice month in it) the archive alone is returned — a stale but
+    correct index beats a current one that measures something else."""
+    index = {m: v for m, v in archive.items() if m <= CPI_SPLICE_MONTH}
+    if CPI_SPLICE_MONTH not in index or CPI_SPLICE_MONTH not in current:
+        return index
+    anchor, base = index[CPI_SPLICE_MONTH], current[CPI_SPLICE_MONTH]
+    for month, value in current.items():
+        if month > CPI_SPLICE_MONTH:
+            index[month] = anchor * value / base
+    return index
+
+
 def get_live_cpi_index(start: str = "01-01-2020") -> Optional[dict[str, float]]:
     """
     Live CPI (TUFE) index keyed by YYYY-MM, or None when the key is missing
@@ -76,8 +101,11 @@ def get_live_cpi_index(start: str = "01-01-2020") -> Optional[dict[str, float]]:
     try:
         from datetime import date
         end = date.today().strftime("%d-%m-%Y")
-        index = fetch_series(CPI_SERIES, start, end)
-        return index or None
+        archive = fetch_series(CPI_ARCHIVE_SERIES, start, end)
+        if not archive or CPI_SPLICE_MONTH not in archive:
+            return None
+        current = fetch_series(CPI_CURRENT_SERIES, "01-01-2024", end)
+        return chain_cpi(archive, current) or None
     except Exception as exc:
         logger.warning("EVDS CPI fetch failed (%s) — falling back to static index", exc)
         return None

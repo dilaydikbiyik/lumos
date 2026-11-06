@@ -182,9 +182,10 @@ async def asset_projection(
     """
     from backend.services.projection import project_asset
 
+    market = await _market_of(db, user_id)
     # project_asset fetches yfinance price history (blocking HTTP)
     result = await asyncio.to_thread(
-        project_asset, body.ticker.upper(), body.amount, body.years, lang
+        project_asset, body.ticker.upper(), body.amount, body.years, lang, market
     )
 
     # One calm sentence about right now, BESIDE the band and never into it.
@@ -201,6 +202,7 @@ async def portfolio_projection(
     request: Request,
     body: PortfolioProjectionRequest,
     user_id: str = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
     lang: str = Depends(language),
 ):
     """
@@ -213,9 +215,12 @@ async def portfolio_projection(
     total = sum(body.weights.values())
     if not 0.95 <= total <= 1.05:
         from fastapi import HTTPException
-        raise HTTPException(status_code=422, detail=f"Weights must sum to ~1 (got {total:.2f}).")
+        from backend.i18n import t
+        raise HTTPException(status_code=422,
+                            detail=t("projection.weights_sum", lang, total=f"{total:.2f}"))
+    market = await _market_of(db, user_id)
     return await asyncio.to_thread(
-        project_portfolio, body.weights, body.amount, body.years, lang
+        project_portfolio, body.weights, body.amount, body.years, lang, market
     )
 
 

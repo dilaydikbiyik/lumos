@@ -3592,6 +3592,34 @@ hep SPY çıkıyor". İkisi ayrı sorunmuş.
       (kira-mı-al hesaplayıcısı dahil). Artık pazarın yerel ayarından.
 - [ ] Almanya tipik ev fiyatı statik (canlı ücretsiz kaynak yok); yılda bir
       gözden geçir (`backend/markets/de.py` typical_home).
+- [x] **Arka plan tutarsızlık taraması (2026-11-06)** — 36 kombinasyon (3
+      pazar × 3 dil × 4 yol) × 15 öneri, smoke listesindeki her uç. Bulunan
+      ve düzeltilenler:
+      - **KRİTİK: Türkiye "enflasyonu" üretici fiyatlarıydı.** TP.FG.J0
+        durunca yerine konan TP.TUFE1YI.T1, EVDS'nin kendi adıyla "Yurt İçi
+        ÜFE". 2021 için %79,9 (TÜFE %36,1), 2023 için %44,2 (TÜFE %64,8).
+        Artık TP.FG.J0 (2025-12'ye kadar) + TP.TUKFIY2025.GENEL'in aylık
+        değişimleri zincirleniyor; TÜİK'in yayımladığı Aralık/Aralık
+        oranlarına testle bağlı. Yedek dosya 20 elle girilmiş noktaydı, artık
+        boşluksuz aylık seri. Bu düzeltmeyle yeniden ölçülen TR rakamları:
+        nakit reel −%86,5, hazine bonosu −%16,5, BIST 100 −%3,6, S&P 500
+        (TL) +%17,5, altın +%52,5 — yukarıdaki eski maddelerdeki TR reel
+        rakamları ÜFE ile hesaplanmıştı.
+      - **Türkiye backtest/projeksiyon/pratik modu dolar ve TL getirilerini
+        çevirmeden topluyordu** (5 yıl reel −%62). Artık her yabancı seri
+        günlük kurla okuyucunun para birimine çevriliyor; kur yoksa seri
+        düşülüyor. Aynı portföy: nominal +%654, reel +%1,8.
+      - Nakit erimesi tek ayın değişimiydi (Almanya'da ekim deflasyonu →
+        "ayda −25 € eriyor"); artık son 12 ayın aylık karşılığı.
+      - Dil değişince sunucunun yazdığı metinler eski dilde kalıyordu; sayfa
+        artık dil değişince de yeniden kuruluyor.
+      - "Holding not found." / "Weights must sum…" İngilizce sabitti → i18n.
+      - Pratik modu her pazarda 100.000 (TR ~2.000 $, ABD 100.000 $) → TR
+        100.000 TL, ABD/DE 2.000.
+- [ ] **Açık (tasarım kararı):** /recommend yatırım yolunu bilmiyor —
+      yalnızca hisse yolunda GYO çıkıyor; hibritte bütçe bölüşümünün GYO'su
+      ve nakdi, bütçenin %100'üyle kurulan portföyün GYO'su ve nakdinin
+      ÜSTÜNE ekleniyor (DE hibrit: efektif GYO ~%21).
 - [ ] Almanya'da hazine bonosu satırı yok (para piyasası fonu var);
       ABD bonosunun EUR karşılığı istenirse USDEUR=X ile eklenebilir.
 - [ ] Keşif listesi tarihli (2026-11) bir seçki; yılda bir piyasa

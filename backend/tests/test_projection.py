@@ -44,9 +44,11 @@ def test_asset_projection_applies_amount():
 
 
 def test_asset_projection_refuses_thin_history():
-    short = {"NEW": _GROWTH.iloc[:300]}  # ~1.2 years of data
+    # A known symbol, so its currency is read offline: an unknown one would
+    # send the currency lookup to the network (and be dropped, unconverted).
+    short = {"SCHH": _GROWTH.iloc[:300]}  # ~1.2 years of data
     with patch("backend.services.projection.fetch_price_history", return_value=short):
-        r = project_asset("NEW", amount=10000, years=5)
+        r = project_asset("SCHH", amount=10000, years=5)
     assert r["available"] is False
     assert "geçmiş veri yok" in r["reason"]
 

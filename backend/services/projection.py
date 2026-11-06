@@ -14,6 +14,8 @@ import numpy as np
 
 from backend.exceptions import MarketDataError
 from backend.i18n import t
+from backend.markets import get_market_pack
+from backend.services.fx_history import in_home_currency
 from backend.services.market_data import fetch_price_history
 from backend.services.portfolio_series import build_normalized_series
 
@@ -118,7 +120,8 @@ def _band(returns: list[float], amount: float) -> dict:
     }
 
 
-def project_asset(ticker: str, amount: float, years: int, lang: str = "tr") -> dict:
+def project_asset(ticker: str, amount: float, years: int, lang: str = "tr",
+                  market: str = "TR") -> dict:
     """
     Scenario band for an exchange-traded asset from its own daily history.
 
@@ -129,7 +132,10 @@ def project_asset(ticker: str, amount: float, years: int, lang: str = "tr") -> d
     # thin: ten years of history under a five-year window is two independent
     # periods however many overlapping ones are counted, and it refused
     # ten-year bands outright for assets that have thirty years of history.
-    history = fetch_price_history([ticker], period="max")
+    # In the reader's currency: a dollar band labelled as lira described
+    # money the reader never had (see fx_history).
+    history = in_home_currency(fetch_price_history([ticker], period="max"),
+                               get_market_pack(market).currency, "max")
     series = history.get(ticker)
     if series is None or series.empty:
         raise MarketDataError(f"No history for {ticker}")
@@ -168,7 +174,7 @@ def project_asset(ticker: str, amount: float, years: int, lang: str = "tr") -> d
 
 
 def project_portfolio(weights: dict[str, float], amount: float, years: int,
-                      lang: str = "tr") -> dict:
+                      lang: str = "tr", market: str = "TR") -> dict:
     """
     Scenario band for a whole weighted portfolio, not a single asset.
 
@@ -179,7 +185,8 @@ def project_portfolio(weights: dict[str, float], amount: float, years: int,
     # Same reasoning as the single asset: the whole record. A portfolio band
     # is bounded by its SHORTEST member's history, so the cap bit hardest
     # exactly where a mix includes one young fund.
-    history = fetch_price_history(list(weights), period="max")
+    history = in_home_currency(fetch_price_history(list(weights), period="max"),
+                               get_market_pack(market).currency, "max")
     # Renormalized, coverage-guarded series (starts at 1.0) — partial
     # yfinance data can no longer shrink the portfolio into a fake tiny return.
     portfolio_series = build_normalized_series(history, weights)

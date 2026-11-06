@@ -53,6 +53,7 @@ def public_markets() -> list[dict]:
             "example_ticker": p.example_ticker,
             "example_asset_name": p.example_asset_name,
             "area_kind": p.area_kind,
+            "practice_budget": p.practice_budget,
             # The ILLUSTRATIVE inflation figure, for teaching copy that works
             # an example. The glossary and the daily tip hardcoded "%50
             # enflasyonda 100 TL" — a fact about Türkiye taught to a German

@@ -6,6 +6,7 @@ from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.db.database import get_db
+from backend.i18n import t
 from backend.limiter import limiter
 from backend.middleware.language import language
 from backend.middleware.verify_clerk import get_current_user
@@ -38,7 +39,8 @@ async def backtest(
     """
     total = sum(body.weights.values())
     if not 0.95 <= total <= 1.05:
-        raise HTTPException(status_code=422, detail=f"Weights must sum to ~1 (got {total:.2f}).")
+        raise HTTPException(status_code=422,
+                            detail=t("projection.weights_sum", lang, total=f"{total:.2f}"))
 
     import asyncio
 
