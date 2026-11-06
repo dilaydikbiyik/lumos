@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useAuth } from '@clerk/clerk-react'
-import { parseTL } from '../utils/number'
+import { parseAmount } from '../utils/number'
 import api, { extractErrorMessage, setAuthToken } from '../utils/api'
 import AppHeader from '../components/AppHeader'
 import IsikTut from '../components/IsikTut'
@@ -44,7 +44,7 @@ function ProvinceScenario({ province, amount }) {
     try {
       const [b] = await Promise.all([
         api.post('/planning/projection/province', {
-          region_code: province.code, amount: parseTL(amount) || 1000000, years: 5,
+          region_code: province.code, amount: parseAmount(amount, pack.locale), years: 5,
         }),
         fetchLinks(),
       ])
@@ -59,10 +59,11 @@ function ProvinceScenario({ province, amount }) {
   return (
     <div style={{ paddingTop: 10, marginTop: 10, borderTop: '1px solid var(--border)' }}>
       {!band && (
-        <button className="btn btn-ghost" style={{ width: '100%' }} onClick={run} disabled={loading}>
+        <button className="btn btn-ghost" style={{ width: '100%' }} onClick={run}
+                disabled={loading || !(parseAmount(amount, pack.locale) > 0)}>
           {loading
             ? <span className="spinner" style={{ width: 16, height: 16 }} />
-            : t('explore.whatIfBought', { amount: money(parseTL(amount) || 1000000), province: province.province })}
+            : t('explore.whatIfBought', { amount: money(parseAmount(amount, pack.locale) || 0), province: province.province })}
         </button>
       )}
       {error && <p style={{ color: 'var(--red)', fontSize: 12 }}>{error}</p>}
@@ -182,7 +183,8 @@ function ProvinceCard({ province, amount, measure }) {
 
 function RentVsBuy() {
   const { t } = useTranslation()
-  const { fmt, money, unit } = useMarket()
+  const { fmt, money, unit, pack } = useMarket()
+  const num = (v) => parseAmount(v, pack.locale)
   const [form, setForm] = useState({ down_payment: '', monthly_rent: '', home_price: '', income: '', years: 10, rate: '', term: '', cash_includes_costs: false })
   const [result, setResult] = useState(null)
   const [error, setError] = useState(null)
@@ -210,16 +212,16 @@ function RentVsBuy() {
     setLoading(true)
     try {
       const res = await api.post('/planning/rent-vs-buy', {
-        down_payment: parseTL(form.down_payment),
-        monthly_rent: parseTL(form.monthly_rent),
+        down_payment: num(form.down_payment),
+        monthly_rent: num(form.monthly_rent),
         years: Number(form.years),
-        ...(form.home_price ? { home_price: parseTL(form.home_price) } : {}),
+        ...(form.home_price ? { home_price: num(form.home_price) } : {}),
         ...(form.rate ? { mortgage_annual_rate_pct: Number(String(form.rate).replace(',', '.')) } : {}),
         ...(form.term ? { mortgage_term_years: Number(form.term) } : {}),
         down_payment_includes_costs: form.cash_includes_costs,
       })
       setResult(res.data)
-      const income = parseTL(form.income)
+      const income = num(form.income)
       if (income > 0 && income !== savedIncome) {
         api.patch('/users/me/income', { monthly_income: income })
           .then(() => setSavedIncome(income)).catch(() => {})
@@ -313,8 +315,8 @@ function RentVsBuy() {
 
           {/* Affordability reality check — a comparison is meaningless if the
               installment doesn't fit the user's income */}
-          {parseTL(form.income) > 0 && result.monthly_mortgage > 0 && (() => {
-            const ratio = result.monthly_mortgage / parseTL(form.income)
+          {num(form.income) > 0 && result.monthly_mortgage > 0 && (() => {
+            const ratio = result.monthly_mortgage / num(form.income)
             const pct = Math.round(ratio * 100)
             return (
               <div style={{
@@ -537,7 +539,7 @@ function ListingLinks() {
 export default function ExplorePage() {
   const { t } = useTranslation()
   const { getToken } = useAuth()
-  const { pack, unit } = useMarket()
+  const { pack, unit, fmt } = useMarket()
   // A national house-price index and a province-by-province table are
   // different data products: Germany has the first (Eurostat) but not the
   // second, so this table is its own gate. The rent-vs-buy calculator and
@@ -551,11 +553,26 @@ export default function ExplorePage() {
   // Set once the reader picks a window themselves, so the suggestion never
   // overrides a deliberate choice.
   const horizonTouched = useRef(false)
-  const [scenarioAmount, setScenarioAmount] = useState('1.000.000')
+  // The example amount starts at what an ordinary home costs in this
+  // market (GET /planning/typical-home), not at one number for everyone:
+  // 1,000,000 was 18 m² in Türkiye and a large house in Germany. Once the
+  // reader types their own, theirs wins.
+  const [typical, setTypical] = useState(null)
+  const [typedAmount, setTypedAmount] = useState(null)
+  const scenarioAmount = typedAmount ?? (typical ? fmt(typical.example_amount) : '')
   const [search, setSearch] = useState('')
   const [showAll, setShowAll] = useState(false)
   // Loading is derived: no data yet, or data belongs to a different horizon
   const loading = hasProvinceTable && (!provinces || provinces._horizon !== horizon)
+
+  useEffect(() => {
+    if (!hasProvinceTable) return
+    let cancelled = false
+    api.get('/planning/typical-home')
+      .then(res => { if (!cancelled) setTypical(res.data) })
+      .catch(() => {})
+    return () => { cancelled = true }
+  }, [hasProvinceTable])
 
   const load = useCallback(async (years) => {
     try {
@@ -654,10 +671,18 @@ export default function ExplorePage() {
               inputMode="numeric"
               placeholder={t('explore.amountPlaceholder', { unit })}
               value={scenarioAmount}
-              onChange={e => setScenarioAmount(e.target.value)}
+              onChange={e => setTypedAmount(e.target.value)}
               style={{ marginBottom: 12 }}
               aria-label={t('explore.amountLabel')}
             />
+            {typical && typedAmount === null && (
+              <p style={{ fontSize: 11.5, color: 'var(--text-dim)', margin: '-6px 0 12px' }}>
+                {t(`explore.typicalHome_${typical.source}`, {
+                  amount: fmt(typical.example_amount), m2: typical.m2, date: typical.as_of,
+                  source: typical.source_name,
+                })}
+              </p>
+            )}
 
             {loading && (
               <div style={{ textAlign: 'center', padding: 24 }}>

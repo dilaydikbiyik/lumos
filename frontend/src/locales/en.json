@@ -848,7 +848,10 @@
     "searchLabel_segment": "Search segment",
     "noResults_segment": "\"{{search}}\" not found — there are {{count}} segments.",
     "loading_segment": "Fetching the Bundesbank housing index…",
-    "manualFilterNote": "The link filters to the district. {{place}} is finer than the site's own URLs go — apply it in the site's filters once you're there."
+    "manualFilterNote": "The link filters to the district. {{place}} is finer than the site's own URLs go — apply it in the site's filters once you're there.",
+    "typicalHome_evds": "Example amount: an ordinary home — the {{source}} national average price per m² × {{m2}} m² ≈ {{amount}} ({{date}}). Type your own.",
+    "typicalHome_fred": "Example amount: the median price of homes sold ({{source}}) ≈ {{amount}} ({{date}}). Type your own.",
+    "typicalHome_static": "Example amount: an ordinary flat — the national average price per m² ({{source}}) × {{m2}} m² ≈ {{amount}} ({{date}}). Type your own."
   },
   "rvb": {
     "title": "Rent, or buy?",

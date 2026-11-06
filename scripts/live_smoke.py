@@ -328,6 +328,7 @@ def journey(run: Run, client: TestClient, market: str, lang: str, ai_chat: bool)
       json={"il": _CITY[market]})
     c("practice", "POST", "/practice/snapshot", json={"weights": weights})
     c("stock explorer", "GET", "/stocks/explore")
+    c("typical home", "GET", "/planning/typical-home")
     c("asset classes", "GET", "/stocks/asset-classes")
     c("role alternatives", "GET", "/planning/alternatives")
 

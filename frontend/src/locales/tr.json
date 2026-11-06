@@ -848,7 +848,10 @@
     "searchLabel_segment": "Kesit ara",
     "noResults_segment": "\"{{search}}\" bulunamadı — {{count}} kesit var.",
     "loading_segment": "Bundesbank konut endeksi alınıyor…",
-    "manualFilterNote": "Bağlantı ilçeye kadar filtreliyor. {{place}} sitenin kendi adreslerinin indiği seviyenin altında — oraya gidince sitenin filtresinden seçmen gerekiyor."
+    "manualFilterNote": "Bağlantı ilçeye kadar filtreliyor. {{place}} sitenin kendi adreslerinin indiği seviyenin altında — oraya gidince sitenin filtresinden seçmen gerekiyor.",
+    "typicalHome_evds": "Örnek tutar: sıradan bir ev — {{source}} ulusal ortalama m² fiyatı × {{m2}} m² ≈ {{amount}} ({{date}}). Kendi tutarını yazabilirsin.",
+    "typicalHome_fred": "Örnek tutar: satılan evlerin medyan fiyatı ({{source}}) ≈ {{amount}} ({{date}}). Kendi tutarını yazabilirsin.",
+    "typicalHome_static": "Örnek tutar: sıradan bir daire — ulusal ortalama m² fiyatı ({{source}}) × {{m2}} m² ≈ {{amount}} ({{date}}). Kendi tutarını yazabilirsin."
   },
   "rvb": {
     "title": "Kirada mı otur, ev mi al?",

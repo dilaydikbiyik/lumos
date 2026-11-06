@@ -140,6 +140,13 @@ DE = MarketPack(
     # cover the ~7% Kaufnebenkosten from their OWN funds on top of the
     # down payment, so the entry bar is genuinely higher than elsewhere.
     property_entry_threshold=100_000.0,
+    # No free live per-m² series. Published 2026 national figures range
+    # EUR 2,950-4,085/m² by method (transactions vs listings); EUR 3,500 is
+    # the Q1 2026 median asking price for existing flats (EUR 3,532, as
+    # reported by Global Property Guide), and 80 m² a
+    # typical flat. Reviewed yearly (todo.md).
+    typical_home={"source": "static", "source_name": "Global Property Guide", "price_per_m2": 3_500.0, "m2": 80,
+                  "fallback": 280_000.0, "as_of": "2026-03"},
     # German revolving card and Dispokredit rates sit around 11-12% a year,
     # far below the Turkish ceiling — quoting 4.25% a month to a German
     # cardholder overstates the cost of their debt by roughly six times.

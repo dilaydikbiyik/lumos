@@ -3575,6 +3575,23 @@ hep SPY çıkıyor". İkisi ayrı sorunmuş.
       sayfaların okuduğu pazar yalnızca sunucu kaydettikten sonra değişiyor
       (seçici bu arada seçimi gösteriyor) ve sayfa pazar değişince baştan
       kuruluyor, yani her şey yeni pazar için yeniden çekiliyor. Testli.
+- [x] **"Almanya'da ev alımında 1 milyon € çıkıyor."** Bölge kaşifinin örnek
+      tutarı her pazarda 1.000.000'du: Türkiye'de ~18 m², Almanya'da büyük
+      bir ev. Artık sıradan bir evin fiyatıyla başlıyor, kaynağı ve tarihi
+      altında yazıyor: **TR** TCMB ulusal birim fiyatı × 100 m² (canlı,
+      2026-09: 53.887 TL/m² → ~5,4 milyon TL), **ABD** satılan evlerin
+      medyan fiyatı (FRED MSPUS, canlı; 2026-Q3 393.300 $), **DE** 3.500
+      €/m² × 80 m² ≈ 280.000 € (2026-Q1 medyan ilan fiyatı; yayınlanan
+      ulusal rakamlar yönteme göre 2.950–4.085 €/m²). Canlı kaynak
+      okunamazsa tarihli yedek değer. Test: giriş eşiği (peşinat +
+      masraflar, nakit) sıradan evin %10–50'si arasında olmalı — TR %19,
+      ABD %20, DE %36; Türkiye fiyatları hızlı arttığı için bu test eşiğin
+      eskidiğini yakalayacak.
+      **Yol üstünde bulunan hata:** tutar ayrıştırıcı her pazarda Türkçe
+      gösterimi varsayıyordu — ABD'li "390,000" yazınca 390 okunuyordu
+      (kira-mı-al hesaplayıcısı dahil). Artık pazarın yerel ayarından.
+- [ ] Almanya tipik ev fiyatı statik (canlı ücretsiz kaynak yok); yılda bir
+      gözden geçir (`backend/markets/de.py` typical_home).
 - [ ] Almanya'da hazine bonosu satırı yok (para piyasası fonu var);
       ABD bonosunun EUR karşılığı istenirse USDEUR=X ile eklenebilir.
 - [ ] Keşif listesi tarihli (2026-11) bir seçki; yılda bir piyasa

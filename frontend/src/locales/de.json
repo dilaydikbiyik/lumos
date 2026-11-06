@@ -537,7 +537,10 @@
     "searchLabel_segment": "Segment suchen",
     "noResults_segment": "\"{{search}}\" nicht gefunden — es gibt {{count}} Segmente.",
     "loading_segment": "Häuserpreisindex der Bundesbank wird geladen…",
-    "manualFilterNote": "Der Link filtert bis zum Bezirk. {{place}} ist feiner, als die Adressen der Seite reichen — wähle es dort in den Filtern der Seite aus."
+    "manualFilterNote": "Der Link filtert bis zum Bezirk. {{place}} ist feiner, als die Adressen der Seite reichen — wähle es dort in den Filtern der Seite aus.",
+    "typicalHome_evds": "Beispielbetrag: eine gewöhnliche Wohnung — landesweiter Durchschnittspreis pro m² ({{source}}) × {{m2}} m² ≈ {{amount}} ({{date}}). Gib deinen eigenen Betrag ein.",
+    "typicalHome_fred": "Beispielbetrag: Medianpreis verkaufter Häuser ({{source}}) ≈ {{amount}} ({{date}}). Gib deinen eigenen Betrag ein.",
+    "typicalHome_static": "Beispielbetrag: eine gewöhnliche Wohnung — landesweiter Durchschnittspreis pro m² ({{source}}) × {{m2}} m² ≈ {{amount}} ({{date}}). Gib deinen eigenen Betrag ein."
   },
   "rvb": {
     "title": "Mieten oder kaufen?",

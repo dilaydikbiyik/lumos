@@ -219,6 +219,21 @@ async def portfolio_projection(
     )
 
 
+@router.get("/typical-home")
+@limiter.limit("30/minute")
+async def typical_home_price(
+    request: Request,
+    user_id: str = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """What an ordinary home costs in the reader's market, with source and
+    date — the default for every example amount on the property pages."""
+    from backend.services.typical_home import typical_home
+
+    market = await _market_of(db, user_id)
+    return await asyncio.to_thread(typical_home, market)
+
+
 @router.get("/province-intelligence")
 @limiter.limit("20/minute")
 async def province_intelligence(

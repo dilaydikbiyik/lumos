@@ -68,6 +68,10 @@ US = MarketPack(
     # down payments exist (FHA), but they carry mortgage insurance, so
     # this stays the conservative figure.
     property_entry_threshold=80_000.0,
+    # Median sales price of houses sold (Census/HUD via FRED), $393,300 in
+    # 2026-Q3.
+    typical_home={"source": "fred", "source_name": "FRED", "series": "MSPUS",
+                  "fallback": 393_300.0, "as_of": "2026-07"},
     # ~21% APR on US revolving card balances (Federal Reserve G.19 has run in
     # the low twenties), expressed as the monthly periodic rate the issuer
     # actually applies.

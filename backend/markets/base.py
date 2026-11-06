@@ -111,6 +111,14 @@ class MarketPack:
     # a smaller flat. A documented assumption, shown to the user, and a fact
     # about a country like every other number in this file.
     property_entry_threshold: float = 1_000_000.0
+    # What a typical home costs here, so example amounts start from the
+    # market rather than from one number for everyone (a 1,000,000 default
+    # was 18 m² in Türkiye and a villa in Germany). "source" says how it is
+    # read: "evds" = TCMB national price per m² x m2, live; "fred" = a FRED
+    # series of median sale prices, live; "static" = price_per_m2 x m2 from
+    # a dated published figure. "fallback" is the price used when a live
+    # source cannot be read, with the date it was true.
+    typical_home: dict = field(default_factory=dict)
     # Credit-card debt: the two facts needed to tell someone honestly whether
     # to clear it before investing. Both were Turkish constants applied to
     # everybody — a 4.25%/month ceiling is the TCMB's, and quoting it to a

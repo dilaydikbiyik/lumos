@@ -21,3 +21,22 @@ describe('parseTL — Turkish money input parsing', () => {
     expect(Number.isNaN(parseTL(''))).toBe(true)
   })
 })
+
+describe('parseAmount — each market writes money its own way', () => {
+  it('reads US notation: a comma groups thousands', async () => {
+    const { parseAmount } = await import('./number')
+    expect(parseAmount('390,000', 'en-US')).toBe(390000)
+    expect(parseAmount('1,250,000.50', 'en-US')).toBe(1250000.5)
+    expect(parseAmount('10.5', 'en-US')).toBe(10.5)
+  })
+
+  it('reads German and Turkish notation: a dot groups, a comma is decimal', async () => {
+    const { parseAmount } = await import('./number')
+    for (const locale of ['de-DE', 'tr-TR']) {
+      expect(parseAmount('280.000', locale)).toBe(280000)
+      expect(parseAmount('1.250.000,50', locale)).toBe(1250000.5)
+      expect(parseAmount('30,5', locale)).toBe(30.5)
+      expect(parseAmount('10.5', locale)).toBe(10.5)
+    }
+  })
+})
