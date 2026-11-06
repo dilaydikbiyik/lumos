@@ -3567,6 +3567,14 @@ hep SPY çıkıyor". İkisi ayrı sorunmuş.
       pazarda testli. Hesap denetimi testleri artık üç pazarda.
       **Senin listen için:** production `/health` → `push: false`; VAPID
       anahtarları Render env'de yok, push production'da çalışmıyor.
+- [x] **"TR pazarı, New Jersey?"** Pazar değiştirince başlık hemen TR'ye
+      dönüyor, ama sunucu kaydı bitmeden ve açık sayfa hiç yeniden veri
+      çekmeden — Keşfet ABD eyaletlerini sıralamaya devam ediyordu. Aynı
+      sorun hisse kaşifi, varlık türleri, dashboard ve diğer tüm sayfalarda
+      vardı (hiçbir sayfa pazarı effect bağımlılığına koymamıştı). Artık
+      sayfaların okuduğu pazar yalnızca sunucu kaydettikten sonra değişiyor
+      (seçici bu arada seçimi gösteriyor) ve sayfa pazar değişince baştan
+      kuruluyor, yani her şey yeni pazar için yeniden çekiliyor. Testli.
 - [ ] Almanya'da hazine bonosu satırı yok (para piyasası fonu var);
       ABD bonosunun EUR karşılığı istenirse USDEUR=X ile eklenebilir.
 - [ ] Keşif listesi tarihli (2026-11) bir seçki; yılda bir piyasa

@@ -74,14 +74,25 @@ export function MarketProvider({ children }) {
     return () => { cancelled = true }
   }, [isSignedIn])
 
+  // The market every page reads is the SAVED one. Switching used to be
+  // optimistic: the header flipped to TR at once while the server still
+  // held US, and the page on screen never fetched again — a reader on the
+  // Turkish market looked at New Jersey and Connecticut. Pages fetch from
+  // the server, the server reads the saved market, so the switch takes
+  // effect only once the save has landed. The selector shows the choice
+  // meanwhile (pendingMarket), so it still responds at once.
+  const [pendingMarket, setPendingMarket] = useState(null)
   const setMarket = useCallback(async (code) => {
-    const prev = marketCode
-    setMarketCode(code) // optimistic — the UI responds instantly
+    if (code === marketCode) return
+    setPendingMarket(code)
     try {
       await api.patch('/users/me/market', { market: code })
       writeJSON(CACHE_KEY, { packs, market: code })
+      setMarketCode(code)
     } catch {
-      setMarketCode(prev) // save failed — don't stay in a lying state
+      // Save failed: the selector returns to the market that is in force.
+    } finally {
+      setPendingMarket(null)
     }
   }, [marketCode, packs])
 
@@ -107,8 +118,8 @@ export function MarketProvider({ children }) {
     /** Unit label for "big number + small unit" layouts */
     const unit = pack.currency === 'TRY' ? 'TL' : (pack.currency_symbol || pack.currency)
 
-    return { market: pack.code, pack, packs, fmt, money, unit, setMarket }
-  }, [packs, marketCode, setMarket])
+    return { market: pack.code, pack, packs, fmt, money, unit, setMarket, pendingMarket }
+  }, [packs, marketCode, setMarket, pendingMarket])
 
   return <MarketContext.Provider value={value}>{children}</MarketContext.Provider>
 }

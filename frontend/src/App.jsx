@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import FireflyMark from './components/FireflyMark'
-import { Suspense, lazy, useEffect } from 'react'
+import { Fragment, Suspense, lazy, useEffect } from 'react'
 import { ClerkLoading, SignedIn, SignedOut, RedirectToSignIn, useAuth } from '@clerk/clerk-react'
 import AppNav from './components/AppNav'
 import { useTranslation } from 'react-i18next'
@@ -8,6 +8,7 @@ import FeedbackButton from './components/FeedbackButton'
 import PanicButton from './components/PanicButton'
 import AdvisorChat from './components/AdvisorChat'
 import { MarketProvider } from './contexts/MarketContext'
+import useMarket from './hooks/useMarket'
 import ErrorBoundary from './utils/errorBoundary'
 import useIllumination from './hooks/useIllumination'
 import { registerTokenGetter } from './utils/api'
@@ -97,6 +98,18 @@ function ProtectedRoute({ children }) {
   )
 }
 
+/**
+ * Every page's server data belongs to one market. When the saved market
+ * changes, the page on screen is mounted afresh so everything it fetched —
+ * regions, funds, prices, the portfolio — is fetched again for the new one,
+ * instead of each page having to remember to list the market among its
+ * effect dependencies (none of them did).
+ */
+function MarketScoped({ children }) {
+  const { market } = useMarket()
+  return <Fragment key={market}>{children}</Fragment>
+}
+
 export default function App() {
   return (
     <ErrorBoundary>
@@ -107,6 +120,7 @@ export default function App() {
         <ScrollToTop />
 
         <MarketProvider>
+        <MarketScoped>
         <Routes>
           <Route path="/"          element={<OnboardingPage />} />
           <Route path="/path"      element={<ProtectedRoute><PathSelectionPage /></ProtectedRoute>} />
@@ -125,6 +139,7 @@ export default function App() {
           <Route path="/terms"     element={<LegalPage doc="terms" />} />
           <Route path="*"          element={<Navigate to="/" replace />} />
         </Routes>
+        </MarketScoped>
 
         {/* Illuminating UI: the courage score moves the background from night to dawn */}
         <Illumination />

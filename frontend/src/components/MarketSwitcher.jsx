@@ -12,13 +12,13 @@ const FLAGS = { TR: '🇹🇷', US: '🇺🇸', DE: '🇩🇪' }
  */
 export default function MarketSwitcher({ compact = false }) {
   const { t } = useTranslation()
-  const { market, packs, setMarket } = useMarket()
+  const { market, packs, setMarket, pendingMarket } = useMarket()
   if (packs.length < 2) return null
 
   return (
     <HeaderSelect
       label={t('market.label')}
-      value={market}
+      value={pendingMarket ?? market}
       onChange={setMarket}
       ariaLabel={t('market.select')}
       compact={compact}
