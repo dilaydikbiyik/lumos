@@ -268,7 +268,8 @@
     "howBody": "Sie nimmt an, dass dein Erspartes nicht ungenutzt liegt, sondern in einem zu deinem Risikoprofil passenden Portfolio im Schnitt {{growth}}% pro Jahr wächst. Diese Rate ist nicht erfunden: sie ist die Live-Inflation ({{inflation}}%) plus die reale Prämie, die ein breit gestreutes Portfolio langfristig erwarten lässt. Der Zeitraum wird in {{months}} Monate umgerechnet, und das Wachstum jedes Beitrags über die Restlaufzeit wird mitgezählt.",
     "howFormula": "monatlich = (Ziel − gewachsener Wert der Ersparnisse) × r / ((1+r)^Monate − 1),  r = monatliche Rendite",
     "howCaveat": "Das ist eine Planungsannahme, keine Prognose: Märkte wachsen nicht jedes Jahr gleich viel, und manche Jahre schließen im Minus. Fällt die Rate niedriger aus, reicht der Monatsbetrag nicht — den Plan einmal im Jahr zu prüfen ist eine gute Gewohnheit.",
-    "selectYears": "Zielzeitraum"
+    "selectYears": "Zielzeitraum",
+    "unreachable": "In diesem Tempo ist das Ziel nicht erreichbar — es braucht einen höheren Monatsbetrag oder mehr Zeit."
   },
   "feedback": {
     "open": "Sag uns etwas dazu",
@@ -1135,7 +1136,7 @@
     "entryCosts": "Der Kauf kostete {{value}}, bevor dir überhaupt etwas gehörte — Übertragungssteuer und Provision.",
     "upkeep": "Instandhaltung im Zeitraum: {{value}}.",
     "rent": "Erhaltene Miete im Zeitraum: {{value}}.",
-    "inflation": "Beide Seiten um {{pct}} % pro Jahr über {{years}} Jahre bereinigt.",
+    "inflation": "Beide Seiten um die in diesen {{years}} Jahren tatsächlich gemessene Inflation von {{pct}} % bereinigt.",
     "periods": {
       "1y": "1 Jahr",
       "3y": "3 Jahre",

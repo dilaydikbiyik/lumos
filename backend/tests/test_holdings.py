@@ -167,3 +167,13 @@ def test_engine_named_holding_follows_the_readers_language(client):
     assert t("asset.cash.name", "en") in names
     assert t("asset.cash.name", "tr") not in names
     assert "Kasadaki dolar" in names
+
+
+def test_a_purchase_dated_in_the_future_is_refused(client):
+    from datetime import date, timedelta
+
+    future = (date.today() + timedelta(days=30)).isoformat()
+    res = client.post("/holdings", json={**LAND, "purchase_date": future})
+    assert res.status_code == 422
+    tomorrow = (date.today() + timedelta(days=1)).isoformat()   # a reader east of UTC
+    assert client.post("/holdings", json={**LAND, "purchase_date": tomorrow}).status_code == 201

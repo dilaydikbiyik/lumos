@@ -1,7 +1,9 @@
 import asyncio
 import logging
 
-from fastapi import APIRouter, Depends, Request
+from typing import Literal
+
+from fastapi import APIRouter, Depends, Query, Request
 from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -243,7 +245,8 @@ async def typical_home_price(
 @limiter.limit("20/minute")
 async def province_intelligence(
     request: Request,
-    horizon_years: int = 3,
+    # The windows the table offers; anything else was silently turned into 3.
+    horizon_years: int = Query(3, ge=1, le=5),
     user_id: str = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
     lang: str = Depends(language),
@@ -257,6 +260,9 @@ async def province_intelligence(
     from backend.i18n import t as translate
     from backend.services.province_intelligence import rank_provinces
 
+    if horizon_years not in (1, 3, 5):
+        from fastapi import HTTPException
+        raise HTTPException(status_code=422, detail=translate("error.invalidInput", lang))
     market = await _market_of(db, user_id)
     result = await asyncio.to_thread(rank_provinces, horizon_years, market, lang)
 
@@ -352,8 +358,10 @@ async def budget_split_plan(
 async def property_vs_portfolio_compare(
     request: Request,
     region: str,
-    amount: float,
-    period: str = "5y",
+    # A negative amount was computed (a property worth -7.79); an unknown
+    # period silently became five years.
+    amount: float = Query(..., gt=0),
+    period: Literal["1y", "3y", "5y"] = "5y",
     user_id: str = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
     lang: str = Depends(language),

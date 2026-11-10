@@ -4,6 +4,7 @@ import AppHeader from '../components/AppHeader'
 import { useNavigate } from 'react-router-dom'
 import api from '../utils/api'
 import { useTranslation } from 'react-i18next'
+import { withRetry } from '../utils/retry'
 
 const FEARS = [
   { id: 'param_eriyor', icon: '💧', color: 'rgba(91,142,240,0.14)',  border: 'rgba(91,142,240,0.4)'  },
@@ -26,11 +27,12 @@ export default function FearCheckInPage() {
 
   function choose(fearId) {
     setSaving(fearId)
-    // Show reassurance immediately — no waiting for the backend.
-    // Fire the save in the background; failure here is non-critical
-    // (the fear tag is re-derivable and the reassurance is local).
+    // Show reassurance immediately — no waiting for the backend. The save
+    // retries in the background: the next app open resumes the intro from
+    // it (utils/homeRoute), and one attempt against a waking server lost it.
     setReassurance(t('fear.reassurance.' + fearId))
-    api.patch('/users/me/fear-check-in', { primary_fear: fearId }).catch(() => {})
+    withRetry(() => api.patch('/users/me/fear-check-in', { primary_fear: fearId }),
+              { tries: 5, delayMs: 3000 }).catch(() => {})
   }
 
   /* ── Reassurance screen ── */

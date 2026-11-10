@@ -236,6 +236,7 @@ async def update_market(
     body: MarketUpdate,
     user_id: str = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
+    lang: str = Depends(language),
 ):
     """Change the user's market pack (TR/US/DE)."""
     from fastapi import HTTPException
@@ -247,7 +248,22 @@ async def update_market(
     if code not in MARKET_PACKS:
         raise HTTPException(status_code=422, detail=f"Unknown market '{code}'. Available: {list(MARKET_PACKS)}")
 
-    return await user_repository.set_market(db, user_id, code)
+    # The stated budget and monthly figures move into the new currency at
+    # today's rate. With no rate the switch is refused rather than letting
+    # 200,000 TL silently become 200,000 EUR.
+    import asyncio
+
+    from backend.i18n import t
+    from backend.services import fx_service
+
+    user = await user_repository.get_or_create(db, user_id)
+    old = MARKET_PACKS.get((user.market or "TR").upper(), MARKET_PACKS["TR"]).currency
+    new = MARKET_PACKS[code].currency
+    rate = 1.0 if old == new else await asyncio.to_thread(fx_service.rate, old, new)
+    has_money = any(getattr(user, f, None) is not None for f in user_repository.MONEY_FIELDS)
+    if rate is None and has_money:
+        raise HTTPException(status_code=503, detail=t("market.rateUnavailable", lang))
+    return await user_repository.set_market(db, user_id, code, rate)
 
 
 class AccountDeletion(BaseModel):

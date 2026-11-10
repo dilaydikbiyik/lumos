@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@clerk/clerk-react'
 import api, { extractErrorMessage } from '../utils/api'
 import useMarket from '../hooks/useMarket'
 import { readJSON, userKey } from '../utils/storage'
 import { useTranslation } from 'react-i18next'
+import { localToday } from '../utils/date'
 
 // portfolio category -> holding asset type
 const CATEGORY_TO_TYPE = {
@@ -61,6 +62,7 @@ export default function BoughtItBridge({ allocations, budget }) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [allocations, userId])
 
+  const saved = useRef(new Set())
   async function transfer() {
     setSaving(true)
     setError(null)
@@ -68,16 +70,20 @@ export default function BoughtItBridge({ allocations, budget }) {
       for (const a of allocations) {
         const amount = Math.round(a.weight * budget)
         if (amount <= 0) continue
+        // A retry after a failure part-way must not record the first ones
+        // twice: each saved allocation is remembered for this transfer.
+        if (saved.current.has(a.ticker)) continue
         const type = CATEGORY_TO_TYPE[a.category] || 'other'
         const body = {
           asset_type: type,
           name: a.name,
           purchase_amount: amount,
           // purchase date = today → live price tracking kicks in automatically
-          purchase_date: new Date().toISOString().slice(0, 10),
+          purchase_date: localToday(),
         }
         if (!NO_TICKER_TYPES.has(type)) body.ticker = a.ticker
         await api.post('/holdings', body)
+        saved.current.add(a.ticker)
       }
       navigate('/holdings')
     } catch (err) {

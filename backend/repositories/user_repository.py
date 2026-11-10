@@ -113,9 +113,29 @@ async def set_primary_fear(db: AsyncSession, clerk_user_id: str, fear: str) -> U
     return user
 
 
-async def set_market(db: AsyncSession, clerk_user_id: str, market: str) -> User:
-    """Set the user's market pack (TR/US/DE). Keeps the mutation in the repo layer."""
+# The money a user states about themselves, stored as bare numbers in their
+# market's currency.
+MONEY_FIELDS = ("budget", "monthly_income", "monthly_outgoings", "monthly_contribution")
+
+
+async def set_market(db: AsyncSession, clerk_user_id: str, market: str,
+                     rate: float | None = None) -> User:
+    """
+    Set the user's market pack (TR/US/DE), converting the money they stated
+    into the new market's currency at `rate`.
+
+    A market switch used to re-read the same numbers in a new currency: a
+    200,000 TL budget became EUR 200,000 and fed the recommendation, the
+    budget split, the drift check and the cash-erosion figure. Holdings keep
+    the currency they were entered in and are converted on read; these
+    fields have no currency of their own, so they are converted here.
+    """
     user = await get_or_create(db, clerk_user_id)
+    if rate is not None and user.market != market:
+        for name in MONEY_FIELDS:
+            value = getattr(user, name, None)
+            if value is not None:
+                setattr(user, name, round(value * rate))
     user.market = market
     await db.flush()
     return user
@@ -172,6 +192,11 @@ async def delete_account(db: AsyncSession, clerk_user_id: str) -> bool:
     # guarantee it. An erasure is too important to depend on a pragma.
     await db.execute(sql_delete(Holding).where(Holding.user_id == user.id))
     await db.execute(sql_delete(Feedback).where(Feedback.user_id == user.id))
+    # Explicit, not left to the foreign key's CASCADE: SQLite enforces no
+    # foreign keys by default, and a subscription that outlives its owner is
+    # a device that can still be sent notifications for a deleted account.
+    from backend.models.push_subscription import PushSubscription
+    await db.execute(sql_delete(PushSubscription).where(PushSubscription.user_id == user.id))
     await db.delete(user)
     await db.commit()
     return True

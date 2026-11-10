@@ -167,6 +167,31 @@ app.add_exception_handler(
     cast(Callable[[Request, Exception], Response], _rate_limit_exceeded_handler),
 )
 
+# ── Validation errors, in the reader's language ─────────────────────────────
+#
+# FastAPI answers a bad field with Pydantic's own English ("Input should be
+# greater than 0"), and the client printed it as-is to Turkish and German
+# readers — reachable from a long holding name, a rent-vs-buy term past 30
+# years, or letters typed into an amount. The reader gets one translated
+# sentence; the field-level detail stays in `errors` for the client and logs.
+from fastapi.exceptions import RequestValidationError  # noqa: E402
+from fastapi.responses import JSONResponse  # noqa: E402
+
+
+async def _validation_error(request: Request, exc: RequestValidationError) -> JSONResponse:
+    from backend.i18n import t
+    from backend.middleware.language import get_language
+
+    errors = [{"field": ".".join(str(p) for p in e.get("loc", ())[1:]), "type": e.get("type")}
+              for e in exc.errors()]
+    return JSONResponse(status_code=422, content={
+        "detail": t("error.invalidInput", get_language(request)),
+        "errors": errors,
+    })
+
+
+app.add_exception_handler(RequestValidationError, _validation_error)
+
 # ── Request ID (correlation) ──────────────────────────────────────────────────
 app.add_middleware(RequestIDMiddleware)
 app.add_middleware(LanguageMiddleware)

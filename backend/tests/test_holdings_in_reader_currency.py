@@ -67,3 +67,26 @@ def test_the_value_chart_uses_each_days_exchange_rate():
     values = [p["value"] for p in out["series"]]
     assert values[0] == pytest.approx(4_000.0) and values[-1] == pytest.approx(4_400.0)
     assert out["change_pct"] == pytest.approx(10.0)
+
+
+def test_switching_market_converts_the_stated_money(client):
+    """A 200,000 TL budget became EUR 200,000 after a switch to Germany."""
+    from unittest.mock import patch
+
+    client.patch("/users/me/market", json={"market": "TR"})
+    client.patch("/users/me/income", json={"monthly_income": 50_000})
+    with patch("backend.services.fx_service.rate", lambda b, q, on=None: 0.02):
+        res = client.patch("/users/me/market", json={"market": "DE"})
+    assert res.status_code == 200
+    assert res.json()["monthly_income"] == 1_000
+
+
+def test_a_switch_without_a_rate_is_refused_not_guessed(client):
+    from unittest.mock import patch
+
+    client.patch("/users/me/market", json={"market": "TR"})
+    client.patch("/users/me/income", json={"monthly_income": 50_000})
+    with patch("backend.services.fx_service.rate", lambda b, q, on=None: None):
+        res = client.patch("/users/me/market", json={"market": "DE"}, headers={"X-Lumos-Lang": "de"})
+    assert res.status_code == 503 and "Wechselkurs" in res.json()["detail"]
+    assert client.get("/users/me").json()["market"] == "TR"

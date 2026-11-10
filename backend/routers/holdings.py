@@ -1,7 +1,7 @@
 import asyncio
 from datetime import date
 
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.db.database import get_db
@@ -21,7 +21,7 @@ from backend.schemas.holding import (
 )
 from backend.markets import get_market_pack
 from backend.services import fx_service, inflation_service, ticker_lookup
-from backend.services.holdings_valuation import current_value, enrich_holdings
+from backend.services.holdings_valuation import current_value, enrich_holdings, purchase_in
 
 router = APIRouter()
 
@@ -174,7 +174,8 @@ async def delete_holding(
 @limiter.limit("20/minute")
 async def value_history(
     request: Request,
-    days: int = 30,
+    # Out-of-range values used to be clamped silently; now they are refused.
+    days: int = Query(30, ge=7, le=365),
     user_id: str = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
@@ -182,7 +183,6 @@ async def value_history(
     closes, everything else is carried flat at its best-known value."""
     from backend.services.portfolio_history import portfolio_value_history
 
-    days = max(7, min(days, 365))
     user = await user_repository.get_or_create(db, user_id)
     holdings = await holding_repository.list_for_user(db, user.id)
     return await asyncio.to_thread(portfolio_value_history, holdings, days,
@@ -266,7 +266,8 @@ async def portfolio_summary(
 
     enrichment = await asyncio.to_thread(enrich_holdings, holdings, _currency_of(user),
                                          user.market or "TR")
-    total_invested = sum(h.purchase_amount for h in holdings)
+    ccy = _currency_of(user)
+    total_invested = sum(purchase_in(h, ccy) for h in holdings)
     total_value = sum(current_value(h, enrichment) for h in holdings)
     by_type: dict[str, float] = {}
     for h in holdings:
@@ -298,7 +299,7 @@ async def portfolio_summary(
     # Monthly-plan tracking: what entered the portfolio this calendar month
     today = date.today()
     invested_this_month = sum(
-        h.purchase_amount for h in holdings
+        purchase_in(h, ccy) for h in holdings
         if (h.purchase_date or (h.created_at.date() if h.created_at else None))
         and (h.purchase_date or h.created_at.date()).year == today.year
         and (h.purchase_date or h.created_at.date()).month == today.month

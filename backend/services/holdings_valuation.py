@@ -333,3 +333,16 @@ def current_value(holding, enrichment: dict[int, dict]) -> float:
     if info:
         return info["value"]
     return holding.purchase_amount
+
+
+def purchase_in(holding, user_currency: str) -> float:
+    """What the holding cost, in the reader's currency at today's rate —
+    0.0 when the rate is unknown (never counted at parity). Without it a
+    switched reader's summary set 100,000 TL invested beside a value of
+    EUR 1,734 and read as a 98% loss."""
+    held = _held_currency(holding)
+    target = (user_currency or held).upper()
+    if held == target:
+        return holding.purchase_amount
+    rate = fx_service.rate(held, target)
+    return holding.purchase_amount * rate if rate else 0.0

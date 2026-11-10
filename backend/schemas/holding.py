@@ -1,7 +1,7 @@
 from datetime import date, datetime
 from typing import Literal, Optional
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 AssetType = Literal[
     "stock", "fund", "etf", "real_estate", "land",
@@ -22,11 +22,23 @@ VALUE_INSTEAD_OF_TICKER = {"gold", "crypto"}
 EmotionTag = Literal["plan", "fomo", "tuyo", "panik"]
 
 
+def _not_in_the_future(value):
+    """A purchase cannot be dated after today. One day of slack covers a
+    reader whose local date is already tomorrow in UTC terms; anything later
+    was accepted, then left out of every chart point but counted in totals."""
+    from datetime import date as _date, timedelta
+
+    if value is not None and value > _date.today() + timedelta(days=1):
+        raise ValueError("purchase_date is in the future")
+    return value
+
+
 class HoldingCreate(BaseModel):
     asset_type: AssetType
     name: str = Field(..., min_length=1, max_length=120)
     ticker: Optional[str] = Field(None, max_length=20)
     purchase_date: Optional[date] = None
+    _purchase_date_ok = field_validator("purchase_date")(_not_in_the_future)
     purchase_amount: float = Field(..., gt=0)
     # ISO 4217 of purchase_amount. Omitted = the user's market currency. It is
     # recorded rather than assumed because the app previously took every stored
@@ -41,6 +53,7 @@ class HoldingCreate(BaseModel):
 class HoldingUpdate(BaseModel):
     name: Optional[str] = Field(None, min_length=1, max_length=120)
     purchase_date: Optional[date] = None
+    _purchase_date_ok = field_validator("purchase_date")(_not_in_the_future)
     purchase_amount: Optional[float] = Field(None, gt=0)
     quantity: Optional[float] = Field(None, gt=0)
     manual_current_value: Optional[float] = Field(None, gt=0)

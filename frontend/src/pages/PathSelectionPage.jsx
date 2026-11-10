@@ -3,6 +3,7 @@ import AppHeader from '../components/AppHeader'
 import { useNavigate } from 'react-router-dom'
 import api from '../utils/api'
 import { useTranslation } from 'react-i18next'
+import { withRetry } from '../utils/retry'
 
 const PATHS = [
   { id: 'stocks',      icon: '🏦', color: 'rgba(91,142,240,0.15)',  border: 'rgba(91,142,240,0.35)' },
@@ -21,11 +22,13 @@ export default function PathSelectionPage() {
   function choose(pathId) {
     setSaving(pathId)
     setError(null)
-    // Move on instantly — the save is not worth blocking the UI on (a cold-
-    // started backend can take 30-60s). Fire it in the background; the token
-    // interceptor attaches auth, and a failure here is non-critical (the path
-    // is re-selectable and re-derived on the next screen's load).
-    api.patch('/users/me/investment-path', { investment_path: pathId }).catch(() => {})
+    // Move on instantly — a cold-started backend can take 30-60s, and the
+    // save is not worth blocking the UI on. But it is not optional either:
+    // the portfolio follows the path and the next app open resumes from it
+    // (utils/homeRoute), and a single attempt lost the choice silently
+    // whenever the server was waking. It retries in the background.
+    withRetry(() => api.patch('/users/me/investment-path', { investment_path: pathId }),
+              { tries: 5, delayMs: 3000 }).catch(() => {})
     navigate('/fear-check-in')
   }
 

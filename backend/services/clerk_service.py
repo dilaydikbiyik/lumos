@@ -108,6 +108,13 @@ def delete_user(clerk_user_id: str) -> bool:
     if not is_configured():
         logger.error("Clerk delete requested without a configured secret key")
         return False
+    # Only something shaped like a Clerk user id reaches the identity API. A
+    # local harness with test ids ("userA") and a real key sent a DELETE to
+    # the dev instance; harmless there, but a delete is the one call that
+    # must never go out on a guess.
+    if not str(clerk_user_id).startswith("user_"):
+        logger.error("refusing Clerk delete for a non-Clerk id")
+        return False
 
     try:
         import httpx

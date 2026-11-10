@@ -36,7 +36,8 @@ export default function GoalPlanner() {
       setPlan(res.data)
 
       // If the user told us what they actually save monthly, check drift
-      if (form.monthly) {
+      // "0" is a real answer (saving nothing), not "not given".
+      if (form.monthly !== '' && form.monthly != null) {
         const drift = await api.post('/planning/goal-progress', {
           target_amount: body.target_amount,
           years_remaining: body.years,
@@ -127,6 +128,8 @@ export default function GoalPlanner() {
               </div>
               {progress.on_track ? (
                 <p style={{ fontSize: 14, color: 'var(--green, #4ade80)' }}>{t('goal.onTrack')}</p>
+              ) : progress.reachable === false ? (
+                <p style={{ fontSize: 14, color: 'var(--red)' }}>⏳ {t('goal.unreachable')}</p>
               ) : (
                 <p style={{ fontSize: 14, color: 'var(--red)' }}>
                   ⏳ <Trans i18nKey="goal.delayed" values={{ months: progress.delay_months }}

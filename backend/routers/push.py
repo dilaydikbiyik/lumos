@@ -181,8 +181,14 @@ async def market_sweep(
 
     for uid, rows in by_user.items():
         checked += 1
+        # By internal id, which is what a subscription row carries. Every
+        # user_repository helper is keyed on the Clerk id instead, and the
+        # sweep has no Clerk id because there is no user making the request.
+        user = (await db.execute(select(User).where(User.id == uid))).scalar_one_or_none()
+        if user is None:
+            continue
         try:
-            move = await _portfolio_move_pct(db, uid)
+            move = await _portfolio_move_pct(db, uid, user.market or "TR")
         except Exception:
             # One reader's missing price data must not end the sweep for
             # everybody after them.
@@ -192,30 +198,19 @@ async def market_sweep(
         if move is None or abs(move) < MARKET_SWEEP_MIN_PCT:
             continue
 
-        # By internal id, which is what a subscription row carries. Every
-        # user_repository helper is keyed on the Clerk id instead, and the
-        # sweep has no Clerk id because there is no user making the request.
-        user = (await db.execute(select(User).where(User.id == uid))).scalar_one_or_none()
-        if user is None:
-            continue
-
-        for sub in rows:
-            message = (drop_message if move < 0 else rise_message)(
-                user.loss_tolerance, lang=sub.lang,
-            )
-            sent = await push_service.send_to_user(
-                db, uid,
-                title=t("push.move_title", sub.lang),
-                body=message,
-                url="/holdings",
-                # One tag per reader per sweep: the service worker replaces
-                # rather than stacks, so a second notification about the same
-                # move cannot pile up on their lock screen.
-                tag="lumos-market-move",
-            )
-            if sent:
-                notified += 1
-            break   # send_to_user already covers every browser this user has
+        compose = drop_message if move < 0 else rise_message
+        sent = await push_service.send_to_user(
+            db, uid,
+            localize=lambda lang: (t("push.move_title", lang),
+                                   compose(user.loss_tolerance, lang=lang)),
+            url="/holdings",
+            # One tag per reader per sweep: the service worker replaces
+            # rather than stacks, so a second notification about the same
+            # move cannot pile up on their lock screen.
+            tag="lumos-market-move",
+        )
+        if sent:
+            notified += 1
 
         await db.execute(
             update(PushSubscription)
@@ -227,13 +222,20 @@ async def market_sweep(
     return {"checked": checked, "notified": notified}
 
 
-async def _portfolio_move_pct(db: AsyncSession, user_id: int) -> Optional[float]:
-    """The reader's OWN portfolio move over the last month, or None."""
+async def _portfolio_move_pct(db: AsyncSession, user_id: int,
+                              market: str = "TR") -> Optional[float]:
+    """The reader's OWN portfolio move over the last month, in their own
+    currency, or None. It defaulted to lira for everybody: a US reader's -4.1%
+    month read as -2.4% once the lira's fall was netted in, on the one number
+    that decides whether they are told about a drop."""
     from backend.repositories import holding_repository
     from backend.services.portfolio_history import portfolio_value_history
 
     holdings = await holding_repository.list_for_user(db, user_id)
     if not holdings:
         return None
-    history = await asyncio.to_thread(portfolio_value_history, holdings, 30)
+    from backend.markets import get_market_pack
+
+    history = await asyncio.to_thread(
+        portfolio_value_history, holdings, 30, get_market_pack(market).currency, market)
     return history.get("change_pct")

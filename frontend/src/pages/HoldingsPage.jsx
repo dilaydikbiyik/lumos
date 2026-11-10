@@ -15,6 +15,7 @@ import useMarket from '../hooks/useMarket'
 import { readJSON, writeJSON, userKey } from '../utils/storage'
 import { Trans, useTranslation } from 'react-i18next'
 import { percent } from '../utils/format'
+import { localToday } from '../utils/date'
 
 const TYPE_KEYS = ['stock', 'fund', 'etf', 'real_estate', 'land', 'vehicle', 'gold', 'crypto', 'cash', 'other']
 const OFF_EXCHANGE = ['real_estate', 'land', 'vehicle', 'cash', 'other']
@@ -127,8 +128,12 @@ export default function HoldingsPage() {
     ? lookedUpPrice * Number(form.quantity)
     : null
 
+  const [submitting, setSubmitting] = useState(false)
   async function addHolding(e) {
     e.preventDefault()
+    // One holding per tap: a double tap during a cold start posted twice.
+    if (submitting) return
+    setSubmitting(true)
     setError(null)
     try {
       const body = {
@@ -156,6 +161,8 @@ export default function HoldingsPage() {
       await refresh()
     } catch (err) {
       setError(extractErrorMessage(err, t('holdings.addError')))
+    } finally {
+      setSubmitting(false)
     }
   }
 
@@ -305,7 +312,7 @@ export default function HoldingsPage() {
                       )}
                       <span style={{ marginLeft: 6, fontSize: 10, opacity: 0.6 }}>
                         {h.value_source === 'live'
-                          ? (h.purchase_date === new Date().toISOString().slice(0, 10)
+                          ? (h.purchase_date === localToday()
                               // A 0% move on the day of purchase is correct, not a
                               // broken feed — say which it is instead of leaving doubt.
                               ? t('holdings.liveBoughtToday')
@@ -469,7 +476,7 @@ export default function HoldingsPage() {
                 already filled and the code correctly refused to overwrite
                 it — which meant every stock was typed out by hand even
                 though the app could have filled it. */}
-            <input className="input" required
+            <input className="input" required maxLength={120}
                    placeholder={t('holdings.namePlaceholder', { example: pack.example_asset_name })}
                    value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
             <input className="input" type="number" placeholder={t('holdings.amountPlaceholder', { unit })} required min="1"
@@ -497,7 +504,7 @@ export default function HoldingsPage() {
               {EMOTION_VALUES.map(v => <option key={v} value={v}>{t(v ? 'holdings.emotions.' + v : 'holdings.emotions.prompt')}</option>)}
             </select>
             <div style={{ display: 'flex', gap: 8 }}>
-              <button className="btn btn-primary" type="submit" style={{ flex: 1 }}>{t('holdings.add')}</button>
+              <button className="btn btn-primary" type="submit" style={{ flex: 1 }} disabled={submitting}>{t('holdings.add')}</button>
               <button className="btn btn-ghost" type="button" onClick={() => setShowForm(false)}>{t('common.cancel')}</button>
             </div>
           </form>

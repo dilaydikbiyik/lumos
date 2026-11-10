@@ -30,7 +30,7 @@ from typing import Optional
 
 from backend.exceptions import MarketDataError
 from backend.i18n import t
-from backend.services import assumptions
+from backend.services import assumptions, inflation_service
 
 logger = logging.getLogger("lumos.property_vs_portfolio")
 
@@ -130,8 +130,15 @@ def compare(*, amount: float, region_code: str, weights: dict[str, float],
 
     portfolio_value = amount * (1 + portfolio["total_return_pct"] / 100)
 
-    inflation = assumptions.annual_inflation_pct(market)
-    deflator = (1 + inflation / 100) ** covered_years
+    # The inflation that actually happened over the same backward window —
+    # not today's annual rate compounded. Both sides are history, so the
+    # deflator must be too: with Türkiye's current 29.8% raised to the fifth
+    # power (+268%) against a realized +667%, every "real" figure on this
+    # page came out about fifty times too large (+111% real for both sides
+    # when the truth was +1-2%).
+    start, end = inflation_service.inflation_window(covered_years, market)
+    inflation = round(inflation_service.cpi_change_pct(start, end, market), 1)
+    deflator = 1 + inflation / 100
 
     def _side(nominal: float) -> dict:
         return {

@@ -279,3 +279,13 @@ def test_the_endpoint_counts_property_holdings_as_committed(client):
     assert body["property_amount"] == 0, "an owned plot was not counted"
     assert any("already" in r.lower() or "zaten" in r.lower() or "bereits" in r.lower()
                for r in body["reasons"]), body["reasons"]
+
+
+def test_zero_outgoings_is_an_answer_and_a_capped_reserve_says_so():
+    from backend.services.budget_split import split
+
+    zero = split(budget=100_000, risk_score=5, monthly_outgoings=0, entry_threshold=TR_THRESHOLD)
+    assert "split.reason.reserve_assumed" not in zero.reasons and zero.reserve == 0
+
+    capped = split(budget=100_000, risk_score=5, monthly_outgoings=50_000, entry_threshold=TR_THRESHOLD)
+    assert capped.reserve == 50_000 and "split.reason.reserve_capped" in capped.reasons

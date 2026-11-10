@@ -106,3 +106,28 @@ def test_the_confirmation_body_is_required(client):
         res = client.request("DELETE", "/users/me")
     assert res.status_code == 422
     clerk.assert_not_called()
+
+
+def test_deleting_an_account_removes_its_push_subscriptions(client):
+    """Production cascades; SQLite does not. A subscription that outlives its
+    owner is a device that can still be notified about a deleted account."""
+    import asyncio
+
+    from sqlalchemy import func, select
+
+    from backend.db.database import get_db
+    from backend.main import app
+    from backend.models.push_subscription import PushSubscription
+
+    sub = client.post("/push/subscribe", json={"endpoint": "https://push.example/abc",
+                                               "keys": {"p256dh": "k", "auth": "a"}})
+    assert sub.status_code in (200, 201), sub.text
+    with patch("backend.services.clerk_service.delete_user", return_value=True):
+        assert client.request("DELETE", "/users/me",
+                              json={"confirm_user_id": FAKE_USER_ID}).status_code == 200
+
+    async def count():
+        gen = app.dependency_overrides[get_db]()
+        db = await gen.__anext__()
+        return (await db.execute(select(func.count()).select_from(PushSubscription))).scalar()
+    assert asyncio.run(count()) == 0

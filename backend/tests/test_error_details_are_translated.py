@@ -43,3 +43,15 @@ def test_the_scan_sees_a_literal_detail():
     """Proof the scan is not empty: the allowed ones are found."""
     found = {(name, text.split("'")[0].strip()) for name, text, _ in _literal_details()}
     assert any(name == "admin.py" for name, _ in found)
+
+
+def test_a_validation_error_reaches_the_reader_in_their_language(client):
+    """Pydantic's English ("Input should be greater than 0") was printed to
+    Turkish and German readers."""
+    bad = {"asset_type": "cash", "name": "x", "purchase_amount": -5}
+    for lang, word in (("tr", "geçerli"), ("de", "ungültig"), ("en", "valid")):
+        res = client.post("/holdings", json=bad, headers={"X-Lumos-Lang": lang})
+        assert res.status_code == 422
+        body = res.json()
+        assert isinstance(body["detail"], str) and word in body["detail"], (lang, body)
+        assert body["errors"] and body["errors"][0]["field"] == "purchase_amount"

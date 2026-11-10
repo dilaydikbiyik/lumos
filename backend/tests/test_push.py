@@ -275,7 +275,33 @@ def test_the_notification_body_is_the_coach_not_a_figure(client, keys_configured
         client.post("/push/market-sweep", headers={"X-Lumos-Cron": "right"})
 
     kwargs = send.await_args.kwargs
+    # The text is built per browser, in that browser's language.
+    for lang in ("tr", "en", "de"):
+        title, body = kwargs["localize"](lang)
+        assert title and "12" not in body and "%" not in body, (lang, body)
+    kwargs = {**kwargs, "body": kwargs["localize"]("tr")[1]}
     assert "12" not in kwargs["body"], f"a figure reached the body: {kwargs['body']!r}"
     assert "%" not in kwargs["body"]
     assert kwargs["url"] == "/holdings"
     assert len(kwargs["body"]) > 40, "the body should be the coach's sentence"
+
+
+def test_each_browser_gets_its_own_language():
+    """One reader, a Turkish phone and a German laptop: the text was built in
+    the first browser's language and sent to both."""
+    import asyncio
+    from types import SimpleNamespace
+    from unittest.mock import AsyncMock, MagicMock, patch
+
+    from backend.services import push_service
+
+    subs = [SimpleNamespace(id=1, lang="tr"), SimpleNamespace(id=2, lang="de")]
+    result = MagicMock()
+    result.scalars.return_value.all.return_value = subs
+    db = MagicMock(execute=AsyncMock(return_value=result), commit=AsyncMock())
+    sent = []
+    with patch.object(push_service, "is_configured", return_value=True), \
+         patch.object(push_service, "_send_one",
+                      side_effect=lambda sub, payload: sent.append((sub.lang, payload["title"])) or False):
+        asyncio.run(push_service.send_to_user(db, 7, localize=lambda lang: (f"title-{lang}", "b")))
+    assert sorted(sent) == [("de", "title-de"), ("tr", "title-tr")]

@@ -103,9 +103,16 @@ def split(*, budget: float,
 
     # ── 1. The reserve, off the top ──────────────────────────────────────
     assumed = False
-    if monthly_outgoings and monthly_outgoings > 0:
-        reserve = min(monthly_outgoings * RESERVE_MONTHS, budget * 0.5)
+    if monthly_outgoings is not None and monthly_outgoings >= 0:
+        # Zero is an answer, not "unknown": it was told "we assumed 10%
+        # because we don't know your outgoings" right after giving them.
+        wanted = monthly_outgoings * RESERVE_MONTHS
+        reserve = min(wanted, budget * 0.5)
         reasons.append("split.reason.reserve_from_outgoings")
+        if wanted > reserve:
+            # Six months would be more than half the budget; say that the
+            # reserve was capped rather than claim six months were set aside.
+            reasons.append("split.reason.reserve_capped")
     else:
         # No figure to work from: a tenth is a placeholder, and saying so is
         # better than implying it was calculated.

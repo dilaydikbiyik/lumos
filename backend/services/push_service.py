@@ -97,8 +97,8 @@ def _send_one(subscription: PushSubscription, payload: dict) -> Optional[int]:
 
 
 async def send_to_user(
-    db: AsyncSession, user_id: int, *, title: str, body: str,
-    url: str = "/", tag: str = "lumos",
+    db: AsyncSession, user_id: int, *, title: str = "", body: str = "",
+    url: str = "/", tag: str = "lumos", localize=None,
 ) -> int:
     """
     Notify every live browser this user has installed. Returns how many
@@ -126,6 +126,11 @@ async def send_to_user(
     sent = 0
     retire: list[int] = []
     for sub in rows:
+        # Each browser in its own language: one reader's phone may be in
+        # Turkish and their laptop in German, and the text was built once in
+        # the first browser's language and sent to both.
+        if localize is not None:
+            title, body = localize(sub.lang)
         payload = {"title": title, "body": body, "url": url, "tag": tag}
         gone = await asyncio.to_thread(_send_one, sub, payload)
         if gone:

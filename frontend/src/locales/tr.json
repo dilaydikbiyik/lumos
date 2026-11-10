@@ -685,7 +685,8 @@
     "howBody": "Biriktirdiğin paranın boşta beklemediği, risk profiline uygun bir portföyde yılda ortalama %{{growth}} büyüdüğü varsayılıyor. Bu oran uydurma değil: canlı enflasyon (%{{inflation}}) üzerine, çeşitlendirilmiş bir portföyün uzun vadede kazandığı varsayılan reel primin eklenmesiyle bulunuyor. Süre {{months}} aya çevriliyor ve her ayki katkının kalan süre boyunca büyümesi hesaba katılıyor.",
     "howFormula": "aylık katkı = (hedef − mevcut birikimin büyümüş hâli) × r / ((1+r)^ay − 1),  r = aylık getiri",
     "howCaveat": "Bu bir tahmin değil, bir planlama varsayımı: piyasa her yıl aynı oranda büyümez, bazı yıllar eksi kapatır. Oran daha düşük olursa aylık katkı yetmez — planı yılda bir gözden geçirmek iyi bir alışkanlıktır.",
-    "selectYears": "Hedef vadesi"
+    "selectYears": "Hedef vadesi",
+    "unreachable": "Bu tempoyla bu hedefe ulaşılamıyor — aylık birikimi artırmak ya da süreyi uzatmak gerekiyor."
   },
   "market": {
     "label": "Pazar",
@@ -1135,7 +1136,7 @@
     "entryCosts": "Daha elinde bir şey olmadan alım {{value}} tuttu — devir vergisi ve komisyon.",
     "upkeep": "Dönem boyunca bakım: {{value}}.",
     "rent": "Dönem boyunca alınan kira: {{value}}.",
-    "inflation": "İki taraf da {{years}} yıl boyunca yılda %{{pct}} enflasyondan arındırıldı.",
+    "inflation": "İki taraf da o {{years}} yılda gerçekten ölçülen toplam %{{pct}} enflasyondan arındırıldı.",
     "periods": {
       "1y": "1 yıl",
       "3y": "3 yıl",

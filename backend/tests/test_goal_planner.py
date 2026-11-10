@@ -53,3 +53,13 @@ def test_goal_progress_endpoint(client):
     })
     assert res.status_code == 200
     assert "on_track" in res.json()
+
+
+def test_an_unreachable_goal_is_not_reported_as_a_delay():
+    """Nothing saved and nothing added never reaches the target; the page
+    printed the loop's 600-month cap as "about 600 months late"."""
+    from backend.services.goal_planner import progress_and_drift as track_progress
+
+    r = track_progress(target_amount=100_000, years_remaining=1, current_savings=0,
+                       actual_monthly_contribution=0)
+    assert r["reachable"] is False and r["delay_months"] is None and r["on_track"] is False

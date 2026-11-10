@@ -3675,6 +3675,36 @@ hep SPY çıkıyor". İkisi ayrı sorunmuş.
       sabitlendi. Ayrıca: CI'ı "son çalışmayı izle" diye takip ediyordum ve
       aynı anda koşan zamanlanmış keepalive işini izleyip "yeşil" demişim;
       artık commit SHA'sıyla izleniyor.
+- [x] **Üçüncü arka plan taraması (2026-11-10)** — girdi uçları, yetki
+      izolasyonu, hesap motorları, zaman, bildirimler, arayüz durumları:
+      - **TR emlak-mı-portföy-mü reel getirileri ~50 kat şişikti**: bugünkü
+        yıllık enflasyon 5 yıla üslenerek (+%268) gerçekleşen +%667 yerine
+        kullanılıyordu; iki taraf +%111 reel görünüyordu, gerçek +%1–2.
+        Artık aynı geriye dönük penceredeki gerçekleşen TÜFE.
+      - Bildirim taraması herkesi TL ile ölçüyordu (ABD'li −%4,1 → −%2,4);
+        artık okuyucunun para birimi. Her tarayıcıya kendi dilinde gidiyor.
+      - Pazar değişince bütçe/gelir/gider sayıları yeni para biriminde
+        okunuyordu (200.000 TL → 200.000 €); artık o günün kuruyla
+        çevriliyor, kur yoksa değişiklik reddediliyor. Özetteki "yatırılan"
+        da çevriliyor.
+      - Pydantic'in İngilizce doğrulama mesajları TR/DE okuyucuya gidiyordu →
+        çevrili tek cümle + alan listesi.
+      - Varlık ekle çift dokunuşta iki kez kaydediyordu; "aldım" köprüsü
+        yarıda kalıp tekrar denenince ilk kalemleri yeniden kaydediyordu.
+      - Alım tarihi UTC'ydi (ABD akşamı "yarın"); gelecek tarih kabul
+        ediliyordu → yerel tarih, sunucuda bugün+1 sınırı.
+      - Ulaşılamayan hedef "~600 ay gecikme" diyordu → "bu tempoyla
+        ulaşılamıyor"; aylık "0" artık bir cevap.
+      - Yol ve korku seçimi tek denemeyle kayboluyordu → arka planda 5 deneme.
+      - Bütçe bölüşümü: gider 0 "bilinmiyor" sayılıyordu; yarı bütçe tavanı
+        uygulanınca "6 aylık gider ayrıldı" diyordu → tavan açıkça yazıyor.
+      - Sessiz kırpmalar 422'ye döndü (geçmiş günleri, bölge penceresi,
+        kıyas süresi, negatif tutar).
+      - Hesap silme push aboneliklerini açıkça siliyor (SQLite CASCADE yok).
+      - Clerk silme yalnızca `user_…` biçimli kimliklere gidiyor.
+      - Kasıtlı/not: AI metin önbelleği 1 gün (silinen hesabın metni en geç
+        ertesi gün düşer); "yüksek faizli borç" risk skorunu değil borç
+        kontrolünü etkiliyor (tasarım gereği).
 - [ ] Almanya'da hazine bonosu satırı yok (para piyasası fonu var);
       ABD bonosunun EUR karşılığı istenirse USDEUR=X ile eklenebilir.
 - [ ] Keşif listesi tarihli (2026-11) bir seçki; yılda bir piyasa

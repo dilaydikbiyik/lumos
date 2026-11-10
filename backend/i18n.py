@@ -428,6 +428,14 @@ _C: dict[str, dict[str, str]] = {
         "tr": "Profilin henüz tamamlanmadı — sohbete biraz daha devam edelim.",
         "en": "Your profile isn't complete yet — let's continue the conversation a little.",
         "de": "Dein Profil ist noch nicht vollständig — lass uns das Gespräch noch etwas fortsetzen."},
+    "market.rateUnavailable": {
+        "tr": "Tutarlarını yeni para birimine çevirmek için güncel kuru şu an okuyamadık; birazdan tekrar dene.",
+        "en": "We couldn't read today's exchange rate to convert your amounts into the new currency; please try again shortly.",
+        "de": "Wir konnten den heutigen Wechselkurs nicht lesen, um deine Beträge umzurechnen; bitte versuche es gleich noch einmal."},
+    "error.invalidInput": {
+        "tr": "Girdiğin değerlerden biri geçerli değil — tutarların sayı ve sıfırdan büyük olduğunu, metinlerin çok uzun olmadığını kontrol eder misin?",
+        "en": "One of the values you entered isn't valid — could you check that amounts are numbers above zero and that text isn't too long?",
+        "de": "Einer der eingegebenen Werte ist ungültig — prüfst du bitte, ob Beträge Zahlen über null sind und Texte nicht zu lang?"},
     "holdings.notFound": {
         "tr": "Varlık bulunamadı.",
         "en": "Holding not found.",
@@ -797,6 +805,10 @@ _C: dict[str, dict[str, str]] = {
         "tr": "Planlanacak bir tutar yok. Bütçeni girdiğinde burada gerçek bir dağılım belirir.",
         "en": "There is no amount to plan yet. Enter your budget and a real split appears here.",
         "de": "Es gibt noch keinen Betrag zu planen. Trag dein Budget ein, dann erscheint hier eine echte Aufteilung."},
+    "split.reason.reserve_capped": {
+        "tr": "{months} aylık gider bütçenin yarısından fazla tutuyor; yedeği bütçenin yarısıyla sınırladık ki geri kalanı da işe yarasın. Tam yedeği zamanla tamamlamak iyi bir hedef.",
+        "en": "{months} months of outgoings would be more than half the budget, so the reserve is capped at half to leave the rest working. Building the full reserve over time is a good goal.",
+        "de": "{months} Monatsausgaben wären mehr als das halbe Budget, daher ist die Reserve auf die Hälfte begrenzt, damit der Rest arbeiten kann. Die volle Reserve mit der Zeit aufzubauen, ist ein gutes Ziel."},
     "split.reason.reserve_from_outgoings": {
         "tr": "Önce {months} aylık gideri kenara ayırdık. Bu bir yatırım değil; kötü bir ayın, en kötü fiyattan satmak zorunda kalmaya dönüşmesini engelleyen şey.",
         "en": "We set aside {months} months of outgoings first. It is not an investment; it is what stops a bad month turning into a forced sale at the worst price.",

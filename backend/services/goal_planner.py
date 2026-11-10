@@ -98,6 +98,7 @@ def progress_and_drift(
     progress_pct = round(min(current_savings / target_amount, 1.0) * 100, 1) if target_amount > 0 else 0.0
 
     delay_months = 0
+    reachable = True
     if projected_at_deadline < target_amount:
         # Keep simulating beyond the deadline until target is reached
         extra_months = 0
@@ -105,7 +106,11 @@ def progress_and_drift(
         while balance < target_amount and extra_months < 600:  # 50-year safety cap
             balance = balance * (1 + monthly_rate) + actual_monthly_contribution
             extra_months += 1
-        delay_months = extra_months
+        # The cap is not a delay. With nothing saved and nothing added the
+        # target is never reached, and the page printed "about 600 months
+        # late" as if it were a measurement.
+        reachable = balance >= target_amount
+        delay_months = extra_months if reachable else None
 
     return {
         "progress_pct": progress_pct,
@@ -113,6 +118,7 @@ def progress_and_drift(
         "projected_value_real": round(assumptions.real_value(projected_at_deadline, years_remaining, inflation_pct, market), 2),
         "on_track": projected_at_deadline >= target_amount,
         "delay_months": delay_months,
+        "reachable": reachable,
         "annual_inflation_pct": inflation_pct,
         "inflation_as_of": assumptions.inflation_as_of(market),
         "annual_growth_pct": annual_growth_pct,
