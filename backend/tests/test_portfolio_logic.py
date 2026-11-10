@@ -27,7 +27,7 @@ from backend.services.risk_engine import compute_risk_score
 FAKE_VOLS = {"XU100.IS": 0.45, "SPY": 0.18, "QQQ": 0.28, "GLD": 0.12, "VNQ": 0.20, "SCHH": 0.22}
 
 
-def _vols(tickers):
+def _vols(tickers, currency=None):
     return {t: FAKE_VOLS.get(t, 0.15) for t in tickers}
 
 

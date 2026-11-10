@@ -258,7 +258,7 @@
       "IQQP_DE": {
         "type": "Avrupa Gayrimenkul ETF'i (UCITS)",
         "what": "iShares European Property Yield — Avrupa genelinde borsaya kote gayrimenkul şirketleri; kira gelirlerini dağıtıyorlar.",
-        "why": "Euro cinsinden gayrimenkul; kredi, noter ya da daha eline geçmeden %7 alım masrafı olmadan.",
+        "why": "Euro cinsinden gayrimenkul; kredi, noter ya da daha eline geçmeden ~%10 alım masrafı (vergi, noter, emlakçı) olmadan.",
         "risk": "Borsaya kote gayrimenkul, çöküşte tam da istemediğin anda borsayla birlikte düşer. Faiz artışı onu iki kere vurur."
       },
       "XEON_DE": {
@@ -561,15 +561,15 @@
   },
   "fx": {
     "title": "Kur Dağılımı",
-    "subtitle": "TL vs Döviz bazlı varlıkların",
+    "subtitle": "Yerel para ile döviz bazlı varlıkların",
     "riskLabel": "Kur riski",
     "high": "Yüksek",
     "mid": "Orta",
-    "highMsg": "Portföyünün büyük çoğunluğu TL bazlı. TL değer kaybettiğinde tüm portföyün etkilenir. Döviz bazlı varlık eklemeyi düşünebilirsin.",
-    "midMsg": "TL ve döviz arasında makul bir denge var. Bu dağılım kur dalgalanmalarına karşı kısmen koruma sağlar.",
-    "tryLegend": "🇹🇷 TL — %{{pct}}",
+    "highMsg": "Portföyünün çoğu yerel parada ({{currency}}). {{currency}} değer kaybederse bütün portföy bunu hisseder. Döviz bazlı varlık eklemeyi düşünebilirsin.",
+    "midMsg": "Yerel para ({{currency}}) ile döviz arasında makul bir denge var. Bu dağılım kur dalgalanmalarına karşı kısmi koruma sağlar.",
     "fxLegend": "🌍 Döviz — %{{pct}}",
-    "fxHeavyMsg": "Portföyün neredeyse tamamen döviz bazlı. Bu, TL değer kaybettiğinde seni korur — ama kiran, gıdan ve ileride alacağın ev TL cinsinden. Kur tersine döndüğünde dengeleyecek bir şeyin olmaz. Yön tercihi olarak makul olabilir; yine de bunun bir yoğunlaşma olduğunu bilerek yap."
+    "fxHeavyMsg": "Portföyün neredeyse tamamen döviz bazlı. {{currency}} değer kaybederken bu seni korur — ama kiran, mutfağın ve alacağın ev {{currency}} ile fiyatlanıyor ve ters yöndeki bir hareketi dengeleyen hiçbir şey yok. Makul bir tercih olabilir; yeter ki bilinçli ve bunun bir yoğunlaşma olduğunu bilerek yapılsın.",
+    "homeLegend": "🏠 {{currency}} — %{{pct}}"
   },
   "drift": {
     "title": "Portföyün dengede mi?",
@@ -877,8 +877,8 @@
     "comparedHome": "Karşılaştırılan ev: <0>{{price}} TL</0> · aylık kredi taksiti ≈ <1>{{installment}} TL</1>",
     "estimatedFromRent": "(kiradan tahmin edildi)",
     "cashBreakdown": "<0>{{cash}}</0> nakdinin {{costs}} kadarı devir vergileri ve komisyona gidiyor; eve peşinat olarak <1>{{applied}}</1> kalıyor.",
-    "affordabilityTight": "Taksit, gelirinin %{{pct}}'i — bankalar genelde gelirin ~%45'inin üzerindeki taksitlere kredi vermez. Bu ev bu peşinatla şu an gerçekçi olmayabilir; daha yüksek peşinat ya da daha uygun bir ev düşünebilirsin.",
-    "affordabilityOk": "Taksit, gelirinin %{{pct}}'i — genel kabul gören güvenli sınır ~%45'in altında, bu plan gelirine uygun görünüyor.",
+    "affordabilityTight": "Taksit, gelirinin %{{pct}}'i — bankalar genelde gelirin ~%{{limit}}'inin üzerindeki taksitlere kredi vermez. Bu ev bu peşinatla şu an gerçekçi olmayabilir; daha yüksek peşinat ya da daha uygun bir ev düşünebilirsin.",
+    "affordabilityOk": "Taksit, gelirinin %{{pct}}'i — bankaların baktığı ~%{{limit}} sınırının altında, bu plan gelirine uygun görünüyor.",
     "loanCost": "<0>Kredinin maliyeti</0> ({{rate}}%/yıl, {{term}} yıl vade)<1/>Çekilen kredi <2>{{principal}} TL</2> · vade sonunda toplam ödenen <3>{{total}} TL</3><4/>Bunun <5>{{interest}} TL</5>'si faiz — yani anaparanın <6>{{ratio}}%</6>'i kadar.",
     "payingTwice": "Faiz, çektiğin krediden fazla: evi iki kez ödüyorsun.",
     "fixedRateNote": "Sabit faizli hesaptır; enflasyon yüksek seyrederse taksitin reel yükü zamanla hafifler.",

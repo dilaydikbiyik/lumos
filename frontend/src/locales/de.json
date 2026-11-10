@@ -370,16 +370,16 @@
     }
   },
   "fx": {
-    "fxHeavyMsg": "Dein Portfolio ist fast vollständig in Fremdwährung. Das schützt dich, wenn die Heimatwährung schwächer wird — aber Miete, Lebensmittel und ein künftiges Zuhause sind darin bepreist, und nichts gleicht eine Gegenbewegung aus. Das kann sinnvoll sein; entscheide es nur bewusst.",
+    "fxHeavyMsg": "Dein Portfolio liegt fast vollständig in Fremdwährungen. Das schützt dich, wenn {{currency}} schwächer wird — aber Miete, Lebensmittel und dein künftiges Zuhause werden darin bezahlt, und nichts gleicht eine Bewegung in die andere Richtung aus. Das kann vertretbar sein; nur sollte es eine bewusste Entscheidung sein, im Wissen um die Konzentration.",
     "title": "Währungsaufteilung",
-    "subtitle": "Deine TL- gegenüber deinen fremdwährungsbasierten Anlagen",
+    "subtitle": "Heimatwährung vs. Fremdwährung in deinem Vermögen",
     "riskLabel": "Währungsrisiko",
     "high": "Hoch",
     "mid": "Mittel",
-    "highMsg": "Der größte Teil deines Portfolios lautet auf TL. Wertet die Lira ab, spürt es das ganze Portfolio. Erwäge, fremdwährungsbasierte Anlagen beizumischen.",
-    "midMsg": "Zwischen TL und Fremdwährung besteht eine vernünftige Balance. Diese Aufteilung schützt teilweise vor Währungsschwankungen.",
-    "tryLegend": "🇹🇷 TL — {{pct}}%",
-    "fxLegend": "🌍 Fremdwährung — {{pct}}%"
+    "highMsg": "Der Großteil deines Portfolios liegt in deiner Heimatwährung ({{currency}}). Wenn sie schwächer wird, spürt es das ganze Portfolio. Erwäge Anlagen in Fremdwährung.",
+    "midMsg": "Zwischen Heimatwährung ({{currency}}) und Fremdwährungen besteht ein vernünftiges Gleichgewicht. Diese Aufteilung schützt teilweise vor Wechselkursschwankungen.",
+    "fxLegend": "🌍 Fremdwährung — {{pct}}%",
+    "homeLegend": "🏠 {{currency}} — {{pct}} %"
   },
   "path": {
     "step": "Schritt 1 / 3",
@@ -566,8 +566,8 @@
     "comparedHome": "Verglichene Immobilie: <0>{{price}}</0> · monatliche Rate ≈ <1>{{installment}}</1>",
     "estimatedFromRent": "(aus der Miete geschätzt)",
     "cashBreakdown": "Von deinen <0>{{cash}}</0> gehen {{costs}} an Erwerbsteuern und Provision; als Eigenkapital bleiben <1>{{applied}}</1>.",
-    "affordabilityTight": "Die Rate beträgt {{pct}}% deines Einkommens — Banken vergeben in der Regel nichts über rund 45%. Diese Immobilie ist mit diesem Eigenkapital derzeit womöglich nicht realistisch; überlege mehr Eigenkapital oder eine günstigere Immobilie.",
-    "affordabilityOk": "Die Rate beträgt {{pct}}% deines Einkommens — unter der allgemein akzeptierten Grenze von rund 45%, dieser Plan wirkt tragfähig.",
+    "affordabilityTight": "Die Rate beträgt {{pct}} % deines Einkommens — Banken gehen hier in der Regel nicht über rund {{limit}} %. Diese Immobilie ist mit diesem Eigenkapital derzeit womöglich nicht realistisch; überlege mehr Eigenkapital oder eine günstigere Immobilie.",
+    "affordabilityOk": "Die Rate beträgt {{pct}} % deines Einkommens — unter der Grenze von rund {{limit}} %, auf die Banken hier achten; dieser Plan wirkt tragfähig.",
     "loanCost": "<0>Was der Kredit kostet</0> ({{rate}}%/Jahr, {{term}} Jahre Laufzeit)<1/>Aufgenommen <2>{{principal}}</2> · über die gesamte Laufzeit gezahlt <3>{{total}}</3><4/>Davon sind <5>{{interest}}</5> Zinsen — also <6>{{ratio}}%</6> der Kreditsumme.",
     "payingTwice": "Die Zinsen übersteigen den Kredit: du bezahlst die Immobilie zweimal.",
     "fixedRateNote": "Gerechnet mit festem Zins; bleibt die Inflation hoch, sinkt die reale Last der Rate mit der Zeit.",
@@ -666,7 +666,7 @@
       "IQQP_DE": {
         "type": "Europäischer Immobilien-ETF (UCITS)",
         "what": "iShares European Property Yield — börsennotierte Immobilienunternehmen in ganz Europa, die ihre Mieteinnahmen ausschütten.",
-        "why": "Immobilien in Euro — ohne Kredit, ohne Notar und ohne 7 % Kaufnebenkosten, bevor dir überhaupt etwas gehört.",
+        "why": "Immobilien in Euro — ohne Kredit, ohne Notar und ohne rund 10 % Kaufnebenkosten (Steuer, Notar, Makler), bevor dir überhaupt etwas gehört.",
         "risk": "Börsennotierte Immobilien fallen im Crash mit dem Aktienmarkt, genau dann, wenn du es nicht wolltest. Zinsanstiege treffen sie doppelt."
       },
       "XEON_DE": {

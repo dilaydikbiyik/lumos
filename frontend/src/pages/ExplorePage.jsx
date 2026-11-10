@@ -318,16 +318,19 @@ function RentVsBuy() {
           {num(form.income) > 0 && result.monthly_mortgage > 0 && (() => {
             const ratio = result.monthly_mortgage / num(form.income)
             const pct = Math.round(ratio * 100)
+            // The market's own lending line, not one Turkish 45% for all.
+            const line = pack.max_payment_to_income ?? 0.45
+            const limit = Math.round(line * 100)
             return (
               <div style={{
                 fontSize: 12.5, lineHeight: 1.6, padding: '10px 12px', marginBottom: 10,
                 borderRadius: 'var(--radius-xs)', border: '1px solid var(--border)',
                 background: 'var(--bg-input)',
-                color: ratio > 0.45 ? 'var(--red)' : 'var(--text-muted)',
+                color: ratio > line ? 'var(--red)' : 'var(--text-muted)',
               }}>
-                {ratio > 0.45
-                  ? t('rvb.affordabilityTight', { pct })
-                  : t('rvb.affordabilityOk', { pct })}
+                {ratio > line
+                  ? t('rvb.affordabilityTight', { pct, limit })
+                  : t('rvb.affordabilityOk', { pct, limit })}
               </div>
             )
           })()}

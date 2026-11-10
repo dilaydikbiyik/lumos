@@ -102,6 +102,23 @@ def _no_network_chat_context():
         yield
 
 
+@pytest.fixture(autouse=True, scope="session")
+def _private_cache(tmp_path_factory):
+    """Tests get a cache of their own. They wrote into the developer's
+    backend/.cache, and with the flat test exchange rates below that left
+    dollar volatilities filed under a lira key — the app then served them to
+    a real local run as if they had been converted."""
+    import diskcache
+
+    from backend.services import cache as cache_service
+
+    original = cache_service._cache
+    cache_service._cache = diskcache.Cache(str(tmp_path_factory.mktemp("lumos-cache")))
+    yield
+    cache_service._cache.close()
+    cache_service._cache = original
+
+
 @pytest.fixture(autouse=True)
 def _flat_exchange_rates():
     """Currency conversion never hits the network in tests: every rate is a

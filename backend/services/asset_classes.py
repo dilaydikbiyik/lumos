@@ -53,8 +53,7 @@ _CACHE_TTL = 12 * 3600
 
 def _real(change_pct: float, market: str) -> Optional[float]:
     try:
-        start = inflation_service.years_to_months_ago(WINDOW_YEARS)
-        end = inflation_service.years_to_months_ago(0)
+        start, end = inflation_service.inflation_window(WINDOW_YEARS, market)
         return round(inflation_service.real_return_pct(change_pct, start, end, market), 1)
     except Exception:
         logger.info("no deflator for %s over %sy", market, WINDOW_YEARS)

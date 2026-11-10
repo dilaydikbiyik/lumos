@@ -258,7 +258,7 @@
       "IQQP_DE": {
         "type": "European Property ETF (UCITS)",
         "what": "iShares European Property Yield — listed property companies across Europe, paying out their rental income.",
-        "why": "Property exposure in euros, without a mortgage, a notary, or 7% in purchase costs before you own anything.",
+        "why": "Property exposure in euros, without a mortgage, a notary, or ~10% in purchase costs (tax, notary, agent) before you own anything.",
         "risk": "Listed property moves with the stock market in a crash, exactly when you hoped it would not. Rate rises hurt it twice."
       },
       "XEON_DE": {
@@ -561,15 +561,15 @@
   },
   "fx": {
     "title": "Currency Split",
-    "subtitle": "Your TL vs FX-based assets",
+    "subtitle": "Your home-currency vs foreign-currency assets",
     "riskLabel": "Currency risk",
     "high": "High",
     "mid": "Medium",
-    "highMsg": "Most of your portfolio is TL-based. When the lira weakens, your whole portfolio feels it. Consider adding FX-based assets.",
-    "midMsg": "There's a reasonable balance between TL and FX. This split gives partial protection against currency swings.",
-    "tryLegend": "🇹🇷 TL — {{pct}}%",
+    "highMsg": "Most of your portfolio is in your home currency ({{currency}}). When it weakens, your whole portfolio feels it. Consider adding foreign-currency assets.",
+    "midMsg": "There's a reasonable balance between your home currency ({{currency}}) and foreign currencies. This split gives partial protection against currency swings.",
     "fxLegend": "🌍 FX — {{pct}}%",
-    "fxHeavyMsg": "Your portfolio is almost entirely FX-based. That protects you when the local currency weakens — but your rent, food and future home are priced in it, and nothing offsets a move the other way. It can be a reasonable stance; just make it a deliberate one, knowing it is a concentration."
+    "fxHeavyMsg": "Your portfolio is almost entirely in foreign currencies. That protects you when {{currency}} weakens — but your rent, food and future home are priced in it, and nothing offsets a move the other way. It can be a reasonable stance; just make it a deliberate one, knowing it is a concentration.",
+    "homeLegend": "🏠 {{currency}} — {{pct}}%"
   },
   "drift": {
     "title": "Is your portfolio in balance?",
@@ -877,8 +877,8 @@
     "comparedHome": "Home compared: <0>{{price}}</0> · monthly mortgage payment ≈ <1>{{installment}}</1>",
     "estimatedFromRent": "(estimated from the rent)",
     "cashBreakdown": "<0>{{cash}}</0> of your cash goes {{costs}} to transfer taxes and commission; <1>{{applied}}</1> is left as the down payment.",
-    "affordabilityTight": "The payment is {{pct}}% of your income — banks generally won't lend past about 45%. This home may not be realistic on this down payment right now; consider a larger deposit or a more affordable home.",
-    "affordabilityOk": "The payment is {{pct}}% of your income — below the widely accepted ~45% safety line, so this plan looks affordable.",
+    "affordabilityTight": "The payment is {{pct}}% of your income — lenders here generally won't go past about {{limit}}%. This home may not be realistic on this down payment right now; consider a larger deposit or a more affordable home.",
+    "affordabilityOk": "The payment is {{pct}}% of your income — below the ~{{limit}}% line lenders here look for, so this plan looks affordable.",
     "loanCost": "<0>What the loan costs</0> ({{rate}}%/yr, {{term}}-year term)<1/>Borrowed <2>{{principal}}</2> · total paid over the full term <3>{{total}}</3><4/>Of which <5>{{interest}}</5> is interest — that is <6>{{ratio}}%</6> of the principal.",
     "payingTwice": "The interest exceeds what you borrowed: you're paying for the home twice.",
     "fixedRateNote": "This assumes a fixed rate; if inflation stays high, the real burden of the payment eases over time.",

@@ -42,7 +42,8 @@ def _inflation_line(market: str = "TR") -> str:
 
     erosion = monthly_cash_erosion(100, market=market)  # only to read the rate
     pct = erosion.get("monthly_inflation_pct")
-    return f"- Monthly inflation ({market}, latest reading): {pct}%" if pct else ""
+    return (f"- Inflation ({market}): {pct}% a month on average over the last 12 months"
+            if pct else "")
 
 
 def build_market_context(market: str = "TR") -> str:

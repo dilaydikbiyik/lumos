@@ -53,9 +53,16 @@ _DEFAULT_VOL = 0.2
 VOLATILITY_WINDOW = "5y"
 
 
-def compute_volatility(tickers: list[str]) -> dict[str, float]:
+def compute_volatility(tickers: list[str], currency: str | None = None) -> dict[str, float]:
     """
-    Return annualised volatility for each ticker.
+    Return annualised volatility for each ticker — in `currency` when given.
+
+    In the READER's currency, because that is the swing they live with: for
+    a Turkish reader the S&P 500 fund moved 23% a year in lira, not the 17%
+    it moved in dollars, and the cash fund 17%, not 0.3%. Measured in
+    dollars, the engine read dollar funds as the calm ones and tilted
+    cautious Turkish profiles toward them, and the cards quoted dollar
+    swings beside lira amounts.
 
     Returns:
         dict: { ticker: annualised_vol }   e.g. {"SPY": 0.18, "GLD": 0.14}
@@ -63,13 +70,16 @@ def compute_volatility(tickers: list[str]) -> dict[str, float]:
     # The window is part of the key. It used to be absent, so changing the
     # window would have left the durable cache serving last week's one-year
     # numbers in production as if nothing had changed.
-    cache_key = f"volatility:{VOLATILITY_WINDOW}:{'_'.join(sorted(tickers))}"
+    cache_key = f"volatility:{VOLATILITY_WINDOW}:{currency or 'own'}:{'_'.join(sorted(tickers))}"
     cached = cache_service.get(cache_key)
     if cached is not None:
         return cached
 
     try:
         price_history = fetch_price_history(tickers, period=VOLATILITY_WINDOW)
+        if currency:
+            from backend.services.fx_history import in_home_currency
+            price_history = in_home_currency(price_history, currency, VOLATILITY_WINDOW)
     except MarketDataError as exc:
         # Data source and every cache tier are down: continue with
         # historical baseline volatilities — never show the user an error page.

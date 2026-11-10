@@ -2,9 +2,14 @@ import { useTranslation } from 'react-i18next'
 import useMarket from '../hooks/useMarket'
 
 /**
- * TL / FX exposure & currency-risk indicator.
- * Groups holdings by their currency and shows an educational
- * message about exchange-rate risk.
+ * Home-currency vs foreign-currency exposure, with an educational message
+ * about exchange-rate risk.
+ *
+ * It used to count only "TRY" as local and format both totals in lira, so a
+ * US or German reader holding home-currency cash and funds read "TL 0%,
+ * FX 100%" in lira, and was warned they held none of the currency their
+ * rent is priced in. The home currency is now the market's, the totals are
+ * in it, and values are the live ones the holdings list shows.
  */
 
 // Which currency an asset's VALUE follows. Physical, locally-priced things
@@ -34,9 +39,9 @@ export default function CurrencyExposure({ holdings }) {
   let usdTotal = 0
 
   holdings.forEach(h => {
-    const value = h.manual_current_value || h.purchase_amount || 0
+    const value = h.current_value ?? h.manual_current_value ?? h.purchase_amount ?? 0
     const currency = getCurrency(h, homeCurrency)
-    if (currency === 'TRY') {
+    if (currency === homeCurrency) {
       tryTotal += value
     } else {
       usdTotal += value
@@ -56,11 +61,11 @@ export default function CurrencyExposure({ holdings }) {
   // food and future home are all priced in the currency they hold none of.
   let riskLevel, riskMessage, riskColor
   if (tryPct >= 80) {
-    riskLevel = t('fx.high'); riskMessage = t('fx.highMsg'); riskColor = 'var(--red)'
+    riskLevel = t('fx.high'); riskMessage = t('fx.highMsg', { currency: homeCurrency }); riskColor = 'var(--red)'
   } else if (tryPct <= 20) {
-    riskLevel = t('fx.high'); riskMessage = t('fx.fxHeavyMsg'); riskColor = 'var(--firefly)'
+    riskLevel = t('fx.high'); riskMessage = t('fx.fxHeavyMsg', { currency: homeCurrency }); riskColor = 'var(--firefly)'
   } else {
-    riskLevel = t('fx.mid'); riskMessage = t('fx.midMsg'); riskColor = 'var(--green)'
+    riskLevel = t('fx.mid'); riskMessage = t('fx.midMsg', { currency: homeCurrency }); riskColor = 'var(--green)'
   }
 
   return (
@@ -103,7 +108,7 @@ export default function CurrencyExposure({ holdings }) {
             background: 'var(--firefly)', display: 'inline-block',
           }} />
           <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>
-            {t('fx.tryLegend', { pct: tryPct })} · {money(tryTotal, 'TRY')}
+            {t('fx.homeLegend', { pct: tryPct, currency: homeCurrency })} · {money(tryTotal)}
           </span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -112,7 +117,7 @@ export default function CurrencyExposure({ holdings }) {
             background: 'var(--accent-2)', display: 'inline-block',
           }} />
           <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>
-            {t('fx.fxLegend', { pct: usdPct })} · {money(usdTotal, 'TRY')}
+            {t('fx.fxLegend', { pct: usdPct })} · {money(usdTotal)}
           </span>
         </div>
       </div>

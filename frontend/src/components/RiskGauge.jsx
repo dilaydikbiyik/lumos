@@ -1,5 +1,8 @@
-/* SVG arc gauge showing risk score 1-10 */
+import { useTranslation } from 'react-i18next'
+
+/* SVG arc gauge showing risk score 1-10, in the reader's number format (6,6 / 6.6). */
 export default function RiskGauge({ score = 5, label = 'Dengeli' }) {
+  const { i18n } = useTranslation()
   const pct = (score - 1) / 9          // 0–1
   const angle = pct * 180              // 0–180 degrees arc
   const r = 70, cx = 100, cy = 90
@@ -37,7 +40,7 @@ export default function RiskGauge({ score = 5, label = 'Dengeli' }) {
         )}
         {/* Score text */}
         <text x={cx} y={cy - 4} textAnchor="middle" fontSize={28} fontWeight={700} fill={color}>
-          {score.toFixed(1)}
+          {new Intl.NumberFormat(i18n.language, { minimumFractionDigits: 1, maximumFractionDigits: 1 }).format(score)}
         </text>
         <text x={cx} y={cy + 18} textAnchor="middle" fontSize={12} fill="#8B8CA8">
           / 10

@@ -123,6 +123,11 @@ class MarketPack:
     # about $2,000 in Türkiye and $100,000 in the US. A beginner's first
     # sum, at roughly the same real money in each market.
     practice_budget: float = 100_000.0
+    # The share of income a mortgage payment can take before lenders balk —
+    # the rent-vs-buy affordability line. One 45% for everybody was a
+    # Turkish figure: US lenders look for housing costs near 28% of gross
+    # income, German banks for a payment near 35% of net income.
+    max_payment_to_income: float = 0.45
     # Credit-card debt: the two facts needed to tell someone honestly whether
     # to clear it before investing. Both were Turkish constants applied to
     # everybody — a 4.25%/month ceiling is the TCMB's, and quoting it to a

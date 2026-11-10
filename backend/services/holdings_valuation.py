@@ -277,7 +277,14 @@ def enrich_holdings(holdings, user_currency: str = "TRY",
     """
     enrichment: dict[int, dict] = {}
     enrichment.update(_exchange_values(holdings, user_currency))
-    enrichment.update(_real_estate_values(holdings, market))
+    # Property is revalued with the index of the country its money is in: a
+    # flat bought in lira does not follow the German index because its owner
+    # switched the app to Germany.
+    by_market: dict[str, list] = {}
+    for h in holdings:
+        by_market.setdefault(_market_of_currency(_held_currency(h), market), []).append(h)
+    for m, group in by_market.items():
+        enrichment.update(_real_estate_values(group, m))
 
     # manual overrides everything
     for h in holdings:
@@ -288,7 +295,36 @@ def enrich_holdings(holdings, user_currency: str = "TRY",
                 "change_pct": round((h.manual_current_value / h.purchase_amount - 1) * 100, 1)
                 if h.purchase_amount else None,
             }
+
+    # Every value in the reader's currency. Values above are in the currency
+    # each holding was recorded in; after a market switch that is not the
+    # reader's, and a TR reader's 150,000 TL showed as 150,000 EUR in
+    # Germany. A holding whose rate is unknown is left out of totals rather
+    # than counted at an assumed 1.0.
+    target = (user_currency or "").upper()
+    for h in holdings:
+        held = _held_currency(h)
+        if not target or held == target:
+            continue
+        rate = fx_service.rate(held, target)
+        info = enrichment.get(h.id) or {"value": h.purchase_amount, "source": "purchase",
+                                        "change_pct": None}
+        enrichment[h.id] = {**info, "value": round(info["value"] * rate, 2) if rate else 0.0,
+                            "converted_from": held, "rate_unknown": rate is None}
     return enrichment
+
+
+def _held_currency(h) -> str:
+    return (getattr(h, "currency", None) or LEGACY_CURRENCY).upper()
+
+
+def _market_of_currency(currency: str, default: str) -> str:
+    from backend.markets import MARKET_PACKS
+
+    for code, pack in MARKET_PACKS.items():
+        if pack.currency == currency:
+            return code
+    return default
 
 
 def current_value(holding, enrichment: dict[int, dict]) -> float:

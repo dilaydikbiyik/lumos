@@ -69,14 +69,21 @@ def _names(pack, lang: str) -> dict[str, str]:
 
 
 def _facts(market: str, tickers: list[str]) -> dict[str, dict]:
-    """Measured facts per ticker, cached per market per day."""
-    key = f"role_alternatives:{market}:{date.today().isoformat()}"
+    """Measured facts per ticker, in the market's currency, cached per day.
+
+    In the reader's currency: a Turkish reader was shown the T-bill fund at
+    0.3% volatility and -0.3% at worst (its dollar figures) while the asset
+    classes page showed them the same fund falling 35% in lira."""
+    key = f"role_alternatives:v2:{market}:{date.today().isoformat()}"
     cached = cache_service.get(key)
     if cached is not None:
         return cached
     # One fetch, one basis (dividends reinvested) for every fund compared —
     # the same rule the stock explorer had to learn.
-    history = fetch_price_history(tickers, period="max")
+    from backend.services.fx_history import in_home_currency
+
+    history = in_home_currency(fetch_price_history(tickers, period="max"),
+                               get_market_pack(market).currency, "max")
     out = {}
     for tk in tickers:
         s = history.get(tk)

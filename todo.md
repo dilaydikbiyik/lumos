@@ -3635,6 +3635,40 @@ hep SPY çıkıyor". İkisi ayrı sorunmuş.
       kaydedilince bayrak hemen yazılıyor. Yönlendirme `replace` — geri tuşu
       tanıtım sayfasına sektirmiyor. Alt menü: Panel ilk sırada (açılış
       ekranı), risk quizi son. Oturumsuz akış tarayıcıda denendi.
+- [x] **İkinci arka plan taraması (2026-11-10)** — 14 bulgu, hepsi düzeltildi:
+      - Panel her açılışta portföyü 100.000'lik bütçeyle yeniden kuruyordu
+        (bütçe `answers.budget`'ta, kod `budget` okuyordu) — Öneri sayfasıyla
+        birbirinin önbelleğini eziyorlardı. (Benim önceki düzeltmemin hatası.)
+      - Hibrit planı harfiyen uygulayan okuyucuya "ciddi sapma" deniyordu:
+        sapma hedefi yalnız piyasa portföyüydü, gerçek ağırlıklar her şeyi
+        kapsıyordu. Hedef artık bütün plan (yedek=nakit, emlak payı, piyasa
+        payı ölçekli). Test: planı aynen uygulayan "dengede".
+      - TR okuyucuya dolar oynaklığı gösteriliyor ve motor dolar fonlarını
+        "sakin" sanıyordu (SPY %17 dolar / %24 TL). Motor oynaklığı ve
+        alternatifler tablosu artık okuyucunun para biriminde; TR nakit
+        kartı "dolar bazında neredeyse düşmez, TL karşılığı kurla oynar"
+        diyor. TR portföyleri SPY/BIST arasında daha dengeli.
+      - Varlık değer grafiği her güne bugünkü kuru uyguluyordu (liste +%1,2,
+        grafik −%2,1); artık her gün o günün kuru.
+      - Pazar değiştiren okuyucunun TL varlıkları € diye toplanıyordu; artık
+        her değer okuyucunun para birimine çevriliyor, kur bilinmiyorsa
+        toplama 0 giriyor (asla 1:1 değil), emlak kendi ülkesinin endeksiyle.
+      - Kur dağılımı kartı her pazarda TL'yi "yerel" sayıyordu → pazarın
+        para birimi, canlı değerler.
+      - Pratik modu ABD/DE'de sonuçları TL ile gösteriyordu.
+      - Reel getiri pencereleri 60 ay fiyata 59 ay enflasyon uyguluyordu;
+        artık endeksin son ayında biten tam pencere. Yeni TR rakamları:
+        BIST 100 reel −%6,4, nakit −%87,0.
+      - ABD yedek TÜFE dosyası 2026-07'de bitiyordu → FRED'den 2026-10'a
+        (Ekim 2025 BLS'in yayımlamadığı ay; boşluk boşluk olarak bırakıldı).
+      - Ev kredisi "gelirin %45'i" sınırı her pazar için → TR %45, ABD %28,
+        DE %35 (pazar paketinde).
+      - Almanya alım masrafı açıklamada %7, motorda %10,57 → "~%10".
+      - Risk skoru her dilde "6.6" → yerel biçim; sohbet bağlamı enflasyonu
+        doğru etiketliyor; sunucu cevap vermezse oturum açmış okuyucu tanıtım
+        akışına değil Panel'e gidiyor (profilin üstüne yazmasın).
+      - Testler geliştiricinin `backend/.cache`'ine yazıyordu (sabit 1.0 kurla
+        "TL" anahtarına dolar oynaklığı); testlere kendi önbelleği.
 - [ ] Almanya'da hazine bonosu satırı yok (para piyasası fonu var);
       ABD bonosunun EUR karşılığı istenirse USDEUR=X ile eklenebilir.
 - [ ] Keşif listesi tarihli (2026-11) bir seçki; yılda bir piyasa

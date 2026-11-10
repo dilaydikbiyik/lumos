@@ -245,14 +245,19 @@ def _growth_rationale(category: str, vol: float, weight: float, alpha: float, la
 
 
 def _defensive_rationale(category: str, weight: float, defensive_target: float,
-                         defensive_actual: float, cap: float, lang: str) -> str:
+                         defensive_actual: float, cap: float, lang: str,
+                         foreign: bool = False) -> str:
     """The sleeve's share as the formula set it — or, when the concentration
     cap trimmed it, both numbers and why. The card used to say "about 54%
     defensive" beside a chart showing 50%."""
     key = ("weight.defensive" if abs(defensive_actual - defensive_target) < 0.005
            else "weight.defensive_capped")
+    # A cash fund in another currency does not "never fall" for this reader:
+    # Türkiye's is a US T-bill fund, which fell 35% in lira at its worst.
+    role = (_t("role.cash_foreign", lang) if foreign and category == "cash"
+            else _role(category, lang))
     return _t(key, lang,
-              role=_role(category, lang),
+              role=role,
               defensive=round(defensive_target * 100),
               actual=round(defensive_actual * 100),
               cap=round(cap * 100),
@@ -298,7 +303,7 @@ def build_portfolio(risk_score: float, budget: float, market: str = "TR",
 
     # Fetch volatility ONLY for the real, fetchable growth tickers
     growth_tickers = [a["ticker"] for a in growth_universe]
-    volatilities = compute_volatility(growth_tickers)
+    volatilities = compute_volatility(growth_tickers, pack.currency)
 
     alpha = _clamp(risk_score / 10.0, 0.1, 1.0)
 
@@ -477,7 +482,8 @@ def build_portfolio(risk_score: float, budget: float, market: str = "TR",
             explanation = _defensive_rationale(
                 category, weight, defensive_target,
                 sum(w for tk, w in weights.items() if tk in defensive_categories),
-                effective_position_cap(len(weights)), lang)
+                effective_position_cap(len(weights)), lang,
+                foreign=ticker_currency(t) not in (None, pack.currency))
         elif t in fixed_share and others:
             # The stated rule, or an honest note of why it does not hold here.
             # With three positions under a 45% cap, two capped positions

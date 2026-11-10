@@ -61,6 +61,10 @@ class HoldingRead(BaseModel):
     note: Optional[str]
     emotion_tag: Optional[EmotionTag]
     created_at: datetime
+    # The currency the purchase amount was entered in. Shown with it, so a
+    # holding recorded before a market switch keeps its own currency label;
+    # current_value below is always in the reader's current currency.
+    currency: Optional[str] = None
 
     # Live valuation (filled by holdings_valuation.py — not stored in the DB)
     current_value: Optional[float] = None

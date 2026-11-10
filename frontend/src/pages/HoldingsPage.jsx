@@ -292,7 +292,7 @@ export default function HoldingsPage() {
               <div style={{ flex: 1 }}>
                 <div style={{ fontWeight: 600, fontSize: 14 }}>{h.name}</div>
                 <div style={{ fontSize: 12, opacity: 0.7 }}>
-                  {t('holdings.purchase')}: {money(h.purchase_amount)}
+                  {t('holdings.purchase')}: {money(h.purchase_amount, h.currency || undefined)}
                   {h.current_value != null && h.value_source !== 'purchase' && (
                     <> · {t('holdings.current')}: <strong style={{ color: 'var(--text)' }}>{money(h.current_value)}</strong>
                       {h.value_change_pct != null && (

@@ -29,6 +29,27 @@ from backend.exceptions import MarketDataError
 logger = logging.getLogger("lumos.portfolio_history")
 
 
+def _daily_rates(base: str, quote: str, days) -> dict:
+    """{day: rate} carrying the last known rate forward; {} when unknown."""
+    base, quote = (base or "").upper(), (quote or "").upper()
+    if not base or not quote or base == quote:
+        return {d: 1.0 for d in days}
+    try:
+        series = fetch_price_history([f"{base}{quote}=X"], period="3mo").get(f"{base}{quote}=X")
+    except MarketDataError:
+        series = None
+    if series is None or series.empty:
+        now = fx_service.rate(base, quote)
+        return {d: now for d in days} if now else {}
+    by_day = {i.date(): float(v) for i, v in series.dropna().items()}
+    out, last = {}, None
+    for d in sorted(days):
+        last = by_day.get(d, last)
+        if last is not None:
+            out[d] = last
+    return out
+
+
 def portfolio_value_history(holdings, days: int = 30, user_currency: str = "TRY",
                             market: str = "TR") -> dict:
     """Return {series, change_amount, change_pct, live_count, flat_count}."""
@@ -78,8 +99,15 @@ def portfolio_value_history(holdings, days: int = 30, user_currency: str = "TRY"
         held_ccy = (getattr(h, "currency", None) or LEGACY_CURRENCY).upper()
         asset_ccy = ticker_currency(h.ticker) if h.ticker else held_ccy
         fx_now = fx_service.rate(asset_ccy, held_ccy)
+        # Each day at THAT day's rate into the reader's currency. Today's rate
+        # applied to every day erased the currency's own move: a TR reader's
+        # SPY bought for 100,000 TL started the chart at 103,369 and showed
+        # -2.1% while the list beside it said +1.2%.
+        daily_rate = _daily_rates(asset_ccy, user_currency, idx) if h in live else {}
+        to_user_now = fx_service.rate(asset_ccy, user_currency)
 
-        if h in live and series is not None and not series.empty and fx_now is not None:
+        if (h in live and series is not None and not series.empty
+                and fx_now is not None and to_user_now is not None):
             units = h.quantity
             if units is None:
                 entry = _price_on_or_before(series, h.purchase_date)
@@ -98,7 +126,7 @@ def portfolio_value_history(holdings, days: int = 30, user_currency: str = "TRY"
                 if price is not None and not pd.isna(price):
                     last_price = float(price)
                 if last_price is not None:
-                    per_day[d] += units * last_price * fx_now
+                    per_day[d] += units * last_price * daily_rate.get(d, to_user_now)
         else:
             # Flat carry at best-known value from its purchase date onward
             val = current_value(h, enrichment)

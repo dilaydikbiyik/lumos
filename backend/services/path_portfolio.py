@@ -71,3 +71,29 @@ async def committed_property(db, user) -> float:
     holdings = await holding_repository.list_for_user(db, user.id)
     return sum((h.manual_current_value or h.purchase_amount or 0)
                for h in holdings if h.asset_type in REAL_ESTATE_TYPES)
+
+
+def plan_targets(portfolio, plan) -> list[dict]:
+    """
+    The WHOLE plan as target weights, for comparing with everything the
+    reader owns.
+
+    The drift check compared only the market portfolio with all holdings, so
+    a hybrid reader who followed the plan to the letter — reserve in cash,
+    the property part in a home, the rest as recommended — was told their
+    portfolio had drifted "seriously" (property 36% against a target of 0%).
+    With a plan, the reserve is a cash target, the property part a property
+    target, and each market position is scaled to the market part's share.
+    """
+    allocations = [{"category": a.category, "ticker": a.ticker, "weight": a.weight}
+                   for a in portfolio.allocations]
+    if not plan or not plan.get("total_budget"):
+        return allocations
+    total = plan["total_budget"]
+    market_share = plan["market_amount"] / total
+    out = [{**a, "weight": a["weight"] * market_share} for a in allocations]
+    if plan["reserve"] > 0:
+        out.append({"category": "cash", "ticker": "", "weight": plan["reserve"] / total})
+    if plan["property_amount"] > 0:
+        out.append({"category": "reit", "ticker": "", "weight": plan["property_amount"] / total})
+    return out

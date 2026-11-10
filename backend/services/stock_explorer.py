@@ -64,8 +64,7 @@ def _measure(series: Optional[pd.Series]) -> Optional[dict]:
 def _real(change_pct: float, market: str) -> Optional[float]:
     """Inflation-adjusted, or None when the deflator cannot be read."""
     try:
-        start = inflation_service.years_to_months_ago(WINDOW_YEARS)
-        end = inflation_service.years_to_months_ago(0)
+        start, end = inflation_service.inflation_window(WINDOW_YEARS, market)
         return round(inflation_service.real_return_pct(change_pct, start, end, market), 1)
     except Exception:            # missing CPI months — show nominal only, say so
         logger.info("no deflator for %s over %sy", market, WINDOW_YEARS)

@@ -10,11 +10,17 @@ import pytest
 
 
 def _yoy(index):
+    """Year on year, with the year-ago month snapped to the nearest one at or
+    before it — the rule the app itself uses. A strict lookup failed on the
+    US series, which has no October 2025: BLS never published that month
+    (the federal shutdown), and the gap is left as a gap rather than filled
+    with an invented value."""
     months = sorted(index)
     latest = months[-1]
     year, month = latest.split("-")
     prior = f"{int(year) - 1}-{month}"
-    return round((index[latest] / index[prior] - 1) * 100, 2) if prior in index else None
+    earlier = [m for m in months if m <= prior]
+    return round((index[latest] / index[earlier[-1]] - 1) * 100, 2) if earlier else None
 
 
 def test_us_falls_back_to_a_real_index_not_a_constant(monkeypatch):

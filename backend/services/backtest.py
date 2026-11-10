@@ -112,8 +112,7 @@ def run_backtest(weights: dict[str, float], budget: float, period: str = "5y",
 
     # Real (inflation-adjusted) return — the honest number most apps hide
     years = {"1y": 1, "3y": 3, "5y": 5}.get(period, 1)
-    start_month = inflation_service.years_to_months_ago(years)
-    end_month = inflation_service.years_to_months_ago(0)
+    start_month, end_month = inflation_service.inflation_window(years, market)
     try:
         # Deflated by the READER'S inflation. This omitted the market, so
         # "the honest number most apps hide" was deflated by Turkish

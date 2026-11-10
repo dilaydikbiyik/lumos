@@ -206,6 +206,22 @@ def _months_between(start: str, end: str) -> int:
     return (ey - sy) * 12 + (em - sm)
 
 
+def inflation_window(years: float, market: str = "TR") -> tuple[str, str]:
+    """
+    (start, end) months for deflating a return over the last `years`.
+
+    Ends at the latest month the index covers and starts exactly `years`
+    earlier, so it spans `years` x 12 months. It used to end at "this month"
+    and start `years` before that; CPI is published with a lag, so the end
+    snapped back a month and five years of prices were deflated by 59 months
+    of inflation — Turkish real returns overstated by about two points.
+    """
+    end = index_as_of(market) or years_to_months_ago(0)
+    y, m = map(int, end.split("-"))
+    total = y * 12 + (m - 1) - round(years * 12)
+    return f"{total // 12}-{total % 12 + 1:02d}", end
+
+
 def years_to_months_ago(years: float, today: Optional[date] = None) -> str:
     """Helper: 'N years ago' as a YYYY-MM string, for wiring into backtest periods."""
     today = today or date.today()

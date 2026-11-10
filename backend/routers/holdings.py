@@ -216,16 +216,17 @@ async def portfolio_drift(
     # The market picks the investable universe, so the drift target has to be
     # built against the user's own market — comparing a German portfolio to a
     # Turkish target would invent drift that isn't there.
-    # The same portfolio the recommendation shows — for the reader's path.
-    committed = await path_portfolio.committed_property(db, user)
-    target, _plan = await asyncio.to_thread(
+    # The plan the reader was given, for their path — the whole plan, since
+    # the holdings are everything they own. Built as given (no property
+    # "already committed"): a home bought with the plan's property part is
+    # the plan being followed, not a reason to re-plan the target around it.
+    target, plan = await asyncio.to_thread(
         lambda: path_portfolio.build_for_path(
             user.investment_path, user.risk_score, user.budget or sum(values.values()),
-            user.market or "TR", lang,
-            monthly_outgoings=user.monthly_outgoings, committed_property=committed,
+            user.market or "TR", lang, monthly_outgoings=user.monthly_outgoings,
         )
     )
-    return compute_drift(holdings, values, target.allocations, lang)
+    return compute_drift(holdings, values, path_portfolio.plan_targets(target, plan), lang)
 
 
 @router.get("/health")

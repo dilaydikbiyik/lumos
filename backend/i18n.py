@@ -300,6 +300,10 @@ _C: dict[str, dict[str, str]] = {
         "tr": "sabit getirili tampon — hisse dalgalanmasını yumuşatır, düzenli faiz üretir",
         "en": "the fixed-income buffer — it dampens equity swings and pays regular interest",
         "de": "der Zinspuffer — er dämpft Aktienschwankungen und zahlt regelmäßig Zinsen"},
+    "role.cash_foreign": {
+        "tr": "güvenlik yastığı — dolar bazında neredeyse hiç düşmez ve faiz kazanır; ama senin paran TL, bu yüzden TL karşılığı kurla birlikte oynar ve kur sert döndüğünde düşebilir",
+        "en": "the safety cushion — it barely moves in dollars and earns interest; but your money is in another currency, so its value to you moves with the exchange rate and can fall when the rate turns sharply",
+        "de": "das Sicherheitspolster — in Dollar bewegt es sich kaum und bringt Zinsen; aber dein Geld ist in einer anderen Währung, daher schwankt sein Wert für dich mit dem Wechselkurs und kann fallen, wenn der Kurs stark dreht"},
     "role.cash": {
         "tr": "güvenlik yastığı — düşüşte değer kaybetmez, fırsat ve acil durum likiditesi",
         "en": "the safety cushion — it doesn't fall in a drop, and it's your liquidity for opportunities and emergencies",

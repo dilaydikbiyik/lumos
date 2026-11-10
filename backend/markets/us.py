@@ -70,6 +70,7 @@ US = MarketPack(
     property_entry_threshold=80_000.0,
     # Median sales price of houses sold (Census/HUD via FRED), $393,300 in
     # 2026-Q3.
+    max_payment_to_income=0.28,
     practice_budget=2_000.0,
     typical_home={"source": "fred", "source_name": "FRED", "series": "MSPUS",
                   "fallback": 393_300.0, "as_of": "2026-07"},

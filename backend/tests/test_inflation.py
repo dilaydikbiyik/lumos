@@ -81,3 +81,17 @@ def test_years_to_months_ago_format():
     from datetime import date
     result = years_to_months_ago(1, today=date(2026, 6, 1))
     assert result == "2025-06"
+
+
+def test_the_inflation_window_spans_exactly_the_years_asked():
+    """Five years of prices were deflated by 59 months of CPI: the window
+    ended at 'this month', which snapped back to the last published one."""
+    from unittest.mock import patch
+
+    from backend.services import inflation_service
+
+    with patch.object(inflation_service, "index_as_of", return_value="2026-10"):
+        assert inflation_service.inflation_window(5, "TR") == ("2021-10", "2026-10")
+        assert inflation_service.inflation_window(1, "TR") == ("2025-10", "2026-10")
+    with patch.object(inflation_service, "index_as_of", return_value="2026-01"):
+        assert inflation_service.inflation_window(3, "TR") == ("2023-01", "2026-01")

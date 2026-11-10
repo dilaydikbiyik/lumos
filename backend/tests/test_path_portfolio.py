@@ -50,3 +50,28 @@ def test_the_recommendation_carries_the_plan(client):
     assert plan["total_budget"] == 20_000
     assert body["budget"] == pytest.approx(plan["market_amount"])
     assert body["includes_reits"] is False
+
+
+@pytest.mark.parametrize("market,budget", [("DE", 500_000), ("TR", 3_000_000), ("US", 20_000)])
+def test_following_the_hybrid_plan_exactly_is_in_balance(market, budget):
+    """The sweep's repro: reserve as cash, the property part as a home, the
+    rest exactly as recommended — the drift check said 'serious'."""
+    from types import SimpleNamespace
+
+    from backend.services.drift import compute_drift
+    from backend.services.path_portfolio import plan_targets
+
+    portfolio, plan = build_for_path("hybrid", 6.6, budget, market, "en")
+    holdings, values = [], {}
+
+    def hold(i, asset_type, ticker, value):
+        holdings.append(SimpleNamespace(id=i, asset_type=asset_type, ticker=ticker))
+        values[i] = value
+
+    hold(1, "cash", None, plan["reserve"])
+    hold(2, "real_estate", None, plan["property_amount"])
+    for i, a in enumerate(portfolio.allocations, start=3):
+        hold(i, "etf", a.ticker, a.weight * plan["market_amount"])
+
+    result = compute_drift(holdings, values, plan_targets(portfolio, plan), "en")
+    assert result["verdict"] == "balanced", result["rows"]

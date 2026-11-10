@@ -4,11 +4,11 @@ import useMarket from '../hooks/useMarket'
 import { Trans, useTranslation } from 'react-i18next'
 
 /**
- * Practice portfolio — follow the recommended portfolio with virtual
- * 100.000 TL on real market data, without risking real money. The heart
- * of the fearless start.
- * Note: the virtual basket is TL-denominated (XU100 + TL-priced data),
- * hence money(n, 'TRY').
+ * Practice portfolio — follow the recommended portfolio with virtual money
+ * on real market data, without risking real money. The heart of the
+ * fearless start. The virtual sum and every value are in the reader's own
+ * market currency (MarketPack.practice_budget; the server converts foreign
+ * prices), so nothing here pins a currency.
  */
 export default function PracticeMode({ allocations }) {
   const { t } = useTranslation()
@@ -49,7 +49,7 @@ export default function PracticeMode({ allocations }) {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
             <div>
               <div style={{ fontSize: 12, opacity: 0.7 }}>{t('practice.virtualNow', { amount: money(snapshot?.virtual_budget ?? pack.practice_budget ?? 100000) })}</div>
-              <div style={{ fontSize: 20, fontWeight: 700 }}>{money(snapshot.current_value, 'TRY')}</div>
+              <div style={{ fontSize: 20, fontWeight: 700 }}>{money(snapshot.current_value)}</div>
             </div>
             <div>
               <div style={{ fontSize: 12, opacity: 0.7 }}>{t('practice.thisWeek')}</div>
@@ -57,7 +57,7 @@ export default function PracticeMode({ allocations }) {
                 fontSize: 20, fontWeight: 700,
                 color: snapshot.weekly_change_pct >= 0 ? 'var(--green, #4ade80)' : 'var(--red)',
               }}>
-                {snapshot.weekly_change_pct >= 0 ? '+' : ''}{money(snapshot.weekly_change_amount, 'TRY')}
+                {snapshot.weekly_change_amount > 0 ? '+' : ''}{money(snapshot.weekly_change_amount)}
               </div>
             </div>
           </div>

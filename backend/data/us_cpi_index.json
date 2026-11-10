@@ -1,7 +1,7 @@
 {
   "_note": "US CPI-U (CUUR0000SA0) monthly index, snapshotted from the BLS public API. Used only when the live call fails \u2014 the BLS v1 endpoint is capped at 25 requests/day per IP and our datacenter shares that budget, which left US inflation sitting on a hardcoded fallback constant. Regenerate with scripts/refresh_us_index.py.",
   "base_series": "BLS CPI-U (1982-84=100)",
-  "generated_from": "2020-01..2026-07",
+  "generated_from": "FRED CPIAUCNS (identical to BLS CUUR0000SA0), 2026-11-10",
   "index": {
     "2020-01": 257.971,
     "2020-02": 258.678,
@@ -80,6 +80,9 @@
     "2026-04": 333.02,
     "2026-05": 335.123,
     "2026-06": 333.952,
-    "2026-07": 333.918
+    "2026-07": 333.918,
+    "2026-08": 334.98,
+    "2026-09": 336.94,
+    "2026-10": 337.511
   }
 }

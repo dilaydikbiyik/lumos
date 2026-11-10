@@ -93,7 +93,7 @@ export default function DashboardPage() {
   /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     loadProfile().then(p => {
-      if (p && hadSavedPortfolio.current) recommend(p.risk_score, p.budget || 100_000)
+      if (p && hadSavedPortfolio.current) recommend(p.risk_score, p.answers?.budget || 100_000)
     })
     loadSummary()
   // recommend is a fresh function every render; this runs once per mount.
@@ -103,7 +103,7 @@ export default function DashboardPage() {
 
   async function handleRerun() {
     if (profile) {
-      await recommend(profile.risk_score, profile.budget || 100_000)
+      await recommend(profile.risk_score, profile.answers?.budget || 100_000)
     }
   }
 

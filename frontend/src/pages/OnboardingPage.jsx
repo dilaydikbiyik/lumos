@@ -88,13 +88,15 @@ export default function OnboardingPage() {
       navigate(await resolveHome({ timeoutMs: PROFILE_CHECK_TIMEOUT_MS }))
       return
     } catch {
-      // Either the backend is cold or it genuinely cannot say. The intro is
-      // the safe destination: it is where a user with no profile belongs, and
-      // anyone who does have one can reach the dashboard from the nav.
+      // The server could not say. A visitor who is not signed in starts the
+      // intro (sign-in comes first on the way). A signed-in reader goes to
+      // the dashboard: sending them into the intro let someone with a
+      // profile re-answer the quiz over it, and the dashboard already offers
+      // the quiz to anyone who has none.
     } finally {
       setChecking(false)
     }
-    navigate('/path')
+    navigate(isSignedIn ? '/dashboard' : '/path')
   }
   const [checking, setChecking] = useState(false)
 
