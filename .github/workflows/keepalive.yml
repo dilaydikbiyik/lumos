@@ -30,7 +30,7 @@ on:
 
 jobs:
   ping:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Ping /health and report whether it was already awake
         run: |

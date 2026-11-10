@@ -10,7 +10,11 @@ jobs:
   # ── Backend: lint + test + migration ─────────────────────────────────────
   backend:
     name: Backend — ruff + pytest + alembic
-    runs-on: ubuntu-latest
+    # Pinned, like every other version here. "ubuntu-latest" moved to 26.04
+    # on 2026-11-10 and actions/setup-python has no build of the pinned
+    # 3.12.10 for it yet, so CI failed before running a single test. The
+    # runner image changes when we choose, not when GitHub does.
+    runs-on: ubuntu-24.04
 
     env:
       # All env vars Settings() needs — no real keys required
@@ -73,7 +77,7 @@ jobs:
   # ── Docker: image builds ──────────────────────────────────────────────────
   docker:
     name: Docker — image builds
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 
@@ -83,7 +87,7 @@ jobs:
   # ── Frontend: lint + test + build ────────────────────────────────────────
   frontend:
     name: Frontend — eslint + vitest + build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     defaults:
       run:
         working-directory: frontend

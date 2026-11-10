@@ -3669,6 +3669,12 @@ hep SPY çıkıyor". İkisi ayrı sorunmuş.
         akışına değil Panel'e gidiyor (profilin üstüne yazmasın).
       - Testler geliştiricinin `backend/.cache`'ine yazıyordu (sabit 1.0 kurla
         "TL" anahtarına dolar oynaklığı); testlere kendi önbelleği.
+- [x] **CI kırmızı (2026-11-10), kod değil ortam:** `ubuntu-latest` 26.04'e
+      geçti, setup-python'da sabitlenmiş 3.12.10'un o sürüm için derlemesi
+      yok — tek test koşmadan düştü. CI ve keepalive `ubuntu-24.04`'e
+      sabitlendi. Ayrıca: CI'ı "son çalışmayı izle" diye takip ediyordum ve
+      aynı anda koşan zamanlanmış keepalive işini izleyip "yeşil" demişim;
+      artık commit SHA'sıyla izleniyor.
 - [ ] Almanya'da hazine bonosu satırı yok (para piyasası fonu var);
       ABD bonosunun EUR karşılığı istenirse USDEUR=X ile eklenebilir.
 - [ ] Keşif listesi tarihli (2026-11) bir seçki; yılda bir piyasa
