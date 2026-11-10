@@ -3705,6 +3705,18 @@ hep SPY çıkıyor". İkisi ayrı sorunmuş.
       - Kasıtlı/not: AI metin önbelleği 1 gün (silinen hesabın metni en geç
         ertesi gün düşer); "yüksek faizli borç" risk skorunu değil borç
         kontrolünü etkiliyor (tasarım gereği).
+- [x] Dördüncü tarama (2026-11-10), yapılanlar: EVDS çökünce tek istek 52
+      kez deniyordu → cooldown; pazar değişiminde yüksek faizli borç da
+      çevriliyor.
+- [ ] **Dördüncü taramadan kalanlar:** (1) varlık grafiği 3 aydan eski
+      alımları düz çiziyor ve 1Y yalnız 3 ay gösteriyor — `portfolio_history`
+      `period="3mo"` sabit; (2) HoldingsPage/PortfolioValueChart önbellek
+      anahtarlarına pazar ekle; (3) PropertyVsPortfolio tutarı `parseAmount`
+      ile oku (ondalık 100× hatası); (4) `listing_bridge._slug` yalnız
+      [a-z0-9-]; (5) doğrulama mesajını hata türüne göre seç; (6) pazar
+      değişimi 503'ünde kullanıcıya mesaj göster; (7) hibrit açıklamada
+      "bütçe" yerine "piyasa kısmı"; (8) `/users/me` tekrar istekleri; (9)
+      CSP'ye Clerk production alan adı.
 - [ ] Almanya'da hazine bonosu satırı yok (para piyasası fonu var);
       ABD bonosunun EUR karşılığı istenirse USDEUR=X ile eklenebilir.
 - [ ] Keşif listesi tarihli (2026-11) bir seçki; yılda bir piyasa

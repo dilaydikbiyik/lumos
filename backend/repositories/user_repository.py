@@ -115,7 +115,8 @@ async def set_primary_fear(db: AsyncSession, clerk_user_id: str, fear: str) -> U
 
 # The money a user states about themselves, stored as bare numbers in their
 # market's currency.
-MONEY_FIELDS = ("budget", "monthly_income", "monthly_outgoings", "monthly_contribution")
+MONEY_FIELDS = ("budget", "monthly_income", "monthly_outgoings", "monthly_contribution",
+                "high_interest_debt")
 
 
 async def set_market(db: AsyncSession, clerk_user_id: str, market: str,

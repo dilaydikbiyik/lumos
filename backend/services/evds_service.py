@@ -56,9 +56,19 @@ def fetch_series(series_code: str, start: str, end: str) -> dict[str, float]:
     if cached is not None:
         return cached
 
+    # A dead EVDS is left alone for a while: every real-return figure reads
+    # the CPI, and without a cooldown one /stocks/explore re-tried a failing
+    # upstream 52 times — minutes for a single request. Callers already fall
+    # back to the bundled index when this raises.
+    if cache_service.in_cooldown("evds"):
+        raise cache_service.UpstreamInCooldown("evds")
     url = f"{BASE_URL}/series={series_code}&startDate={start}&endDate={end}&type=json"
-    resp = httpx.get(url, headers={"key": settings.TCMB_EVDS_API_KEY}, timeout=15)
-    resp.raise_for_status()
+    try:
+        resp = httpx.get(url, headers={"key": settings.TCMB_EVDS_API_KEY}, timeout=15)
+        resp.raise_for_status()
+    except Exception:
+        cache_service.start_cooldown("evds")
+        raise
     payload = resp.json()
 
     field = series_code.replace(".", "_")
