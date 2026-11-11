@@ -130,8 +130,13 @@ def _fetch_series(series_id: str, years: int = 6) -> Optional[dict[str, float]]:
 
 
 def get_cpi_index() -> Optional[dict[str, float]]:
-    """US CPI-U index keyed by YYYY-MM."""
-    return _fetch_series(_CPI_SERIES)
+    """US CPI-U index keyed by YYYY-MM: the bundled long history with the
+    live years laid over it. The API returns six years, and the housing
+    data it deflates goes back to 2000."""
+    live = _fetch_series(_CPI_SERIES)
+    static = _static_index(_CPI_SERIES) or {}
+    merged = {**static, **(live or {})}
+    return merged or None
 
 
 def get_rent_index() -> Optional[dict[str, float]]:

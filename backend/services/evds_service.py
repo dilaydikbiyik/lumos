@@ -101,7 +101,7 @@ def chain_cpi(archive: dict[str, float], current: dict[str, float]) -> dict[str,
     return index
 
 
-def get_live_cpi_index(start: str = "01-01-2020") -> Optional[dict[str, float]]:
+def get_live_cpi_index(start: str = "01-01-2005") -> Optional[dict[str, float]]:
     """
     Live CPI (TUFE) index keyed by YYYY-MM, or None when the key is missing
     or the call fails — callers fall back to the bundled static index.

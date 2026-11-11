@@ -17,7 +17,11 @@ CASES = [("TR", 250_000), ("US", 20_000), ("DE", 20_000), ("DE", 500_000)]
 @pytest.mark.parametrize("score", [2.0, 5.5, 9.0])
 def test_stocks_only_never_holds_a_property_fund(market, budget, score):
     portfolio, plan = build_for_path("stocks", score, budget, market, "en")
-    assert plan is None and portfolio.budget == budget
+    # The market part of the same split the dashboard's budget plan shows:
+    # the reserve comes off the top, and nothing goes to property.
+    assert plan["property_amount"] == 0 and plan["property_vehicle"] == "none"
+    assert plan["reserve"] + plan["market_amount"] == pytest.approx(budget)
+    assert portfolio.budget == pytest.approx(plan["market_amount"])
     assert all(a.category != "reit" for a in portfolio.allocations)
 
 
@@ -75,3 +79,28 @@ def test_following_the_hybrid_plan_exactly_is_in_balance(market, budget):
 
     result = compute_drift(holdings, values, plan_targets(portfolio, plan), "en")
     assert result["verdict"] == "balanced", result["rows"]
+
+
+def test_a_reit_fund_bought_for_the_property_part_counts_as_property():
+    """Recorded as an ETF and absent from the portfolio, it was filed under
+    stocks: property 0% against a target of 8%, 'notable' drift."""
+    from types import SimpleNamespace
+
+    from backend.markets import get_market_pack
+    from backend.services.drift import compute_drift
+    from backend.services.path_portfolio import plan_targets
+
+    for market in ("TR", "US", "DE"):
+        budget = 20_000 if market != "TR" else 400_000
+        portfolio, plan = build_for_path("hybrid", 6.6, budget, market, "en",
+                                         monthly_outgoings=budget / 100)
+        assert plan["property_vehicle"] == "reit"
+        reit = get_market_pack(market).reit_assets[0]["ticker"]
+        holdings = [SimpleNamespace(id=1, asset_type="cash", ticker=None),
+                    SimpleNamespace(id=2, asset_type="etf", ticker=reit)]
+        values = {1: plan["reserve"], 2: plan["property_amount"]}
+        for i, a in enumerate(portfolio.allocations, start=3):
+            holdings.append(SimpleNamespace(id=i, asset_type="etf", ticker=a.ticker))
+            values[i] = a.weight * plan["market_amount"]
+        result = compute_drift(holdings, values, plan_targets(portfolio, plan, market), "en")
+        assert result["verdict"] == "balanced", (market, result["rows"])

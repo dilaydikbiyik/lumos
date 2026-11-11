@@ -3708,15 +3708,37 @@ hep SPY çıkıyor". İkisi ayrı sorunmuş.
 - [x] Dördüncü tarama (2026-11-10), yapılanlar: EVDS çökünce tek istek 52
       kez deniyordu → cooldown; pazar değişiminde yüksek faizli borç da
       çevriliyor.
-- [ ] **Dördüncü taramadan kalanlar:** (1) varlık grafiği 3 aydan eski
-      alımları düz çiziyor ve 1Y yalnız 3 ay gösteriyor — `portfolio_history`
-      `period="3mo"` sabit; (2) HoldingsPage/PortfolioValueChart önbellek
-      anahtarlarına pazar ekle; (3) PropertyVsPortfolio tutarı `parseAmount`
-      ile oku (ondalık 100× hatası); (4) `listing_bridge._slug` yalnız
-      [a-z0-9-]; (5) doğrulama mesajını hata türüne göre seç; (6) pazar
-      değişimi 503'ünde kullanıcıya mesaj göster; (7) hibrit açıklamada
-      "bütçe" yerine "piyasa kısmı"; (8) `/users/me` tekrar istekleri; (9)
-      CSP'ye Clerk production alan adı.
+- [x] **Dördüncü taramadan kalanlar kapandı (2026-11-11):** varlık grafiği
+      eski alımlar için yeterli geçmişi çekiyor (3 ay sabitti; liste +%8,9
+      derken grafik düzdü, "1Y" 3 ay gösteriyordu); varlık/grafik önbelleği
+      pazara göre; emlak kıyasında tutar `parseAmount` (ondalık 100× hatası);
+      ilan bağlantısı slug'ı yalnız [a-z0-9-]; doğrulama mesajı hata türüne
+      göre; pazar değişimi reddedilince mesaj; hibrit açıklamada "planın
+      piyasa kısmı"; `/users/me` tek paylaşımlı istek (10 bileşen ayrı ayrı
+      soruyordu). Açık kalan: CSP'ye Clerk production alan adı (anahtar
+      geçişiyle birlikte).
+- [x] **Baştan sona senaryo taraması (2026-11-11)** — 3 pazar × 2 yol,
+      gerçekçi bütçelerle profil → öneri → kayıt → özet/sapma/grafik/backtest:
+      - **TR ve ABD enflasyon verisi 2020'de başlıyordu ve öncesi sessizce
+        %0 dönüyordu** — bölge kaşifinin 2010'lara uzanan "reel" bantları
+        eski dönemlerde hiç arındırılmıyordu. Veri TR 2005'e, ABD 2000'e
+        uzatıldı (canlı değerler aynı bazda üstüne biniyor); kapsanmayan
+        dönem artık hata, sıfır değil.
+      - ABD yıllık enflasyonu 13 aylık değişimdi (Ekim 2025 yok): %3,9 →
+        %3,6. Eksik ay süreyi uzatır, oranı değil.
+      - Almanya konut artışı son 12 ayın %0,6'sıydı ve 10–30 yıl ileri
+        taşınıyordu (her Alman alıcı reel −%2/yıl ev sahibi); artık 10
+        yıllık ortalama (%3,7).
+      - Portföy ve tek varlık senaryo bantları yalnız nominaldi (TR "kötü
+        senaryo +%106"); her pencere kendi enflasyonuyla arındırılmış reel
+        bant eklendi.
+      - Yalnızca-hisse yolunda portföy bütçenin tamamıyla, aynı ekrandaki
+        bütçe planı yarısıyla kuruluyordu → herkes için yedek önce ayrılıyor.
+      - Planın emlak payını GYO fonuyla alan okuyucu sapma kontrolünde
+        "hisse" sayılıyordu → pazarın bütün fonları kategorisiyle tanınıyor.
+      - "Aldım" köprüsü nakit fonunu (BIL/XEON) tickersız düz nakit
+        kaydediyordu: fiyatı izlenmiyor, "eriyen nakit" sayılıyordu → fon
+        olarak, tickerıyla.
 - [ ] Almanya'da hazine bonosu satırı yok (para piyasası fonu var);
       ABD bonosunun EUR karşılığı istenirse USDEUR=X ile eklenebilir.
 - [ ] Keşif listesi tarihli (2026-11) bir seçki; yılda bir piyasa

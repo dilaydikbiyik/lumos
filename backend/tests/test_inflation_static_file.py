@@ -51,3 +51,24 @@ def test_chain_keeps_the_archive_and_applies_the_new_series_changes():
 def test_chain_without_the_new_series_is_the_archive_alone():
     archive = {"2025-11": 200.0, "2025-12": 210.0}
     assert evds_service.chain_cpi(archive, {}) == archive
+
+
+def test_the_static_file_reaches_back_past_the_housing_data():
+    """Housing series start in 2010 (TR) and 2000 (US). The CPI files began
+    in 2020, and a window before that was deflated by 0%."""
+    us = json.loads((Path(__file__).resolve().parents[1] / "data" / "us_cpi_index.json").read_text())["index"]
+    assert min(STATIC) <= "2005-01" and min(us) <= "2000-01"
+
+
+def test_a_window_before_the_data_is_refused_not_answered_with_zero():
+    from unittest.mock import patch
+
+    from backend.services import inflation_service
+
+    index = {"2020-01": 100.0, "2021-01": 115.0}
+    with patch.object(inflation_service, "_get_index", lambda market="TR": index):
+        assert inflation_service.cpi_change_pct("2020-01", "2021-01") == pytest.approx(15.0)
+        with pytest.raises(ValueError):
+            inflation_service.cpi_change_pct("2012-01", "2017-01")
+        with pytest.raises(ValueError):
+            inflation_service.real_return_pct(50.0, "2012-01", "2017-01")

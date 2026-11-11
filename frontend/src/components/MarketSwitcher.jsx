@@ -12,10 +12,11 @@ const FLAGS = { TR: '🇹🇷', US: '🇺🇸', DE: '🇩🇪' }
  */
 export default function MarketSwitcher({ compact = false }) {
   const { t } = useTranslation()
-  const { market, packs, setMarket, pendingMarket } = useMarket()
+  const { market, packs, setMarket, pendingMarket, marketError } = useMarket()
   if (packs.length < 2) return null
 
   return (
+    <>
     <HeaderSelect
       label={t('market.label')}
       value={pendingMarket ?? market}
@@ -30,5 +31,15 @@ export default function MarketSwitcher({ compact = false }) {
         </option>
       ))}
     </HeaderSelect>
+    {marketError && (
+      <span role="alert" style={{
+        position: 'fixed', left: 16, right: 16, bottom: 88, zIndex: 50,
+        padding: '10px 12px', borderRadius: 10, fontSize: 12.5, lineHeight: 1.5,
+        background: 'var(--bg-card, #16182a)', border: '1px solid var(--red)', color: 'var(--text)',
+      }}>
+        {marketError === true ? t('market.switchFailed') : marketError}
+      </span>
+    )}
+    </>
   )
 }

@@ -27,9 +27,21 @@ def explain_portfolio(portfolio: PortfolioRecommendResponse, user_profile: dict,
         for a in portfolio.allocations
     )
     profile_lines = "\n".join(f"  - {k}: {v}" for k, v in user_profile.items() if v)
+    # For a hybrid reader the portfolio is the MARKET PART of their plan,
+    # not their budget: calling 15,100 "a budget of" told a reader with
+    # 20,000 that the app had the wrong number.
+    plan = (portfolio.metadata or {}).get("plan")
+    if plan:
+        money_line = (
+            f"and this portfolio is the market part of their plan: "
+            f"{portfolio.budget:,.0f} {currency} of a total budget of "
+            f"{plan['total_budget']:,.0f} {currency} (the rest is an emergency "
+            f"reserve and a property share, planned separately), ")
+    else:
+        money_line = f"and a budget of {portfolio.budget:,.0f} {currency}, "
     prompt = (
         f"The user has a risk score of {portfolio.risk_score}/10 "
-        f"and a budget of {portfolio.budget:,.0f} {currency}, "
+        f"{money_line}"
         f"investing in the {market} market.\n"
         f"Their profile:\n{profile_lines or '  (no extra profile data)'}\n\n"
         f"Their recommended portfolio allocation:\n{alloc_lines}\n\n"

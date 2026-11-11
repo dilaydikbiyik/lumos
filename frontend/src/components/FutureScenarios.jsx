@@ -5,8 +5,9 @@ import useMarket from '../hooks/useMarket'
 import { Trans, useTranslation } from 'react-i18next'
 import { signedPercent } from '../utils/format'
 
-function BandRow({ label, tone, data, amount }) {
+function BandRow({ label, tone, data, amount, real }) {
   const { fmt, money } = useMarket()
+  const { t } = useTranslation()
   const colors = { bad: 'var(--red)', mid: 'var(--firefly, #F5A524)', good: 'var(--green, #3DD68C)' }
   const gain = data.value - amount
   return (
@@ -23,6 +24,12 @@ function BandRow({ label, tone, data, amount }) {
         <span style={{ fontSize: 11, opacity: 0.65, display: 'block' }}>
           {gain >= 0 ? '+' : ''}{fmt(gain)} ({signedPercent(data.return_pct, { decimals: 1 })})
         </span>
+        {/* After inflation — the number that says what the money buys. */}
+        {real != null && (
+          <span style={{ fontSize: 11, display: 'block', color: real < 0 ? 'var(--red)' : 'var(--text-muted)' }}>
+            {t('scenarios.afterInflation', { pct: signedPercent(real, { decimals: 1 }) })}
+          </span>
+        )}
       </div>
     </div>
   )
@@ -107,9 +114,9 @@ export default function FutureScenarios({ allocations, budget }) {
                    }}
                    components={[<strong key="a" />]} />
           </p>
-          <BandRow label={t('scenarios.bad')}  tone="bad"  data={result.pessimistic} amount={budget} />
-          <BandRow label={t('scenarios.typical')} tone="mid"  data={result.typical}     amount={budget} />
-          <BandRow label={t('scenarios.good')}   tone="good" data={result.optimistic}  amount={budget} />
+          <BandRow label={t('scenarios.bad')}  tone="bad"  data={result.pessimistic} amount={budget} real={result.real_band?.pessimistic_pct} />
+          <BandRow label={t('scenarios.typical')} tone="mid"  data={result.typical}     amount={budget} real={result.real_band?.typical_pct} />
+          <BandRow label={t('scenarios.good')}   tone="good" data={result.optimistic}  amount={budget} real={result.real_band?.optimistic_pct} />
           <p style={{ fontSize: 12, opacity: 0.6, marginTop: 8, lineHeight: 1.5 }}>
             {result.honesty_note}
           </p>

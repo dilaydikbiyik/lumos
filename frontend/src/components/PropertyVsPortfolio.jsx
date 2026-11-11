@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import api, { extractErrorMessage } from '../utils/api'
 import useMarket from '../hooks/useMarket'
 import { percent } from '../utils/format'
+import { parseAmount } from '../utils/number'
 
 /**
  * "A 500,000 plot, or a 500,000 portfolio?"
@@ -48,7 +49,9 @@ export default function PropertyVsPortfolio({ regions = [] }) {
 
   async function run(e) {
     e.preventDefault()
-    const value = Number(String(amount).replace(/[^\d]/g, ''))
+    // In the market's notation: stripping every non-digit read "250.000,50"
+    // as 25,000,050 — a hundred times the amount.
+    const value = parseAmount(amount, pack.locale)
     if (!region || !value || loading) return
     setLoading(true)
     setError(null)

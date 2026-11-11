@@ -343,7 +343,8 @@
     "good": "İyi dönem",
     "selectAsset": "Varlık seç",
     "selectYears": "Vade seç",
-    "rightNow": "Şu sıralar:"
+    "rightNow": "Şu sıralar:",
+    "afterInflation": "enflasyon sonrası {{pct}}"
   },
   "whatIf": {
     "title": "Ne olurdu?",
@@ -691,7 +692,8 @@
   "market": {
     "label": "Pazar",
     "select": "Pazar seç",
-    "limitedData": "sınırlı veri"
+    "limitedData": "sınırlı veri",
+    "switchFailed": "Pazar değiştirilemedi — birazdan tekrar dene."
   },
   "path": {
     "step": "Adım 1 / 3",

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { SignedIn, useAuth } from '@clerk/clerk-react'
 import { useTranslation } from 'react-i18next'
-import api, { setAuthToken } from '../utils/api'
+import { setAuthToken, getMe } from '../utils/api'
 import LumosLogo from './LumosLogo'
 import MarketSwitcher from './MarketSwitcher'
 import LanguageSwitcher from './LanguageSwitcher'
@@ -66,7 +66,7 @@ function NavSurfaces() {
     async function load() {
       try {
         setAuthToken(await getToken())
-        const res = await api.get('/users/me')
+        const res = await getMe()
         if (cancelled) return
         setInvestmentPath(res.data.investment_path)
         // Hiding the link is convenience, not security — every admin

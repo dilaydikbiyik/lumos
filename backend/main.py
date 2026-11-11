@@ -184,8 +184,18 @@ async def _validation_error(request: Request, exc: RequestValidationError) -> JS
 
     errors = [{"field": ".".join(str(p) for p in e.get("loc", ())[1:]), "type": e.get("type")}
               for e in exc.errors()]
+    # The sentence fits the kind of mistake: the general one talks about
+    # amounts and length, which misled a reader whose choice was not on the
+    # list.
+    kinds = {e["type"] or "" for e in errors}
+    if kinds and all(k in ("literal_error", "enum") for k in kinds):
+        key = "error.invalidChoice"
+    elif kinds and all(k.startswith("string_too") for k in kinds):
+        key = "error.invalidLength"
+    else:
+        key = "error.invalidInput"
     return JSONResponse(status_code=422, content={
-        "detail": t("error.invalidInput", get_language(request)),
+        "detail": t(key, get_language(request)),
         "errors": errors,
     })
 

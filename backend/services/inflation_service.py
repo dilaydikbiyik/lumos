@@ -50,10 +50,13 @@ def _get_index(market: str = "TR") -> dict[str, float]:
         from backend.services import evds_service  # local import avoids cycles
 
         live = evds_service.get_live_cpi_index()
-        # Freshest wins, rather than "live always". The upstream series can
-        # stall — one did, at 2026-01 — and blindly preferring it served data
-        # eight months older than the copy already bundled in the repo.
-        return _freshest(live, _STATIC_INDEX)
+        # The bundled index with live values laid over it, so the result is
+        # as long as the longer and as fresh as the fresher. Both are the
+        # same series on the same base (2003=100). "Live always" once served
+        # data eight months staler than the bundled copy when the upstream
+        # stalled; "freshest wins" then threw away whichever history the
+        # winner lacked.
+        return {**_STATIC_INDEX, **(live or {})}
     if source == "bls":
         from backend.services import bls_service
 
@@ -80,14 +83,6 @@ def index_as_of(market: str = "TR") -> Optional[str]:
     """
     index = _get_index(market)
     return max(index) if index else None
-
-
-def _freshest(*indices) -> dict[str, float]:
-    """The index whose most recent observation is latest; {} if none have any."""
-    usable = [i for i in indices if i]
-    if not usable:
-        return {}
-    return max(usable, key=lambda i: max(i))
 
 
 def get_rent_index(market: str = "TR") -> dict[str, float]:
@@ -125,6 +120,12 @@ def cpi_change_pct(start_month: str, end_month: str, market: str = "TR") -> floa
     if not index:
         return 0.0
     sorted_months = sorted(index)
+    if start_month < sorted_months[0]:
+        # No data is not zero inflation. The Turkish and US indices began in
+        # 2020, and a window before that was answered with 0.0% — so every
+        # pre-2020 housing window in the region explorer's "real" band was
+        # not deflated at all. Callers treat this as "cannot say".
+        raise ValueError(f"no inflation data for {market} before {sorted_months[0]}")
     start_idx = _index_at(index, sorted_months, start_month)
     end_idx = _index_at(index, sorted_months, end_month)
     return (end_idx / start_idx - 1) * 100
@@ -143,8 +144,16 @@ def trailing_annual_inflation_pct(market: str = "TR") -> float:
         return 0.0
     latest = months[-1]
     year, month = latest.split("-")
-    a_year_ago = f"{int(year) - 1}-{month}"  # cpi_change_pct snaps to nearest prior month
-    return round(cpi_change_pct(a_year_ago, latest, market), 2)
+    a_year_ago = _month_at_or_before(months, f"{int(year) - 1}-{month}")
+    span = _months_between(a_year_ago, latest)
+    if span <= 0:
+        return 0.0
+    change = cpi_change_pct(a_year_ago, latest, market) / 100
+    # A missing month is a longer span, not a higher rate. The US series has
+    # no October 2025 (never published), so "a year ago" snapped to September
+    # and thirteen months of price rises were reported as annual inflation:
+    # 3.9% where the twelve-month rate is 3.4%.
+    return round(((1 + change) ** (12 / span) - 1) * 100, 2)
 
 
 def real_return_pct(nominal_return_pct: float, start_month: str, end_month: str,
@@ -188,6 +197,9 @@ def monthly_cash_erosion(cash_amount: float, reference_month: Optional[str] = No
     if start < sorted_months[0]:
         # Less than a year of history: the span there is, per month.
         start = sorted_months[0]
+    # The month the index actually has, so a gap lengthens the span instead
+    # of inflating the rate (see trailing_annual_inflation_pct).
+    start = _month_at_or_before(sorted_months, start)
     span = _months_between(start, end)
     if span <= 0:
         return {"monthly_inflation_pct": 0.0, "erosion_amount": 0.0}
@@ -198,6 +210,12 @@ def monthly_cash_erosion(cash_amount: float, reference_month: Optional[str] = No
         "monthly_inflation_pct": round(monthly_pct, 2),
         "erosion_amount": round(erosion, 2),
     }
+
+
+def _month_at_or_before(sorted_months: list, month: str) -> str:
+    """The latest month the index has at or before `month`."""
+    pos = max(bisect_right(sorted_months, month) - 1, 0)
+    return sorted_months[pos]
 
 
 def _months_between(start: str, end: str) -> int:

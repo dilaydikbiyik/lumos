@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import AppHeader from '../components/AppHeader'
-import api from '../utils/api'
+import api, { getMe } from '../utils/api'
 import useMarket from '../hooks/useMarket'
 import UserAccessPanel from '../components/UserAccessPanel'
 
@@ -55,7 +55,7 @@ export default function AdminPage() {
         const [s, f, me] = await Promise.all([
           api.get('/admin/stats'),
           api.get('/feedback'),
-          api.get('/users/me'),
+          getMe(),
         ])
         if (cancelled) return
         setStats(s.data)
@@ -68,7 +68,7 @@ export default function AdminPage() {
         setError(err.response?.status === 403 ? 'forbidden' : 'failed')
         if (err.response?.status === 403) {
           try {
-            const me = await api.get('/users/me')
+            const me = await getMe()
             if (!cancelled) setOwnId(me.data.clerk_user_id)
           } catch { /* the hint is a convenience, not a requirement */ }
         }

@@ -28,14 +28,17 @@ from backend.exceptions import MarketDataError
 
 logger = logging.getLogger("lumos.portfolio_history")
 
+# (days covered, provider period) — the shortest that covers what is needed.
+_PERIODS = ((85, "3mo"), (175, "6mo"), (360, "1y"), (725, "2y"), (1820, "5y"), (3640, "10y"))
 
-def _daily_rates(base: str, quote: str, days) -> dict:
+
+def _daily_rates(base: str, quote: str, days, period: str = "3mo") -> dict:
     """{day: rate} carrying the last known rate forward; {} when unknown."""
     base, quote = (base or "").upper(), (quote or "").upper()
     if not base or not quote or base == quote:
         return {d: 1.0 for d in days}
     try:
-        series = fetch_price_history([f"{base}{quote}=X"], period="3mo").get(f"{base}{quote}=X")
+        series = fetch_price_history([f"{base}{quote}=X"], period=period).get(f"{base}{quote}=X")
     except MarketDataError:
         series = None
     if series is None or series.empty:
@@ -62,10 +65,19 @@ def portfolio_value_history(holdings, days: int = 30, user_currency: str = "TRY"
         ):
             live.append(h)
 
+    # Enough history for the window asked for AND for the oldest purchase
+    # whose units must be backed out of its entry price. It was a fixed three
+    # months: a holding bought earlier found no entry price, was drawn flat
+    # (the list said +8.9%, the chart 0.0%), and "1Y" showed three months.
+    oldest = min((h.purchase_date for h in live if h.quantity is None and h.purchase_date),
+                 default=None)
+    need = max(days, (date.today() - oldest).days if oldest else 0) + 7
+    period = next((p for limit, p in _PERIODS if need <= limit), "max")
+
     history: dict = {}
     if live:
         try:
-            history = fetch_price_history(sorted({h.ticker for h in live}), period="3mo")
+            history = fetch_price_history(sorted({h.ticker for h in live}), period=period)
         except MarketDataError as exc:
             # MarketDataError only, for the same reason as in
             # property_vs_portfolio: this fallback carries every holding
@@ -103,7 +115,7 @@ def portfolio_value_history(holdings, days: int = 30, user_currency: str = "TRY"
         # applied to every day erased the currency's own move: a TR reader's
         # SPY bought for 100,000 TL started the chart at 103,369 and showed
         # -2.1% while the list beside it said +1.2%.
-        daily_rate = _daily_rates(asset_ccy, user_currency, idx) if h in live else {}
+        daily_rate = _daily_rates(asset_ccy, user_currency, idx, period) if h in live else {}
         to_user_now = fx_service.rate(asset_ccy, user_currency)
 
         if (h in live and series is not None and not series.empty

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useAuth } from '@clerk/clerk-react'
 import { parseAmount } from '../utils/number'
-import api, { extractErrorMessage, setAuthToken } from '../utils/api'
+import api, { extractErrorMessage, setAuthToken, getMe } from '../utils/api'
 import AppHeader from '../components/AppHeader'
 import IsikTut from '../components/IsikTut'
 import PropertyVsPortfolio from '../components/PropertyVsPortfolio'
@@ -194,7 +194,7 @@ function RentVsBuy() {
 
   useEffect(() => {
     let cancelled = false
-    api.get('/users/me')
+    getMe()
       .then(res => {
         if (cancelled) return
         if (res.data?.monthly_income > 0) {

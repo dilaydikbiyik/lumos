@@ -32,7 +32,8 @@
   "market": {
     "label": "Markt",
     "select": "Markt wählen",
-    "limitedData": "eingeschränkte Daten"
+    "limitedData": "eingeschränkte Daten",
+    "switchFailed": "Der Markt konnte nicht gewechselt werden — bitte versuche es gleich noch einmal."
   },
   "onboarding": {
     "tagline": "Investieren wirkt wie ein dunkler Wald.",
@@ -752,7 +753,8 @@
     "good": "Gute Phase",
     "selectAsset": "Anlage wählen",
     "selectYears": "Zeitraum wählen",
-    "rightNow": "Zurzeit:"
+    "rightNow": "Zurzeit:",
+    "afterInflation": "{{pct}} nach Inflation"
   },
   "whatIf": {
     "title": "Was würde passieren?",

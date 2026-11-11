@@ -162,6 +162,36 @@ def portfolio_growth_pct(market: str = "TR") -> float:
     return _apply_spread(annual_inflation_pct(market), _pack(market).portfolio_real_spread_pct)
 
 
+# How far back the long-run housing rate looks.
+HOUSING_GROWTH_YEARS = 10
+
+
+def _annualized_from_index(index: dict, years: int = HOUSING_GROWTH_YEARS) -> float | None:
+    """
+    Annualised growth over the last `years` of a {period: value} index.
+
+    The rent-vs-buy model carries this rate forward for ten to thirty years,
+    and it used the last twelve months alone: Germany's index rose 0.6% in
+    the year to 2026-Q2, so every German buyer was modelled as owning a home
+    that loses about 2% a year in real terms for a decade — one soft year
+    deciding a ten-year verdict, the same flaw the one-year volatility
+    window had. Over ten years the same index grew about 3.5% a year. Uses
+    what the index covers when it is shorter, but never less than five
+    years; below that the caller's spread over inflation applies.
+    """
+    if not index:
+        return None
+    periods = sorted(index)
+    per_year = 4 if "Q" in periods[-1] else 12
+    span = min(years * per_year, len(periods) - 1)
+    if span < 5 * per_year:
+        return None
+    first, last = index.get(periods[-1 - span]), index.get(periods[-1])
+    if not first or not last:
+        return None
+    return round(((last / first) ** (per_year / span) - 1) * 100, 1)
+
+
 def housing_growth_pct(market: str = "TR") -> float:
     """
     Housing growth — measured where a real house PRICE index exists, and a
@@ -173,7 +203,7 @@ def housing_growth_pct(market: str = "TR") -> float:
     if pack.housing_index_source == "eurostat":
         from backend.services import eurostat_service
 
-        measured = _yoy_from_index(eurostat_service.get_house_price_index(market) or {})
+        measured = _annualized_from_index(eurostat_service.get_house_price_index(market) or {})
         if measured is not None:
             return measured
     return _apply_spread(annual_inflation_pct(market), pack.housing_real_spread_pct)

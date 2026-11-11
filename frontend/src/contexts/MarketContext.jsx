@@ -1,6 +1,6 @@
 import { createContext, useCallback, useEffect, useMemo, useState } from 'react'
 import { useAuth } from '@clerk/clerk-react'
-import api from '../utils/api'
+import api, { extractErrorMessage, getMe } from '../utils/api'
 import { readJSON, writeJSON } from '../utils/storage'
 
 /**
@@ -54,7 +54,7 @@ export function MarketProvider({ children }) {
       try {
         const [marketsRes, meRes] = await Promise.all([
           api.get('/users/markets'),
-          api.get('/users/me'),
+          getMe(),
         ])
         if (cancelled) return
         const fetched = marketsRes.data?.markets
@@ -82,15 +82,21 @@ export function MarketProvider({ children }) {
   // effect only once the save has landed. The selector shows the choice
   // meanwhile (pendingMarket), so it still responds at once.
   const [pendingMarket, setPendingMarket] = useState(null)
+  // Why the last switch did not happen, in the server's words (it refuses
+  // when no exchange rate can be read). The selector used to snap back
+  // with no explanation.
+  const [marketError, setMarketError] = useState(null)
   const setMarket = useCallback(async (code) => {
     if (code === marketCode) return
     setPendingMarket(code)
+    setMarketError(null)
     try {
       await api.patch('/users/me/market', { market: code })
       writeJSON(CACHE_KEY, { packs, market: code })
       setMarketCode(code)
-    } catch {
+    } catch (err) {
       // Save failed: the selector returns to the market that is in force.
+      setMarketError(extractErrorMessage(err, true))
     } finally {
       setPendingMarket(null)
     }
@@ -118,8 +124,8 @@ export function MarketProvider({ children }) {
     /** Unit label for "big number + small unit" layouts */
     const unit = pack.currency === 'TRY' ? 'TL' : (pack.currency_symbol || pack.currency)
 
-    return { market: pack.code, pack, packs, fmt, money, unit, setMarket, pendingMarket }
-  }, [packs, marketCode, setMarket, pendingMarket])
+    return { market: pack.code, pack, packs, fmt, money, unit, setMarket, pendingMarket, marketError }
+  }, [packs, marketCode, setMarket, pendingMarket, marketError])
 
   return <MarketContext.Provider value={value}>{children}</MarketContext.Provider>
 }

@@ -29,6 +29,41 @@ let tokenGetter = null
 
 export function registerTokenGetter(fn) {
   tokenGetter = fn
+  forgetMe()          // another account may be signing in on this device
+}
+
+/**
+ * GET /users/me, shared.
+ *
+ * Ten components each asked for it on their own, and the nav asked again on
+ * every route change: three or four identical requests at once, each a
+ * round trip to a server that may be waking from sleep. Callers that arrive
+ * together share one request, and the answer is reused for a few seconds.
+ * Any write (PATCH/POST/PUT/DELETE) drops it, so a changed path, market or
+ * profile is read fresh by whoever asks next.
+ */
+const ME_TTL_MS = 5000
+let meInflight = null
+let meValue = null
+let meAt = 0
+
+export function forgetMe() {
+  meValue = null
+  meInflight = null
+}
+
+export function getMe() {
+  if (meValue && Date.now() - meAt < ME_TTL_MS) return Promise.resolve(meValue)
+  if (!meInflight) {
+    const request = api.get('/users/me')
+      .then(res => {
+        if (meInflight === request) { meValue = res; meAt = Date.now() }
+        return res
+      })
+      .finally(() => { if (meInflight === request) meInflight = null })
+    meInflight = request
+  }
+  return meInflight
 }
 
 api.interceptors.request.use(async (config) => {
@@ -111,7 +146,10 @@ api.interceptors.request.use((config) => {
 })
 
 api.interceptors.response.use(
-  (res) => res,
+  (res) => {
+    if ((res.config?.method || 'get').toLowerCase() !== 'get') forgetMe()
+    return res
+  },
   async (error) => {
     const cfg = error.config
     if (!cfg || error.code === 'ERR_CANCELED') return Promise.reject(error)

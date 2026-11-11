@@ -95,3 +95,29 @@ def test_the_inflation_window_spans_exactly_the_years_asked():
         assert inflation_service.inflation_window(1, "TR") == ("2025-10", "2026-10")
     with patch.object(inflation_service, "index_as_of", return_value="2026-01"):
         assert inflation_service.inflation_window(3, "TR") == ("2023-01", "2026-01")
+
+
+def test_a_missing_month_lengthens_the_span_not_the_rate():
+    """The US index has no October 2025; 'a year ago' snapped to September
+    and thirteen months of inflation were reported as the annual rate."""
+    from unittest.mock import patch
+
+    from backend.services import inflation_service
+
+    index = {f"2025-{m:02d}": 100.0 * 1.003 ** (m - 1) for m in range(1, 13) if m != 10}
+    index.update({f"2026-{m:02d}": 100.0 * 1.003 ** (11 + m) for m in range(1, 11)})
+    true_annual = (1.003 ** 12 - 1) * 100
+    with patch.object(inflation_service, "_get_index", lambda market="TR": index):
+        assert inflation_service.trailing_annual_inflation_pct("US") == pytest.approx(true_annual, abs=0.02)
+        monthly = inflation_service.monthly_cash_erosion(10_000, market="US")["monthly_inflation_pct"]
+    assert monthly == pytest.approx(0.3, abs=0.01)
+
+
+def test_long_run_housing_growth_is_not_last_years():
+    from backend.services.assumptions import _annualized_from_index
+
+    quarters = [f"{y}-Q{q}" for y in range(2015, 2027) for q in (1, 2, 3, 4)][:46]
+    index = {q: 100 * 1.01 ** i for i, q in enumerate(quarters)}      # +1% a quarter
+    index[quarters[-1]] = index[quarters[-5]] * 1.006                 # a flat last year
+    assert _annualized_from_index(index) == pytest.approx(3.7, abs=0.2)
+    assert _annualized_from_index({q: index[q] for q in quarters[-12:]}) is None   # under five years

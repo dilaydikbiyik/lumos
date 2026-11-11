@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import api from '../utils/api'
+import api, { getMe } from '../utils/api'
 
 const PATHS = ['stocks', 'real_estate', 'hybrid', 'undecided']
 
@@ -31,7 +31,7 @@ export default function PathSwitcher({ onChanged }) {
 
   useEffect(() => {
     let cancelled = false
-    api.get('/users/me')
+    getMe()
       .then(res => { if (!cancelled) setCurrent(res.data.investment_path) })
       .catch(() => { /* the switcher simply shows nothing as selected */ })
     return () => { cancelled = true }

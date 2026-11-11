@@ -109,6 +109,42 @@ def _windowed_real_band(
     return band, real_band
 
 
+def _real_band_daily(series, window: int, step: int, market: str) -> Optional[dict]:
+    """
+    The same rolling windows, each deflated by ITS OWN period's inflation.
+
+    The asset and portfolio bands were nominal only: a Turkish reader was
+    told the pessimistic five-year case was "+106%" — in lira, across
+    windows whose inflation ran from 50% to 670%. Without the real band
+    beside it, the worst case reads as doubling your money. Windows the
+    inflation data does not cover are left out, and the count says how many
+    were used.
+    """
+    from backend.services import inflation_service
+
+    index = [str(i)[:7] for i in series.index]
+    values = series.to_numpy()
+    reals: list[float] = []
+    for start in range(0, len(values) - window, step):
+        begin, end = values[start], values[start + window]
+        if begin <= 0:
+            continue
+        try:
+            reals.append(inflation_service.real_return_pct(
+                (end / begin - 1) * 100, index[start], index[start + window], market) / 100)
+        except Exception:
+            continue
+    if len(reals) < MIN_WINDOWS:
+        return None
+    p10, p50, p90 = np.percentile(np.array(reals), [10, 50, 90])
+    return {
+        "pessimistic_pct": round(float(p10) * 100, 1),
+        "typical_pct": round(float(p50) * 100, 1),
+        "optimistic_pct": round(float(p90) * 100, 1),
+        "windows_analysed": len(reals),
+    }
+
+
 def _band(returns: list[float], amount: float) -> dict:
     arr = np.array(returns)
     p10, p50, p90 = np.percentile(arr, [10, 50, 90])
@@ -167,6 +203,7 @@ def project_asset(ticker: str, amount: float, years: int, lang: str = "tr",
         # thin basis stated honestly rather than a thick one implied.
         "independent_periods": independent,
         **_band(returns, amount),
+        "real_band": _real_band_daily(series, window, 21, market),
         "honesty_note": (
             t("projection.note_asset", lang, ticker=ticker, years=years)
         ),
@@ -213,6 +250,7 @@ def project_portfolio(weights: dict[str, float], amount: float, years: int,
         "history_years": years_covered,
         "tickers": list(weights),
         **_band(returns, amount),
+        "real_band": _real_band_daily(portfolio_series, window, 21, market),
         "honesty_note": (
             t("projection.note_portfolio", lang, years=years)
         ),

@@ -12,10 +12,16 @@ const CATEGORY_TO_TYPE = {
   // 'bond' was missing, so every bond position the bridge recorded landed in
   // 'other' — a type the valuation layer does not price, leaving it frozen at
   // its purchase amount forever.
-  stocks: 'stock', reit: 'etf', fund: 'fund', gold: 'gold', cash: 'cash',
+  stocks: 'stock', reit: 'etf', fund: 'fund', gold: 'gold',
   bond: 'etf',
+  // The portfolio's "cash" position is a FUND (a T-bill or overnight-rate
+  // fund), not money in an account. Recorded as plain cash with no ticker it
+  // was frozen at its purchase amount, counted as idle cash "eroding" at the
+  // inflation rate, and — for a Turkish reader, whose cash fund is in
+  // dollars — shown as lira that never moved. It is tracked like what it is.
+  cash: 'fund',
 }
-const NO_TICKER_TYPES = new Set(['cash'])
+const NO_TICKER_TYPES = new Set()
 
 /**
  * "I bought it" bridge — the last link of our execution model: the user

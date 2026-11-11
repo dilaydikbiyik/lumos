@@ -37,3 +37,12 @@ def test_without_a_micro_location_nothing_claims_one():
 
     for link in build_listing_links("Edirne", "Keşan", "arsa"):
         assert "manual_filter" not in link
+
+
+def test_reader_text_cannot_steer_the_listing_url():
+    """The slug went into another site's path as typed: "../../x?y"."""
+    from backend.services.listing_bridge import _slug
+
+    assert _slug("../../x?y") == "xy"
+    assert _slug("Keşan Merkez") == "kesan-merkez"
+    assert _slug("  İstanbul / Kadıköy ") == "istanbul-kadikoy"

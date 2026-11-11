@@ -343,7 +343,8 @@
     "good": "Good stretch",
     "selectAsset": "Select an asset",
     "selectYears": "Select a horizon",
-    "rightNow": "Right now:"
+    "rightNow": "Right now:",
+    "afterInflation": "{{pct}} after inflation"
   },
   "whatIf": {
     "title": "What would happen?",
@@ -691,7 +692,8 @@
   "market": {
     "label": "Market",
     "select": "Select market",
-    "limitedData": "limited data"
+    "limitedData": "limited data",
+    "switchFailed": "The market could not be changed — please try again shortly."
   },
   "path": {
     "step": "Step 1 / 3",

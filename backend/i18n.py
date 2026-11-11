@@ -432,6 +432,14 @@ _C: dict[str, dict[str, str]] = {
         "tr": "Tutarlarını yeni para birimine çevirmek için güncel kuru şu an okuyamadık; birazdan tekrar dene.",
         "en": "We couldn't read today's exchange rate to convert your amounts into the new currency; please try again shortly.",
         "de": "Wir konnten den heutigen Wechselkurs nicht lesen, um deine Beträge umzurechnen; bitte versuche es gleich noch einmal."},
+    "error.invalidChoice": {
+        "tr": "Seçimlerden biri listede yok — sayfayı yenileyip tekrar seçer misin?",
+        "en": "One of the choices isn't on the list — could you refresh the page and pick again?",
+        "de": "Eine der Auswahlen steht nicht in der Liste — lädst du die Seite neu und wählst noch einmal?"},
+    "error.invalidLength": {
+        "tr": "Yazdığın metinlerden biri çok uzun ya da boş — kısaltıp tekrar dener misin?",
+        "en": "One of the texts you typed is too long or empty — could you shorten it and try again?",
+        "de": "Einer der eingegebenen Texte ist zu lang oder leer — kürzt du ihn und versuchst es noch einmal?"},
     "error.invalidInput": {
         "tr": "Girdiğin değerlerden biri geçerli değil — tutarların sayı ve sıfırdan büyük olduğunu, metinlerin çok uzun olmadığını kontrol eder misin?",
         "en": "One of the values you entered isn't valid — could you check that amounts are numbers above zero and that text isn't too long?",

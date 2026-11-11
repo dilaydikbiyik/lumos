@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@clerk/clerk-react'
-import api from '../utils/api'
+import { getMe } from '../utils/api'
 import { readJSON, writeJSON, userKey } from '../utils/storage'
 
 /**
@@ -43,7 +43,7 @@ export default function PathInvitation() {
 
   useEffect(() => {
     let cancelled = false
-    api.get('/users/me')
+    getMe()
       .then(res => { if (!cancelled) setPath(res.data.investment_path) })
       .catch(() => { /* no invitation is the safe default */ })
     return () => { cancelled = true }

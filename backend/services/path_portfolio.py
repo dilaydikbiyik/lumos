@@ -12,7 +12,10 @@ about property funds by budget alone, whatever path the reader had chosen:
 
 So the path decides:
 
-  * stocks — the whole budget, no property funds;
+  * stocks — the market part of the budget split (the budget less the
+    emergency reserve), no property funds. It was the whole budget, while
+    the budget-plan card on the same dashboard told the same reader to set
+    half of it aside first: two plans for one sum;
   * hybrid / undecided — the portfolio is the MARKET part of the budget
     split: built on `market_amount`, with no property fund, because the
     split's property part (a home, or a REIT when a home is out of reach)
@@ -29,7 +32,7 @@ from backend.markets import get_market_pack
 from backend.services import budget_split
 from backend.services.portfolio_engine import build_portfolio
 
-SPLIT_PATHS = {"hybrid", "undecided"}
+SPLIT_PATHS = {"stocks", "hybrid", "undecided"}
 
 
 def build_for_path(path: Optional[str], risk_score: float, budget: float, market: str,
@@ -38,8 +41,6 @@ def build_for_path(path: Optional[str], risk_score: float, budget: float, market
     """(portfolio, plan) — `plan` is the split the portfolio is the market
     part of, or None when the whole budget is the portfolio."""
     path = path or "hybrid"
-    if path == "stocks":
-        return build_portfolio(risk_score, budget, market, lang, include_reits=False), None
     if path not in SPLIT_PATHS:
         return build_portfolio(risk_score, budget, market, lang), None
 
@@ -73,7 +74,7 @@ async def committed_property(db, user) -> float:
                for h in holdings if h.asset_type in REAL_ESTATE_TYPES)
 
 
-def plan_targets(portfolio, plan) -> list[dict]:
+def plan_targets(portfolio, plan, market: str | None = None) -> list[dict]:
     """
     The WHOLE plan as target weights, for comparing with everything the
     reader owns.
@@ -87,6 +88,18 @@ def plan_targets(portfolio, plan) -> list[dict]:
     """
     allocations = [{"category": a.category, "ticker": a.ticker, "weight": a.weight}
                    for a in portfolio.allocations]
+    # Every fund this market knows, at weight zero, so a holding is filed by
+    # what it IS. A reader who bought the plan's property part as a REIT fund
+    # had it counted as "stocks" (its type is ETF and it is not in the
+    # portfolio), and was told property was 0% against a target of 8%.
+    if market:
+        from backend.markets import get_market_pack
+
+        pack = get_market_pack(market)
+        held = {a["ticker"] for a in allocations}
+        allocations += [{"category": a["category"], "ticker": a["ticker"], "weight": 0.0}
+                        for a in [*pack.asset_universe, *pack.reit_assets]
+                        if a["ticker"] not in held]
     if not plan or not plan.get("total_budget"):
         return allocations
     total = plan["total_budget"]

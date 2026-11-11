@@ -19,7 +19,7 @@ import BoughtItBridge from '../components/BoughtItBridge'
 import BeginnerGuide from '../components/BeginnerGuide'
 import Glossary from '../components/Glossary'
 import RealEstatePathNotice from '../components/RealEstatePathNotice'
-import api from '../utils/api'
+import { getMe } from '../utils/api'
 import usePortfolio from '../hooks/usePortfolio'
 import useMarket from '../hooks/useMarket'
 
@@ -70,7 +70,7 @@ export default function RecommendPage() {
 
   useEffect(() => {
     let cancelled = false
-    api.get('/users/me')
+    getMe()
       .then(res => { if (!cancelled) setRealEstateOnly(res.data.investment_path === 'real_estate') })
       .catch(() => { /* showing the portfolio is the safe default */ })
     return () => { cancelled = true }

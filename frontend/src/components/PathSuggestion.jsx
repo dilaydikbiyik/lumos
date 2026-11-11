@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import api from '../utils/api'
+import api, { getMe } from '../utils/api'
 import useMarket from '../hooks/useMarket'
 
 /**
@@ -26,7 +26,7 @@ export default function PathSuggestion({ onApplied }) {
     let cancelled = false
     // Both GETs; api.js coalesces in-flight ones, so the concurrent
     // /users/me here and in PathInvitation collapse into a single request.
-    api.get('/users/me')
+    getMe()
       .then(res => { if (!cancelled) setUndecided(res.data.investment_path === 'undecided') })
       .catch(() => { /* showing nothing is the safe default */ })
     api.get('/users/me/path-suggestion')

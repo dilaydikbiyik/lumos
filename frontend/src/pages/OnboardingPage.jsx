@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '@clerk/clerk-react'
-import api from '../utils/api'
+import { getMe } from '../utils/api'
 import { hasRememberedProfile, homeRoute, rememberProfile } from '../utils/homeRoute'
 import LumosLogo from '../components/LumosLogo'
 import { SignInButton, SignedIn, SignedOut, UserButton } from '@clerk/clerk-react'
@@ -50,7 +50,7 @@ export default function OnboardingPage() {
   async function resolveHome({ timeoutMs }) {
     if (hasRememberedProfile(userId)) return '/dashboard'
     const res = await Promise.race([
-      api.get('/users/me'),
+      getMe(),
       new Promise((_, reject) => setTimeout(() => reject(new Error('slow')), timeoutMs)),
     ])
     if (res.data?.risk_score != null) rememberProfile(userId)

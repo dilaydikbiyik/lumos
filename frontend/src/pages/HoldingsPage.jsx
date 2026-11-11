@@ -41,7 +41,9 @@ export default function HoldingsPage() {
   // The example ticker and asset are facts about the MARKET, not the
   // language: a Turkish reader in the US market was being shown THYAO.IS.
   const { money, pack, unit } = useMarket()
-  const cacheKey = userKey('holdings', userId)
+  // Per market: after a switch the snapshot is in the old currency, and it
+  // was painted under the new one until the (possibly cold) fetch returned.
+  const cacheKey = userKey(`holdings-${pack.code}`, userId)
   // Hydrate instantly from the last snapshot so returning users never see a
   // blank/jank frame; the network refresh below replaces it in the background.
   const cached = readJSON(cacheKey)

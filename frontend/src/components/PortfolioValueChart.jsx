@@ -21,10 +21,10 @@ const MATERIAL_MOVE_PCT = 5
     follow actual closes; cash/manual assets are carried flat (no fake wiggle). */
 export default function PortfolioValueChart({ holdingsCount }) {
   const { t } = useTranslation()
-  const { money } = useMarket()
+  const { money, pack } = useMarket()
   const { userId } = useAuth()
   const [days, setDays] = useState(30)
-  const ck = userKey(`history-${days}`, userId)
+  const ck = userKey(`history-${pack.code}-${days}`, userId)   // per market: values are in its currency
   const [data, setData] = useState(() => readJSON(ck))
   const [error, setError] = useState(false)
   const [coach, setCoach] = useState(null)

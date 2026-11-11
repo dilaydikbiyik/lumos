@@ -161,3 +161,26 @@ describe('api version fallback', () => {
     })
   })
 })
+
+describe('getMe — one request for everyone who asks together', () => {
+  it('shares the in-flight request and drops the answer after a write', async () => {
+    const { default: api, getMe, forgetMe } = await import('./api')
+    forgetMe()
+    let calls = 0
+    const original = api.get
+    api.get = (url) => { calls += 1; return Promise.resolve({ data: { url, n: calls } }) }
+    try {
+      const [a, b] = await Promise.all([getMe(), getMe()])
+      expect(calls).toBe(1)
+      expect(a).toBe(b)
+      await getMe()
+      expect(calls).toBe(1)            // reused within the window
+      forgetMe()                       // what any write does
+      await getMe()
+      expect(calls).toBe(2)
+    } finally {
+      api.get = original
+      forgetMe()
+    }
+  })
+})

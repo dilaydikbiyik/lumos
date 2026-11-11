@@ -26,6 +26,7 @@ REALISM NOTE (verified live 2026-07-10):
 Market-aware: TR keeps hand-tuned deep URLs; other markets use their
 pack's search templates.
 """
+import re
 from typing import Optional
 from urllib.parse import quote
 
@@ -43,7 +44,11 @@ _CATEGORY_SLUGS = {
 
 def _slug(text: str) -> str:
     """Simplifies Turkish characters into a URL slug: 'Keşan' → 'kesan'."""
-    return "-".join(text.strip().lower().translate(_TR_CHAR_MAP).split())
+    # Letters, digits and dashes only: the text is typed by the reader and
+    # goes into another site's URL path, where "../../x?y" would otherwise
+    # travel as written.
+    words = text.strip().lower().translate(_TR_CHAR_MAP).split()
+    return "-".join(w for w in (re.sub(r"[^a-z0-9]", "", word) for word in words) if w)
 
 
 def _tr_links(il: str, ilce: str, asset_type: str, detail: Optional[str] = None) -> list[dict]:

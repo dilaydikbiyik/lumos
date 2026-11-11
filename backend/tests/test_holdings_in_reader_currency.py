@@ -90,3 +90,26 @@ def test_a_switch_without_a_rate_is_refused_not_guessed(client):
         res = client.patch("/users/me/market", json={"market": "DE"}, headers={"X-Lumos-Lang": "de"})
     assert res.status_code == 503 and "Wechselkurs" in res.json()["detail"]
     assert client.get("/users/me").json()["market"] == "TR"
+
+
+def test_a_holding_bought_long_ago_is_tracked_not_drawn_flat():
+    """The chart fetched three months of prices, so a purchase 300 days old
+    had no entry price and was carried flat beside a list saying +8.9%."""
+    from backend.services import portfolio_history as ph
+
+    days = pd.bdate_range(date.today() - timedelta(days=320), date.today())
+    spy = pd.Series([100.0 + i * 0.1 for i in range(len(days))], index=days)
+    h = _holding(1, "etf", 1_000.0, currency="USD", ticker="SPY",
+                 purchase_date=date.today() - timedelta(days=300))
+    asked = []
+
+    def fake_fetch(tickers, period="3mo", adjusted=True):
+        asked.append(period)
+        return {t: spy for t in tickers}
+
+    with patch.object(ph, "fetch_price_history", side_effect=fake_fetch), \
+         patch.object(ph.fx_service, "rate", lambda b, q, on=None: 1.0), \
+         patch.object(ph, "enrich_holdings", return_value={}):
+        out = ph.portfolio_value_history([h], days=30, user_currency="USD", market="US")
+    assert asked[0] == "1y"
+    assert out["live_count"] == 1 and out["change_pct"] > 0
