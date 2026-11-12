@@ -3756,6 +3756,10 @@ hep SPY çıkıyor". İkisi ayrı sorunmuş.
         kuruyor (eklenen para artık yedek/emlak payını da alıyor).
       - Hisse yolu açıklaması "emlak payı" demiyor; sapma mesajı yerel
         ondalıkla; boş geri bildirim reddediliyor.
+- [x] Oturumsuz ziyaretçi her zaman Türkiye yedek pazarıyla görüyordu: Alman
+      ziyaretçiye tanıtım sayfasında "%40 enflasyonda %28 kazandım" örneği.
+      Artık açık pazar listesinden, dilin varsayılan pazarı (yeni hesapla
+      aynı kural). Almanca metinlerde yüzde "28 %" (41 metin).
 - [ ] Almanya'da hazine bonosu satırı yok (para piyasası fonu var);
       ABD bonosunun EUR karşılığı istenirse USDEUR=X ile eklenebilir.
 - [ ] Keşif listesi tarihli (2026-11) bir seçki; yılda bir piyasa

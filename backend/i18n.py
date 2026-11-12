@@ -209,7 +209,7 @@ _C: dict[str, dict[str, str]] = {
     "risk.factor.weighted": {
         "tr": "{name} (ağırlık %{pct})",
         "en": "{name} (weight {pct}%)",
-        "de": "{name} (Gewicht {pct}%)"},
+        "de": "{name} (Gewicht {pct} %)"},
     "risk.why.time_horizon": {
         "tr": "Vade uzadıkça kısa vadeli dalgalanmaların önemi azalır — en belirleyici faktör budur",
         "en": "The longer the horizon, the less short-term swings matter — this is the most decisive factor",
@@ -319,31 +319,31 @@ _C: dict[str, dict[str, str]] = {
     "weight.tilt.cautious": {
         "tr": "profilin temkinli olduğu için düşük oynaklık (%{vol}) ağırlığı artırdı",
         "en": "your profile is cautious, so low volatility ({vol}%) raised the weight",
-        "de": "dein Profil ist vorsichtig, daher erhöhte die niedrige Volatilität ({vol}%) das Gewicht"},
+        "de": "dein Profil ist vorsichtig, daher erhöhte die niedrige Volatilität ({vol} %) das Gewicht"},
     "weight.tilt.bold": {
         "tr": "yüksek risk iştahın oynaklığı (%{vol}) getiri motoruna çevirdi",
         "en": "your high risk appetite turned volatility ({vol}%) into a return engine",
-        "de": "deine hohe Risikobereitschaft macht die Volatilität ({vol}%) zum Renditemotor"},
+        "de": "deine hohe Risikobereitschaft macht die Volatilität ({vol} %) zum Renditemotor"},
     "weight.tilt.balanced": {
         "tr": "dengeli profilinde %{vol} oynaklık orta ağırlık aldı",
         "en": "in your balanced profile, {vol}% volatility earned a middling weight",
-        "de": "in deinem ausgewogenen Profil erhielt {vol}% Volatilität ein mittleres Gewicht"},
+        "de": "in deinem ausgewogenen Profil erhielt {vol} % Volatilität ein mittleres Gewicht"},
     "weight.gold_diversifier": {
         "tr": "Rolü: {role}. Ağırlığın gerekçesi: altın, risk seviyen ne olursa olsun büyüme diliminin sabit %{share}'ini alır — kâr ya da temettü üretmediği için oynaklığı büyüme vaadi sayılmaz; hisseler düşerken çoğu zaman ayakta kaldığı için çeşitlendirici olarak tutulur → %{pct}.",
         "en": "Its role: {role}. Why this weight: gold takes a fixed {share}% of the growth sleeve at every risk level — it produces no earnings or dividends, so its volatility is not a promise of growth; it is held as a diversifier because it often holds up while stocks fall → {pct}%.",
-        "de": "Seine Rolle: {role}. Warum dieses Gewicht: Gold erhält auf jeder Risikostufe feste {share}% des Wachstumsteils — es erwirtschaftet weder Gewinne noch Dividenden, daher ist seine Volatilität kein Wachstumsversprechen; es wird als Diversifizierer gehalten, weil es oft stabil bleibt, wenn Aktien fallen → {pct}%."},
+        "de": "Seine Rolle: {role}. Warum dieses Gewicht: Gold erhält auf jeder Risikostufe feste {share} % des Wachstumsteils — es erwirtschaftet weder Gewinne noch Dividenden, daher ist seine Volatilität kein Wachstumsversprechen; es wird als Diversifizierer gehalten, weil es oft stabil bleibt, wenn Aktien fallen → {pct} %."},
     "weight.gold_diversifier_capped": {
         "tr": "Rolü: {role}. Ağırlığın gerekçesi: altın normalde büyüme diliminin sabit %{share}'idir — kâr ya da temettü üretmediği için oynaklığı büyüme vaadi sayılmaz, çeşitlendirici olarak tutulur. Bu küçük portföyde diğer pozisyonlar yoğunlaşma sınırına dayandığı için payı %{actual} oldu → %{pct}.",
         "en": "Its role: {role}. Why this weight: gold normally takes a fixed {share}% of the growth sleeve — it produces no earnings or dividends, so its volatility is not a promise of growth, and it is held as a diversifier. In this small portfolio the other positions reached the concentration limit, so its share came to {actual}% → {pct}%.",
-        "de": "Seine Rolle: {role}. Warum dieses Gewicht: Gold erhält normalerweise feste {share}% des Wachstumsteils — es erwirtschaftet weder Gewinne noch Dividenden, daher ist seine Volatilität kein Wachstumsversprechen, und es wird als Diversifizierer gehalten. In diesem kleinen Portfolio erreichten die anderen Positionen die Konzentrationsgrenze, daher liegt sein Anteil bei {actual}% → {pct}%."},
+        "de": "Seine Rolle: {role}. Warum dieses Gewicht: Gold erhält normalerweise feste {share} % des Wachstumsteils — es erwirtschaftet weder Gewinne noch Dividenden, daher ist seine Volatilität kein Wachstumsversprechen, und es wird als Diversifizierer gehalten. In diesem kleinen Portfolio erreichten die anderen Positionen die Konzentrationsgrenze, daher liegt sein Anteil bei {actual} % → {pct} %."},
     "weight.reit_diversifier": {
         "tr": "Rolü: {role}. Ağırlığın gerekçesi: gayrimenkul fonu, risk seviyen ne olursa olsun büyüme diliminin sabit %{share}'ini alır — oynaklığının çoğu faiz hassasiyetinden gelir, ek büyümeden değil; ev almadan gayrimenkule ortak olmanın yolu olarak tutulur → %{pct}.",
         "en": "Its role: {role}. Why this weight: the property fund takes a fixed {share}% of the growth sleeve at every risk level — most of its volatility comes from sensitivity to interest rates, not from extra growth; it is held as a way to own property without buying a home → {pct}%.",
-        "de": "Seine Rolle: {role}. Warum dieses Gewicht: Der Immobilienfonds erhält auf jeder Risikostufe feste {share}% des Wachstumsteils — seine Volatilität kommt überwiegend aus der Zinsempfindlichkeit, nicht aus zusätzlichem Wachstum; er wird gehalten, um an Immobilien beteiligt zu sein, ohne ein Haus zu kaufen → {pct}%."},
+        "de": "Seine Rolle: {role}. Warum dieses Gewicht: Der Immobilienfonds erhält auf jeder Risikostufe feste {share} % des Wachstumsteils — seine Volatilität kommt überwiegend aus der Zinsempfindlichkeit, nicht aus zusätzlichem Wachstum; er wird gehalten, um an Immobilien beteiligt zu sein, ohne ein Haus zu kaufen → {pct} %."},
     "weight.reit_diversifier_capped": {
         "tr": "Rolü: {role}. Ağırlığın gerekçesi: gayrimenkul fonu normalde büyüme diliminin sabit %{share}'idir — oynaklığının çoğu faiz hassasiyetinden gelir, ek büyümeden değil. Bu küçük portföyde diğer pozisyonlar yoğunlaşma sınırına dayandığı için payı %{actual} oldu → %{pct}.",
         "en": "Its role: {role}. Why this weight: the property fund normally takes a fixed {share}% of the growth sleeve — most of its volatility comes from sensitivity to interest rates, not from extra growth. In this small portfolio the other positions reached the concentration limit, so its share came to {actual}% → {pct}%.",
-        "de": "Seine Rolle: {role}. Warum dieses Gewicht: Der Immobilienfonds erhält normalerweise feste {share}% des Wachstumsteils — seine Volatilität kommt überwiegend aus der Zinsempfindlichkeit, nicht aus zusätzlichem Wachstum. In diesem kleinen Portfolio erreichten die anderen Positionen die Konzentrationsgrenze, daher liegt sein Anteil bei {actual}% → {pct}%."},
+        "de": "Seine Rolle: {role}. Warum dieses Gewicht: Der Immobilienfonds erhält normalerweise feste {share} % des Wachstumsteils — seine Volatilität kommt überwiegend aus der Zinsempfindlichkeit, nicht aus zusätzlichem Wachstum. In diesem kleinen Portfolio erreichten die anderen Positionen die Konzentrationsgrenze, daher liegt sein Anteil bei {actual} % → {pct} %."},
     "holds.SPY": {
         "tr": "S&P 500 — ABD'nin en büyük 500 şirketi.",
         "en": 'S&P 500 — the 500 largest US companies.',
@@ -419,7 +419,7 @@ _C: dict[str, dict[str, str]] = {
     "weight.growth": {
         "tr": "Rolü: {role}. Ağırlığın gerekçesi: {tilt} → %{pct}.",
         "en": "Its role: {role}. Why this weight: {tilt} → {pct}%.",
-        "de": "Seine Rolle: {role}. Warum dieses Gewicht: {tilt} → {pct}%."},
+        "de": "Seine Rolle: {role}. Warum dieses Gewicht: {tilt} → {pct} %."},
     "projection.weights_sum": {
         "tr": "Ağırlıkların toplamı yaklaşık 1 olmalı (şu an {total}).",
         "en": "Weights must sum to about 1 (got {total}).",
@@ -451,11 +451,11 @@ _C: dict[str, dict[str, str]] = {
     "weight.defensive_capped": {
         "tr": "Rolü: {role}. Ağırlığın gerekçesi: risk profilin portföyün ~%{defensive}'ünü savunmaya (nakit/tahvil) ayırmayı gerektiriyor; ama bu kadar az pozisyonlu bir portföyde tek bir pozisyon %{cap}'i geçemediği için savunma payı burada %{actual} oldu → %{pct}.",
         "en": "Its role: {role}. Why this weight: your risk profile calls for roughly {defensive}% of the portfolio on the defensive side (cash/bonds); in a portfolio with this few positions no single one may exceed {cap}%, so the defensive side is {actual}% here → {pct}%.",
-        "de": "Seine Rolle: {role}. Warum dieses Gewicht: dein Risikoprofil verlangt rund {defensive}% des Portfolios auf der defensiven Seite (Bargeld/Anleihen); in einem Portfolio mit so wenigen Positionen darf keine einzelne {cap}% überschreiten, daher liegt die defensive Seite hier bei {actual}% → {pct}%."},
+        "de": "Seine Rolle: {role}. Warum dieses Gewicht: dein Risikoprofil verlangt rund {defensive} % des Portfolios auf der defensiven Seite (Bargeld/Anleihen); in einem Portfolio mit so wenigen Positionen darf keine einzelne {cap} % überschreiten, daher liegt die defensive Seite hier bei {actual} % → {pct} %."},
     "weight.defensive": {
         "tr": "Rolü: {role}. Ağırlığın gerekçesi: risk profilin portföyün ~%{defensive}'ünü savunmaya (nakit/tahvil) ayırmayı gerektiriyor → %{pct}.",
         "en": "Its role: {role}. Why this weight: your risk profile calls for roughly {defensive}% of the portfolio to sit on the defensive side (cash/bonds) → {pct}%.",
-        "de": "Seine Rolle: {role}. Warum dieses Gewicht: dein Risikoprofil verlangt rund {defensive}% des Portfolios auf der defensiven Seite (Bargeld/Anleihen) → {pct}%."},
+        "de": "Seine Rolle: {role}. Warum dieses Gewicht: dein Risikoprofil verlangt rund {defensive} % des Portfolios auf der defensiven Seite (Bargeld/Anleihen) → {pct} %."},
 
     # ── portfolio engine: why an asset was dropped ──
     "drop.same_category": {
@@ -469,13 +469,13 @@ _C: dict[str, dict[str, str]] = {
     "drop.crumb": {
         "tr": "%{min} altı kırıntı pozisyon — takip yükü ve işlem maliyeti katkısını aşar",
         "en": "A crumb position under {min}% — the tracking effort and trading costs exceed what it contributes",
-        "de": "Eine Krümelposition unter {min}% — Aufwand und Handelskosten übersteigen ihren Beitrag"},
+        "de": "Eine Krümelposition unter {min} % — Aufwand und Handelskosten übersteigen ihren Beitrag"},
 
     # ── portfolio engine: the formula ──
     "formula.allocation": {
         "tr": "Güvenli pay = 60 − (5,5 × risk skoru), en az %0 en fazla %60 (nakit + tahvil). Sonuç %10'un altına düşerse sıfıra çekilir: %3'lük bir nakit dilimi portföyü korumaz, sadece takip yükü yaratır — bu yüzden 9,1 üstü skorlarda savunma payı tamamen kapanır. Kalan pay büyüme varlıklarına dağıtılır. Altın, risk skorundan bağımsız olarak büyüme payının sabit %15'ini alır: kâr ya da temettü üretmediği için oynaklığı büyüme vaadi sayılmaz. Gayrimenkul fonu (varsa) aynı şekilde sabit %10'unu alır: oynaklığı çoğunlukla faiz hassasiyetidir. Geri kalanında her varlığın ağırlığı = (1 − α) × (1 / oynaklık) + α × oynaklık; oynaklık son 5 yılın fiyatlarından ölçülür. α risk skorunun onda biridir; yani α büyüdükçe oynak varlıklar daha fazla, küçüldükçe sakin varlıklar daha fazla pay alır. Hiçbir pozisyon %45'i geçemez ve %5'in altında kalan pozisyonlar elenir.",
         "en": "Defensive share = 60 − (5.5 × risk score), floored at 0% and capped at 60% (cash + bonds). If the result falls below 10% it is set to zero: a 3% cash sleeve protects nothing and only adds something to track — so above a score of 9.1 the defensive side closes entirely. What's left goes to the growth assets. Gold takes a fixed 15% of the growth share whatever the risk score: it produces no earnings or dividends, so its volatility is not a promise of growth. A property fund, when held, likewise takes a fixed 10%: its volatility is mostly interest-rate sensitivity. For the rest, each weight = (1 − α) × (1 / volatility) + α × volatility, with volatility measured over the last 5 years of prices. α is one tenth of the risk score — so the larger α gets, the more the volatile assets take, and the smaller it gets, the more the calm ones do. No position may exceed 45%, and anything under 5% is dropped.",
-        "de": "Defensiver Anteil = 60 − (5,5 × Risikowert), mindestens 0% und höchstens 60% (Bargeld + Anleihen). Fällt das Ergebnis unter 10%, wird es auf null gesetzt: ein Barbestand von 3% schützt nichts und macht nur Arbeit — ab einem Wert über 9,1 entfällt die defensive Seite daher ganz. Der Rest geht an die Wachstumsanlagen. Gold erhält unabhängig vom Risikowert feste 15% des Wachstumsanteils: Es erwirtschaftet weder Gewinne noch Dividenden, daher ist seine Volatilität kein Wachstumsversprechen. Ein Immobilienfonds erhält, wenn enthalten, ebenso feste 10%: seine Volatilität ist überwiegend Zinsempfindlichkeit. Für den Rest gilt: Gewicht je Anlage = (1 − α) × (1 / Volatilität) + α × Volatilität, wobei die Volatilität aus den Kursen der letzten 5 Jahre gemessen wird. α ist ein Zehntel des Risikowerts — je größer α, desto mehr erhalten die schwankungsreichen Anlagen, je kleiner, desto mehr die ruhigen. Keine Position darf 45% überschreiten, und alles unter 5% entfällt."},
+        "de": "Defensiver Anteil = 60 − (5,5 × Risikowert), mindestens 0 % und höchstens 60 % (Bargeld + Anleihen). Fällt das Ergebnis unter 10 %, wird es auf null gesetzt: ein Barbestand von 3 % schützt nichts und macht nur Arbeit — ab einem Wert über 9,1 entfällt die defensive Seite daher ganz. Der Rest geht an die Wachstumsanlagen. Gold erhält unabhängig vom Risikowert feste 15 % des Wachstumsanteils: Es erwirtschaftet weder Gewinne noch Dividenden, daher ist seine Volatilität kein Wachstumsversprechen. Ein Immobilienfonds erhält, wenn enthalten, ebenso feste 10 %: seine Volatilität ist überwiegend Zinsempfindlichkeit. Für den Rest gilt: Gewicht je Anlage = (1 − α) × (1 / Volatilität) + α × Volatilität, wobei die Volatilität aus den Kursen der letzten 5 Jahre gemessen wird. α ist ein Zehntel des Risikowerts — je größer α, desto mehr erhalten die schwankungsreichen Anlagen, je kleiner, desto mehr die ruhigen. Keine Position darf 45 % überschreiten, und alles unter 5 % entfällt."},
 
 
     # ── health score ──
@@ -490,7 +490,7 @@ _C: dict[str, dict[str, str]] = {
     "health.illiquid": {
         "tr": "Varlıklarının ~%{pct}'i hızla nakde dönmez (arsa/ev/araç). Acil bir ihtiyaç planın var mı?",
         "en": "About {pct}% of your holdings can't be turned into cash quickly (land/home/vehicle). Do you have a plan for an emergency?",
-        "de": "Rund {pct}% deiner Anlagen lassen sich nicht schnell zu Geld machen (Grundstück/Haus/Fahrzeug). Hast du einen Plan für den Notfall?"},
+        "de": "Rund {pct} % deiner Anlagen lassen sich nicht schnell zu Geld machen (Grundstück/Haus/Fahrzeug). Hast du einen Plan für den Notfall?"},
     "health.balanced": {
         "tr": "Dengeli görünüyor — fenerin gür yanıyor. 🔦",
         "en": "This looks balanced — your lantern is burning bright. 🔦",

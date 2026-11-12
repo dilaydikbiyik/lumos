@@ -1,5 +1,6 @@
 import { createContext, useCallback, useEffect, useMemo, useState } from 'react'
 import { useAuth } from '@clerk/clerk-react'
+import { useTranslation } from 'react-i18next'
 import api, { extractErrorMessage, getMe } from '../utils/api'
 import { readJSON, writeJSON } from '../utils/storage'
 
@@ -41,11 +42,33 @@ function cached() {
 
 const MarketContext = createContext(null)
 
+// A visitor who has not signed in has no saved market. The page used the
+// Turkish fallback for them, so a German visitor read "made 28% when
+// inflation was 40%" — Türkiye's arithmetic. They get the market a new
+// account in their language would start in (the backend's
+// DEFAULT_MARKET_BY_LANGUAGE), from the public market list.
+const MARKET_BY_LANGUAGE = { tr: 'TR', en: 'US', de: 'DE' }
+
 export function MarketProvider({ children }) {
-  const { isSignedIn } = useAuth()
+  const { isSignedIn, isLoaded } = useAuth()
+  const { i18n } = useTranslation()
   const remembered = cached()
   const [packs, setPacks] = useState(remembered?.packs ?? [TR_FALLBACK])
   const [marketCode, setMarketCode] = useState(remembered?.market ?? 'TR')
+
+  useEffect(() => {
+    if (!isLoaded || isSignedIn || remembered) return
+    let cancelled = false
+    api.get('/users/markets')
+      .then(res => {
+        if (cancelled || !res.data?.markets?.length) return
+        setPacks(res.data.markets)
+        setMarketCode(MARKET_BY_LANGUAGE[(i18n.language || '').slice(0, 2)] || 'TR')
+      })
+      .catch(() => { /* the fallback stays; formatting must never break */ })
+    return () => { cancelled = true }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoaded, isSignedIn, i18n.language])
 
   useEffect(() => {
     if (!isSignedIn) return

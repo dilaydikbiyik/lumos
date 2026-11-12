@@ -50,7 +50,7 @@
     "features": {
       "realReturn": {
         "title": "Echte Rendite nach Inflation",
-        "desc": "\"Ich habe {{nominal}}% gemacht\" heißt Verlust, wenn die Inflation bei {{inflation}}% lag. Lumos bereinigt jede Zahl mit offiziellen Daten."
+        "desc": "\"Ich habe {{nominal}} % gemacht\" heißt Verlust, wenn die Inflation bei {{inflation}} % lag. Lumos bereinigt jede Zahl mit offiziellen Daten."
       },
       "realEstate": {
         "title": "Immobilien und Aktien nebeneinander",
@@ -102,7 +102,7 @@
     "readyTitle": "Dein Risikoprofil ist fertig",
     "readySubtitle": "Deine Antworten sind ausgewertet — dein persönliches Portfolio wird berechnet.",
     "profileWord": "Profil",
-    "budgetNote": "Dein Budget beträgt <0>{{budget}}</0>. Bei diesem Risikoniveau könnte ein starker Einbruch dein Portfolio vorübergehend um rund <1>{{pct}}%</1> auf <2>{{worst}}</2> drücken. Das ist für dieses Profil eine normale Schwankung — ein Verlust wird erst real, wenn du verkaufst.",
+    "budgetNote": "Dein Budget beträgt <0>{{budget}}</0>. Bei diesem Risikoniveau könnte ein starker Einbruch dein Portfolio vorübergehend um rund <1>{{pct}} %</1> auf <2>{{worst}}</2> drücken. Das ist für dieses Profil eine normale Schwankung — ein Verlust wird erst real, wenn du verkaufst.",
     "whyTitle": "Woher kommt dieser Wert?",
     "whySubtitle": "Keine Blackbox — Quelle und Begründung für jeden Punkt:",
     "total": "Summe ≈ <0>{{score}}/10</0> (Summe der Beiträge, begrenzt auf 1–10)",
@@ -111,7 +111,7 @@
   },
   "debt": {
     "title": "Lass uns zuerst darüber sprechen",
-    "body": "Du hast <0>{{debt}}</0> Kreditkarten- oder Konsumkreditschulden. Diese wachsen mit rund <1>{{debtPct}}%</1> pro Jahr. Ein Portfolio, das zu deinem Risikoprofil passt, hat eine langfristige Erwartung von etwa <2>{{portPct}}%</2> — und das ist eine Erwartung, keine Garantie.",
+    "body": "Du hast <0>{{debt}}</0> Kreditkarten- oder Konsumkreditschulden. Diese wachsen mit rund <1>{{debtPct}} %</1> pro Jahr. Ein Portfolio, das zu deinem Risikoprofil passt, hat eine langfristige Erwartung von etwa <2>{{portPct}} %</2> — und das ist eine Erwartung, keine Garantie.",
     "ifRepay": "Wenn du die Schulden mit {{amount}} tilgst",
     "repayCaption": "Zinsen, die du in einem Jahr nicht zahlst — sicher",
     "ifInvest": "Wenn du dasselbe Geld anlegst",
@@ -119,7 +119,7 @@
     "verdict": "Die Schulden zu tilgen ist dieses Jahr <0>{{advantage}}</0> besser — und das ganz ohne Risiko.",
     "covers": "Dein Budget deckt die Schulden; mit den verbleibenden <0>{{leftover}}</0> kannst du beruhigt anfangen zu investieren.",
     "notCovered": "Tilge zuerst die Schulden und komm dann zurück. Dein Portfolio wartet.",
-    "assumption": "Die Rechnung nimmt einen Kartenzins von {{monthly}}%/Monat an ({{annual}}% p. a. effektiv). Das ist eine Planungsannahme, nicht der aktuelle offizielle Satz. Sieh auf deiner eigenen Abrechnung nach; die Zahl ändert sich, die Richtung nicht. Du kannst dir das Portfolio unten trotzdem ansehen."
+    "assumption": "Die Rechnung nimmt einen Kartenzins von {{monthly}} %/Monat an ({{annual}} % p. a. effektiv). Das ist eine Planungsannahme, nicht der aktuelle offizielle Satz. Sieh auf deiner eigenen Abrechnung nach; die Zahl ändert sich, die Richtung nicht. Du kannst dir das Portfolio unten trotzdem ansehen."
   },
   "recommend": {
     "preparing": "Dein Portfolio wird vorbereitet…",
@@ -147,16 +147,16 @@
     "title": "Warum diese Aufteilung?",
     "subtitle": "Diese Gewichte stammen aus einer deterministischen Formel, nicht von der KI — jeder Schritt steht hier:",
     "intro": "Dein Risikowert ist <0>{{score}}/10</0>. Die Aufteilung entsteht in zwei Schritten:",
-    "step1": "<0>Wie viel bleibt auf der sicheren Seite?</0><1/>Je höher der Risikowert, desto kleiner der Anteil aus Bargeld und Anleihen. Bei dir sind es <2>{{pct}}%</2> — dieser Teil dämpft den Schock in starken Abschwüngen.",
-    "step2": "<0>Wie wurden die restlichen {{pct}}% verteilt?</0><1/>Die Wachstumswerte werden nach ihrer Volatilität gewichtet (wie stark der Preis schwankt). Bei niedrigem Risikowert dominieren die ruhigen Werte, bei hohem die lebhaften.",
+    "step1": "<0>Wie viel bleibt auf der sicheren Seite?</0><1/>Je höher der Risikowert, desto kleiner der Anteil aus Bargeld und Anleihen. Bei dir sind es <2>{{pct}} %</2> — dieser Teil dämpft den Schock in starken Abschwüngen.",
+    "step2": "<0>Wie wurden die restlichen {{pct}} % verteilt?</0><1/>Die Wachstumswerte werden nach ihrer Volatilität gewichtet (wie stark der Preis schwankt). Bei niedrigem Risikowert dominieren die ruhigen Werte, bei hohem die lebhaften.",
     "lowBand": "Dein Wert liegt eher niedrig, das Gewicht neigt zu ruhigen Anlagen.",
     "highBand": "Dein Wert liegt eher hoch, das Gewicht neigt zu lebhaften Anlagen.",
     "midBand": "Du liegst in der Mitte, beides wird ausgewogen gemischt.",
     "showFormula": "Die eigentliche Formel anzeigen",
     "alphaNote": "α = {{alpha}} (dein Risikowert ÷ 10)",
     "droppedTitle": "Warum {{count}} Positionen? Diese wurden bewusst weggelassen:",
-    "wouldBe": "(wären {{pct}}% gewesen)",
-    "footer": "Dein Budget {{budget}} · auf höchstens {{cap}} Anlagen verteilt · alles unter {{minPct}}% wurde weggelassen (winzige Positionen sind schwer zu verfolgen und tragen kaum bei)",
+    "wouldBe": "(wären {{pct}} % gewesen)",
+    "footer": "Dein Budget {{budget}} · auf höchstens {{cap}} Anlagen verteilt · alles unter {{minPct}} % wurde weggelassen (winzige Positionen sind schwer zu verfolgen und tragen kaum bei)",
     "alternativesTitle": "Fonds, die dieselbe Rolle spielen könnten ({{count}})",
     "inPortfolio": "in deinem Portfolio",
     "altFacts": "Volatilität {{vol}} · stärkster Rückgang {{drop}} · {{years}} Jahre Historie",
@@ -231,7 +231,7 @@
     "emptyBody": "Fangen wir gemeinsam an — füge einen ersten Wert hinzu.",
     "namePlaceholder": "Name (z. B. {{example}})",
     "vehicleTitle": "🚗 Ist dein Auto Vermögen oder Kosten?",
-    "vehicleBody": "Ein Fahrzeug darf im Vermögensbild auftauchen — aber Vorsicht: es verliert jedes Jahr 10–20% an Wert, dazu kommen Versicherung, Steuer und Wartung. Lumos empfiehlt niemals einen Autokauf als Geldanlage.",
+    "vehicleBody": "Ein Fahrzeug darf im Vermögensbild auftauchen — aber Vorsicht: es verliert jedes Jahr 10–20 % an Wert, dazu kommen Versicherung, Steuer und Wartung. Lumos empfiehlt niemals einen Autokauf als Geldanlage.",
     "vehicleTip": "Wenn du es trotzdem aufnehmen willst, trage den aktuellen Marktwert unter \"Aktueller Schätzwert\" ein.",
     "tickerPlaceholder": "Symbol (z. B. {{example}})",
     "amountPlaceholder": "Kaufbetrag ({{unit}})",
@@ -260,13 +260,13 @@
     "error": "Konnte nicht berechnet werden",
     "alreadyOnTrack": "Deine vorhandenen Ersparnisse erreichen das Ziel von allein — kein zusätzlicher Beitrag nötig.",
     "needMonthly": "Um das Ziel rechtzeitig zu erreichen, solltest du monatlich etwa <0>{{amount}}</0> zurücklegen.",
-    "realValueNote": "Bei {{inflation}}% Inflation wird dein Ziel von {{target}} dann in heutigem Geld ≈ <0>{{real}}</0> wert sein. Ein fester Zielbetrag verliert mit der Zeit Kaufkraft — vielleicht willst du ihn anpassen.",
+    "realValueNote": "Bei {{inflation}} % Inflation wird dein Ziel von {{target}} dann in heutigem Geld ≈ <0>{{real}}</0> wert sein. Ein fester Zielbetrag verliert mit der Zeit Kaufkraft — vielleicht willst du ihn anpassen.",
     "atYourPace": "Mit deinem aktuellen Tempo ({{amount}}/Monat):",
     "onTrack": "✓ Du erreichst das Ziel rechtzeitig.",
     "delayed": "In diesem Tempo verzögert sich dein Ziel um etwa <0>{{months}} Monate</0>.",
-    "progress": "Fortschritt: {{pct}}%",
+    "progress": "Fortschritt: {{pct}} %",
     "howTitle": "Worauf beruht diese Rechnung?",
-    "howBody": "Sie nimmt an, dass dein Erspartes nicht ungenutzt liegt, sondern in einem zu deinem Risikoprofil passenden Portfolio im Schnitt {{growth}}% pro Jahr wächst. Diese Rate ist nicht erfunden: sie ist die Live-Inflation ({{inflation}}%) plus die reale Prämie, die ein breit gestreutes Portfolio langfristig erwarten lässt. Der Zeitraum wird in {{months}} Monate umgerechnet, und das Wachstum jedes Beitrags über die Restlaufzeit wird mitgezählt.",
+    "howBody": "Sie nimmt an, dass dein Erspartes nicht ungenutzt liegt, sondern in einem zu deinem Risikoprofil passenden Portfolio im Schnitt {{growth}} % pro Jahr wächst. Diese Rate ist nicht erfunden: sie ist die Live-Inflation ({{inflation}} %) plus die reale Prämie, die ein breit gestreutes Portfolio langfristig erwarten lässt. Der Zeitraum wird in {{months}} Monate umgerechnet, und das Wachstum jedes Beitrags über die Restlaufzeit wird mitgezählt.",
     "howFormula": "monatlich = (Ziel − gewachsener Wert der Ersparnisse) × r / ((1+r)^Monate − 1),  r = monatliche Rendite",
     "howCaveat": "Das ist eine Planungsannahme, keine Prognose: Märkte wachsen nicht jedes Jahr gleich viel, und manche Jahre schließen im Minus. Fällt die Rate niedriger aus, reicht der Monatsbetrag nicht — den Plan einmal im Jahr zu prüfen ist eine gute Gewohnheit.",
     "selectYears": "Zielzeitraum",
@@ -356,11 +356,11 @@
     },
     "enflasyon": {
       "label": "Inflation",
-      "text": "Der Verlust dessen, was dein Geld kaufen kann. Bei {{rate}}% Inflation verhalten sich 100 {{unit}} unter der Matratze ein Jahr später wie {{eroded}} {{unit}}."
+      "text": "Der Verlust dessen, was dein Geld kaufen kann. Bei {{rate}} % Inflation verhalten sich 100 {{unit}} unter der Matratze ein Jahr später wie {{eroded}} {{unit}}."
     },
     "reel getiri": {
       "label": "reale Rendite",
-      "text": "Dein echter Gewinn nach Inflation. {{nominal}}% gemacht, aber die Inflation lag bei {{inflation}}%? Dann hast du verloren."
+      "text": "Dein echter Gewinn nach Inflation. {{nominal}} % gemacht, aber die Inflation lag bei {{inflation}} %? Dann hast du verloren."
     },
     "drawdown": {
       "label": "Drawdown",
@@ -380,7 +380,7 @@
     "mid": "Mittel",
     "highMsg": "Der Großteil deines Portfolios liegt in deiner Heimatwährung ({{currency}}). Wenn sie schwächer wird, spürt es das ganze Portfolio. Erwäge Anlagen in Fremdwährung.",
     "midMsg": "Zwischen Heimatwährung ({{currency}}) und Fremdwährungen besteht ein vernünftiges Gleichgewicht. Diese Aufteilung schützt teilweise vor Wechselkursschwankungen.",
-    "fxLegend": "🌍 Fremdwährung — {{pct}}%",
+    "fxLegend": "🌍 Fremdwährung — {{pct}} %",
     "homeLegend": "🏠 {{currency}} — {{pct}} %"
   },
   "path": {
@@ -477,7 +477,7 @@
     "progress": "{{seen}}/{{total}} Schlagzeilen entschlüsselt · Karte antippen → nächste",
     "headline-crash": {
       "headline": "📰 \"DER MARKT IST ABGESTÜRZT\"",
-      "reality": "Der Index ist höchstwahrscheinlich 2–4% gefallen. Historisch wurden solche Rückgänge meist innerhalb von Monaten aufgeholt. \"Absturz\" klingt gut in einer Schlagzeile und ist für Anleger normal.",
+      "reality": "Der Index ist höchstwahrscheinlich 2–4 % gefallen. Historisch wurden solche Rückgänge meist innerhalb von Monaten aufgeholt. \"Absturz\" klingt gut in einer Schlagzeile und ist für Anleger normal.",
       "action": "Bleib ruhig. Heute zu verkaufen macht aus dem Rückgang einen echten Verlust."
     },
     "headline-crash-global": {
@@ -570,7 +570,7 @@
     "cashBreakdown": "Von deinen <0>{{cash}}</0> gehen {{costs}} an Erwerbsteuern und Provision; als Eigenkapital bleiben <1>{{applied}}</1>.",
     "affordabilityTight": "Die Rate beträgt {{pct}} % deines Einkommens — Banken gehen hier in der Regel nicht über rund {{limit}} %. Diese Immobilie ist mit diesem Eigenkapital derzeit womöglich nicht realistisch; überlege mehr Eigenkapital oder eine günstigere Immobilie.",
     "affordabilityOk": "Die Rate beträgt {{pct}} % deines Einkommens — unter der Grenze von rund {{limit}} %, auf die Banken hier achten; dieser Plan wirkt tragfähig.",
-    "loanCost": "<0>Was der Kredit kostet</0> ({{rate}}%/Jahr, {{term}} Jahre Laufzeit)<1/>Aufgenommen <2>{{principal}}</2> · über die gesamte Laufzeit gezahlt <3>{{total}}</3><4/>Davon sind <5>{{interest}}</5> Zinsen — also <6>{{ratio}}%</6> der Kreditsumme.",
+    "loanCost": "<0>Was der Kredit kostet</0> ({{rate}} %/Jahr, {{term}} Jahre Laufzeit)<1/>Aufgenommen <2>{{principal}}</2> · über die gesamte Laufzeit gezahlt <3>{{total}}</3><4/>Davon sind <5>{{interest}}</5> Zinsen — also <6>{{ratio}} %</6> der Kreditsumme.",
     "payingTwice": "Die Zinsen übersteigen den Kredit: du bezahlst die Immobilie zweimal.",
     "fixedRateNote": "Gerechnet mit festem Zins; bleibt die Inflation hoch, sinkt die reale Last der Rate mit der Zeit.",
     "ifBuy": "Wenn du kaufst",
@@ -582,7 +582,7 @@
     "rentLine": "Eigenkapital + Differenz angelegt · gezahlte Miete {{rent}}",
     "verdictBuy": "Unter diesen Annahmen wirkt <0>Kaufen</0> um rund <1>{{amount}}</1> vorteilhafter.",
     "verdictRent": "Unter diesen Annahmen wirkt <0>Mieten und Anlegen</0> um rund <1>{{amount}}</1> vorteilhafter.",
-    "assumptions": "Annahmen: Immobilien +{{housing}}%/Jahr, Portfolio +{{portfolio}}%/Jahr, Kredit {{rate}}%/Jahr {{rateSource}} ({{term}} Jahre Laufzeit), Inflation {{inflation}}%/Jahr (Daten bis {{asOf}}). Kaufnebenkosten sind enthalten: Erwerbsteuern und Amtsgebühren {{deed}}% + Maklerprovision {{agency}}% + MwSt. ({{vat}}%) = {{agencyVat}}%; dazu {{upkeep}}% des Immobilienwerts pro Jahr für Hausgeld, Versicherung und Instandhaltung. Diese Sätze werden durch Gesetz und Gepflogenheit bestimmt und ändern sich. Große Zahlen sind meist von der Inflation aufgebläht; die Zeile \"in heutigem Geld\" zeigt den realen Wert. Die Rechnung geht davon aus, dass du wohnen bleibst — Steuern bei einem Verkauf und der nicht-finanzielle Wert des Eigentums sind daher nicht enthalten; die emotionale Seite dieser Entscheidung ist ebenso legitim.",
+    "assumptions": "Annahmen: Immobilien +{{housing}} %/Jahr, Portfolio +{{portfolio}} %/Jahr, Kredit {{rate}} %/Jahr {{rateSource}} ({{term}} Jahre Laufzeit), Inflation {{inflation}} %/Jahr (Daten bis {{asOf}}). Kaufnebenkosten sind enthalten: Erwerbsteuern und Amtsgebühren {{deed}} % + Maklerprovision {{agency}} % + MwSt. ({{vat}} %) = {{agencyVat}} %; dazu {{upkeep}} % des Immobilienwerts pro Jahr für Hausgeld, Versicherung und Instandhaltung. Diese Sätze werden durch Gesetz und Gepflogenheit bestimmt und ändern sich. Große Zahlen sind meist von der Inflation aufgebläht; die Zeile \"in heutigem Geld\" zeigt den realen Wert. Die Rechnung geht davon aus, dass du wohnen bleibst — Steuern bei einem Verkauf und der nicht-finanzielle Wert des Eigentums sind daher nicht enthalten; die emotionale Seite dieser Entscheidung ist ebenso legitim.",
     "staleInflation": "⚠️ Der Inflationswert dieses Marktes stammt aus {{asOf}} — {{months}} Monate alt. Die Quelle (Eurostat) hat nichts Neueres veröffentlicht; die Rechnung nutzt die aktuellste offizielle Zahl, die tatsächliche Inflation kann davon abweichen.",
     "selectYears": "Projektionsdauer",
     "rateLive": "(aktueller veröffentlichter Durchschnitt)",
@@ -603,7 +603,7 @@
         "type": "Aktienindex",
         "what": "BIST 100 — ein Index der 100 größten börsennotierten Unternehmen der Türkei, darunter Schwergewichte wie Turkish Airlines, Aselsan und BİM.",
         "why": "Wächst die türkische Wirtschaft, wächst auch der Wert dieser Unternehmen. Der einfachste Weg, in den heimischen Markt zu investieren.",
-        "risk": "Kurzfristig sind Rückgänge von 20–30% möglich. Langfristig (5+ Jahre) hat der türkische Markt die Inflation historisch geschlagen."
+        "risk": "Kurzfristig sind Rückgänge von 20–30 % möglich. Langfristig (5+ Jahre) hat der türkische Markt die Inflation historisch geschlagen."
       },
       "SPY": {
         "type": "US-Aktien-ETF",
@@ -615,7 +615,7 @@
         "type": "Technologie-ETF",
         "what": "Der Nasdaq 100 — ein Korb der weltweiten Technologieriesen: Apple, Microsoft, NVIDIA, Meta und mehr.",
         "why": "Technologie war langfristig der am schnellsten wachsende Sektor. Auf Dollarbasis, mit hohem Wachstumspotenzial.",
-        "risk": "Tech-Aktien schwanken stärker. 2022 −33%, 2023 +55% — das braucht starke Nerven."
+        "risk": "Tech-Aktien schwanken stärker. 2022 −33 %, 2023 +55 % — das braucht starke Nerven."
       },
       "GLD": {
         "type": "Gold-ETF",
@@ -774,7 +774,7 @@
     "error": "Das virtuelle Portfolio ließ sich gerade nicht starten",
     "virtualNow": "Virtuelle {{amount}} sind jetzt",
     "thisWeek": "Diese Woche",
-    "mover": "Am stärksten bewegt hat sich diese Woche <0>{{ticker}}</0> ({{pct}}%). Hast du diesen Ausschlag gespürt? Mit echtem Geld fühlt es sich genauso an — nur verlierst du gerade nichts.",
+    "mover": "Am stärksten bewegt hat sich diese Woche <0>{{ticker}}</0> ({{pct}} %). Hast du diesen Ausschlag gespürt? Mit echtem Geld fühlt es sich genauso an — nur verlierst du gerade nichts.",
     "honesty": "Diese Zahl ist eine Woche echter Marktbewegung — kein Renditeversprechen. Manche Wochen schließen im Minus; die Kunst ist, dann nicht zu verkaufen."
   },
   "guide": {
@@ -811,8 +811,8 @@
     "balanced": "Im Gleichgewicht",
     "notable": "Leichte Abweichung",
     "serious": "Deutliche Abweichung",
-    "target": "Ziel {{pct}}%",
-    "actual": "aktuell {{pct}}%",
+    "target": "Ziel {{pct}} %",
+    "actual": "aktuell {{pct}} %",
     "categories": {
       "stocks": "Aktien / ETF",
       "reit": "Immobilien",
@@ -856,7 +856,7 @@
       },
       "inflation": {
         "title": "Inflation lässt dein Geld schmelzen",
-        "body": "Bei {{rate}}% Inflation verhalten sich 100 {{unit}} unter der Matratze ein Jahr später wie {{eroded}} {{unit}}. Nicht anzulegen ist auch ein Risiko."
+        "body": "Bei {{rate}} % Inflation verhalten sich 100 {{unit}} unter der Matratze ein Jahr später wie {{eroded}} {{unit}}. Nicht anzulegen ist auch ein Risiko."
       },
       "dividend": {
         "title": "Eine Dividende ist wie Miete",
@@ -864,7 +864,7 @@
       },
       "reel-return": {
         "title": "Die reale Rendite ist der echte Gewinn",
-        "body": "{{nominal}}% verdient, aber die Inflation lag bei {{inflation}}%? Dann hast du verloren. Sieh immer auf die Zahl nach Inflation."
+        "body": "{{nominal}} % verdient, aber die Inflation lag bei {{inflation}} %? Dann hast du verloren. Sieh immer auf die Zahl nach Inflation."
       },
       "liquidity": {
         "title": "Liquidität rettet dich",
@@ -872,7 +872,7 @@
       },
       "drawdown": {
         "title": "Rückgänge sind normal",
-        "body": "Märkte fallen häufig um 10–15%. Das ist keine Panik, sondern der natürliche Zyklus. Kein Verlust ist festgeschrieben, solange du nicht verkaufst."
+        "body": "Märkte fallen häufig um 10–15 %. Das ist keine Panik, sondern der natürliche Zyklus. Kein Verlust ist festgeschrieben, solange du nicht verkaufst."
       },
       "gold": {
         "title": "Gold ist wie eine Versicherung",
@@ -1196,7 +1196,7 @@
   },
   "population": {
     "title": "Wohin die Menschen ziehen",
-    "workingAge": "{{pct}}% im Erwerbsalter"
+    "workingAge": "{{pct}} % im Erwerbsalter"
   },
   "section": {
     "prices": "Wo die Preise stehen",
