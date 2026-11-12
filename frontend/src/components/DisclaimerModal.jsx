@@ -12,9 +12,10 @@ export default function DisclaimerModal({ onAccept }) {
       display: 'flex', alignItems: 'center', justifyContent: 'center',
       zIndex: 1000, padding: 16,
     }}>
-      <div className="card" style={{ maxWidth: 480, width: '100%' }}>
+      <div className="card" style={{ maxWidth: 480, width: '100%' }}
+           role="dialog" aria-modal="true" aria-labelledby="disclaimer-title">
         <div style={{ fontSize: 36, marginBottom: 16, textAlign: 'center' }}></div>
-        <h2 style={{ marginBottom: 12, textAlign: 'center' }}>{t('disclaimerModal.title')}</h2>
+        <h2 id="disclaimer-title" style={{ marginBottom: 12, textAlign: 'center' }}>{t('disclaimerModal.title')}</h2>
 
         {/* Same legal boundary as before, stated in the other order: what the
             app does first, then its limits. Leading with "only" made the

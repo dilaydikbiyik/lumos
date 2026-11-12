@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import FireflyMark from './components/FireflyMark'
-import { Fragment, Suspense, lazy, useEffect } from 'react'
+import { Fragment, Suspense, lazy, useEffect, useRef } from 'react'
 import { ClerkLoading, SignedIn, SignedOut, RedirectToSignIn, useAuth } from '@clerk/clerk-react'
 import AppNav from './components/AppNav'
 import { useTranslation } from 'react-i18next'
@@ -13,6 +13,7 @@ import ErrorBoundary from './utils/errorBoundary'
 import useIllumination from './hooks/useIllumination'
 import { registerTokenGetter } from './utils/api'
 import OnboardingPage from './pages/OnboardingPage'
+import { forgetUser } from './utils/storage'
 
 // The landing page is what a first-time visitor loads, so it stays in the
 // main bundle. Everything behind sign-in is split: the whole app was one
@@ -48,11 +49,19 @@ function ScrollToTop() {
 /** Registers Clerk's getToken with the axios interceptor so every API
     request carries a fresh token — permanent fix for "Signature has expired". */
 function AuthBridge() {
-  const { getToken } = useAuth()
+  const { getToken, userId, isLoaded } = useAuth()
   useEffect(() => {
     registerTokenGetter(getToken)
     return () => registerTokenGetter(null)
   }, [getToken])
+  // On sign-out (a known user becomes nobody, or another account signs in),
+  // the previous account's copies on this device are removed.
+  const previous = useRef(null)
+  useEffect(() => {
+    if (!isLoaded) return
+    if (previous.current && previous.current !== userId) forgetUser(previous.current)
+    previous.current = userId || null
+  }, [userId, isLoaded])
   return null
 }
 

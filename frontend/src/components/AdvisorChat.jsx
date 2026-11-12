@@ -54,8 +54,10 @@ function AdvisorPanel({ onClose }) {
   }
 
   return (
-    <div className="advisor-overlay" onClick={onClose}>
-      <div onClick={e => e.stopPropagation()} className="card advisor-panel">
+    <div className="advisor-overlay" onClick={onClose}
+         onKeyDown={e => { if (e.key === 'Escape') onClose() }}>
+      <div onClick={e => e.stopPropagation()} className="card advisor-panel"
+           role="dialog" aria-modal="true" aria-label={t('advisor.title')}>
         {/* Header */}
         <div style={{
           display: 'flex', alignItems: 'center', gap: 8, padding: '14px 16px',

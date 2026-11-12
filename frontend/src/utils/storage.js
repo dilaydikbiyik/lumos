@@ -45,3 +45,25 @@ export function readFlag(key) {
 export function writeFlag(key, value) {
   try { localStorage.setItem(key, value) } catch { /* best effort */ }
 }
+
+/**
+ * Remove everything this device keeps for one account — holdings, portfolio,
+ * history, quiz draft, chat drafts, the profile flag — on sign-out.
+ *
+ * Only account deletion used to clear them, so on a shared device the next
+ * person could open the browser's storage and read the previous reader's
+ * budget, income and debt. Keys are `lumos-<name>-<userId>` (userKey) or
+ * `lumos-profile-<userId>`; device-wide keys (language, market cache,
+ * disclaimer) carry no user id and stay.
+ */
+export function forgetUser(userId) {
+  if (!userId) return
+  try {
+    const doomed = []
+    for (let i = 0; i < localStorage.length; i += 1) {
+      const key = localStorage.key(i)
+      if (key && key.startsWith('lumos-') && key.endsWith(`-${userId}`)) doomed.push(key)
+    }
+    doomed.forEach(key => localStorage.removeItem(key))
+  } catch { /* storage blocked: nothing was kept */ }
+}

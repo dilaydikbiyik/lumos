@@ -29,7 +29,12 @@ const config: CapacitorConfig = {
     // would prompt users for permission to do something Lumos never does.
     // Verify this still holds before each release — an analytics SDK added
     // later would silently introduce an IDFA dependency and a rejection.
-    limitsNavigationsToAppBoundDomains: true,
+    // limitsNavigationsToAppBoundDomains was true here with no
+    // WKAppBoundDomains in Info.plist. With app-bound limiting on and no
+    // bound domains, WKWebView refuses scripts and navigation to every
+    // remote host — Clerk's sign-in and the API among them — so the iOS
+    // build could not sign anyone in. It is left at the default; if it is
+    // ever wanted, Info.plist must list the Clerk and API domains first.
   },
   android: {
     allowMixedContent: false,

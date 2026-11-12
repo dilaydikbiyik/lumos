@@ -67,6 +67,13 @@ _NOT_TICKERS = {
     "ETF", "ETFS", "REIT", "REITS", "GYO", "GYOS", "BIST", "TRY", "USD", "EUR", "TL",
     "AB", "EU", "US", "USA", "UK", "SPK", "SEC", "BAFIN", "UCITS", "ETC",
     "DAX", "MSCI", "VAT", "KDV", "AI", "APP", "PWA",
+    # Institutions, indices and country names in caps. "ABD" is the ordinary
+    # Turkish word for the US: a correct explanation saying "%35'i ABD'nin en
+    # büyük şirketlerine" was deleted as naming a ticker; so were FED, EZB
+    # and TCMB in the sentences the explanation is supposed to contain.
+    "ABD", "FED", "EZB", "ECB", "TCMB", "KKM", "NASDAQ", "NYSE", "IMF", "OECD",
+    "EFT", "TUFE", "TÜFE", "ÜFE", "HVPI", "CPI", "BIP", "GDP", "GSYH", "S&P",
+    "EURO", "DOLAR", "DOLLAR", "FX", "OK",
     # German nouns in caps that fit the ticker shape.
     "DEIN", "DEINE", "DAS", "DER", "DIE", "UND", "IST", "EIN", "EINE",
     # Turkish and English short words that fit it.
@@ -183,7 +190,18 @@ def verified_or_dropped(text: str, portfolio: "PortfolioRecommendResponse",
 # The REIT ETFs this app's engine can select. The REIT explanation names its
 # subject, which may be a fund the engine considered but did not allocate —
 # the prompt itself says "VNQ and/or SCHH" without knowing which was chosen.
-_REIT_UNIVERSE = frozenset({"VNQ", "SCHH"})
+def _reit_universe() -> frozenset:
+    """Every property fund any market pack can select — derived from the
+    packs, not a list of two US funds."""
+    from backend.markets import MARKET_PACKS
+    from backend.services.hybrid_basket import get_reit_assets
+
+    tickers = {a["ticker"].upper() for p in MARKET_PACKS.values() for a in p.reit_assets}
+    tickers |= {a["ticker"].upper() for a in get_reit_assets()}
+    return frozenset(tickers)
+
+
+_REIT_UNIVERSE = _reit_universe()
 
 
 def reit_verified_or_dropped(text: str, portfolio: "PortfolioRecommendResponse") -> str:

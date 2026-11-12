@@ -87,6 +87,9 @@ export default function PortfolioChart({ allocations = [], onSliceClick }) {
         {data.map((d, i) => (
           <div
             key={d.ticker}
+            // A keyboard can reach it too: it opens the asset's rationale.
+            role="button" tabIndex={0} aria-pressed={active === d.ticker}
+            onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleClick(d) } }}
             style={{
               display: 'flex', alignItems: 'center', gap: 10,
               cursor: 'pointer', opacity: active && active !== d.ticker ? 0.5 : 1,

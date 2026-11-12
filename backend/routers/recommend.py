@@ -109,7 +109,7 @@ async def recommend(
 
     if portfolio.includes_reits:
         reit_text = await _prose_or_nothing(
-            explain_reit_inclusion, portfolio, user_profile, lang
+            explain_reit_inclusion, portfolio, user_profile, lang, market
         )
         # The REIT-specific checker, NOT the portfolio one. Its prompt
         # instructs regulatory and historical figures ("at least 90% of

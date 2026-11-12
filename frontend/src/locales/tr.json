@@ -975,7 +975,7 @@
         },
         {
           "h": "Yapay zekâ modellerine ne gönderiliyor",
-          "p": "Danışmanı kullandığında mesajın bir yapay zekâ sağlayıcısına — duruma göre Google Gemini, Groq veya OpenRouter — mantıklı cevap verebilmek için gereken profil ve portföy parçalarıyla birlikte gönderilir. Adın ve e-posta adresin gönderilmez. Bu sağlayıcılar isteği kendi koşullarına göre işler; Lumos onların ücretsiz katmanlarını kullanır ve ücretsiz katmanlar çoğunlukla sağlayıcıya gönderilen içeriği hizmetlerini geliştirmek için kullanma hakkı tanır. Danışmanı herkese açık bir sohbet gibi düşün: üçüncü bir tarafın elinde olmasını istemeyeceğin hiçbir şeyi oraya yapıştırma."
+          "p": "Danışmanı ya da profil sohbetini kullandığında, bir önerinin açıklamasını, gayrimenkul fonu açıklamasını, \"ya şöyle olsaydı\" cevabını ya da günlük haber özetini istediğinde, o cevap için gereken metin bir yapay zekâ sağlayıcısına — yapılandırmaya ve duruma göre Google Gemini, Groq, OpenRouter ya da Anthropic — gönderilir. Buna risk skorun, bütçen, profil cevapların ve portföy ağırlıkların dahil olabilir; adın ve e-posta adresin asla gönderilmez. Bu sağlayıcılar isteği kendi koşullarına göre işler ve ücretsiz katmanlar çoğunlukla sağlayıcıya gönderilen içeriği hizmetini geliştirmek için kullanma izni verir. Danışmanı açık bir sohbet gibi düşün: üçüncü bir tarafın elinde olmasını istemeyeceğin hiçbir şeyi yazma."
         },
         {
           "h": "Hata izleme",
@@ -983,11 +983,11 @@
         },
         {
           "h": "Tarayıcında ne tutuluyor",
-          "p": "Lumos seçtiğin dili ve pazarı, bir de pazar listesinin önbelleğini tarayıcında tutar; böylece uygulama bıraktığın gibi açılır. Clerk, oturumunu açık tutmak için gereken çerezleri kullanır. Reklam veya analitik çerezi yoktur."
+          "p": "Uygulama bıraktığın gibi hızlı açılsın diye Lumos tarayıcında şunları tutar: seçtiğin dil ve pazar, pazar listesi ve — hesap başına — varlıklarının, önerilen portföyünün ve değer grafiğinin bir kopyası, yarım kalmış bir quiz (bütçe, gelir, yaş ve borç içerebilir) ve gönderilmemiş sohbet taslakları. Bu kopyalar çıkış yaptığında ya da hesabını sildiğinde kaldırılır; ortak bir cihazdaysan işin bitince çıkış yap. Clerk, oturumunu açık tutmak için gereken çerezleri kullanır. Reklam veya analitik çerezi yoktur."
         },
         {
           "h": "Ne kadar süre saklanıyor",
-          "p": "Verin, hesabın var olduğu sürece saklanır. Piyasa verisi önbellekleri teknikdir ve kişisel bilgi içermez. Hesabını sildiğinde verin de gider — sonrasında bir saklama süresi yoktur, geri yüklenmeyi bekleyen bir arşiv kopyası da yoktur."
+          "p": "Verilerin hesabın var olduğu sürece kalır. Piyasa verisi önbellekleri tekniktir ve kişisel veri içermez. Yapay zekânın yazdığı metinler, onları üreten isteğin tam hâliyle en fazla bir gün önbellekte tutulur ve bu istek profil rakamları içerebilir; hesap silindikten sonra böyle bir kopya en geç bir gün içinde kendiliğinden düşer ve sana bağlanmaz. Bunun dışında hesabını silmek verilerini kaldırır — saklama süresi ya da geri yüklenmeyi bekleyen arşiv kopyası yoktur."
         },
         {
           "h": "Hesabını silmek",

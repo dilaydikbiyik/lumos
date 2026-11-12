@@ -144,6 +144,10 @@ function ProvinceCard({ province, amount, measure }) {
   const [open, setOpen] = useState(false)
   return (
     <div className="card" onClick={() => setOpen(true)}
+         // Reachable by keyboard until it opens; once open it holds its
+         // own inputs and buttons, so it stops acting as one.
+         role={open ? undefined : 'button'} tabIndex={open ? undefined : 0} aria-expanded={open}
+         onKeyDown={e => { if (!open && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); setOpen(true) } }}
          style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', cursor: 'pointer' }}>
       {/* A rank number invites "pick number one". The backend only sends one
           when the areas are genuine alternatives; Germany's are nested

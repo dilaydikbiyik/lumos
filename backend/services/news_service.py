@@ -19,6 +19,7 @@ from backend.services.ai_service import generate_text
 
 logger = logging.getLogger("lumos.news")
 
+_EMPTY_DIGEST_TTL = 15 * 60
 _DIGEST_TTL = 60 * 60 * 12  # refresh twice a day
 
 # The reader's language and the market's headlines are separate choices: an
@@ -125,7 +126,10 @@ def get_daily_digest(investment_path: str = "hybrid", market: str = "TR",
         logger.info("news digest: %s of %s items dropped (forecast or wrong language)",
                     len(digest) - len(kept), len(digest))
 
-    cache_service.set(cache_key, kept, ttl=_DIGEST_TTL)
+    # An empty digest is a failed reply, not a quiet day: one unparseable
+    # answer was cached for twelve hours and the card stayed empty all day.
+    # It is kept only briefly, so the next visit tries again.
+    cache_service.set(cache_key, kept, ttl=_DIGEST_TTL if kept else _EMPTY_DIGEST_TTL)
     return kept
 
 

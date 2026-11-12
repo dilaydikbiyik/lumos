@@ -641,7 +641,7 @@ def chat(
     )
 
 
-def extract_profile(messages: list[dict], language: str = "tr") -> dict:
+def extract_profile(messages: list[dict], language: str = "tr", currency: str = "TRY") -> dict:
     """
     Extract structured risk-profile answers from a completed profiling
     conversation. Returns a dict matching RiskProfileAnswers fields.
@@ -649,9 +649,12 @@ def extract_profile(messages: list[dict], language: str = "tr") -> dict:
     Raises HTTPException(422) if the AI output cannot be parsed as JSON.
     """
 
+    # The reader's currency. The prompt said "plain number in TRY" to every
+    # market, so a US reader's "$20,000" was extracted under an instruction
+    # to express it in lira.
     extract_system = (
         Path(__file__).parent.parent / "prompts" / "profile_extract_prompt.txt"
-    ).read_text()
+    ).read_text().replace("{currency}", currency)
     transcript = "\n".join(f"{m['role'].upper()}: {m['content']}" for m in messages)
 
     raw = _dispatch(

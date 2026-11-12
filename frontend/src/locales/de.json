@@ -975,7 +975,7 @@
         },
         {
           "h": "Was an die KI-Modelle geht",
-          "p": "Wenn du den Berater nutzt, geht deine Nachricht an einen KI-Anbieter — je nach Verfügbarkeit Google Gemini, Groq oder OpenRouter — zusammen mit den Teilen deines Profils und Portfolios, die für eine sinnvolle Antwort nötig sind. Name und E-Mail-Adresse sind nicht dabei. Diese Anbieter verarbeiten die Anfrage nach ihren eigenen Bedingungen; Lumos nutzt ihre kostenlosen Kontingente, und kostenlose Kontingente erlauben dem Anbieter üblicherweise, eingereichte Inhalte zur Verbesserung seiner Dienste zu verwenden. Behandle den Berater wie ein öffentliches Gespräch: füge dort nichts ein, was ein Dritter nicht haben soll."
+          "p": "Wenn du den Berater oder das Profilgespräch nutzt oder eine Erklärung zur Empfehlung, die Erklärung zum Immobilienfonds, eine Was-wäre-wenn-Antwort oder den täglichen Nachrichtenüberblick abrufst, geht der dafür nötige Text an einen KI-Anbieter — je nach Konfiguration und Verfügbarkeit Google Gemini, Groq, OpenRouter oder Anthropic. Das kann deinen Risikowert, dein Budget, deine Profilantworten und die Gewichte deines Portfolios umfassen; Name und E-Mail-Adresse sind nie dabei. Diese Anbieter verarbeiten die Anfrage nach ihren eigenen Bedingungen, und kostenlose Kontingente erlauben dem Anbieter häufig, eingereichte Inhalte zur Verbesserung seiner Dienste zu nutzen. Betrachte den Berater als öffentliches Gespräch: Gib nichts ein, was ein Dritter nicht haben soll."
         },
         {
           "h": "Fehlerüberwachung",
@@ -983,11 +983,11 @@
         },
         {
           "h": "Was im Browser bleibt",
-          "p": "Lumos speichert deine Sprache, deinen Markt und eine zwischengespeicherte Marktliste in deinem Browser, damit die App so aufgeht, wie du sie verlassen hast. Clerk setzt die Cookies, die deine Anmeldung aufrechterhalten. Werbe- oder Analyse-Cookies gibt es nicht."
+          "p": "Damit die App schnell so aufgeht, wie du sie verlassen hast, speichert Lumos in deinem Browser: Sprache und Markt, die Marktliste und — je Konto — eine Kopie deiner Positionen, deines empfohlenen Portfolios, deines Wertverlaufs, eines unfertigen Fragebogens (er kann Budget, Einkommen, Alter und Schulden enthalten) und nicht gesendeter Chat-Entwürfe. Diese Kopien werden beim Abmelden und beim Löschen des Kontos entfernt; melde dich auf einem geteilten Gerät ab, wenn du fertig bist. Clerk setzt die Cookies, die deine Anmeldung aufrechterhalten. Werbe- oder Analyse-Cookies gibt es nicht."
         },
         {
           "h": "Wie lange gespeichert wird",
-          "p": "Deine Daten bleiben, solange dein Konto besteht. Marktdaten-Caches sind technisch und enthalten keine personenbezogenen Daten. Löschst du dein Konto, gehen die Daten mit — danach gibt es keine Aufbewahrungsfrist und keine archivierte Kopie, die auf Wiederherstellung wartet."
+          "p": "Deine Daten bleiben, solange dein Konto besteht. Marktdaten-Caches sind technisch und enthalten keine personenbezogenen Daten. Von der KI geschriebene Texte werden bis zu einem Tag unter der genauen Anfrage zwischengespeichert, die sie erzeugt hat, und diese kann Profilzahlen enthalten; nach einer Kontolöschung verfällt eine solche Kopie innerhalb eines Tages von selbst und wird nie mit dir verknüpft. Ansonsten entfernt die Kontolöschung deine Daten — es gibt keine Aufbewahrungsfrist und keine archivierte Kopie, die auf Wiederherstellung wartet."
         },
         {
           "h": "Konto löschen",

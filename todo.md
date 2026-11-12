@@ -3760,6 +3760,26 @@ hep SPY çıkıyor". İkisi ayrı sorunmuş.
       ziyaretçiye tanıtım sayfasında "%40 enflasyonda %28 kazandım" örneği.
       Artık açık pazar listesinden, dilin varsayılan pazarı (yeni hesapla
       aynı kural). Almanca metinlerde yüzde "28 %" (41 metin).
+- [x] **Altıncı tarama (2026-11-12)** — gerileme yok. Düzeltilenler:
+      - Açıklama denetçisi "ABD", "FED", "EZB", "TCMB", "KKM", "NASDAQ"
+        kelimelerini fon sembolü sanıp DOĞRU TR/DE açıklamaları siliyordu.
+      - Profil çıkarma talimatı her pazara "tutarlar TL" diyordu; artık
+        okuyucunun para birimi; bütçe söylenmediyse 50.000 uydurmak yerine
+        0 (uygulama soruyor).
+      - GYO açıklama talimatı herkese VNQ/SCHH ve bir ABD getirisi
+        söylüyordu; artık pazarın kendi fonu ve para birimi, getiri rakamı yok.
+      - **iOS'ta giriş büyük olasılıkla imkânsızdı:** app-bound domains açık
+        ama izinli alan adı listesi yoktu → bayrak kaldırıldı. Simülatörde
+        doğrulanmalı (bkz. aşağı).
+      - Boş haber özeti 12 saat önbellekte kalıyordu → 15 dk.
+      - Gizlilik politikası tarayıcıda tutulanları (varlık, portföy, quiz
+        taslağı…) ve yapay zekâya gidenleri eksik yazıyordu; çıkışta bu
+        kopyalar artık siliniyor (ortak cihaz).
+      - Klavyeyle açılamayan iki tıklama alanı; iletişim kutularında
+        `role="dialog"`; service worker önbelleği budanıyor; og:image mutlak.
+- [ ] **iOS simülatöründe giriş akışını doğrula** (Clerk yönlendirmesi
+      `capacitor://localhost`'a geri dönüyor mu; gerekirse @capacitor/browser
+      ya da Clerk'in uygulama içi modalı).
 - [ ] Almanya'da hazine bonosu satırı yok (para piyasası fonu var);
       ABD bonosunun EUR karşılığı istenirse USDEUR=X ile eklenebilir.
 - [ ] Keşif listesi tarihli (2026-11) bir seçki; yılda bir piyasa

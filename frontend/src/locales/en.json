@@ -975,7 +975,7 @@
         },
         {
           "h": "What is sent to the AI models",
-          "p": "When you use the advisor, your message is sent to an AI provider — Google Gemini, Groq or OpenRouter, depending on availability — together with the parts of your profile and portfolio needed to answer sensibly. Your name and email address are not included. These providers process the request under their own terms; Lumos uses their free tiers, and free tiers commonly permit the provider to use submitted content to improve their services. Treat the advisor as a public conversation: do not paste anything into it you would not want a third party to hold."
+          "p": "When you use the advisor or the profile conversation, ask for a recommendation's explanation, the property-fund explanation, a what-if answer or the daily news digest, the text needed for that answer is sent to an AI provider — Google Gemini, Groq, OpenRouter or Anthropic, depending on configuration and availability. That can include your risk score, budget, profile answers and portfolio weights; your name and email address are never included. These providers process the request under their own terms, and free tiers commonly permit the provider to use submitted content to improve their services. Treat the advisor as a public conversation: do not paste anything into it you would not want a third party to hold."
         },
         {
           "h": "Error monitoring",
@@ -983,11 +983,11 @@
         },
         {
           "h": "What is kept in your browser",
-          "p": "Lumos stores your chosen language and market, and a cached copy of the market list, in your browser so the app opens the way you left it. Clerk sets the cookies needed to keep you signed in. There are no advertising or analytics cookies."
+          "p": "So the app opens quickly the way you left it, Lumos keeps in your browser: your chosen language and market, the market list, and — per account — a copy of your holdings, your recommended portfolio, your value chart, an unfinished quiz (which can include budget, income, age and debt) and unsent chat drafts. These copies are removed when you sign out or delete your account; on a shared device, sign out when you finish. Clerk sets the cookies needed to keep you signed in. There are no advertising or analytics cookies."
         },
         {
           "h": "How long it is kept",
-          "p": "Your data is kept for as long as your account exists. Market data caches are technical and hold no personal information. Delete your account and the data goes with it — there is no retention period afterwards, and no archived copy waiting to be restored."
+          "p": "Your data stays as long as your account exists. Market-data caches are technical and hold no personal data. AI-written text is cached for up to a day by the exact request that produced it, which can contain profile figures; after an account is deleted such a copy expires on its own within a day and is never linked back to you. Apart from that, deleting your account removes your data — there is no retention period and no archived copy waiting to be restored."
         },
         {
           "h": "Deleting your account",

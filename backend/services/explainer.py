@@ -62,11 +62,21 @@ def explain_portfolio(portfolio: PortfolioRecommendResponse, user_profile: dict,
 
 
 def explain_reit_inclusion(portfolio: PortfolioRecommendResponse, user_profile: dict,
-                           lang: str = "tr") -> str:
+                           lang: str = "tr", market: str = "TR") -> str:
     """Generate a personalised REIT explanation (3 sentences per prompt template)."""
+    # The reader's own market's funds and currency. The prompt named VNQ and
+    # SCHH to every reader — US-domiciled funds a German broker must refuse —
+    # and quoted a US return figure.
+    from backend.markets import get_market_pack
+
+    pack = get_market_pack(market)
+    reit_funds = ", ".join(f"{a['name']} ({a['ticker']})" for a in pack.reit_assets) or "REIT funds"
     filled_prompt = _REIT_PROMPT_TEMPLATE.format(
         risk_score=portfolio.risk_score,
-        budget=portfolio.budget,
+        budget=f"{portfolio.budget:,.0f}",
+        currency=pack.currency,
+        market=pack.name,
+        reit_funds=reit_funds,
         time_horizon=user_profile.get("time_horizon", "medium"),
         loss_tolerance=user_profile.get("loss_tolerance", "medium"),
         goal=user_profile.get("goal", "growth"),

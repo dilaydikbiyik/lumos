@@ -181,6 +181,7 @@ async def extract_profile_endpoint(
     request: Request,
     body: ChatRequest,
     user_id: str = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
 ):
     """
     Extract structured risk-profile answers from a completed profiling
@@ -188,7 +189,9 @@ async def extract_profile_endpoint(
     Validation against RiskProfileAnswers happens via the response model.
     """
     messages = [m.model_dump() for m in body.messages]
-    answers = await asyncio.to_thread(extract_profile, messages, get_language(request))
+    user = await user_repository.get_or_create(db, user_id)
+    currency = get_market_pack(user.market or "TR").currency
+    answers = await asyncio.to_thread(extract_profile, messages, get_language(request), currency)
     try:
         return RiskProfileAnswers(**answers)
     except ValidationError:

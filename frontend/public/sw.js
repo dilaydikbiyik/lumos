@@ -3,6 +3,20 @@
 const CACHE = 'lumos-shell-v3'  // v3: hashed assets cache-first; HTML fallback for navigations only
 const SHELL = ['/', '/manifest.webmanifest', '/favicon.svg']
 
+// Hashed build files are never reused once a deploy replaces them, and the
+// cache kept every one ever fetched: it grew with each release until the
+// version string above was bumped by hand. Only the newest MAX_ASSETS stay;
+// Cache.keys() lists entries in insertion order, so the oldest go first.
+const MAX_ASSETS = 80
+
+function trimAssets(cache) {
+  return cache.keys().then(keys => {
+    const assets = keys.filter(k => new URL(k.url).pathname.startsWith('/assets/'))
+    const excess = assets.length - MAX_ASSETS
+    return excess > 0 ? Promise.all(assets.slice(0, excess).map(k => cache.delete(k))) : null
+  })
+}
+
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)))
   self.skipWaiting()
@@ -40,7 +54,9 @@ self.addEventListener('fetch', event => {
       caches.match(event.request).then(hit => hit || fetch(event.request).then(res => {
         if (res.ok) {
           const copy = res.clone()
-          caches.open(CACHE).then(c => c.put(event.request, copy)).catch(() => {})
+          caches.open(CACHE)
+            .then(c => c.put(event.request, copy).then(() => trimAssets(c)))
+            .catch(() => {})
         }
         return res
       }))

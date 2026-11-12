@@ -6,18 +6,20 @@ Output this exact structure:
 {"budget":<number>,"monthly_contribution":<number|null>,"time_horizon":"<short|medium|long>","loss_tolerance":"<low|medium|high>","goal":"<preservation|growth|income|speculation>","experience":"<none|beginner|intermediate|advanced>","age":<number|null>,"income_stability":"<stable|variable|irregular|null>","high_interest_debt":<number|null>}
 
 Field rules:
-- budget: plain number in TRY. Convert "50K" → 50000, "1M" → 1000000, "100 bin" → 100000. No symbols. If the user invests REGULARLY (monthly), budget is the lump sum available NOW (0 → use the first monthly amount).
-- monthly_contribution: TRY the user plans to add EVERY MONTH ("her ay 10 bin yatıracağım" → 10000). null if the investment is one-time only.
+The reader's currency is {currency}. Every amount below is a plain number in {currency}, exactly as the reader stated it — never convert it to another currency.
+
+- budget: plain number in {currency}. Convert "50K" → 50000, "1M" → 1000000, "100 bin" → 100000, "20.000 €" → 20000, "$20,000" → 20000. No symbols. If the user invests REGULARLY (monthly), budget is the lump sum available NOW (0 → use the first monthly amount).
+- monthly_contribution: amount in {currency} the user plans to add EVERY MONTH ("her ay 10 bin yatıracağım" → 10000, "500 a month" → 500, "monatlich 300" → 300). null if the investment is one-time only.
 - time_horizon: short = under 2 years, medium = 2-10 years, long = over 10 years
 - loss_tolerance: low = panics/sells at loss, medium = holds steady, high = buys more at dip
 - goal: preservation = keep value safe, growth = grow wealth, income = dividends/rent, speculation = high-risk bets
 - experience: none = never invested, beginner = tried once/twice, intermediate = invests regularly, advanced = expert
 - age: integer if mentioned (e.g. "30 yaşındayım" → 30). null if not mentioned.
 - income_stability: stable = fixed salary/pension, variable = freelance/commission, irregular = seasonal/sporadic. null if not mentioned.
-- high_interest_debt: outstanding CREDIT-CARD or CONSUMER-LOAN debt in TRY. 0 if the
+- high_interest_debt: outstanding CREDIT-CARD or CONSUMER-LOAN debt in {currency}. 0 if the
   user says they have none ("yok"). null if never discussed. A MORTGAGE ("ev kredisi",
   "konut kredisi") is NOT high-interest debt — exclude it; its rate is far lower and it
   is secured by the home. Rent and living costs are not debt either.
 
 If any field is ambiguous, choose the most conservative matching enum value.
-If budget is not mentioned, use 50000 as default.
+If budget is not mentioned, use 0 — the app then asks for it instead of inventing a figure.
