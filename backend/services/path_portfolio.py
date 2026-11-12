@@ -74,39 +74,61 @@ async def committed_property(db, user) -> float:
                for h in holdings if h.asset_type in REAL_ESTATE_TYPES)
 
 
-def plan_targets(portfolio, plan, market: str | None = None) -> list[dict]:
+def plan_targets(portfolio, plan, market: str | None = None, holdings=None) -> list[dict]:
     """
-    The WHOLE plan as target weights, for comparing with everything the
-    reader owns.
+    The plan as target weights, for comparing with everything the reader owns.
 
-    The drift check compared only the market portfolio with all holdings, so
-    a hybrid reader who followed the plan to the letter — reserve in cash,
-    the property part in a home, the rest as recommended — was told their
-    portfolio had drifted "seriously" (property 36% against a target of 0%).
-    With a plan, the reserve is a cash target, the property part a property
-    target, and each market position is scaled to the market part's share.
+    Only the parts of the plan the reader actually RECORDS are targets.
+    "I bought it" records the market portfolio and nothing else — the reserve
+    usually stays in a bank account nobody types in, and the property part
+    may not be bought yet. Making them targets anyway told every reader who
+    had just followed the recommendation exactly that they had drifted
+    (stocks path: cash 10% against 19%; hybrid: "serious"). So:
+
+      * the reserve is a cash target only if the reader holds cash outside
+        the portfolio's own funds;
+      * the property part is a property target only if they hold property —
+        a home, land, or a property fund;
+      * the market part always is, and the targets are rescaled to sum to 1.
+
+    A hybrid reader who records the whole plan (reserve, home, portfolio) is
+    still compared with the whole plan, which is the case this was built for.
     """
     allocations = [{"category": a.category, "ticker": a.ticker, "weight": a.weight}
                    for a in portfolio.allocations]
+    portfolio_tickers = {a["ticker"] for a in allocations}
     # Every fund this market knows, at weight zero, so a holding is filed by
     # what it IS. A reader who bought the plan's property part as a REIT fund
     # had it counted as "stocks" (its type is ETF and it is not in the
     # portfolio), and was told property was 0% against a target of 8%.
+    reit_tickers: set[str] = set()
     if market:
         from backend.markets import get_market_pack
 
         pack = get_market_pack(market)
-        held = {a["ticker"] for a in allocations}
+        reit_tickers = {a["ticker"] for a in pack.reit_assets}
         allocations += [{"category": a["category"], "ticker": a["ticker"], "weight": 0.0}
                         for a in [*pack.asset_universe, *pack.reit_assets]
-                        if a["ticker"] not in held]
+                        if a["ticker"] not in portfolio_tickers]
     if not plan or not plan.get("total_budget"):
         return allocations
-    total = plan["total_budget"]
+
+    holdings = list(holdings or [])
+    def ticker(h):
+        return (getattr(h, "ticker", None) or "").upper()
+    holds_reserve = any(h.asset_type == "cash" and ticker(h) not in portfolio_tickers
+                        for h in holdings)
+    holds_property = any(h.asset_type in ("real_estate", "land") or ticker(h) in reit_tickers
+                         for h in holdings)
+
+    parts = [(plan["market_amount"], None)]
+    if plan["reserve"] > 0 and holds_reserve:
+        parts.append((plan["reserve"], "cash"))
+    if plan["property_amount"] > 0 and holds_property:
+        parts.append((plan["property_amount"], "reit"))
+    total = sum(amount for amount, _ in parts) or 1.0
     market_share = plan["market_amount"] / total
     out = [{**a, "weight": a["weight"] * market_share} for a in allocations]
-    if plan["reserve"] > 0:
-        out.append({"category": "cash", "ticker": "", "weight": plan["reserve"] / total})
-    if plan["property_amount"] > 0:
-        out.append({"category": "reit", "ticker": "", "weight": plan["property_amount"] / total})
+    for amount, category in parts[1:]:
+        out.append({"category": category, "ticker": "", "weight": amount / total})
     return out

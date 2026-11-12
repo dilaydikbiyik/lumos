@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, Request
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -18,6 +18,14 @@ CATEGORIES = {"bug", "confusing", "idea", "other"}
 
 class FeedbackRequest(BaseModel):
     message: str = Field(..., min_length=1, max_length=2000)
+
+    # Checked AFTER stripping: "    " passed min_length and was stored empty.
+    @field_validator("message")
+    @classmethod
+    def _not_blank(cls, value: str) -> str:
+        if not value.strip():
+            raise ValueError("message is blank")
+        return value
     category: str | None = Field(None, description="bug | confusing | idea | other")
     page: str | None = Field(None, max_length=200)
 

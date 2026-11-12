@@ -17,7 +17,6 @@ from backend.exceptions import AIServiceError
 from backend.schemas.portfolio import PortfolioRecommendResponse
 from backend.services import explanation_check
 from backend.services.ai_service import _dispatch, generate_text
-from backend.services.portfolio_engine import build_portfolio
 
 logger = logging.getLogger("lumos.what_if")
 
@@ -72,7 +71,8 @@ def _diff_summary(before: PortfolioRecommendResponse, after: PortfolioRecommendR
 
 
 def answer_what_if(question: str, current_risk_score: float, current_budget: float,
-                   market: str = "TR", lang: str = "tr", path: str | None = None) -> dict:
+                   market: str = "TR", lang: str = "tr", path: str | None = None,
+                   monthly_outgoings: float | None = None) -> dict:
     """
     Returns {"understood": bool, "answer": str|None, "diff": dict|None}.
     When not understood, the caller should fall back to normal chat.
@@ -89,15 +89,19 @@ def answer_what_if(question: str, current_risk_score: float, current_budget: flo
     # changes if they add money was shown BIST instruments and told the
     # numbers came from the portfolio engine, which they did, for the wrong
     # country.
-    # The budget here is the portfolio's own (for a hybrid reader, the market
-    # part of their split), so the path's property rule applies as-is: no
-    # property fund unless the reader is on the real-estate path.
-    reits = None if path == "real_estate" else False
-    before = build_portfolio(risk_score=current_risk_score, budget=current_budget,
-                             market=market, lang=lang, include_reits=reits)
-    after = build_portfolio(risk_score=new_risk, budget=new_budget, market=market,
-                            lang=lang, include_reits=reits)
+    # The budget is the reader's TOTAL, and both sides go through the same
+    # path rules as the recommendation. With the market part passed in and
+    # rebuilt directly, "add 50,000" put the whole sum into the market
+    # portfolio — no share to the reserve or the property part the plan sets
+    # aside from every other sum.
+    from backend.services.path_portfolio import build_for_path
+
+    before, _ = build_for_path(path, current_risk_score, current_budget, market, lang,
+                               monthly_outgoings=monthly_outgoings)
+    after, _ = build_for_path(path, new_risk, new_budget, market, lang,
+                              monthly_outgoings=monthly_outgoings)
     diff = _diff_summary(before, after)
+    diff["before_budget"], diff["after_budget"] = current_budget, new_budget
 
     context = (
         f"Question: {question}\n\n"

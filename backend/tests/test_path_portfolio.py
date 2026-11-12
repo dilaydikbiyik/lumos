@@ -77,7 +77,7 @@ def test_following_the_hybrid_plan_exactly_is_in_balance(market, budget):
     for i, a in enumerate(portfolio.allocations, start=3):
         hold(i, "etf", a.ticker, a.weight * plan["market_amount"])
 
-    result = compute_drift(holdings, values, plan_targets(portfolio, plan), "en")
+    result = compute_drift(holdings, values, plan_targets(portfolio, plan, market, holdings), "en")
     assert result["verdict"] == "balanced", result["rows"]
 
 
@@ -102,5 +102,25 @@ def test_a_reit_fund_bought_for_the_property_part_counts_as_property():
         for i, a in enumerate(portfolio.allocations, start=3):
             holdings.append(SimpleNamespace(id=i, asset_type="etf", ticker=a.ticker))
             values[i] = a.weight * plan["market_amount"]
-        result = compute_drift(holdings, values, plan_targets(portfolio, plan, market), "en")
+        result = compute_drift(holdings, values, plan_targets(portfolio, plan, market, holdings), "en")
         assert result["verdict"] == "balanced", (market, result["rows"])
+
+
+@pytest.mark.parametrize("path", ["stocks", "hybrid"])
+@pytest.mark.parametrize("market,budget", [("TR", 400_000), ("US", 20_000), ("DE", 20_000)])
+def test_recording_only_the_portfolio_is_in_balance(path, market, budget):
+    """What "I bought it" records — the portfolio and nothing else. The
+    reserve and property targets made every such reader 'drifted'."""
+    from types import SimpleNamespace
+
+    from backend.services.drift import compute_drift
+    from backend.services.path_portfolio import plan_targets
+
+    portfolio, plan = build_for_path(path, 6.6, budget, market, "en")
+    holdings, values = [], {}
+    for i, a in enumerate(portfolio.allocations, start=1):
+        typ = "fund" if a.category == "cash" else "etf"
+        holdings.append(SimpleNamespace(id=i, asset_type=typ, ticker=a.ticker))
+        values[i] = a.weight * portfolio.budget
+    result = compute_drift(holdings, values, plan_targets(portfolio, plan, market, holdings), "en")
+    assert result["verdict"] == "balanced", (path, market, result["rows"])

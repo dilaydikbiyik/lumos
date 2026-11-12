@@ -510,7 +510,7 @@ _C: dict[str, dict[str, str]] = {
     "drift.biggest": {
         "tr": "En büyük sapma {label} tarafında: hedefin %{target} iken şu an %{actual} — bu taraf {direction}. ",
         "en": "The biggest drift is on the {label} side: your target is {target}% and it now sits at {actual}% — that side has {direction}. ",
-        "de": "Die größte Abweichung liegt bei {label}: dein Ziel sind {target}%, aktuell sind es {actual}% — diese Seite ist {direction}. "},
+        "de": "Die größte Abweichung liegt bei {label}: dein Ziel sind {target} %, aktuell sind es {actual} % — diese Seite ist {direction}. "},
     "drift.serious": {
         "tr": "Bu, risk profilinin öngördüğünden belirgin bir sapma; yeni katkılarını geride kalan tarafa yönlendirmek, satmadan dengelemenin en ucuz yoludur.",
         "en": "That's a clear departure from what your risk profile called for; steering new contributions toward the lagging side is the cheapest way to rebalance without selling.",

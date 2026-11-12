@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import api from '../utils/api'
 import useMarket from '../hooks/useMarket'
 import { percent } from '../utils/format'
+import { parseAmount } from '../utils/number'
 
 /**
  * "I have this much — what goes where?"
@@ -23,7 +24,7 @@ const SEGMENTS = [
 
 export default function BudgetSplit() {
   const { t } = useTranslation()
-  const { money } = useMarket()
+  const { money, pack } = useMarket()
   const [plan, setPlan] = useState(null)
   const [outgoings, setOutgoings] = useState('')
   const [saving, setSaving] = useState(false)
@@ -41,8 +42,9 @@ export default function BudgetSplit() {
   // replace the assumption with the real number.
   async function saveOutgoings(e) {
     e.preventDefault()
-    const value = Number(String(outgoings).replace(/[^\d]/g, ''))
-    if (!value || saving) return
+    // Market notation, and 0 is an answer (no outgoings), not "empty".
+    const value = parseAmount(outgoings, pack.locale)
+    if (!Number.isFinite(value) || value < 0 || saving) return
     setSaving(true)
     try {
       await api.patch('/users/me/outgoings', { monthly_outgoings: value })

@@ -109,7 +109,7 @@ def _windowed_real_band(
     return band, real_band
 
 
-def _real_band_daily(series, window: int, step: int, market: str) -> Optional[dict]:
+def _real_band_daily(series, window: int, step: int, market: str):
     """
     The same rolling windows, each deflated by ITS OWN period's inflation.
 
@@ -125,6 +125,7 @@ def _real_band_daily(series, window: int, step: int, market: str) -> Optional[di
     index = [str(i)[:7] for i in series.index]
     values = series.to_numpy()
     reals: list[float] = []
+    nominals: list[float] = []
     for start in range(0, len(values) - window, step):
         begin, end = values[start], values[start + window]
         if begin <= 0:
@@ -132,17 +133,38 @@ def _real_band_daily(series, window: int, step: int, market: str) -> Optional[di
         try:
             reals.append(inflation_service.real_return_pct(
                 (end / begin - 1) * 100, index[start], index[start + window], market) / 100)
+            nominals.append(end / begin - 1)
         except Exception:
             continue
     if len(reals) < MIN_WINDOWS:
-        return None
+        return None, None
     p10, p50, p90 = np.percentile(np.array(reals), [10, 50, 90])
     return {
         "pessimistic_pct": round(float(p10) * 100, 1),
         "typical_pct": round(float(p50) * 100, 1),
         "optimistic_pct": round(float(p90) * 100, 1),
         "windows_analysed": len(reals),
-    }
+    }, nominals
+
+
+def _paired_bands(returns, series, window: int, amount: float, market: str) -> dict:
+    """
+    The nominal band and the real band over the SAME windows.
+
+    Each scenario row prints both, so they must describe one set of periods.
+    The nominal band used every window the prices allow, the real band only
+    those the inflation data covers: for the BIST 100 that set Türkiye's late
+    1990s against a real band starting in 2005, and the pessimistic row read
+    "+27% (after inflation -23%)" from two different histories. When a real
+    band exists the nominal one is drawn from its windows; otherwise every
+    window is used and there is no real figure to pair it with.
+    """
+    real_band, nominals = _real_band_daily(series, window, 21, market)
+    if real_band is None:
+        return {**_band(returns, amount), "real_band": None,
+                "windows_analysed": len(returns)}
+    return {**_band(nominals, amount), "real_band": real_band,
+            "windows_analysed": len(nominals)}
 
 
 def _band(returns: list[float], amount: float) -> dict:
@@ -202,8 +224,7 @@ def project_asset(ticker: str, amount: float, years: int, lang: str = "tr",
         # many non-overlapping stretches of history, and three of them is a
         # thin basis stated honestly rather than a thick one implied.
         "independent_periods": independent,
-        **_band(returns, amount),
-        "real_band": _real_band_daily(series, window, 21, market),
+        **_paired_bands(returns, series, window, amount, market),
         "honesty_note": (
             t("projection.note_asset", lang, ticker=ticker, years=years)
         ),
@@ -249,8 +270,7 @@ def project_portfolio(weights: dict[str, float], amount: float, years: int,
         "years": years,
         "history_years": years_covered,
         "tickers": list(weights),
-        **_band(returns, amount),
-        "real_band": _real_band_daily(portfolio_series, window, 21, market),
+        **_paired_bands(returns, portfolio_series, window, amount, market),
         "honesty_note": (
             t("projection.note_portfolio", lang, years=years)
         ),

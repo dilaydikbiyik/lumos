@@ -226,7 +226,7 @@ async def portfolio_drift(
             user.market or "TR", lang, monthly_outgoings=user.monthly_outgoings,
         )
     )
-    return compute_drift(holdings, values, path_portfolio.plan_targets(target, plan, user.market or "TR"), lang)
+    return compute_drift(holdings, values, path_portfolio.plan_targets(target, plan, user.market or "TR", holdings), lang)
 
 
 @router.get("/health")

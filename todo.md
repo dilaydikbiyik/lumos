@@ -3742,6 +3742,20 @@ hep SPY çıkıyor". İkisi ayrı sorunmuş.
 - [x] Öneri sayfasındaki bütçe rozeti planın piyasa kısmını "bütçe" diye
       gösteriyordu (400.000 bütçe → "166.800 bütçe"); artık toplam bütçe,
       hangi kısım olduğu altındaki notta.
+- [x] **Beşinci tarama (2026-11-12):**
+      - **Gerileme:** "Aldım" ile portföyü birebir kaydeden her hisse/hibrit
+        okuyucuya hemen sapma deniyordu (yedek ve emlak payı hedefti ama
+        köprü onları kaydetmiyor). Artık yedek yalnızca portföy dışı nakit
+        tutuluyorsa, emlak payı yalnızca emlak/GYO tutuluyorsa hedef.
+      - Senaryo satırları nominal bandı tüm pencerelerden (TR 1997'den),
+        reel bandı yalnız TÜFE'nin kapsadıklarından alıyordu — "+%27 (enflasyon
+        sonrası −%23)" iki farklı tarihten. Artık aynı pencereler.
+      - Quiz, gider ve ilan alanları rakam dışını silerek okuyordu
+        ("20,000.00" → 2.000.000, "85,5 m²" → 855) → `parseAmount`.
+      - "Ya şöyle olsaydı" toplam bütçeyle ve yol kurallarıyla yeniden
+        kuruyor (eklenen para artık yedek/emlak payını da alıyor).
+      - Hisse yolu açıklaması "emlak payı" demiyor; sapma mesajı yerel
+        ondalıkla; boş geri bildirim reddediliyor.
 - [ ] Almanya'da hazine bonosu satırı yok (para piyasası fonu var);
       ABD bonosunun EUR karşılığı istenirse USDEUR=X ile eklenebilir.
 - [ ] Keşif listesi tarihli (2026-11) bir seçki; yılda bir piyasa

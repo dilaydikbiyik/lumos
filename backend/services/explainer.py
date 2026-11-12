@@ -32,11 +32,13 @@ def explain_portfolio(portfolio: PortfolioRecommendResponse, user_profile: dict,
     # 20,000 that the app had the wrong number.
     plan = (portfolio.metadata or {}).get("plan")
     if plan:
+        rest = ("an emergency reserve and a property share" if plan.get("property_amount")
+                else "an emergency reserve")
         money_line = (
             f"and this portfolio is the market part of their plan: "
             f"{portfolio.budget:,.0f} {currency} of a total budget of "
-            f"{plan['total_budget']:,.0f} {currency} (the rest is an emergency "
-            f"reserve and a property share, planned separately), ")
+            f"{plan['total_budget']:,.0f} {currency} (the rest is {rest}, "
+            f"planned separately), ")
     else:
         money_line = f"and a budget of {portfolio.budget:,.0f} {currency}, "
     prompt = (

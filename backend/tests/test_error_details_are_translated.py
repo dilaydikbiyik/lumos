@@ -55,3 +55,8 @@ def test_a_validation_error_reaches_the_reader_in_their_language(client):
         body = res.json()
         assert isinstance(body["detail"], str) and word in body["detail"], (lang, body)
         assert body["errors"] and body["errors"][0]["field"] == "purchase_amount"
+
+
+def test_blank_feedback_is_refused(client):
+    res = client.post("/feedback", json={"message": "    "}, headers={"X-Lumos-Lang": "tr"})
+    assert res.status_code == 422

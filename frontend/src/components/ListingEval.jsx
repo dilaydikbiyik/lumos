@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import api, { extractErrorMessage } from '../utils/api'
 import useMarket from '../hooks/useMarket'
+import { parseAmount } from '../utils/number'
 
 /**
  * "Is this listing a fair price?"
@@ -28,20 +29,21 @@ const VERDICT_COLOR = {
 
 export default function ListingEval({ areas = [] }) {
   const { t } = useTranslation()
-  const { money } = useMarket()
+  const { money, pack } = useMarket()
   const navigate = useNavigate()
   const [form, setForm] = useState({ area_code: '', size_m2: '', asking_price: '' })
   const [result, setResult] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
 
-  const digits = (value) => Number(String(value).replace(/[^\d]/g, ''))
+  // Market notation: stripping non-digits read "85,5 m²" as 855.
+  const digits = (value) => parseAmount(value, pack.locale)
 
   async function run(e) {
     e.preventDefault()
     const size = digits(form.size_m2)
     const price = digits(form.asking_price)
-    if (!form.area_code || !size || !price || loading) return
+    if (!form.area_code || !(size > 0) || !(price > 0) || loading) return
     setLoading(true)
     setError(null)
     setResult(null)

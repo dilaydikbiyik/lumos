@@ -181,3 +181,26 @@ def test_a_band_needs_independent_periods_not_just_overlapping_windows():
         ok = project_asset("SPY", amount=10_000, years=5)
     assert ok["available"] is True
     assert ok["independent_periods"] >= 3
+
+
+def test_nominal_and_real_bands_describe_the_same_windows():
+    """The nominal band took every window, the real band only those the CPI
+    covered, and one row printed both: '+27% (after inflation -23%)'."""
+    import numpy as np
+    import pandas as pd
+
+    from backend.services import inflation_service, projection
+
+    days = pd.bdate_range("1998-01-01", periods=252 * 26)
+    series = pd.Series(np.linspace(100, 900, len(days)), index=days)
+
+    def covered_from_2005(nominal, start, end, market="TR"):
+        if start < "2005-01":
+            raise ValueError("before the index")
+        return nominal / 2
+
+    with patch.object(inflation_service, "real_return_pct", side_effect=covered_from_2005):
+        out = projection._paired_bands(
+            [0.0] * 9999, series, 252 * 5, 1000.0, "TR")
+    assert out["real_band"]["windows_analysed"] == out["windows_analysed"]
+    assert out["windows_analysed"] < 9999

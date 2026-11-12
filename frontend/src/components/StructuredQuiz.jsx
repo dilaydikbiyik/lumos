@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import api, { extractErrorMessage } from '../utils/api'
 import useMarket from '../hooks/useMarket'
+import { parseAmount } from '../utils/number'
 
 /**
  * The risk quiz as a form, one question at a time.
@@ -23,7 +24,7 @@ import useMarket from '../hooks/useMarket'
  */
 export default function StructuredQuiz({ onComplete, onPreferChat }) {
   const { t } = useTranslation()
-  const { unit } = useMarket()
+  const { unit, pack } = useMarket()
   const [questions, setQuestions] = useState(null)
   const [step, setStep] = useState(0)
   const [answers, setAnswers] = useState({})
@@ -48,7 +49,6 @@ export default function StructuredQuiz({ onComplete, onPreferChat }) {
 
   const question = questions[step]
   const isLast = step === questions.length - 1
-  const digits = (value) => String(value).replace(/[^\d]/g, '')
 
   async function finish(collected) {
     setSaving(true)
@@ -88,9 +88,17 @@ export default function StructuredQuiz({ onComplete, onPreferChat }) {
 
   function submitTyped(e) {
     e.preventDefault()
-    const raw = digits(draft)
-    if (question.required && !raw) return
-    const value = raw ? Number(raw) : undefined
+    // In the market's notation. Stripping every non-digit read "20,000.00"
+    // as 2,000,000 and "250.000,50" as 25,000,050 — straight into the saved
+    // budget, income and monthly contribution.
+    const typed = String(draft ?? '').trim()
+    const parsed = typed ? parseAmount(typed, pack.locale) : undefined
+    if (typed && !Number.isFinite(parsed)) {
+      setError(t('quiz.outOfRange', { min: question.min, max: question.max }))
+      return
+    }
+    if (question.required && parsed === undefined) return
+    const value = parsed
     if (outOfRange(value) !== null) {
       setError(t('quiz.outOfRange', { min: question.min, max: question.max }))
       return

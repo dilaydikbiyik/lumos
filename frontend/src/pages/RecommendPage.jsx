@@ -245,7 +245,8 @@ export default function RecommendPage() {
           <PracticeMode allocations={portfolio.allocations} />
           <TimeMachine allocations={portfolio.allocations} budget={portfolio.budget} />
           <FutureScenarios allocations={portfolio.allocations} budget={portfolio.budget} />
-          <WhatIfAssistant riskScore={portfolio.risk_score} budget={portfolio.budget} />
+          {/* The reader's total: the what-if rebuilds the plan, reserve and all. */}
+          <WhatIfAssistant riskScore={portfolio.risk_score} budget={portfolio.metadata?.plan?.total_budget ?? portfolio.budget} />
         </Layer>
 
         {/* "How do I actually buy this?" — reference material, fine to fold away */}

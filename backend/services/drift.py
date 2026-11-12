@@ -29,6 +29,13 @@ _CATEGORY_BY_TYPE = {
 }
 
 
+def _num(value: float, lang: str) -> str:
+    """One decimal in the reader's notation: 19,0 in Turkish and German.
+    The sentence printed Python's 19.0 into all three languages."""
+    text = f"{value:.1f}"
+    return text.replace(".", ",") if lang in ("tr", "de") else text
+
+
 def _actual_weights(holdings, values: dict[int, float],
                     category_by_ticker: dict[str, str]) -> dict[str, float]:
     """Weights per portfolio category.
@@ -97,8 +104,8 @@ def compute_drift(holdings, values: dict[int, float], target_allocations,
         message = t(
             "drift.biggest", lang,
             label=t(f"category.{drifted['category']}", lang),
-            target=drifted["target_pct"],
-            actual=drifted["actual_pct"],
+            target=_num(drifted["target_pct"], lang),
+            actual=_num(drifted["actual_pct"], lang),
             direction=t("drift.grew" if drifted["diff_pct"] > 0 else "drift.shrank", lang),
         ) + t("drift.serious" if level == "serious" else "drift.mild", lang)
         verdict = level
