@@ -3739,6 +3739,9 @@ hep SPY çıkıyor". İkisi ayrı sorunmuş.
       - "Aldım" köprüsü nakit fonunu (BIL/XEON) tickersız düz nakit
         kaydediyordu: fiyatı izlenmiyor, "eriyen nakit" sayılıyordu → fon
         olarak, tickerıyla.
+- [x] Öneri sayfasındaki bütçe rozeti planın piyasa kısmını "bütçe" diye
+      gösteriyordu (400.000 bütçe → "166.800 bütçe"); artık toplam bütçe,
+      hangi kısım olduğu altındaki notta.
 - [ ] Almanya'da hazine bonosu satırı yok (para piyasası fonu var);
       ABD bonosunun EUR karşılığı istenirse USDEUR=X ile eklenebilir.
 - [ ] Keşif listesi tarihli (2026-11) bir seçki; yılda bir piyasa

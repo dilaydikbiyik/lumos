@@ -140,7 +140,10 @@ export default function RecommendPage() {
           <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
             <span className="badge badge-amber">{t('recommend.riskBadge', { score: portfolio.risk_score })}</span>
             <span className="badge" style={{ background: 'var(--bg-input)', color: 'var(--text-muted)', border: '1px solid var(--border)' }}>
-              {t('recommend.budgetBadge', { amount: money(portfolio.budget ?? 0) })}
+              {/* The reader's whole budget; the note below says which part of it
+                  this portfolio is. The badge showed the market part alone,
+                  so a 400,000 budget read as "166,800 budget". */}
+              {t('recommend.budgetBadge', { amount: money(portfolio.metadata?.plan?.total_budget ?? portfolio.budget ?? 0) })}
             </span>
             {portfolio.includes_reits && <span className="badge badge-green">{t('recommend.reitBadge')}</span>}
           </div>
