@@ -120,6 +120,40 @@ def _private_cache(tmp_path_factory):
 
 
 @pytest.fixture(autouse=True)
+def _no_real_market_provider():
+    """The suite never reaches the real price provider.
+
+    Tests that did not fake prices used to be served from the developer's
+    disk cache; once tests got a cache of their own they went to the network
+    on every run — passing while the provider answered, failing (and taking
+    minutes of timeouts) on a day it did not, here or in CI. A test that
+    needs prices fakes them; anything else gets an immediate failure that
+    the code under test must already handle.
+    """
+    import yfinance
+
+    def refused(*args, **kwargs):
+        raise ConnectionError("no market provider in tests")
+
+    class _NoTicker:
+        def __init__(self, *args, **kwargs):
+            pass
+
+        def history(self, *args, **kwargs):
+            raise ConnectionError("no market provider in tests")
+
+        @property
+        def info(self):
+            raise ConnectionError("no market provider in tests")
+
+        fast_info = info
+
+    with patch.object(yfinance, "download", side_effect=refused), \
+         patch.object(yfinance, "Ticker", _NoTicker):
+        yield
+
+
+@pytest.fixture(autouse=True)
 def _flat_exchange_rates():
     """Currency conversion never hits the network in tests: every rate is a
     flat 1.0, so mocked dollar prices keep their shape for a lira reader.

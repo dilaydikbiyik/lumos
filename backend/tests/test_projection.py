@@ -124,11 +124,15 @@ def test_the_context_sentence_never_touches_the_numbers(client):
 
     payload = {"ticker": "SPY", "amount": 100000, "years": 5}
 
-    with patch("backend.services.news_service.context_sentence",
-               return_value="Markets are quiet this week."):
-        with_context = client.post("/api/v1/planning/projection/asset", json=payload).json()
-    with patch("backend.services.news_service.context_sentence", return_value=None):
-        without = client.post("/api/v1/planning/projection/asset", json=payload).json()
+    # Prices are faked: this test used to reach the real provider (served
+    # from the developer's disk cache, so nobody noticed) and failed on any
+    # day the provider did not answer.
+    with patch("backend.services.projection.fetch_price_history", side_effect=_fake_history):
+        with patch("backend.services.news_service.context_sentence",
+                   return_value="Markets are quiet this week."):
+            with_context = client.post("/api/v1/planning/projection/asset", json=payload).json()
+        with patch("backend.services.news_service.context_sentence", return_value=None):
+            without = client.post("/api/v1/planning/projection/asset", json=payload).json()
 
     assert with_context.get("context") == "Markets are quiet this week."
     assert without.get("context") is None
@@ -141,7 +145,8 @@ def test_the_context_sentence_never_touches_the_numbers(client):
 def test_a_failing_digest_costs_the_card_its_sentence_and_nothing_else(client):
     from unittest.mock import patch
 
-    with patch("backend.services.news_service.context_sentence",
+    with patch("backend.services.projection.fetch_price_history", side_effect=_fake_history), \
+         patch("backend.services.news_service.context_sentence",
                side_effect=RuntimeError("feeds down")):
         res = client.post("/api/v1/planning/projection/asset",
                           json={"ticker": "SPY", "amount": 100000, "years": 5})

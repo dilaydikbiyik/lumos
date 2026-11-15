@@ -3777,6 +3777,17 @@ hep SPY çıkıyor". İkisi ayrı sorunmuş.
         kopyalar artık siliniyor (ortak cihaz).
       - Klavyeyle açılamayan iki tıklama alanı; iletişim kutularında
         `role="dialog"`; service worker önbelleği budanıyor; og:image mutlak.
+- [x] **App Store yüklemesine hazırlık (2026-11-15)** — bu Mac'te Xcode yok,
+      derleme/yükleme yapılamadı; kod ve proje tarafı hazırlandı:
+      mağaza sürümünde giriş uygulamanın İÇİNDE (Clerk'in barındırılan
+      sayfasına yönlendirme WebView'ı uygulamadan çıkarıyordu), kayıt aynı
+      formda, sosyal giriş gizli (Google WebView'da OAuth'u reddediyor;
+      üçüncü taraf girişi Apple ile Giriş'i zorunlu kılardı — 4.8);
+      Info.plist'te şifreleme beyanı + üç dil + yalnız dikey; gizlilik
+      bildirimi (PrivacyInfo.xcprivacy) projeye kayıtlı; yalnız iPhone
+      (iPad ekran görüntüsü ve iPad QA gerekmiyor — tek satırla geri
+      alınır). Testli (`test_store_build_is_submittable.py`).
+      **Senin adımların: `docs/app-store-upload.md`.**
 - [ ] **iOS simülatöründe giriş akışını doğrula** (Clerk yönlendirmesi
       `capacitor://localhost`'a geri dönüyor mu; gerekirse @capacitor/browser
       ya da Clerk'in uygulama içi modalı).

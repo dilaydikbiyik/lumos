@@ -121,17 +121,29 @@ app, which looks like nothing is wrong.
 These are configured but have never run on a device. Test them first, in
 this order, because each one blocks the next:
 
-1. **Sign-in.** `capacitor.config.ts` sets `limitsNavigationsToAppBoundDomains:
-   true`, and `ios/App/App/Info.plist` has **no** `WKAppBoundDomains` list.
-   That setting restricts the WebView to the domains in that list, and Clerk's
-   sign-in reaches out to its own domain. If sign-in hangs or fails on the
-   device, either set the flag to `false`, or add `WKAppBoundDomains` with the
-   API host and the Clerk frontend host (exact domains, at most ten). Do not
-   change it before seeing the failure — it is also what keeps the shell from
-   being navigated to arbitrary sites.
-2. **Google sign-in, if enabled in Clerk.** Google refuses OAuth inside an
-   embedded WebView. It must open in the system browser, or be off in the
-   native build — and if it stays on, Sign in with Apple is required (4.8).
+1. **Sign-in.** In the store build a signed-out reader sees Clerk's sign-in
+   form *inside the app* (`SignedOutGate` in `App.jsx`), with sign-up in the
+   same form — the web's redirect to Clerk's hosted page would navigate the
+   WebView away from the bundled app with nothing to bring it back. Check
+   that an email sign-up and a sign-in both complete and land on the page
+   that was asked for. Two things can still go wrong on a device and cannot
+   be seen from here:
+   - **Clerk must accept the app's origin.** The bundled app's origin is
+     `capacitor://localhost`. A Clerk *production* instance only talks to
+     origins it knows; add it under the instance's allowed origins
+     (Dashboard → Configure → Paths, or `PATCH /v1/instance` with
+     `allowed_origins`) before the first TestFlight build.
+   - **Session cookies.** If sign-in succeeds and the app then behaves as
+     signed-out after a restart, the WebView is refusing Clerk's cookie as
+     third-party. The fix is to serve the app from a hostname under your own
+     domain (`server.hostname` in `capacitor.config.ts`, with Clerk on
+     `clerk.<that domain>`), then allow that origin in `NATIVE_APP_ORIGINS`.
+   `limitsNavigationsToAppBoundDomains` used to be on with no
+   `WKAppBoundDomains` list, which blocks every remote host; it is off.
+2. **Social sign-in is hidden in the store build** (`NATIVE_APPEARANCE` in
+   `main.jsx`): Google refuses OAuth inside an embedded WebView, and any
+   third-party login would require Sign in with Apple beside it (4.8). Email
+   sign-in is the only method there. Confirm no social button shows.
 3. **The API.** The bundled app's origin is `capacitor://localhost` on iOS and
    `https://localhost` on Android. Production CORS allowed only the website,
    so every request from the store builds would have failed while the web

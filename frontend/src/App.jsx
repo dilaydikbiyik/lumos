@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import FireflyMark from './components/FireflyMark'
 import { Fragment, Suspense, lazy, useEffect, useRef } from 'react'
-import { ClerkLoading, SignedIn, SignedOut, RedirectToSignIn, useAuth } from '@clerk/clerk-react'
+import { ClerkLoading, SignedIn, SignedOut, RedirectToSignIn, SignIn, useAuth } from '@clerk/clerk-react'
 import AppNav from './components/AppNav'
 import { useTranslation } from 'react-i18next'
 import FeedbackButton from './components/FeedbackButton'
@@ -14,6 +14,7 @@ import useIllumination from './hooks/useIllumination'
 import { registerTokenGetter } from './utils/api'
 import OnboardingPage from './pages/OnboardingPage'
 import { forgetUser } from './utils/storage'
+import { isNativeApp } from './utils/platform'
 
 // The landing page is what a first-time visitor loads, so it stays in the
 // main bundle. Everything behind sign-in is split: the whole app was one
@@ -92,6 +93,25 @@ function FloatingHelpers() {
   )
 }
 
+/**
+ * What a signed-out visitor meets on a protected page.
+ *
+ * On the web: Clerk's hosted sign-in page, then back. Inside the store
+ * build that redirect leaves the app — the web view navigates to another
+ * site, and nothing brings it back to the bundled app — so sign-in (and
+ * sign-up, in the same form) is rendered in place instead. Apple also
+ * expects an app to sign people in itself, not send them to a website.
+ */
+function SignedOutGate() {
+  const { pathname } = useLocation()
+  if (!isNativeApp()) return <><RedirectToSignIn /><AuthPending /></>
+  return (
+    <div className="page" style={{ alignItems: 'center', justifyContent: 'center', minHeight: '100dvh', padding: 16 }}>
+      <SignIn routing="hash" withSignUp fallbackRedirectUrl={pathname} signUpFallbackRedirectUrl={pathname} />
+    </div>
+  )
+}
+
 function ProtectedRoute({ children }) {
   return (
     <>
@@ -100,8 +120,7 @@ function ProtectedRoute({ children }) {
           never flashes a blank page between auth and render. */}
       <SignedIn><Suspense fallback={<AuthPending />}>{children}</Suspense></SignedIn>
       <SignedOut>
-        <RedirectToSignIn />
-        <AuthPending />
+        <SignedOutGate />
       </SignedOut>
     </>
   )

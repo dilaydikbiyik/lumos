@@ -104,10 +104,11 @@ Paste, once native push is live:
 
 ### Sign-in (Apple 4.8)
 
-If the sign-in screen offers Google (or any third-party login), Apple 4.8
-requires an equivalent privacy-preserving option, in practice **Sign in with
-Apple**, alongside it. Which methods are on is set in the Clerk dashboard,
-not in this repository — check it before submitting.
+The store build shows **email sign-in only**: social buttons are hidden in
+the native shell (`NATIVE_APPEARANCE` in `main.jsx`), so 4.8's requirement
+for Sign in with Apple beside a third-party login does not arise. If a social
+method is ever shown in the app, Sign in with Apple must be added with it.
+Email + password (or email code) must be enabled in the Clerk dashboard.
 
 Separately, Google refuses OAuth inside an embedded WebView
 ("disallowed_useragent"), which is what a Capacitor app is. Google sign-in
@@ -324,6 +325,9 @@ Output lands in `demo/screens/<lang>/store/`. Required sizes:
 | Apple | 6.5" (iPhone 11 Pro Max) | 1242 × 2688 |
 | Google Play | Phone | 1080 × 1920 (min 320px shortest side) |
 | Google Play | Feature graphic | 1024 × 500 — **[you]**, a designed banner, not a screenshot |
+
+The iOS build is **iPhone only, portrait** (`TARGETED_DEVICE_FAMILY = 1`), so
+no iPad screenshots are needed and the reviewer tests one layout.
 
 Apple accepts the 6.7" set for the 6.5" slot in most cases, but supplying both
 avoids the one review round-trip where it doesn't.

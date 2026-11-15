@@ -4,6 +4,7 @@ import { ClerkProvider } from '@clerk/clerk-react'
 import App from './App.jsx'
 import './index.css'
 import { initI18n } from './i18n'
+import { isNativeApp } from './utils/platform'
 
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
 
@@ -40,6 +41,19 @@ if ('serviceWorker' in navigator && import.meta.env.PROD) {
 // cure for a dropped chunk or a page left open across a deploy); if that
 // fails too, say so plainly in all three languages, since which one the
 // reader reads is exactly what could not be loaded.
+// In the store build, sign-in is email only. Google refuses OAuth inside an
+// embedded web view ("disallowed_useragent"), so its button would fail on
+// tap; and offering any third-party login obliges the app to offer Sign in
+// with Apple beside it (App Store guideline 4.8). Hiding the social row in
+// the native shell removes both problems; the web keeps every method.
+const NATIVE_APPEARANCE = {
+  elements: {
+    socialButtons: { display: 'none' },
+    socialButtonsRoot: { display: 'none' },
+    dividerRow: { display: 'none' },
+  },
+}
+
 const RELOAD_FLAG = 'lumos-locale-reload'
 
 /** True the first time in this tab; false after, or when storage is blocked
@@ -84,6 +98,7 @@ initI18n()
         <ClerkProvider
           publishableKey={PUBLISHABLE_KEY || 'pk_test_placeholder'}
           afterSignOutUrl="/"
+          appearance={isNativeApp() ? NATIVE_APPEARANCE : undefined}
         >
           <App />
         </ClerkProvider>

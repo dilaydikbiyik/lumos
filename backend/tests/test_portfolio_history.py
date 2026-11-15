@@ -28,8 +28,12 @@ def test_live_holding_follows_prices_and_flat_stays_put():
                     purchase_amount=10000.0)
     cash = _holding(id=2, asset_type="cash", purchase_amount=5000.0, purchase_date=bought)
 
+    # A fixed exchange rate: the holding is a dollar fund held in lira, and
+    # this test used to read the real USD/TRY rate from the network.
     with patch("backend.services.portfolio_history.fetch_price_history",
                return_value={"SPY": _series(40)}), \
+         patch("backend.services.portfolio_history.fx_service.rate",
+               lambda base, quote, on=None: 1.0), \
          patch("backend.services.portfolio_history.enrich_holdings", return_value={}):
         out = portfolio_value_history([live, cash], days=30)
 
