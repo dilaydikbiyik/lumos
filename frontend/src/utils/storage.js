@@ -56,6 +56,27 @@ export function writeFlag(key, value) {
  * `lumos-profile-<userId>`; device-wide keys (language, market cache,
  * disclaimer) carry no user id and stay.
  */
+/**
+ * With nobody signed in, no account's copies belong on this device.
+ *
+ * forgetUser runs when the app SEES the sign-out, but Clerk signs out with a
+ * full page load, and the page can unload before React commits that state —
+ * then nothing was removed and, after the reload, nobody remembers who had
+ * been signed in. So the signed-out state itself purges: every per-account
+ * key (Clerk ids start with "user_") and the last account's market, which
+ * otherwise decided what the next visitor's examples looked like.
+ */
+export function forgetEveryUser() {
+  try {
+    const doomed = []
+    for (let i = 0; i < localStorage.length; i += 1) {
+      const key = localStorage.key(i)
+      if (key && (/^lumos-.+-user_[A-Za-z0-9]+$/.test(key) || key === 'lumos-market-cache')) doomed.push(key)
+    }
+    doomed.forEach(key => localStorage.removeItem(key))
+  } catch { /* storage blocked: nothing was kept */ }
+}
+
 export function forgetUser(userId) {
   if (!userId) return
   try {

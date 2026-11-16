@@ -51,7 +51,16 @@ self.addEventListener('fetch', event => {
   // loadable on a flaky connection once it has been fetched.
   if (url.pathname.startsWith('/assets/')) {
     event.respondWith(
-      caches.match(event.request).then(hit => hit || fetch(event.request).then(res => {
+      caches.match(event.request).then(hit => {
+        if (hit) {
+          // Used now, so newest: trimming is by insertion order, and a file
+          // whose hash survives several deploys (the vendor chunk, a locale)
+          // would otherwise be the first one evicted while still current.
+          const again = hit.clone()
+          caches.open(CACHE).then(c => c.put(event.request, again)).catch(() => {})
+          return hit
+        }
+        return fetch(event.request).then(res => {
         if (res.ok) {
           const copy = res.clone()
           caches.open(CACHE)
@@ -59,7 +68,8 @@ self.addEventListener('fetch', event => {
             .catch(() => {})
         }
         return res
-      }))
+      })
+      })
     )
     return
   }

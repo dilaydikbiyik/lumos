@@ -64,3 +64,21 @@ def test_the_reit_prompt_names_only_the_readers_own_funds():
         explainer.explain_reit_inclusion(portfolio, {}, "de", "DE")
     assert "IQQP.DE" in seen["p"] and "VNQ" not in seen["p"] and "SCHH" not in seen["p"]
     assert "EUR" in seen["p"]
+
+
+@pytest.mark.parametrize("word", ["NOT", "NEVER", "ASLA", "NICHT", "PANIK", "TER", "ISIN",
+                                  "FOMO", "ESG", "CEO", "TEFAS", "KGV", "NAV", "YTD"])
+def test_emphasis_and_acronyms_do_not_delete_a_paragraph(word):
+    from backend.services import explanation_check
+
+    for market in ("TR", "US", "DE"):
+        portfolio, _ = build_for_path("stocks", 6.6, 400_000, market, "en")
+        assert explanation_check.contradictions(f"This is {word} a guarantee.", portfolio) == []
+
+
+@pytest.mark.parametrize("ticker", ["QQQ", "NVDA", "BTC", "THYAO.IS", "SAP.DE", "XYZ.IS"])
+def test_a_real_instrument_from_outside_the_portfolio_is_caught(ticker):
+    from backend.services import explanation_check
+
+    portfolio, _ = build_for_path("stocks", 6.6, 20_000, "DE", "de")
+    assert explanation_check.contradictions(f"Kauf lieber {ticker}.", portfolio)

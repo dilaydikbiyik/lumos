@@ -33,7 +33,7 @@ def test_it_refuses_to_compare_two_different_windows():
     shorter side is not a smaller number, it is a different question.
     """
     with patch.object(compare_service, "_region_growth_pct",
-                      return_value=(30.0, 2.0)):          # only 2 of 5 years
+                      return_value=(30.0, 2.0, "2024-09", "2026-09")):   # only 2 of 5 years
         result = compare_service.compare(
             amount=500_000, region_code="34", weights=WEIGHTS,
             period="5y", market="TR", lang="en")
@@ -62,7 +62,7 @@ def test_a_missing_portfolio_side_shows_nothing_rather_than_one_side():
     """
     from backend.exceptions import MarketDataError
 
-    with patch.object(compare_service, "_region_growth_pct", return_value=(60.0, 5.0)), \
+    with patch.object(compare_service, "_region_growth_pct", return_value=(60.0, 5.0, "2021-09", "2026-09")), \
          patch("backend.services.backtest.run_backtest",
                side_effect=MarketDataError("yfinance returned no usable data")):
         result = compare_service.compare(
@@ -77,7 +77,7 @@ def test_the_property_side_pays_the_costs_only_it_pays():
     portfolio. Leaving them out is how property wins an argument it might
     not deserve.
     """
-    with patch.object(compare_service, "_region_growth_pct", return_value=(60.0, 5.0)), \
+    with patch.object(compare_service, "_region_growth_pct", return_value=(60.0, 5.0, "2021-09", "2026-09")), \
          patch("backend.services.backtest.run_backtest", _fake_backtest(60.0)):
         result = compare_service.compare(
             amount=500_000, region_code="34", weights=WEIGHTS,
@@ -100,7 +100,7 @@ def test_both_sides_are_reported_in_real_terms():
     In a high-inflation market, nominal numbers make both sides look like
     wins. Deflating only one of them would be worse than deflating neither.
     """
-    with patch.object(compare_service, "_region_growth_pct", return_value=(60.0, 5.0)), \
+    with patch.object(compare_service, "_region_growth_pct", return_value=(60.0, 5.0, "2021-09", "2026-09")), \
          patch("backend.services.backtest.run_backtest", _fake_backtest(60.0)), \
          patch("backend.services.assumptions.annual_inflation_pct", return_value=30.0):
         result = compare_service.compare(
@@ -147,7 +147,7 @@ def test_a_broken_call_crashes_instead_of_claiming_missing_data():
     def broken(*args, **kwargs):
         raise TypeError("run_backtest() got an unexpected keyword argument")
 
-    with patch.object(compare_service, "_region_growth_pct", return_value=(60.0, 5.0)), \
+    with patch.object(compare_service, "_region_growth_pct", return_value=(60.0, 5.0, "2021-09", "2026-09")), \
          patch("backend.services.backtest.run_backtest", broken):
         with pytest.raises(TypeError):
             compare_service.compare(

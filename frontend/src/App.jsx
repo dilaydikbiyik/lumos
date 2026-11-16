@@ -13,7 +13,7 @@ import ErrorBoundary from './utils/errorBoundary'
 import useIllumination from './hooks/useIllumination'
 import { registerTokenGetter } from './utils/api'
 import OnboardingPage from './pages/OnboardingPage'
-import { forgetUser } from './utils/storage'
+import { forgetEveryUser, forgetUser } from './utils/storage'
 import { isNativeApp } from './utils/platform'
 
 // The landing page is what a first-time visitor loads, so it stays in the
@@ -61,6 +61,7 @@ function AuthBridge() {
   useEffect(() => {
     if (!isLoaded) return
     if (previous.current && previous.current !== userId) forgetUser(previous.current)
+    if (!userId) forgetEveryUser()
     previous.current = userId || null
   }, [userId, isLoaded])
   return null
@@ -139,7 +140,12 @@ function ProtectedRoute({ children }) {
 function MarketScoped({ children }) {
   const { market } = useMarket()
   const { i18n } = useTranslation()
-  return <Fragment key={`${market}|${i18n.language}`}>{children}</Fragment>
+  const { isSignedIn } = useAuth()
+  // A visitor has no server data to refetch: the landing page re-renders in
+  // place when their market or language arrives. Remounting it reset what
+  // they were doing (a ticked disclaimer) whenever a slow server answered.
+  const key = isSignedIn ? `${market}|${i18n.language}` : 'visitor'
+  return <Fragment key={key}>{children}</Fragment>
 }
 
 export default function App() {

@@ -57,7 +57,9 @@ export function MarketProvider({ children }) {
   const [marketCode, setMarketCode] = useState(remembered?.market ?? 'TR')
 
   useEffect(() => {
-    if (!isLoaded || isSignedIn || remembered) return
+    // Signed out, a remembered market belongs to whoever used this device
+    // last and is being removed (storage.forgetEveryUser); it does not apply.
+    if (!isLoaded || isSignedIn) return
     let cancelled = false
     api.get('/users/markets')
       .then(res => {
@@ -67,8 +69,11 @@ export function MarketProvider({ children }) {
       })
       .catch(() => { /* the fallback stays; formatting must never break */ })
     return () => { cancelled = true }
+  // Once, from the language the visitor arrived in. Switching language
+  // afterwards does not move the market: the two are independent choices
+  // everywhere else in the app, and stay so here.
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isLoaded, isSignedIn, i18n.language])
+  }, [isLoaded, isSignedIn])
 
   useEffect(() => {
     if (!isSignedIn) return

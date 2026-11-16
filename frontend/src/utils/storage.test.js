@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest'
-import { forgetUser, userKey } from './storage'
+import { forgetEveryUser, forgetUser, userKey } from './storage'
 
 describe('forgetUser', () => {
   beforeEach(() => {
@@ -24,5 +24,16 @@ describe('forgetUser', () => {
     expect(localStorage.length).toBe(2)
     expect(localStorage.getItem('lumos-language')).toBe('tr')
     expect(localStorage.getItem(userKey('holdings-TR', 'user_b'))).toBe('1')
+  })
+
+  it('with nobody signed in, every account copy and the last market go', () => {
+    localStorage.setItem(userKey('holdings-TR', 'user_a1B2'), '1')
+    localStorage.setItem('lumos-profile-user_c3D4', '1')
+    localStorage.setItem('lumos-market-cache', '{}')
+    localStorage.setItem('lumos-language', 'de')
+    localStorage.setItem('lumos-disclaimer-ok', '1')
+    forgetEveryUser()
+    expect(localStorage.length).toBe(2)
+    expect(localStorage.getItem('lumos-language')).toBe('de')
   })
 })

@@ -38,7 +38,7 @@ _PERIOD_YEARS = {"1y": 1, "3y": 3, "5y": 5}
 
 
 def _region_growth_pct(code: str, years: int, market: str,
-                       lang: str) -> Optional[tuple[float, int]]:
+                       lang: str) -> Optional[tuple]:
     """
     (total % change, years actually covered) for a region's price index.
 
@@ -67,7 +67,16 @@ def _region_growth_pct(code: str, years: int, market: str,
     start, end = entry["series"][periods[-1 - step]], entry["series"][periods[-1]]
     if not start:
         return None
-    return round((end / start - 1) * 100, 2), round(step / per_year, 2)
+    return (round((end / start - 1) * 100, 2), round(step / per_year, 2),
+            _as_month(periods[-1 - step]), _as_month(periods[-1]))
+
+
+def _as_month(period: str) -> str:
+    """'2026-Q2' → '2026-06'; a 'YYYY-MM' key is returned as it is."""
+    if "-Q" in period:
+        year, quarter = period.split("-Q")
+        return f"{year}-{int(quarter) * 3:02d}"
+    return period[:7]
 
 
 def compare(*, amount: float, region_code: str, weights: dict[str, float],
@@ -88,7 +97,7 @@ def compare(*, amount: float, region_code: str, weights: dict[str, float],
         return {"available": False,
                 "reason": t("compare.no_region", lang)}
 
-    region_pct, covered_years = region
+    region_pct, covered_years, region_start, region_end = region
     if covered_years < years * 0.8:
         # Rule 1: a shorter window is not the same question.
         return {"available": False,
@@ -139,8 +148,17 @@ def compare(*, amount: float, region_code: str, weights: dict[str, float],
     start, end = inflation_service.inflation_window(covered_years, market)
     inflation = round(inflation_service.cpi_change_pct(start, end, market), 1)
     deflator = 1 + inflation / 100
+    # The property side is deflated over ITS OWN months. The region index
+    # ends at its latest quarter, a month or two before the CPI's latest
+    # month; at Turkish inflation (about 2% a month) deflating it with the
+    # later window was a few points off.
+    try:
+        property_deflator = 1 + inflation_service.cpi_change_pct(
+            region_start, region_end, market) / 100
+    except Exception:
+        property_deflator = deflator
 
-    def _side(nominal: float) -> dict:
+    def _side(nominal: float, deflator: float = deflator) -> dict:
         return {
             "value": round(nominal, 2),
             "return_pct": round((nominal / amount - 1) * 100, 2),
@@ -155,7 +173,7 @@ def compare(*, amount: float, region_code: str, weights: dict[str, float],
         "market": market,
         "inflation_pct": inflation,
         "property": {
-            **_side(property_value),
+            **_side(property_value, property_deflator),
             "index_growth_pct": region_pct,
             "entry_costs": round(amount - invested, 2),
             "upkeep_paid": round(upkeep, 2),

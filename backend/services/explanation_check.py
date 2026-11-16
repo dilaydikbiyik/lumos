@@ -81,6 +81,56 @@ _NOT_TICKERS = {
 }
 
 
+# Instruments a model is likely to reach for that no pack lists. With the
+# packs' own symbols these are what "a ticker from nowhere" looks like.
+_WELL_KNOWN_TICKERS = frozenset({
+    "TSLA", "AAPL", "NVDA", "AMZN", "MSFT", "GOOG", "GOOGL", "META", "NFLX", "GME", "AMC",
+    "VOO", "VTI", "IVV", "QQQM", "TQQQ", "SQQQ", "ARKK", "SCHD", "VT", "VEA", "VWO",
+    "BTC", "ETH", "DOGE", "SOL", "XRP", "USDT",
+})
+
+
+def _known_instruments() -> frozenset:
+    """
+    Every symbol this app knows, in any market — with and without its
+    exchange suffix — plus the well-known ones above.
+
+    The rule used to be the other way round: any capitalised token was a
+    ticker unless it was on an allowlist of ordinary words. That list could
+    never be complete, and a correct paragraph was deleted for "NOT", "ASLA",
+    "NICHT", "TER", "FOMO", "ABD" or "EZB". A token is now an instrument only
+    if it IS one, or looks like nothing else (an exchange suffix). A symbol
+    nobody has heard of slips through; a real one from outside the portfolio,
+    which is the case that can move a reader's money, does not.
+    """
+    from backend.markets import MARKET_PACKS
+    from backend.services.hybrid_basket import get_reit_assets
+
+    symbols = set(_WELL_KNOWN_TICKERS)
+    for pack in MARKET_PACKS.values():
+        groups = [pack.asset_universe, pack.reit_assets, pack.explorer_stocks,
+                  [pack.cash_asset or {}, pack.bond_asset or {}],
+                  [x for alts in pack.role_alternatives.values() for x in alts],
+                  pack.asset_classes]
+        for group in groups:
+            for item in group:
+                if item.get("ticker"):
+                    symbols.add(item["ticker"].upper())
+    symbols |= {a["ticker"].upper() for a in get_reit_assets()}
+    symbols |= {"BIL", "BND"}
+    return frozenset(symbols | {s.split(".")[0] for s in symbols})
+
+
+_KNOWN_INSTRUMENTS = _known_instruments()
+
+
+def _is_foreign_instrument(token: str, allowed: set) -> bool:
+    """A token that names an instrument the text was not given."""
+    if token in allowed or token.split(".")[0] in {a.split(".")[0] for a in allowed}:
+        return False
+    return "." in token or token in _KNOWN_INSTRUMENTS
+
+
 def _allowed_percentages(portfolio: "PortfolioRecommendResponse") -> set[float]:
     """
     Every percentage the prose may legitimately state.
@@ -135,7 +185,7 @@ def contradictions(
     #    single worst thing this app could print, because a reader may act
     #    on a symbol.
     for token in set(_TICKER_RE.findall(text)):
-        if token in _NOT_TICKERS or token in real_tickers:
+        if token in _NOT_TICKERS or not _is_foreign_instrument(token, real_tickers):
             continue
         # A token that is also a holding's NAME word is prose, not a symbol.
         if any(token.lower() in a.name.lower() for a in portfolio.allocations):
@@ -268,7 +318,7 @@ def whatif_contradictions(text: str, diff: dict) -> list[str]:
     tickers = {str(c.get("ticker", "")).upper() for c in changes if c.get("ticker")}
 
     for token in set(_TICKER_RE.findall(text)):
-        if token in _NOT_TICKERS or token in tickers:
+        if token in _NOT_TICKERS or not _is_foreign_instrument(token, tickers):
             continue
         problems.append(f"names {token!r}, which is not in this change")
 

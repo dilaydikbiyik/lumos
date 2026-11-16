@@ -3788,6 +3788,22 @@ hep SPY çıkıyor". İkisi ayrı sorunmuş.
       (iPad ekran görüntüsü ve iPad QA gerekmiyor — tek satırla geri
       alınır). Testli (`test_store_build_is_submittable.py`).
       **Senin adımların: `docs/app-store-upload.md`.**
+- [x] **Yedinci tarama (2026-11-16)** — gerileme yok; hesaplar üç pazarda
+      sentetik veriyle elle hesaplananla tuttu. Kapatılan açıklar:
+      - Açıklama denetçisinin kuralı tersine çevrildi: büyük harfli her
+        kelime "sembol" sayılıp izin listesiyle ayıklanıyordu ("NOT", "ASLA",
+        "TER", "FOMO" doğru paragrafı siliyordu); artık yalnızca BİLİNEN bir
+        enstrüman (paketlerdeki her sembol + yaygın olanlar + borsa uzantılı)
+        portföyde yoksa hata.
+      - Çıkışta silme, Clerk'in tam sayfa yenilemesiyle yarışıyordu; artık
+        oturumsuz her açılışta hesap kopyaları ve son hesabın pazarı siliniyor.
+      - Tanıtım sayfası ziyaretçinin pazarı gelince baştan kuruluyordu;
+        dil değişince ziyaretçinin pazarı da değişiyordu → ikisi de yok.
+      - Service worker kullanılan dosyayı "en yeni" sayıyor (hash'i
+        değişmeyen dosya ilk silinen oluyordu).
+      - Emlak kıyasında emlak tarafı kendi aylarıyla arındırılıyor.
+      - Not: `project_asset` yılı 252 satır sayıyor; 7 gün işlem gören bir
+        varlık (kripto) öneri evrenine girerse tarihe göre kesilmeli.
 - [ ] **iOS simülatöründe giriş akışını doğrula** (Clerk yönlendirmesi
       `capacitor://localhost`'a geri dönüyor mu; gerekirse @capacitor/browser
       ya da Clerk'in uygulama içi modalı).
