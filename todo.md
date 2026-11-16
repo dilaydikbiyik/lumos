@@ -3804,6 +3804,22 @@ hep SPY çıkıyor". İkisi ayrı sorunmuş.
       - Emlak kıyasında emlak tarafı kendi aylarıyla arındırılıyor.
       - Not: `project_asset` yılı 252 satır sayıyor; 7 gün işlem gören bir
         varlık (kripto) öneri evrenine girerse tarihe göre kesilmeli.
+- [x] Sekizinci tarama (2026-11-16), yapılanlar: istek sınırı artık okuyucu
+      başına (Render proxy'si arkasında herkes tek kovayı paylaşıyordu);
+      kur kesintisinde oynaklık eksik kalan fonlara taban değer veriyor ve
+      eksik sonucu önbelleğe almıyor.
+- [ ] **Sekizinci taramadan kalanlar:** (1) fiyat geçmişinin kalıcı önbelleği
+      çalışmıyor — `cache_store.set` pandas Series'i JSON'a çeviremiyor,
+      yeniden başlatmada son-bilinen-değer kayboluyor; (2) `api.js`
+      uygulamanın kendi 503'lerini (çevrili `detail`'li) POST dahil 5 kez
+      deniyor; (3) denetçi fonun içindeki şirket adlarını (SAP, BMW) ve
+      sözlük kelimesi sembolleri (SIE, AIR) hâlâ hata sayıyor — keşif
+      hisseleri "izinli bağlam" olmalı; (4) `consume_quota` atomik değil
+      (tek UPDATE … RETURNING); (5) push abone ol çift dokunuşta 500;
+      (6) cron sırrı `hmac.compare_digest` ile; (7) kalıcı→yerel ısınmada
+      kalan TTL taşınmalı; (8) çevrili 429 mesajı + uvicorn
+      `--proxy-headers`; (9) `_real`/değerleme `except Exception` blokları
+      daraltılmalı; (10) pazar gidiş-dönüşünde tutar yuvarlama kaybı.
 - [ ] **iOS simülatöründe giriş akışını doğrula** (Clerk yönlendirmesi
       `capacitor://localhost`'a geri dönüyor mu; gerekirse @capacitor/browser
       ya da Clerk'in uygulama içi modalı).

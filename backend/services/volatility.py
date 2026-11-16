@@ -95,5 +95,16 @@ def compute_volatility(tickers: list[str], currency: str | None = None) -> dict[
         vol = float(log_returns.std() * np.sqrt(TRADING_DAYS))
         result[ticker] = round(vol, 6)
 
+    # A ticker the conversion dropped (its exchange rate could not be read)
+    # gets its baseline, and a partial answer is NOT cached. An FX outage
+    # used to leave only the home-currency funds measured; the engine gave
+    # every dollar fund a made-up 15%, the Turkish portfolio shifted from
+    # the BIST to the S&P, and the result was kept for a day.
+    missing = [t for t in tickers if t not in result]
+    for t in missing:
+        result[t] = BASELINE_VOLATILITY.get(t, _DEFAULT_VOL)
+    if missing:
+        logger.warning("volatility: no usable series for %s, baselines used, not cached", missing)
+        return result
     cache_service.set(cache_key, result)
     return result
