@@ -126,11 +126,56 @@ def is_enabled() -> bool:
     return _get_engine() is not None
 
 
+# ── price series ────────────────────────────────────────────────────────────
+# Price history is cached as {ticker: pandas Series}, which json.dumps
+# refuses — so the write "failed quietly" and every fallback tier for prices
+# (fresh, stale, last-known-good) lived only on the instance's own disk,
+# which Render discards on each deploy and restart. A provider outage after
+# a restart then had no last-known-good to serve, while /health reported a
+# durable cache. Series are stored as day numbers and values, and rebuilt.
+_SERIES_TAG = "__price_series__"
+
+
+def _encode(value: Any) -> Any:
+    try:
+        import pandas as pd
+    except Exception:
+        return value
+    if isinstance(value, dict) and value and all(isinstance(v, pd.Series) for v in value.values()):
+        out = {}
+        for name, series in value.items():
+            s = series.dropna()
+            idx = pd.to_datetime(s.index)
+            if idx.tz is not None:
+                idx = idx.tz_localize(None)
+            out[str(name)] = {"d": [int(d.toordinal()) for d in idx],
+                              "v": [round(float(x), 6) for x in s.to_numpy()]}
+        return {_SERIES_TAG: out}
+    return value
+
+
+def _decode(value: Any) -> Any:
+    if isinstance(value, dict) and list(value) == [_SERIES_TAG]:   # `set` is this module's own function
+        import pandas as pd
+        from datetime import date as _date
+
+        return {name: pd.Series(body["v"], name=name,
+                                index=pd.to_datetime([_date.fromordinal(d) for d in body["d"]]))
+                for name, body in value[_SERIES_TAG].items()}
+    return value
+
+
 def get(key: str) -> Any:
     """The stored value, or None when absent, expired or unreadable."""
+    return get_with_ttl(key)[0]
+
+
+def get_with_ttl(key: str) -> tuple[Any, Optional[int]]:
+    """(value, seconds left) — seconds is None for a value that never
+    expires. (None, None) when absent, expired or unreadable."""
     engine = _get_engine()
     if engine is None:
-        return None
+        return None, None
     try:
         from sqlalchemy import text
 
@@ -140,16 +185,19 @@ def get(key: str) -> Any:
                 {"k": key},
             ).first()
         if not row:
-            return None
+            return None, None
         value, expires_at = row
-        if expires_at is not None and expires_at <= datetime.now(timezone.utc):
-            return None
+        now = datetime.now(timezone.utc)
+        if expires_at is not None and expires_at <= now:
+            return None, None
+        left = max(int((expires_at - now).total_seconds()), 1) if expires_at is not None else None
         # Stored as {"v": ...} so that a cached scalar, list or None round-trips
         # through a JSONB column that would otherwise flatten them.
-        return value.get("v") if isinstance(value, dict) and "v" in value else value
+        inner = value.get("v") if isinstance(value, dict) and "v" in value else value
+        return _decode(inner), left
     except Exception as exc:
         logger.warning("durable cache read failed (%s)", type(exc).__name__)
-        return None
+        return None, None
 
 
 def set(key: str, value: Any, ttl: Optional[int]) -> bool:
@@ -158,7 +206,7 @@ def set(key: str, value: Any, ttl: Optional[int]) -> bool:
     if engine is None:
         return False
     try:
-        payload = json.dumps({"v": value})
+        payload = json.dumps({"v": _encode(value)})
     except (TypeError, ValueError):
         # Not everything cached locally is JSON — pickled objects stay local
         # rather than failing the write that was only ever a nice-to-have.

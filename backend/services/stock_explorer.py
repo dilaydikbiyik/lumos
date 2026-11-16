@@ -66,7 +66,7 @@ def _real(change_pct: float, market: str) -> Optional[float]:
     try:
         start, end = inflation_service.inflation_window(WINDOW_YEARS, market)
         return round(inflation_service.real_return_pct(change_pct, start, end, market), 1)
-    except Exception:            # missing CPI months — show nominal only, say so
+    except (ValueError, KeyError, ZeroDivisionError):   # missing CPI months — nominal only
         logger.info("no deflator for %s over %sy", market, WINDOW_YEARS)
         return None
 

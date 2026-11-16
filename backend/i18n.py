@@ -440,6 +440,10 @@ _C: dict[str, dict[str, str]] = {
         "tr": "Yazdığın metinlerden biri çok uzun ya da boş — kısaltıp tekrar dener misin?",
         "en": "One of the texts you typed is too long or empty — could you shorten it and try again?",
         "de": "Einer der eingegebenen Texte ist zu lang oder leer — kürzt du ihn und versuchst es noch einmal?"},
+    "error.rateLimited": {
+        "tr": "Kısa sürede çok fazla istek geldi — bir dakika sonra tekrar dener misin?",
+        "en": "Too many requests in a short time — could you try again in a minute?",
+        "de": "Zu viele Anfragen in kurzer Zeit — versuchst du es in einer Minute noch einmal?"},
     "error.invalidInput": {
         "tr": "Girdiğin değerlerden biri geçerli değil — tutarların sayı ve sıfırdan büyük olduğunu, metinlerin çok uzun olmadığını kontrol eder misin?",
         "en": "One of the values you entered isn't valid — could you check that amounts are numbers above zero and that text isn't too long?",

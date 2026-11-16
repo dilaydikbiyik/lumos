@@ -55,7 +55,9 @@ def _real(change_pct: float, market: str) -> Optional[float]:
     try:
         start, end = inflation_service.inflation_window(WINDOW_YEARS, market)
         return round(inflation_service.real_return_pct(change_pct, start, end, market), 1)
-    except Exception:
+    except (ValueError, KeyError, ZeroDivisionError):
+        # Missing inflation data only. A broad except here turned any bug in
+        # the deflator into a quiet "nominal only" on every row.
         logger.info("no deflator for %s over %sy", market, WINDOW_YEARS)
         return None
 

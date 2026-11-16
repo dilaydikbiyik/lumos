@@ -44,13 +44,14 @@ def get(key: str):
     if local is not _MISS:
         return local
 
-    durable = cache_store.get(key)
+    durable, seconds_left = cache_store.get_with_ttl(key)
     if durable is not None:
-        # Warm the local tier so the next read costs nothing. The TTL is not
-        # recoverable from here, so it gets the default — the durable row
-        # keeps the authoritative expiry either way.
+        # Warm the local tier so the next read costs nothing — for as long as
+        # the durable row has left, not a fresh day: a value with minutes
+        # remaining (the 15-minute empty news digest) used to get another 24
+        # hours locally.
         try:
-            _cache.set(key, durable, expire=TTL_SECONDS)
+            _cache.set(key, durable, expire=seconds_left)
         except Exception:  # a full or read-only disk must not fail the read
             pass
         return durable

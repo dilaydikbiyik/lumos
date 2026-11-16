@@ -87,10 +87,19 @@ async def subscribe(
         # permanently silent after one lapsed grant.
         existing.failed_at = None
     else:
-        db.add(PushSubscription(
-            user_id=user.id, endpoint=body.endpoint,
-            p256dh=body.keys.p256dh, auth=body.keys.auth, lang=lang,
-        ))
+        # In a savepoint: a double tap or a retried request can insert the
+        # same endpoint twice, and the unique constraint then failed the
+        # second one with a 500. The loser of that race is already subscribed.
+        from sqlalchemy.exc import IntegrityError
+
+        try:
+            async with db.begin_nested():
+                db.add(PushSubscription(
+                    user_id=user.id, endpoint=body.endpoint,
+                    p256dh=body.keys.p256dh, auth=body.keys.auth, lang=lang,
+                ))
+        except IntegrityError:
+            pass
 
     await db.commit()
     return {"subscribed": True}
@@ -156,7 +165,10 @@ async def market_sweep(
     tolerance THEY stated.
     """
     secret = settings.CRON_SECRET
-    if not secret or request.headers.get("X-Lumos-Cron") != secret:
+    # Constant-time: a plain != leaks how many leading characters matched.
+    import hmac
+
+    if not secret or not hmac.compare_digest(request.headers.get("X-Lumos-Cron", ""), secret):
         raise HTTPException(status_code=404)
 
     if not push_service.is_configured():

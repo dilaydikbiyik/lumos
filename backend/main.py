@@ -3,7 +3,6 @@ from typing import Callable, cast
 
 from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
-from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 
 
@@ -162,9 +161,21 @@ app = FastAPI(
 app.state.limiter = limiter
 # cast: slowapi's handler signature is narrower than the generic
 # (Request, Exception) Starlette expects — cast sidesteps the type check
+async def _rate_limited(request: Request, exc: Exception) -> Response:
+    """429 in the reader's language, in the `detail` field the client reads.
+    slowapi's own handler answers {"error": "Rate limit exceeded…"} in
+    English, which the app showed as a generic failure."""
+    from fastapi.responses import JSONResponse as _JSON
+
+    from backend.i18n import t
+    from backend.middleware.language import get_language
+
+    return _JSON(status_code=429, content={"detail": t("error.rateLimited", get_language(request))},
+                 headers={"Retry-After": "60"})
+
+
 app.add_exception_handler(
-    RateLimitExceeded,
-    cast(Callable[[Request, Exception], Response], _rate_limit_exceeded_handler),
+    RateLimitExceeded, cast(Callable[[Request, Exception], Response], _rate_limited),
 )
 
 # ── Validation errors, in the reader's language ─────────────────────────────

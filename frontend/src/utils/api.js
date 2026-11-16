@@ -109,8 +109,13 @@ export const RETRY_DELAYS_MS = [2000, 5000, 10000, 20000]
 const IDEMPOTENT = new Set(['get', 'head', 'options', 'put', 'delete', 'patch'])
 
 /** Exported for tests — the safety-critical retry decision in one place. */
-export function shouldRetry({ hasResponse, status, method, retryCount }) {
-  const proxyLevel = status === 502 || status === 503
+export function shouldRetry({ hasResponse, status, method, retryCount, appAnswered = false }) {
+  // A 502/503 from the PROXY means the request never reached the app, so it
+  // is safe to send again whatever the method. A 503 the app wrote itself
+  // (prices or the AI are down, no exchange rate) carries a message for the
+  // reader: retrying it sent every such request five times over 37 seconds
+  // before showing that message, POSTs included.
+  const proxyLevel = (status === 502 || status === 503) && !appAnswered
   const maybeProcessed = !hasResponse || status === 504
   const retryable = proxyLevel || (maybeProcessed && IDEMPOTENT.has(method))
   return retryable && retryCount < RETRY_DELAYS_MS.length
@@ -174,6 +179,8 @@ api.interceptors.response.use(
     const ok = shouldRetry({
       hasResponse: !!error.response,
       status: error.response?.status,
+      // The app's own errors are JSON with a `detail`; a proxy's are not.
+      appAnswered: typeof error.response?.data?.detail === 'string',
       method: (cfg.method || 'get').toLowerCase(),
       retryCount: cfg.__retryCount,
     })

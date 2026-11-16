@@ -84,9 +84,9 @@ _NOT_TICKERS = {
 # Instruments a model is likely to reach for that no pack lists. With the
 # packs' own symbols these are what "a ticker from nowhere" looks like.
 _WELL_KNOWN_TICKERS = frozenset({
-    "TSLA", "AAPL", "NVDA", "AMZN", "MSFT", "GOOG", "GOOGL", "META", "NFLX", "GME", "AMC",
-    "VOO", "VTI", "IVV", "QQQM", "TQQQ", "SQQQ", "ARKK", "SCHD", "VT", "VEA", "VWO",
-    "BTC", "ETH", "DOGE", "SOL", "XRP", "USDT",
+    "TSLA", "AAPL", "NVDA", "AMZN", "MSFT", "GOOG", "GOOGL", "NFLX", "GME", "AMC",
+    "VOO", "VTI", "IVV", "QQQM", "TQQQ", "SQQQ", "ARKK", "SCHD", "VEA", "VWO",
+    "BTC", "DOGE", "XRP", "USDT",
 })
 
 
@@ -108,7 +108,12 @@ def _known_instruments() -> frozenset:
 
     symbols = set(_WELL_KNOWN_TICKERS)
     for pack in MARKET_PACKS.values():
-        groups = [pack.asset_universe, pack.reit_assets, pack.explorer_stocks,
+        # FUNDS only. The explorer's companies are what the index funds
+        # hold: "der DAX-Fonds hält SAP, BMW und Siemens" describes the
+        # portfolio, and with every company symbol (and its bare prefix —
+        # SIE, AIR, DIS, KO) counted as foreign, such a sentence, or a German
+        # "SIE entscheiden", deleted the paragraph.
+        groups = [pack.asset_universe, pack.reit_assets,
                   [pack.cash_asset or {}, pack.bond_asset or {}],
                   [x for alts in pack.role_alternatives.values() for x in alts],
                   pack.asset_classes]

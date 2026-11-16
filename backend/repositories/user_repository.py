@@ -147,24 +147,30 @@ async def consume_quota(db: AsyncSession, clerk_user_id: str, daily_limit: int) 
     Atomically count one AI message against today's quota.
     Returns True if the message is allowed, False if the limit is reached.
 
-    Uses a read-then-update pattern inside the same transaction — safe on SQLite
-    (single writer) and correct on Postgres because get_db commits the whole
-    transaction as a unit, making the check-and-increment effectively atomic.
-    For high-concurrency Postgres use SELECT ... FOR UPDATE when needed.
+    One conditional UPDATE, so the check and the increment are a single
+    statement. It used to read the counter, add one in Python and write it
+    back, with a docstring calling that atomic: two requests arriving
+    together both read N and both wrote N+1 (Postgres READ COMMITTED), so
+    the quota could be overrun.
     """
+    from sqlalchemy import or_, update
+
     user = await get_or_create(db, clerk_user_id)
     today = date.today().isoformat()
 
-    if user.quota_date != today:
-        user.quota_date = today
-        user.quota_used = 0
-
-    if user.quota_used >= daily_limit:
-        return False
-
-    user.quota_used += 1
+    # A new day starts the count again — only if it is still yesterday's.
+    await db.execute(
+        update(User).where(User.id == user.id,
+                           or_(User.quota_date.is_(None), User.quota_date != today))
+        .values(quota_date=today, quota_used=0)
+    )
+    result = await db.execute(
+        update(User).where(User.id == user.id, User.quota_used < daily_limit)
+        .values(quota_used=User.quota_used + 1)
+    )
     await db.flush()
-    return True
+    await db.refresh(user)
+    return result.rowcount == 1
 
 
 async def delete_account(db: AsyncSession, clerk_user_id: str) -> bool:

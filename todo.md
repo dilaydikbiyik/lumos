@@ -3808,18 +3808,21 @@ hep SPY çıkıyor". İkisi ayrı sorunmuş.
       başına (Render proxy'si arkasında herkes tek kovayı paylaşıyordu);
       kur kesintisinde oynaklık eksik kalan fonlara taban değer veriyor ve
       eksik sonucu önbelleğe almıyor.
-- [ ] **Sekizinci taramadan kalanlar:** (1) fiyat geçmişinin kalıcı önbelleği
-      çalışmıyor — `cache_store.set` pandas Series'i JSON'a çeviremiyor,
-      yeniden başlatmada son-bilinen-değer kayboluyor; (2) `api.js`
-      uygulamanın kendi 503'lerini (çevrili `detail`'li) POST dahil 5 kez
-      deniyor; (3) denetçi fonun içindeki şirket adlarını (SAP, BMW) ve
-      sözlük kelimesi sembolleri (SIE, AIR) hâlâ hata sayıyor — keşif
-      hisseleri "izinli bağlam" olmalı; (4) `consume_quota` atomik değil
-      (tek UPDATE … RETURNING); (5) push abone ol çift dokunuşta 500;
-      (6) cron sırrı `hmac.compare_digest` ile; (7) kalıcı→yerel ısınmada
-      kalan TTL taşınmalı; (8) çevrili 429 mesajı + uvicorn
-      `--proxy-headers`; (9) `_real`/değerleme `except Exception` blokları
-      daraltılmalı; (10) pazar gidiş-dönüşünde tutar yuvarlama kaybı.
+- [x] **Sekizinci taramadan kalanlar kapandı (2026-11-16):** fiyat geçmişi
+      kalıcı önbelleğe yazılıyor (pandas Series JSON'a çevrilemediği için
+      sessizce yazılmıyordu; yeniden başlatmada son-bilinen-değer yoktu);
+      arayüz uygulamanın kendi 503'lerini yeniden denemiyor (POST dahil 5
+      kez, 37 sn); 429 çevrili ve `detail` alanında; uvicorn proxy
+      başlıklarını okuyor; denetçi fonun içindeki şirketleri (SAP, BMW,
+      "SIE") hata saymıyor; yapay zekâ kotası tek koşullu UPDATE; push
+      aboneliği çift dokunuşta 500 vermiyor; cron sırrı sabit zamanlı
+      karşılaştırılıyor; kalıcı→yerel ısınma kalan süreyi taşıyor; reel
+      getiri `except` blokları daraltıldı.
+- [ ] Bilinen, bilerek bırakılan: pazar gidiş-dönüşünde tutarlar tam sayıya
+      yuvarlanıp o günün kuruyla çevriliyor (küçük kayıp); kota günü UTC;
+      önbellek değerlerinin biçimi değişirse en fazla bir gün eski biçim
+      servis edilebilir (anahtara sürüm eklenmeli); değerleme ve bölge
+      servislerinde geniş `except` blokları duruyor.
 - [ ] **iOS simülatöründe giriş akışını doğrula** (Clerk yönlendirmesi
       `capacitor://localhost`'a geri dönüyor mu; gerekirse @capacitor/browser
       ya da Clerk'in uygulama içi modalı).

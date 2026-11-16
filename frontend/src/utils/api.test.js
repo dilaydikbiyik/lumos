@@ -184,3 +184,12 @@ describe('getMe — one request for everyone who asks together', () => {
     }
   })
 })
+
+describe('shouldRetry — the app answering is not the proxy failing', () => {
+  it('does not resend a request the app answered with its own 503', async () => {
+    const { shouldRetry } = await import('./api')
+    const base = { hasResponse: true, status: 503, method: 'post', retryCount: 0 }
+    expect(shouldRetry({ ...base, appAnswered: true })).toBe(false)
+    expect(shouldRetry({ ...base, appAnswered: false })).toBe(true)
+  })
+})

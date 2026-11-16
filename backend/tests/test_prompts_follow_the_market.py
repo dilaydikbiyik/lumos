@@ -82,3 +82,15 @@ def test_a_real_instrument_from_outside_the_portfolio_is_caught(ticker):
 
     portfolio, _ = build_for_path("stocks", 6.6, 20_000, "DE", "de")
     assert explanation_check.contradictions(f"Kauf lieber {ticker}.", portfolio)
+
+
+@pytest.mark.parametrize("text", [
+    "Der DAX-Fonds hält Unternehmen wie SAP, BMW und Siemens.",
+    "Am Ende entscheiden SIE, nicht die App.",
+    "The fund holds companies such as KO, PG and DIS.",
+])
+def test_naming_what_a_fund_holds_is_not_naming_a_foreign_instrument(text):
+    from backend.services import explanation_check
+
+    portfolio, _ = build_for_path("stocks", 6.6, 20_000, "DE", "de")
+    assert explanation_check.contradictions(text, portfolio) == []

@@ -122,7 +122,7 @@ def run_backtest(weights: dict[str, float], budget: float, period: str = "5y",
         # otherwise.
         real_pct = inflation_service.real_return_pct(
             total_return_pct, start_month, end_month, market)
-    except Exception:
+    except (ValueError, KeyError, ZeroDivisionError):   # no inflation data for the window
         real_pct = None
 
     return {

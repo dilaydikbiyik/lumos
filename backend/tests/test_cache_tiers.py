@@ -48,7 +48,7 @@ def test_a_value_survives_the_local_tier_being_wiped():
 
     with patch.object(cache_store, "set",
                       side_effect=lambda k, v, ttl: durable.__setitem__(k, v) or True), \
-         patch.object(cache_store, "get", side_effect=durable.get):
+         patch.object(cache_store, "get_with_ttl", side_effect=lambda k: (durable.get(k), None)):
         cache_service.set("lkg:tcmb:cpi", {"2026-08": 1234.5}, ttl=None)
         assert cache_service.get("lkg:tcmb:cpi") == {"2026-08": 1234.5}
 
@@ -65,9 +65,9 @@ def test_a_durable_hit_warms_the_local_tier():
 
     def _get(key):
         calls.append(key)
-        return durable.get(key)
+        return durable.get(key), 3600
 
-    with patch.object(cache_store, "get", side_effect=_get), \
+    with patch.object(cache_store, "get_with_ttl", side_effect=_get), \
          patch.object(cache_store, "set", return_value=True):
         assert cache_service.get("fred:obs:USSTHPI") == {"2026-01": 100.0}
         assert cache_service.get("fred:obs:USSTHPI") == {"2026-01": 100.0}
@@ -81,7 +81,7 @@ def test_a_cached_none_is_not_mistaken_for_a_miss():
     "Found, and it was falsy" and "not found" have to stay distinguishable, or
     a negative result gets refetched forever.
     """
-    with patch.object(cache_store, "get", return_value=None), \
+    with patch.object(cache_store, "get_with_ttl", return_value=(None, None)), \
          patch.object(cache_store, "set", return_value=True):
         cache_service.set("empty", "", ttl=600)
         assert cache_service.get("empty") == ""
