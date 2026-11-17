@@ -22,7 +22,8 @@ def test_two_readers_behind_one_proxy_have_two_buckets():
 
 
 def test_a_visitor_is_keyed_by_the_forwarded_address_and_garbage_does_not_crash():
-    assert reader_key(_request({"x-forwarded-for": "1.2.3.4, 10.0.0.1"})) == "ip:1.2.3.4"
+    # The proxy appends the real address on the right; the left is the client's say.
+    assert reader_key(_request({"x-forwarded-for": "6.6.6.6, 1.2.3.4"})) == "ip:1.2.3.4"
     assert reader_key(_request({"authorization": "Bearer not-a-token"})) == "ip:10.0.0.1"
 
 

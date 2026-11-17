@@ -88,7 +88,8 @@
     "preferChat": "Ich rede lieber →",
     "yearsPlaceholder": "Eine Zahl",
     "backToQuiz": "← Zurück zum kurzen Formular",
-    "outOfRange": "Bitte gib eine Zahl zwischen {{min}} und {{max}} ein."
+    "outOfRange": "Bitte gib eine Zahl zwischen {{min}} und {{max}} ein.",
+    "notANumber": "Bitte gib nur eine Zahl ein (z. B. 250.000)."
   },
   "profile": {
     "bands": {

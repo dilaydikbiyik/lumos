@@ -94,7 +94,9 @@ export default function StructuredQuiz({ onComplete, onPreferChat }) {
     const typed = String(draft ?? '').trim()
     const parsed = typed ? parseAmount(typed, pack.locale) : undefined
     if (typed && !Number.isFinite(parsed)) {
-      setError(t('quiz.outOfRange', { min: question.min, max: question.max }))
+      // Amount questions have no min/max: the range sentence read
+      // "between  and ." for them.
+      setError(t('quiz.notANumber'))
       return
     }
     if (question.required && parsed === undefined) return

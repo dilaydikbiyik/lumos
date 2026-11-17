@@ -94,3 +94,14 @@ def test_naming_what_a_fund_holds_is_not_naming_a_foreign_instrument(text):
 
     portfolio, _ = build_for_path("stocks", 6.6, 20_000, "DE", "de")
     assert explanation_check.contradictions(text, portfolio) == []
+
+
+@pytest.mark.parametrize("market,text", [
+    ("US", "The S&P 500 fund holds Apple (AAPL), Microsoft (MSFT) and Nvidia (NVDA)."),
+    ("DE", "Der MSCI-World-Fonds hält unter anderem Apple (AAPL) und Microsoft (MSFT)."),
+])
+def test_companies_named_as_what_a_fund_holds_survive(market, text):
+    from backend.services import explanation_check
+
+    portfolio, _ = build_for_path("stocks", 6.6, 20_000, market, "en")
+    assert explanation_check.contradictions(text, portfolio) == []

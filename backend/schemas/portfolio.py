@@ -23,7 +23,7 @@ class AssetAllocation(BaseModel):
 
 class PortfolioRecommendRequest(BaseModel):
     risk_score: float = Field(..., ge=1, le=10)
-    budget: float = Field(..., gt=0, description="Investment budget in TRY")
+    budget: float = Field(..., gt=0, description="Investment budget, in the market currency")
 
 
 class PortfolioRecommendResponse(BaseModel):

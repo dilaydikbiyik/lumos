@@ -33,7 +33,9 @@ def reader_key(request: Request) -> str:
             return f"user:{subject}"
     forwarded = request.headers.get("x-forwarded-for", "")
     if forwarded:
-        return f"ip:{forwarded.split(',')[0].strip()}"
+        # The RIGHTMOST entry: the one Render's proxy appended. The leftmost
+        # is whatever the client chose to send.
+        return f"ip:{forwarded.split(',')[-1].strip()}"
     return f"ip:{request.client.host if request.client else 'unknown'}"
 
 

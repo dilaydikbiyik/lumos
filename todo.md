@@ -3823,6 +3823,17 @@ hep SPY çıkıyor". İkisi ayrı sorunmuş.
       önbellek değerlerinin biçimi değişirse en fazla bir gün eski biçim
       servis edilebilir (anahtara sürüm eklenmeli); değerleme ve bölge
       servislerinde geniş `except` blokları duruyor.
+- [x] Dokuzuncu tarama (2026-11-17) — gerileme yok; bilgi sayfaları üç
+      pazarda doğru. Düzeltildi: denetçi, aynı cümlede bir endeks/fon
+      geçiyorsa şirket adlarını ("S&P 500 fonu AAPL, MSFT tutar") açıklama
+      sayıyor; endekssiz "NVDA al" hâlâ yakalanıyor; quiz'de sayı olmayan girişte "arasında
+      bir sayı gir" boş kalıyordu; ziyaretçi sınır anahtarı en sağdaki
+      (proxy'nin eklediği) adres; kalıcı önbelleğe sığmayan değer uyarı
+      olarak loglanıyor.
+- [ ] Açık: çok tickerlı "max" fiyat geçmişi 1 MB'ı aşıp kalıcı önbelleğe
+      girmiyor (alternatifler tablosu) — ticker başına anahtar; para
+      alanlarına üst sınır (yanlışlıkla fazladan sıfır); TR fon bilgilerindeki
+      "Eylül 2026 tasfiyesi: önce üç, sonra altı ay" iddiası için kaynak.
 - [ ] **iOS simülatöründe giriş akışını doğrula** (Clerk yönlendirmesi
       `capacitor://localhost`'a geri dönüyor mu; gerekirse @capacitor/browser
       ya da Clerk'in uygulama içi modalı).

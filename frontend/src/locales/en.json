@@ -82,7 +82,8 @@
     "preferChat": "I'd rather just talk →",
     "yearsPlaceholder": "A number",
     "backToQuiz": "← Back to the short form",
-    "outOfRange": "Please enter a number between {{min}} and {{max}}."
+    "outOfRange": "Please enter a number between {{min}} and {{max}}.",
+    "notANumber": "Please enter a number only (e.g. 250,000)."
   },
   "profile": {
     "bands": {

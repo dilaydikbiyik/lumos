@@ -212,7 +212,10 @@ def set(key: str, value: Any, ttl: Optional[int]) -> bool:
         # rather than failing the write that was only ever a nice-to-have.
         return False
     if len(payload) > _MAX_VALUE_BYTES:
-        logger.debug("durable cache skip: %s is %d bytes", key, len(payload))
+        # Warning, not debug: a value that never reaches the durable tier has
+        # no last-known-good after a restart (multi-ticker "max" histories
+        # are the likely case).
+        logger.warning("durable cache skip: %s is %d bytes", key, len(payload))
         return False
 
     expires_at = (datetime.now(timezone.utc) + timedelta(seconds=ttl)) if ttl else None

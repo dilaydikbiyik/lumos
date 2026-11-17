@@ -127,6 +127,24 @@ def _known_instruments() -> frozenset:
 
 
 _KNOWN_INSTRUMENTS = _known_instruments()
+# Funds stay foreign even beside an index word: "VOO tracks the same index"
+# could still be an invitation to switch fund.
+_FUND_TICKERS = frozenset({"VOO", "VTI", "IVV", "QQQM", "TQQQ", "SQQQ", "ARKK", "SCHD",
+                           "VEA", "VWO", "BTC", "DOGE", "XRP", "USDT"})
+
+
+# Index and fund words. A sentence containing one is describing what a fund
+# holds or tracks — "the S&P 500 fund holds Apple (AAPL) and Microsoft
+# (MSFT)" — and the companies it names are context, not a recommendation.
+# A sentence without one that names a company ("buy NVDA instead") is still
+# caught.
+_INDEX_WORDS = re.compile(
+    r"S&P|MSCI|DAX|BIST|NASDAQ|Nasdaq|World|Welt|Dünya|endeks|index|Index|Fonds?|fund|fon",
+)
+
+
+def _sentences(text: str) -> list[str]:
+    return [s for s in re.split(r"(?<=[.!?])\s+", text) if s]
 
 
 def _is_foreign_instrument(token: str, allowed: set) -> bool:
@@ -189,8 +207,12 @@ def contradictions(
     #    the model supplying an instrument from nowhere — which is also the
     #    single worst thing this app could print, because a reader may act
     #    on a symbol.
+    described = {tok for sentence in _sentences(text) if _INDEX_WORDS.search(sentence)
+                 for tok in _TICKER_RE.findall(sentence)
+                 if "." not in tok and tok not in _FUND_TICKERS}
     for token in set(_TICKER_RE.findall(text)):
-        if token in _NOT_TICKERS or not _is_foreign_instrument(token, real_tickers):
+        if token in _NOT_TICKERS or token in described \
+                or not _is_foreign_instrument(token, real_tickers):
             continue
         # A token that is also a holding's NAME word is prose, not a symbol.
         if any(token.lower() in a.name.lower() for a in portfolio.allocations):

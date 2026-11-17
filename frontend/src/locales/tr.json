@@ -82,7 +82,8 @@
     "preferChat": "Ben konuşarak yapayım →",
     "yearsPlaceholder": "Bir sayı",
     "backToQuiz": "← Kısa forma dön",
-    "outOfRange": "Lütfen {{min}} ile {{max}} arasında bir sayı gir."
+    "outOfRange": "Lütfen {{min}} ile {{max}} arasında bir sayı gir.",
+    "notANumber": "Lütfen yalnızca bir sayı gir (ör. 250.000)."
   },
   "profile": {
     "bands": {
