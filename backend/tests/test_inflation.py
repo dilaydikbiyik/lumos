@@ -121,3 +121,16 @@ def test_long_run_housing_growth_is_not_last_years():
     index[quarters[-1]] = index[quarters[-5]] * 1.006                 # a flat last year
     assert _annualized_from_index(index) == pytest.approx(3.7, abs=0.2)
     assert _annualized_from_index({q: index[q] for q in quarters[-12:]}) is None   # under five years
+
+
+def test_no_index_is_not_zero_inflation():
+    """An empty index made a 50% nominal gain read as 50% real."""
+    from unittest.mock import patch
+
+    from backend.services import inflation_service
+
+    with patch.object(inflation_service, "_get_index", lambda market="TR": {}):
+        with pytest.raises(ValueError):
+            inflation_service.cpi_change_pct("2021-01", "2026-01", "DE")
+        with pytest.raises(ValueError):
+            inflation_service.real_return_pct(50.0, "2021-01", "2026-01", "DE")

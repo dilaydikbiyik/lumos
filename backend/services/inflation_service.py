@@ -31,6 +31,18 @@ def _load_static_index() -> dict[str, float]:
 _STATIC_INDEX = _load_static_index()
 
 
+def _load_de_static_index() -> dict[str, float]:
+    path = Path(__file__).parent.parent / "data" / "de_hicp_index.json"
+    try:
+        return json.loads(path.read_text())["index"]
+    except Exception:
+        logger.warning("bundled German HICP file unreadable")
+        return {}
+
+
+_DE_STATIC_INDEX = _load_de_static_index()
+
+
 def _get_index(market: str = "TR") -> dict[str, float]:
     """
     The CPI index for a market, keyed by YYYY-MM.
@@ -68,7 +80,10 @@ def _get_index(market: str = "TR") -> dict[str, float]:
     if source == "bundesbank":
         from backend.services import bundesbank_service
 
-        return bundesbank_service.get_hicp_index() or {}
+        # The bundled index under the live one, as for Türkiye and the US:
+        # without it a Bundesbank outage on a fresh deploy left Germany with
+        # no index at all.
+        return {**_DE_STATIC_INDEX, **(bundesbank_service.get_hicp_index() or {})}
     return {}
 
 
@@ -118,7 +133,9 @@ def cpi_change_pct(start_month: str, end_month: str, market: str = "TR") -> floa
     """% change in the price index between two YYYY-MM months."""
     index = _get_index(market)
     if not index:
-        return 0.0
+        # No index is not zero inflation: a 50% nominal gain was shown as 50%
+        # real. Callers already treat this as "cannot say" and show nominal.
+        raise ValueError(f"no inflation index for {market}")
     sorted_months = sorted(index)
     if start_month < sorted_months[0]:
         # No data is not zero inflation. The Turkish and US indices began in

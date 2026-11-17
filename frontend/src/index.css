@@ -1,4 +1,6 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap');
+/* Fonts load from index.html (preconnect + stylesheet), not an @import here:
+   an @import inside the bundled CSS made a blocking chain — app CSS, then the
+   font CSS, then the fonts — before the first paint. */
 
 /* ── Reset & Design Tokens ────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -57,7 +59,7 @@
   --page-pad:     16px;
   --shadow:       0 4px 32px rgba(0,0,0,0.6);
   --shadow-glow:  0 0 32px rgba(245,165,36,0.18);
-  --font:         'Outfit', 'Inter', system-ui, sans-serif;
+  --font:         'Outfit', system-ui, -apple-system, 'Segoe UI', sans-serif;
 }
 
 html { font-size: 16px; }
@@ -102,9 +104,12 @@ body {
 /* ── Top Navbar ──────────────────────────────────────────────────────────── */
 .navbar {
   position: sticky; top: 0; z-index: 100;
-  background: rgba(10,11,18,0.88);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  /* Nearly opaque and NOT blurred on phones: a backdrop-filter on a sticky
+     bar re-blurs everything scrolling under it on every frame, the most
+     common cause of scroll stutter on iOS and mid-range Android. Desktop
+     keeps the frosted look (see the min-width:1024px rule below). */
+  background: rgba(10,11,18,0.97);
+  transform: translateZ(0);
   border-bottom: 1px solid var(--border);
   /* iOS safe area: push content below the status bar (clock, carrier icons)
      max() ensures we always have at least 12px even on non-notch devices. */
@@ -115,9 +120,10 @@ body {
 /* ── Bottom Nav (mobile) ─────────────────────────────────────────────────── */
 .bottom-nav {
   position: fixed; bottom: 0; left: 0; right: 0;
-  background: rgba(12,14,24,0.97);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  /* Opaque already — the blur behind it was invisible and cost a repaint of
+     the page under it on every scroll frame. */
+  background: rgba(12,14,24,0.98);
+  transform: translateZ(0);
   border-top: 1px solid var(--border);
   display: flex; justify-content: space-around; align-items: center;
   padding: 8px 0; padding-bottom: max(8px, env(safe-area-inset-bottom));
@@ -221,10 +227,10 @@ body {
 
 /* Glassmorphism card variant */
 .card-glass {
-  background: rgba(18,20,31,0.7);
+  /* Solid enough to read without a blur behind it; blurred only where the
+     hardware can afford it (desktop rule below). */
+  background: rgba(18,20,31,0.92);
   border: 1px solid rgba(245,165,36,0.12);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
   border-radius: var(--radius);
   padding: 20px;
   transition: border-color 0.2s, box-shadow 0.2s;
@@ -263,7 +269,7 @@ p  { line-height: 1.65; color: var(--text-muted); }
   padding: 0 24px;
   border-radius: var(--radius-sm);
   font-size: 15px; font-weight: 600; cursor: pointer;
-  border: none; transition: all 0.2s ease;
+  border: none; transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
   font-family: var(--font);
   -webkit-tap-highlight-color: transparent;
   letter-spacing: 0.01em;
@@ -504,6 +510,10 @@ select.input { cursor: pointer; }
 body::before {
   content: "";
   position: fixed; left: 0; right: 0; top: 0; height: 52vh;
+  /* Its own compositor layer: a fixed full-width gradient behind scrolling
+     content was repainted on every frame. */
+  transform: translateZ(0);
+  will-change: transform;
   z-index: -1; pointer-events: none;
   background: radial-gradient(130% 80% at 50% -8%,
     rgba(245,165,36,0.22) 0%, rgba(232,102,63,0.09) 38%, transparent 66%);
@@ -516,6 +526,8 @@ body::before {
 body::after {
   content: "";
   position: fixed; left: 0; right: 0; bottom: 0; height: 62vh;
+  transform: translateZ(0);
+  will-change: transform;
   z-index: -1; pointer-events: none; opacity: 0;
   background: radial-gradient(150% 100% at 50% 132%,
     rgba(245,165,36,0.22) 0%, rgba(232,102,63,0.10) 42%, transparent 72%);
@@ -634,10 +646,12 @@ body.illumination-3::after { opacity: 1; }
   100% { transform: translate(calc(var(--dx,20px) * -0.3), var(--dy,-30px)); opacity: 0.7; }
 }
 
+/* Opacity, not filter: animating filter: blur/brightness repainted every
+   particle on every frame; opacity runs on the compositor. */
 @keyframes particle-glow {
-  0%, 100% { filter: brightness(1) blur(0px); }
-  45%       { filter: brightness(0.3) blur(1px); }
-  70%       { filter: brightness(1.2) blur(0px); }
+  0%, 100% { opacity: 1; }
+  45%       { opacity: 0.3; }
+  70%       { opacity: 0.95; }
 }
 
 /* ── Onboarding hero particle sweep — drift animation ── */
@@ -800,4 +814,20 @@ body.illumination-3::after { opacity: 1; }
   letter-spacing: 0.07em;
   font-weight: 600;
   margin-bottom: 4px;
+}
+
+
+/* Frosted surfaces where they are cheap enough: a desktop with a real
+   pointer. Phones get the opaque versions above. */
+@media (min-width: 1024px) and (hover: hover) {
+  .navbar {
+    background: rgba(10,11,18,0.88);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
+  .card-glass {
+    background: rgba(18,20,31,0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
 }

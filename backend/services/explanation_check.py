@@ -139,8 +139,18 @@ _FUND_TICKERS = frozenset({"VOO", "VTI", "IVV", "QQQM", "TQQQ", "SQQQ", "ARKK", 
 # A sentence without one that names a company ("buy NVDA instead") is still
 # caught.
 _INDEX_WORDS = re.compile(
-    r"S&P|MSCI|DAX|BIST|NASDAQ|Nasdaq|World|Welt|Dünya|endeks|index|Index|Fonds?|fund|fon",
+    r"S&P|MSCI|DAX|BIST|NASDAQ|Nasdaq|World|Welt|Dünya|endeks|index|Index|Fonds?|fund|fon|ETF",
 )
+# ...and only when the sentence DESCRIBES holdings without telling the reader
+# to act. The index-word rule alone let "sell the S&P 500 fund and buy MSFT"
+# and "bu fon yerine TSLA al" through: the vocabulary of switching funds is
+# the vocabulary of funds.
+_HOLDING_VERBS = re.compile(
+    r"\b(holds?|owns?|contains?|includes?|tracks?|hält|enthält|umfasst|beinhaltet|"
+    r"tutar|içerir|barındırır|kapsar|gibi)\b", re.IGNORECASE)
+_ACTION_WORDS = re.compile(
+    r"\b(buy|sell|switch|instead|rather|better|skip|kauf\w*|verkauf\w*|lieber|statt|"
+    r"stattdessen|besser|al|sat|yerine|tercih\w*|daha iyi)\b", re.IGNORECASE)
 
 
 def _sentences(text: str) -> list[str]:
@@ -207,7 +217,9 @@ def contradictions(
     #    the model supplying an instrument from nowhere — which is also the
     #    single worst thing this app could print, because a reader may act
     #    on a symbol.
-    described = {tok for sentence in _sentences(text) if _INDEX_WORDS.search(sentence)
+    described = {tok for sentence in _sentences(text)
+                 if _INDEX_WORDS.search(sentence) and _HOLDING_VERBS.search(sentence)
+                 and not _ACTION_WORDS.search(sentence)
                  for tok in _TICKER_RE.findall(sentence)
                  if "." not in tok and tok not in _FUND_TICKERS}
     for token in set(_TICKER_RE.findall(text)):

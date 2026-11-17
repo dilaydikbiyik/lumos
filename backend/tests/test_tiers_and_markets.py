@@ -133,6 +133,7 @@ def test_admin_can_set_plan(client):
         async with _TestSession() as db:
             user = await user_repository.get_or_create(db, "user_admin_2")
             user.role = "admin"
+            await user_repository.get_or_create(db, "user_target_1")   # the target exists
             await db.commit()
 
     asyncio.run(promote())

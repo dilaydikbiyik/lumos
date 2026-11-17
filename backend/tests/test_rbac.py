@@ -80,6 +80,7 @@ def test_feedback_queue_is_gated_on_the_permission_not_the_role_name(
 def test_changing_a_plan_needs_write_access(client, role, expected):
     _as(f"rbac_plan_{role}")
     _set_role(f"rbac_plan_{role}", role)
+    _set_role("rbac_plan_target", "user")        # the target must exist: a typo is a 404
     res = client.patch("/admin/users/rbac_plan_target/plan", json={"plan": "plus"})
     assert res.status_code == expected
 
@@ -110,6 +111,7 @@ def test_an_admin_can_grant_and_withdraw_support(client):
     _as("rbac_grantor")
     _set_role("rbac_grantor", "admin")
 
+    _set_role("rbac_grantee", "user")
     granted = client.patch("/admin/users/rbac_grantee/role", json={"role": "support"})
     assert granted.status_code == 200
     assert granted.json()["role"] == "support"
@@ -189,6 +191,7 @@ def test_permissions_are_derived_from_the_role_never_stored(client):
     """Two places holding the same truth is how a revoked role keeps powers."""
     _as("rbac_derive_admin")
     _set_role("rbac_derive_admin", "admin")
+    _set_role("rbac_derive", "user")
     client.patch("/admin/users/rbac_derive/role", json={"role": "admin"})
 
     _as("rbac_derive")
@@ -209,3 +212,15 @@ def test_the_role_table_is_served_rather_than_hard_coded_on_the_client(client):
 
     assert {r["name"] for r in body["roles"]} == set(perms.ROLES)
     assert body["assignable"] == list(perms.ASSIGNABLE_ROLES)
+
+
+def test_an_admin_change_never_creates_a_user(client):
+    """A typo in the id used to make a new account; it is a 404 now."""
+    _as("rbac_ghost_admin")
+    _set_role("rbac_ghost_admin", "admin")
+    before = client.get("/admin/stats").json()["total_users"]
+    assert client.patch("/admin/users/user_typo_nobody/plan", json={"plan": "plus"}).status_code == 404
+    assert client.patch("/admin/users/user_typo_nobody/role", json={"role": "user"}).status_code == 404
+    stats = client.get("/admin/stats").json()
+    assert stats["total_users"] == before
+    assert sum(stats["users_by_path"].values()) == stats["total_users"]

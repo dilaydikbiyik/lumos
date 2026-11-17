@@ -440,6 +440,10 @@ _C: dict[str, dict[str, str]] = {
         "tr": "Yazdığın metinlerden biri çok uzun ya da boş — kısaltıp tekrar dener misin?",
         "en": "One of the texts you typed is too long or empty — could you shorten it and try again?",
         "de": "Einer der eingegebenen Texte ist zu lang oder leer — kürzt du ihn und versuchst es noch einmal?"},
+    "admin.userNotFound": {
+        "tr": "Bu kimlikte bir kullanıcı yok.",
+        "en": "There is no user with this id.",
+        "de": "Es gibt keinen Nutzer mit dieser ID."},
     "error.rateLimited": {
         "tr": "Kısa sürede çok fazla istek geldi — bir dakika sonra tekrar dener misin?",
         "en": "Too many requests in a short time — could you try again in a minute?",
@@ -1094,4 +1098,24 @@ def t(key: str, lang: str = "tr", **kw: Any) -> str:
                 break
     if text is None:
         return key
-    return text.format(**kw) if kw else text
+    return text.format(**{k: _localised(v, lang) for k, v in kw.items()}) if kw else text
+
+
+# Languages that write the decimal mark as a comma.
+_COMMA_DECIMAL = {"tr", "de"}
+
+
+def _localised(value: Any, lang: str) -> Any:
+    """A float in the reader's notation: 35,0 in Turkish and German.
+
+    Every engine sentence received a raw Python float, so the cards read
+    "→ %35.0" and "35.3 %" in languages that write 35,0. Formatting here,
+    once, covers every template instead of each caller remembering to.
+    Integers and strings pass through unchanged.
+    """
+    if isinstance(value, float) and not isinstance(value, bool):
+        text = repr(round(value, 6)) if value != int(value) else f"{value:.1f}"
+        if "e" in text:
+            text = f"{value:.2f}"
+        return text.replace(".", ",") if lang in _COMMA_DECIMAL else text
+    return value

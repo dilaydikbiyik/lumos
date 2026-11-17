@@ -1,9 +1,17 @@
 """
 What a fund actually is, per market — and what its protections do not cover.
 
-Why this exists. In September 2026 the Turkish regulator closed 131 funds
-across seven portfolio companies and moved them to liquidation; its own
-press release put the number of individual investors at 455,758. The app
+Why this exists. On 17 September 2026 the Turkish regulator (SPK) closed
+131 funds across seven portfolio companies and moved them to liquidation,
+run by two state banks; its own press release put the number of individual
+investors at 455,758. The liquidation was first expected to finish within
+three months; the period was then extended to six.
+
+Sources (checked 2026-11-17; the authoritative ones are SPK bulletins
+2026/60 and 2026/61):
+  https://haber.sol.org.tr/haber/spk-tasfiye-edilen-131-fondaki-yatirimci-sayisi-455-bin-758-kisi-414158
+  https://www.yatirimx.com.tr/piyasa/spkdan-131-fon-icin-tasfiye-rehberi-sureci-dev-bankalar-yurutecek/25162
+  https://www.sde.org.tr/haber/spk-dan-tasfiye-edilen-131-fon-icin-odeme-aciklamasi-yapildi-maliye-bakani-simsek-yatirimcilarin-mesru-haklarini-gozetiyoruz-dedi-haberi-67328 The app
 had nothing to say about it, because it taught only ONE kind of liquidity —
 "how fast can I sell this", stocks in minutes and land in months. That
 misses the thing that actually happened: the asset inside was fine and the
@@ -45,7 +53,7 @@ FUND_FACTS: dict[str, dict[str, list[dict]]] = {
             {"title": "Ayrı olmak, değerinin garantisi değildir",
              "body": "Bu ayrım seni yöneticinin BATMASINDAN korur, KARARLARINDAN korumaz. Fon kötü yatırım yaptıysa zarar senindir. Hiçbir kurum anaparanı geri ödeyeceğini taahhüt etmez; \"SPK'ya kayıtlı\" demek \"devlet garantili\" demek değildir."},
             {"title": "En büyük risk paranı o gün alamamaktır",
-             "body": "Bir fon işleme kapatılıp tasfiyeye alınırsa, varlıklar yerinde olsa bile sen aylarca paranı çekemezsin. 2026 Eylül'ündeki tasfiyede süre önce üç ay, sonra altı ay olarak belirlendi. Acil ihtiyaç planını fona bağlama."},
+             "body": "Bir fon işleme kapatılıp tasfiyeye alınırsa, varlıklar yerinde olsa bile sen aylarca paranı çekemezsin. Eylül 2026'da 131 fonun tasfiyesinde sürecin önce en fazla üç ayda bitmesi öngörüldü, sonra süre altı aya uzatıldı. Acil ihtiyaç planını fona bağlama."},
             {"title": "Borsada işlem gören fon farklı bir yapıdır",
              "body": "ETF gibi borsada işlem gören fonlarda payını piyasa açıkken bir başkasına satarsın; fonun kendisinden para çekmen gerekmez. Portföy şirketinin yönettiği fonda ise iadeyi fondan istersin — zincirde bir halka daha vardır. İkisi de \"fon\" adını taşır, riskleri aynı değildir."},
             {"title": "Tek kurumda yığılma da bir yoğunlaşmadır",
@@ -57,7 +65,7 @@ FUND_FACTS: dict[str, dict[str, list[dict]]] = {
             {"title": "Separate does not mean guaranteed",
              "body": "That separation protects you from the manager GOING UNDER, not from its DECISIONS. If the fund invested badly, the loss is yours. No institution undertakes to return your principal; \"registered with the regulator\" does not mean \"guaranteed by the state\"."},
             {"title": "The real risk is not getting your money that day",
-             "body": "If a fund is closed to trading and moved to liquidation, you cannot withdraw for months even though the assets are where they should be. In the September 2026 liquidation the period was first set at three months and then extended to six. Do not tie your emergency plan to a fund."},
+             "body": "If a fund is closed to trading and moved to liquidation, you cannot withdraw for months even though the assets are where they should be. When 131 funds were moved to liquidation in September 2026, the process was first expected to take at most three months; the period was then extended to six. Do not tie your emergency plan to a fund."},
             {"title": "An exchange-traded fund is a different structure",
              "body": "With an ETF you sell your share to another buyer while the market is open; you never have to withdraw from the fund itself. With a fund run by a portfolio company you ask the fund to redeem — one more link in the chain. Both are called funds; their risks are not the same."},
             {"title": "Piling into one institution is concentration too",
@@ -69,7 +77,7 @@ FUND_FACTS: dict[str, dict[str, list[dict]]] = {
             {"title": "Getrennt heißt nicht garantiert",
              "body": "Diese Trennung schützt dich vor dem UNTERGANG des Verwalters, nicht vor seinen ENTSCHEIDUNGEN. Hat der Fonds schlecht investiert, ist der Verlust deiner. Keine Institution sagt zu, dein eingesetztes Kapital zurückzugeben; \"bei der Aufsicht registriert\" heißt nicht \"staatlich garantiert\"."},
             {"title": "Das eigentliche Risiko ist, am Tag X nicht heranzukommen",
-             "body": "Wird ein Fonds für den Handel geschlossen und abgewickelt, kommst du monatelang nicht an dein Geld, obwohl die Werte vorhanden sind. Bei der Abwicklung im September 2026 wurde die Frist zunächst auf drei, dann auf sechs Monate gesetzt. Binde deine Notfallplanung nicht an einen Fonds."},
+             "body": "Wird ein Fonds für den Handel geschlossen und abgewickelt, kommst du monatelang nicht an dein Geld, obwohl die Werte vorhanden sind. Als im September 2026 131 Fonds in die Abwicklung gingen, sollte der Prozess zunächst höchstens drei Monate dauern; dann wurde die Frist auf sechs Monate verlängert. Binde deine Notfallplanung nicht an einen Fonds."},
             {"title": "Ein börsengehandelter Fonds ist eine andere Struktur",
              "body": "Beim ETF verkaufst du deinen Anteil während der Handelszeit an einen anderen Käufer; du musst nie aus dem Fonds selbst aussteigen. Beim Fonds einer Portfoliogesellschaft verlangst du die Rücknahme vom Fonds — ein Glied mehr in der Kette. Beide heißen Fonds, ihre Risiken sind es nicht."},
             {"title": "Alles bei einem Haus ist auch Konzentration",

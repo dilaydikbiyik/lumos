@@ -35,11 +35,11 @@ async def admin_stats(
         select(func.coalesce(func.sum(User.quota_used), 0)).where(User.quota_date == today)
     )).scalar()
 
-    by_path = dict((await db.execute(
-        select(User.investment_path, func.count(User.id))
-        .where(User.investment_path.is_not(None))
-        .group_by(User.investment_path)
-    )).all())
+    # Every user in a bucket, so the buckets sum to total_users; those who
+    # have not chosen a path are counted as "none" rather than left out.
+    by_path = {(path or "none"): count for path, count in (await db.execute(
+        select(User.investment_path, func.count(User.id)).group_by(User.investment_path)
+    )).all()}
 
     return {
         "total_users": total_users,
@@ -63,6 +63,7 @@ class RoleUpdate(BaseModel):
 
 @router.patch("/users/{clerk_user_id}/plan")
 async def set_user_plan(
+    request: Request,
     clerk_user_id: str,
     body: PlanUpdate,
     admin_id: str = Depends(require_permission(perms.PLANS_WRITE)),
@@ -80,7 +81,13 @@ async def set_user_plan(
     if body.plan not in AI_TIERS:
         raise HTTPException(status_code=422, detail=f"Unknown plan '{body.plan}'. Available: {list(AI_TIERS)}")
 
-    user = await user_repository.get_or_create(db, clerk_user_id)
+    from backend.i18n import t
+    from backend.middleware.language import get_language
+
+    # Look up, never create: a typo in the id used to make a new account.
+    user = await user_repository.get_by_clerk_id(db, clerk_user_id)
+    if user is None:
+        raise HTTPException(status_code=404, detail=t("admin.userNotFound", get_language(request)))
     user.plan = body.plan
     await db.flush()
     return {"clerk_user_id": clerk_user_id, "plan": user.plan}
@@ -116,9 +123,12 @@ async def list_users(
     limit = max(1, min(limit, 200))
     stmt = select(User).order_by(User.id.desc()).limit(limit)
     if q.strip():
-        needle = f"%{q.strip()}%"
+        # "_" and "%" are wildcards in LIKE; escaped, so searching for "_"
+        # finds ids containing an underscore rather than every user.
+        term = q.strip().replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+        needle = f"%{term}%"
         stmt = select(User).where(
-            User.email.ilike(needle) | User.clerk_user_id.ilike(needle)
+            User.email.ilike(needle, escape="\\") | User.clerk_user_id.ilike(needle, escape="\\")
         ).order_by(User.id.desc()).limit(limit)
 
     rows = (await db.execute(stmt)).scalars().all()
@@ -181,7 +191,9 @@ async def set_user_role(
                      roles=", ".join(perms.ASSIGNABLE_ROLES)),
         )
 
-    target = await user_repository.get_or_create(db, clerk_user_id)
+    target = await user_repository.get_by_clerk_id(db, clerk_user_id)
+    if target is None:
+        raise HTTPException(status_code=404, detail=t("admin.userNotFound", lang))
 
     if target.role == perms.ADMIN and body.role != perms.ADMIN:
         if clerk_user_id == admin_id:

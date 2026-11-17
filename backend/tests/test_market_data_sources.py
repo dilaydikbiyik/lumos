@@ -162,7 +162,9 @@ def test_inflation_and_rent_route_to_the_declared_source():
     fake_rent = {"2026-07": 102.3, "2026-08": 102.5}
     with patch.object(bundesbank_service, "get_hicp_index", lambda: fake_cpi), \
          patch.object(bundesbank_service, "get_rent_index", lambda: fake_rent):
-        assert inflation_service._get_index("DE") == fake_cpi
+        # The live values sit on top of the bundled German index.
+        index = inflation_service._get_index("DE")
+        assert {k: index[k] for k in fake_cpi} == fake_cpi
         assert inflation_service.get_rent_index("DE") == fake_rent
 
 
@@ -174,4 +176,8 @@ def test_a_source_that_goes_dark_reports_nothing_rather_than_a_neighbour():
     from backend.services import bundesbank_service, inflation_service
 
     with patch.object(bundesbank_service, "get_hicp_index", lambda: None):
-        assert inflation_service._get_index("DE") == {}
+        index = inflation_service._get_index("DE")
+    # Germany's OWN bundled index, never a neighbour's: no Turkish or US
+    # value, and the German 2022 rate (9.6%, December on December).
+    assert index == inflation_service._DE_STATIC_INDEX
+    assert round((index["2022-12"] / index["2021-12"] - 1) * 100, 1) == 9.6

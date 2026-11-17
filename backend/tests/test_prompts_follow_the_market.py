@@ -105,3 +105,36 @@ def test_companies_named_as_what_a_fund_holds_survive(market, text):
 
     portfolio, _ = build_for_path("stocks", 6.6, 20_000, market, "en")
     assert explanation_check.contradictions(text, portfolio) == []
+
+
+@pytest.mark.parametrize("text", [
+    "Statt dieses Fonds lieber NVDA kaufen.",
+    "Bu fon yerine TSLA al.",
+    "Endeks fonu yerine NVDA daha iyi.",
+    "Index funds are boring, buy AAPL.",
+    "Skip the fund and buy TSLA.",
+    "Sell the S&P 500 fund and buy MSFT.",
+    "Der DAX ist langweilig, kauf AMZN.",
+    "The fund holds AAPL, but buy NVDA directly.",
+    "Fon AAPL içerir ama NVDA al.",
+])
+def test_a_switch_recommendation_beside_a_fund_word_is_caught(text):
+    from backend.services import explanation_check
+
+    for market in ("TR", "US", "DE"):
+        portfolio, _ = build_for_path("stocks", 6.6, 20_000, market, "en")
+        assert explanation_check.contradictions(text, portfolio), (market, text)
+
+
+@pytest.mark.parametrize("text", [
+    "Der S&P-500-Fonds hält Apple (AAPL) und Microsoft (MSFT).",
+    "S&P 500 fonu Apple (AAPL) ve Microsoft (MSFT) gibi şirketleri tutar.",
+    "Der MSCI-World-ETF enthält Nvidia (NVDA).",
+    "Your S&P 500 fund already owns NVDA, AAPL and MSFT.",
+    "The S&P 500 fund includes Apple (AAPL) among 500 companies.",
+])
+def test_describing_what_a_fund_holds_still_passes(text):
+    from backend.services import explanation_check
+
+    portfolio, _ = build_for_path("stocks", 6.6, 20_000, "US", "en")
+    assert explanation_check.contradictions(text, portfolio) == []

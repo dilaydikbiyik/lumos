@@ -88,9 +88,18 @@ async def recommend(
 
     # explain_portfolio / explain_reit_inclusion call generate_text() which is
     # synchronous blocking I/O — run in a thread so the event loop stays free.
-    explanation = await _prose_or_nothing(
+    # The two explanations are independent model calls, so they run
+    # together: one after the other, a property-path reader waited for both
+    # round trips back to back before the page could draw anything.
+    explanation_task = _prose_or_nothing(
         explain_portfolio, portfolio, user_profile, lang, pack.currency, market
     )
+    reit_task = (_prose_or_nothing(explain_reit_inclusion, portfolio, user_profile, lang, market)
+                 if portfolio.includes_reits else None)
+    if reit_task is not None:
+        explanation, reit_text = await asyncio.gather(explanation_task, reit_task)
+    else:
+        explanation, reit_text = await explanation_task, None
     # Checked against the figures it was given before it reaches the reader.
     #
     # The allocation is a formula and the same input produces the same
@@ -108,9 +117,6 @@ async def recommend(
     )
 
     if portfolio.includes_reits:
-        reit_text = await _prose_or_nothing(
-            explain_reit_inclusion, portfolio, user_profile, lang, market
-        )
         # The REIT-specific checker, NOT the portfolio one. Its prompt
         # instructs regulatory and historical figures ("at least 90% of
         # taxable income", "~8-10% annualized over 20 years") that are not

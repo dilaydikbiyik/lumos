@@ -3834,6 +3834,27 @@ hep SPY çıkıyor". İkisi ayrı sorunmuş.
       girmiyor (alternatifler tablosu) — ticker başına anahtar; para
       alanlarına üst sınır (yanlışlıkla fazladan sıfır); TR fon bilgilerindeki
       "Eylül 2026 tasfiyesi: önce üç, sonra altı ay" iddiası için kaynak.
+- [x] **Performans / kasma (2026-11-17):** telefonda yapışkan üst menü ve
+      sabit alt menüde `backdrop-filter: blur` kaydırmanın her karesinde
+      altındaki sayfayı yeniden bulanıklaştırıyordu (iOS/orta Android
+      kasmasının en yaygın nedeni; alt menü zaten %97 opaktı) → telefonda
+      opak, masaüstünde buzlu. Sabit radyal arka plan katmanları kendi
+      katmanlarında; ateşböceği animasyonu filter yerine opacity; düğme
+      geçişleri `all` yerine belirli özellikler. Yazı tipleri CSS
+      `@import` zincirinden index.html'e (preconnect); hiç gösterilmeyen
+      Inter'in 6 ağırlığı ve kullanılmayan 300 ağırlığı indirilmiyor. Öneri
+      ucu iki yapay zekâ açıklamasını paralel bekliyor.
+- [x] **Onuncu tarama (2026-11-17):** gerileme — denetçinin "endeks kelimesi"
+      kuralı "fon yerine TSLA al"ı geçiriyordu → bağlam yalnızca tutma fiili
+      olup eylem kelimesi yoksa (9 kötü / 5 iyi cümle testli). Almanya
+      enflasyon kaynağı çökünce indeks boş kalıp reel = nominal oluyordu →
+      paketli HICP dosyası; boş indeks artık "%0" değil hata. Sunucunun
+      yazdığı TR/DE ondalıkları ("%35.0") → çeviri fonksiyonunda yerel ayraç.
+      Yönetici panelinde olmayan kimlik için plan/rol değişikliği yeni
+      kullanıcı yaratıyordu → 404; aramada "_" ve "%" kaçışlı; yol
+      istatistiği "none" kovasıyla toplama eşit. Fon tasfiyesi iddiasına
+      kaynak eklendi (SPK, 17 Eylül 2026; bültenler 2026/60–61). Gizlilik
+      politikası tarihi güncellendi.
 - [ ] **iOS simülatöründe giriş akışını doğrula** (Clerk yönlendirmesi
       `capacitor://localhost`'a geri dönüyor mu; gerekirse @capacitor/browser
       ya da Clerk'in uygulama içi modalı).
