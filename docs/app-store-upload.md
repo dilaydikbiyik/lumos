@@ -23,6 +23,12 @@ her biri bir sonrakinin ön koşulu.
    uygulamalarını tüzel kişiden bekler; inceleme notu uygulamanın eğitim
    aracı olduğunu söylüyor, ama bu bir avukatın onaylaması gereken iddia.
 
+## 0.5 Ödeme (isteğe bağlı, ilk sürümde olmayabilir)
+
+Abonelik satılacaksa App Store ürünleri, RevenueCat ve Lemon Squeezy
+kurulumu: `docs/billing-setup.md`. Anahtarlar girilmezse uygulama satın
+alma düğmesi göstermez; ücretsiz sürüm olarak da gönderilebilir.
+
 ## 1. Derleme
 
 ```bash

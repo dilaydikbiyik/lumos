@@ -948,7 +948,7 @@
   },
   "legal": {
     "updated": "Son güncelleme: {{date}}",
-    "updatedDate": "17 Kasım 2026",
+    "updatedDate": "21 Kasım 2026",
     "backHome": "Lumos'a dön",
     "contact": "Buradaki her şeyle ilgili sorular için: dilaydikbiyik@gmail.com.",
     "privacy": {
@@ -965,6 +965,10 @@
         {
           "h": "Bildirimlere izin verirsen ne saklanıyor",
           "p": "Bildirimleri açtığında tarayıcın bir abonelik adresi (endpoint) üretir; bunu, cihazına özel iki şifreleme anahtarını ve o anki dil seçimini saklarız. Bunlar yalnızca sana bildirim gönderebilmek içindir: adres cihazını tanımlar ama kimliğini, konumunu veya başka uygulamalardaki davranışını taşımaz, reklam kimliği değildir ve kimseyle paylaşılmaz. Bildirimleri kapattığında kayıt silinir — işaretlenmez, silinir. Gönderdiğimiz tek bildirim, kendi portföyün belirgin biçimde hareket ettiğinde gelen sakinleştirici mesajdır; pazarlama bildirimi göndermeyiz."
+        },
+        {
+          "h": "Plan satın alırsan",
+          "p": "Ödemeleri tamamen satıcı yürütür — web'de Lemon Squeezy, iOS uygulamasında Apple (App Store aboneliğini bizim için RevenueCat kaydeder). Lumos kart ya da banka bilgini asla görmez. Yalnızca hangi planda olduğunu, sağlayıcının abonelik kimliğini, iptal edilen planın bitiş tarihini ve aboneliğini yönettiğin bağlantıyı alıp saklarız; hesabına doğru plan uygulansın diye."
         },
         {
           "h": "Lumos'un asla toplamadıkları",
@@ -1030,6 +1034,10 @@
         {
           "h": "Senin sorumluluğun",
           "p": "Verdiğin kararlar senindir. Yazdıklarının doğruluğu — gelirin, varlıkların, borcun — geri dönen cevabın ne kadar işe yarayacağını belirler ve Lumos'un bunların hiçbirini doğrulama imkânı yoktur."
+        },
+        {
+          "h": "Ücretli planlar",
+          "p": "Lumos'u kullanmak ücretsizdir. İsteğe bağlı ücretli planlar (Fener, Şafak) yapay zekâ danışmanının günlük mesaj sınırını yükseltir ve daha güçlü bir model kullanır; hiçbir öneriyi, hesabı ya da rakamı değiştirmez — bunlar herkes için aynıdır.\n\nWeb'de planları satıcı ve vergi sorumlusu (merchant of record) olarak Lemon Squeezy satar; ödemeyi o alır, KDV ve satış vergisini o öder. iOS uygulamasında planları Apple, uygulama içi satın alma ile satar. Abonelikler iptal edilene kadar her ay yenilenir. İstediğin zaman iptal edebilirsin — web'de Planlar sayfasındaki bağlantıdan, iOS'ta Ayarlar → Abonelikler'den — plan ödediğin dönemin sonuna kadar sürer. İadeler satıcının politikasına tabidir: web'de Lemon Squeezy'nin, uygulamada Apple'ın."
         },
         {
           "h": "Hesabın",
@@ -1364,5 +1372,40 @@
         "lesson": "Uygulama önermez. En kötü düşüş ve oynaklık nedenini gösteriyor — ve geçmişi, bir senaryo bandı çizmeye yetecek kadar uzun değil."
       }
     }
+  },
+  "plans": {
+    "title": "Planlar",
+    "sameAdvice": "Ücretli plan yalnızca yapay zekâ danışmanını değiştirir: günlük mesaj hakkı ve daha güçlü bir model. Öneriler, hesaplar ve her rakam herkes için aynıdır.",
+    "plus": {
+      "label": "Fener",
+      "pitch": "Danışmana günde on kat daha fazla soru, daha derin cevaplar veren bir model."
+    },
+    "pro": {
+      "label": "Şafak",
+      "pitch": "En güçlü danışman modeli ve en yüksek günlük sınır."
+    },
+    "quota_one": "Danışmana günde {{count}} mesaj",
+    "quota_other": "Danışmana günde {{count}} mesaj",
+    "perMonth": "{{price}} / ay",
+    "current": "Mevcut planın",
+    "endsAt": "{{date}} tarihinde sona eriyor",
+    "choose": "Bu planı seç",
+    "thanks": "Teşekkürler! Ödemen alındı; planın birkaç saniye içinde etkinleşir.",
+    "loadError": "Planlar şu an yüklenemedi.",
+    "storeError": "App Store'a şu an ulaşılamıyor.",
+    "buyError": "Satın alma tamamlanamadı.",
+    "manageWeb": "Aboneliğini yönet",
+    "manageApple": "Aboneliğini iPhone'unun Ayarlar → Abonelikler bölümünden yönetebilirsin.",
+    "restore": "Satın alımları geri yükle",
+    "soon": "Ücretli planlar yakında.",
+    "renewalWeb": "Abonelik her ay yenilenir; istediğin zaman iptal edebilirsin, ödediğin dönemin sonuna kadar plan sürer. Satıcı ve vergi sorumlusu Lemon Squeezy'dir.",
+    "renewalApple": "Abonelik Apple Kimliğinden tahsil edilir ve dönem bitiminden en az 24 saat önce iptal edilmezse her ay kendiliğinden yenilenir. Ayarlar → Abonelikler'den yönetebilir ve iptal edebilirsin.",
+    "terms": "Kullanım koşulları",
+    "privacy": "Gizlilik politikası",
+    "free": {
+      "label": "Ateş Böceği",
+      "pitch": "Öğrenmeye başlamak için ihtiyacın olan her şey — sonsuza dek ücretsiz."
+    },
+    "freePrice": "Ücretsiz"
   }
 }

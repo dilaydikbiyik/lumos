@@ -267,6 +267,12 @@ export default function ProfilePage() {
             way through retaking it — had no way to delete itself. Apple
             requires deletion to be reachable for any account that can be
             created, not only for a completed one. */}
+        {/* Plans sit with the account, not in the main navigation: they
+            change the AI advisor only, never the advice. */}
+        <button type="button" className="btn btn-ghost" style={{ minHeight: 44 }}
+                onClick={() => navigate('/plans')}>
+          {t('plans.title')}
+        </button>
         <DeleteAccount compact={!showResult} />
       </div>
     </div>

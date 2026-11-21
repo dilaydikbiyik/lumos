@@ -29,6 +29,7 @@ const ExplorePage = lazy(() => import('./pages/ExplorePage'))
 const RecommendPage = lazy(() => import('./pages/RecommendPage'))
 const StocksPage = lazy(() => import('./pages/StocksPage'))
 const DashboardPage = lazy(() => import('./pages/DashboardPage'))
+const PlansPage = lazy(() => import('./pages/PlansPage'))
 const AdminPage = lazy(() => import('./pages/AdminPage'))
 const LegalPage = lazy(() => import('./pages/LegalPage'))
 
@@ -170,6 +171,7 @@ export default function App() {
           <Route path="/stocks"    element={<ProtectedRoute><StocksPage /></ProtectedRoute>} />
           <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
           <Route path="/admin"     element={<ProtectedRoute><AdminPage /></ProtectedRoute>} />
+          <Route path="/plans"     element={<ProtectedRoute><PlansPage /></ProtectedRoute>} />
           {/* Public on purpose: both app stores fetch these from a
               signed-out crawler during review, and a policy you must log in
               to read has not actually been published. */}

@@ -215,15 +215,20 @@ async def what_if_endpoint(
     """
     from backend.services.what_if import answer_what_if
 
-    allowed = await user_repository.consume_quota(db, user_id, settings.DAILY_MESSAGE_QUOTA)
+    from backend.services.ai_tiers import get_tier
+
+    # The reader's plan decides the quota here too, as in the two chats: a
+    # paying reader was held to the free allowance on the what-if.
+    user = await user_repository.get_or_create(db, user_id)
+    tier = get_tier(user.plan)
+    effective_quota = settings.DAILY_MESSAGE_QUOTA if settings.APP_ENV == "development" else tier["daily_quota"]
+    allowed = await user_repository.consume_quota(db, user_id, effective_quota)
     if not allowed:
         raise HTTPException(
             status_code=429,
-            detail=t("error.quota", get_language(request),
-                     quota=settings.DAILY_MESSAGE_QUOTA),
+            detail=t("error.quota", get_language(request), quota=tier["daily_quota"]),
         )
 
-    user = await user_repository.get_or_create(db, user_id)
     return await asyncio.to_thread(answer_what_if, body.question, body.risk_score,
                                    body.budget, user.market or "TR",
                                    get_language(request), user.investment_path,

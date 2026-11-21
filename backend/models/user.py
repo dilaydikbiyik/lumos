@@ -53,6 +53,17 @@ class User(Base):
     # Market pack: TR (reference) / US / DE ... (backend/markets/)
     market: Mapped[str] = mapped_column(String, default="TR", nullable=False, server_default="TR")
 
+    # Where the paid plan came from, so a cancellation from one store never
+    # downgrades a plan bought in the other: "lemonsqueezy" (web),
+    # "revenuecat" (App Store), "admin", or null for free.
+    plan_source: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    # The provider's subscription id and the link where the reader manages
+    # it (web only; the App Store has its own).
+    subscription_id: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    billing_portal_url: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    # When a cancelled subscription stops (the plan is kept until then).
+    plan_ends_at: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+
     # Access role: user (default) / admin — admin unlocks /admin/stats
     role: Mapped[str] = mapped_column(String, default="user", nullable=False, server_default="user")
 

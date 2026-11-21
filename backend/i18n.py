@@ -440,6 +440,14 @@ _C: dict[str, dict[str, str]] = {
         "tr": "Yazdığın metinlerden biri çok uzun ya da boş — kısaltıp tekrar dener misin?",
         "en": "One of the texts you typed is too long or empty — could you shorten it and try again?",
         "de": "Einer der eingegebenen Texte ist zu lang oder leer — kürzt du ihn und versuchst es noch einmal?"},
+    "billing.unavailable": {
+        "tr": "Ödeme şu an açılamıyor — birazdan tekrar dener misin?",
+        "en": "Checkout can't be opened right now — could you try again shortly?",
+        "de": "Der Bezahlvorgang lässt sich gerade nicht öffnen — versuchst du es gleich noch einmal?"},
+    "billing.alreadyApple": {
+        "tr": "Bu planı App Store üzerinden zaten alıyorsun; aboneliğini iPhone'unun Ayarlar → Abonelikler bölümünden yönetebilirsin.",
+        "en": "You already have this plan through the App Store; manage it in your iPhone's Settings → Subscriptions.",
+        "de": "Du hast diesen Plan bereits über den App Store; verwalte ihn in den iPhone-Einstellungen → Abonnements."},
     "admin.userNotFound": {
         "tr": "Bu kimlikte bir kullanıcı yok.",
         "en": "There is no user with this id.",

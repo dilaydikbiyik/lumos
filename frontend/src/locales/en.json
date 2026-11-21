@@ -948,7 +948,7 @@
   },
   "legal": {
     "updated": "Last updated: {{date}}",
-    "updatedDate": "17 November 2026",
+    "updatedDate": "21 November 2026",
     "backHome": "Back to Lumos",
     "contact": "Questions about any of this: dilaydikbiyik@gmail.com.",
     "privacy": {
@@ -965,6 +965,10 @@
         {
           "h": "What is stored if you allow notifications",
           "p": "When you turn notifications on, your browser issues a subscription address (an endpoint); we store that, the two encryption keys specific to your device, and the language you were using. They exist only so a notification can reach you: the address identifies a browser, not you — it carries no identity, no location and nothing about your behaviour elsewhere, it is not an advertising identifier, and it is shared with nobody. Turn notifications off and the record is deleted, not flagged. The only notification we send is the steadying message that follows a significant move in your own portfolio; we send no marketing."
+        },
+        {
+          "h": "If you buy a plan",
+          "p": "Payments are handled entirely by the seller — Lemon Squeezy on the web, Apple in the iOS app (with RevenueCat recording the App Store subscription for us). Lumos never sees your card or bank details. We receive and store only which plan you have, the provider's subscription id, when a cancelled plan ends, and the link where you manage it, so that the right plan is applied to your account."
         },
         {
           "h": "What Lumos never collects",
@@ -1030,6 +1034,10 @@
         {
           "h": "Your responsibility",
           "p": "Decisions you make are yours. The accuracy of what you type — your income, your holdings, your debt — determines the usefulness of what comes back, and Lumos has no way to verify any of it."
+        },
+        {
+          "h": "Paid plans",
+          "p": "Lumos is free to use. The optional paid plans (Lantern, Dawn) raise the AI advisor's daily message limit and use a stronger model; they do not change any recommendation, calculation or figure, which are the same for every reader.\n\nOn the web, plans are sold by Lemon Squeezy as merchant of record, which charges you and handles VAT and sales tax. In the iOS app they are sold by Apple through in-app purchase. Subscriptions renew monthly until cancelled. Cancel any time — on the web from the link on the Plans page, on iOS in Settings → Subscriptions — and the plan lasts to the end of the period you paid for. Refunds follow the seller's policy: Lemon Squeezy's on the web, Apple's in the app."
         },
         {
           "h": "Your account",
@@ -1364,5 +1372,40 @@
         "lesson": "The app does not recommend it. The worst-fall and volatility figures show why — and its history is too short to draw a scenario band."
       }
     }
+  },
+  "plans": {
+    "title": "Plans",
+    "sameAdvice": "A paid plan changes the AI advisor only: more daily messages and a stronger model. Recommendations, calculations and every figure are the same for everyone.",
+    "free": {
+      "label": "Firefly",
+      "pitch": "Everything you need to start learning — free forever."
+    },
+    "plus": {
+      "label": "Lantern",
+      "pitch": "Ten times the advisor questions a day, from a model that answers in more depth."
+    },
+    "pro": {
+      "label": "Dawn",
+      "pitch": "The strongest advisor model and the highest daily limit."
+    },
+    "quota_one": "{{count}} advisor message a day",
+    "quota_other": "{{count}} advisor messages a day",
+    "perMonth": "{{price}} / month",
+    "current": "Your current plan",
+    "endsAt": "ends on {{date}}",
+    "choose": "Choose this plan",
+    "thanks": "Thank you! Your payment went through; your plan switches on within a few seconds.",
+    "loadError": "Plans couldn't be loaded right now.",
+    "storeError": "The App Store can't be reached right now.",
+    "buyError": "The purchase couldn't be completed.",
+    "manageWeb": "Manage your subscription",
+    "manageApple": "Manage your subscription in your iPhone's Settings → Subscriptions.",
+    "restore": "Restore purchases",
+    "soon": "Paid plans are coming soon.",
+    "renewalWeb": "The subscription renews monthly; cancel any time and the plan lasts to the end of the period you paid for. The seller and merchant of record is Lemon Squeezy.",
+    "renewalApple": "Payment is charged to your Apple ID and the subscription renews monthly unless cancelled at least 24 hours before the period ends. Manage or cancel it in Settings → Subscriptions.",
+    "terms": "Terms of use",
+    "privacy": "Privacy policy",
+    "freePrice": "Free"
   }
 }

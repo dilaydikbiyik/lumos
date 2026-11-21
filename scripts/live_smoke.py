@@ -177,7 +177,10 @@ def call(run: Run, client: TestClient, combo, step, method, path, *,
         body = res.text
 
     code = res.status_code
-    if code >= 500:
+    # A 5xx the step explicitly expects (billing checkout without store keys
+    # answers a translated 503) is checked like any expected status below,
+    # not reported as a crash.
+    if code >= 500 and not (isinstance(expect, set) and code in expect):
         err = body.get("error", {}) if isinstance(body, dict) else {}
         detail = body.get("detail") if isinstance(body, dict) else None
         upstream = code == 503 and (
@@ -329,6 +332,15 @@ def journey(run: Run, client: TestClient, market: str, lang: str, ai_chat: bool)
     c("practice", "POST", "/practice/snapshot", json={"weights": weights})
     c("stock explorer", "GET", "/stocks/explore")
     c("typical home", "GET", "/planning/typical-home")
+    c("billing plans", "GET", "/billing/plans")
+    c("billing me", "GET", "/billing/me")
+    # Billing is off without store keys: checkout refuses with a translated
+    # 503, and an unsigned webhook is a 401 — never a plan change.
+    c("billing checkout", "POST", "/billing/checkout", expect={200, 503}, json={"plan": "plus"})
+    c("billing webhook unsigned", "POST", "/billing/webhook/lemonsqueezy", expect={401},
+      json={"meta": {}, "data": {}})
+    c("billing webhook rc unsigned", "POST", "/billing/webhook/revenuecat", expect={401},
+      json={"event": {}})
     c("asset classes", "GET", "/stocks/asset-classes")
     c("role alternatives", "GET", "/planning/alternatives")
 

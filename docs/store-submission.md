@@ -142,6 +142,7 @@ third-party analytics.
 | Financial info — *other financial info* | Yes | Yes | No | App functionality (the profile and holdings the user types in) |
 | User content — *other user content* | Yes | Yes | No | App functionality, support (feedback messages, advisor chat) |
 | Diagnostics / crash data | Yes (if Sentry enabled) | No | No | Diagnostics |
+| Purchases — *purchase history* | Yes (only if the user buys a plan) | Yes | No | App functionality — applying the plan bought (App Store via RevenueCat) |
 | Device identifier — *push subscription endpoint* | Yes (only if the user allows notifications) | Yes | No | App functionality — delivering the market-move notification |
 | Identifiers — advertising | **No** | — | — | — |
 | Location | **No** | — | — | — |

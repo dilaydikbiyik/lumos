@@ -46,6 +46,21 @@ class Settings(BaseSettings):
     # endpoint outright: an unauthenticated sweep would let anyone make the
     # app notify every user at will.
     CRON_SECRET: str = ""
+
+    # ── Billing ───────────────────────────────────────────────────────────
+    # Web: Lemon Squeezy, the merchant of record — it sells, charges and
+    # remits VAT in all three markets, and accepts an individual seller in
+    # Türkiye (Stripe does not). iOS: RevenueCat over Apple's in-app
+    # purchase, which the App Store requires for digital subscriptions.
+    # Every value empty = billing off: the pricing page shows the plans
+    # without a buy button and nothing fails.
+    LEMONSQUEEZY_API_KEY: str = ""
+    LEMONSQUEEZY_STORE_ID: str = ""
+    LEMONSQUEEZY_WEBHOOK_SECRET: str = ""
+    LEMONSQUEEZY_VARIANT_PLUS: str = ""
+    LEMONSQUEEZY_VARIANT_PRO: str = ""
+    # The value RevenueCat sends in the webhook's Authorization header.
+    REVENUECAT_WEBHOOK_AUTH: str = ""
     MISTRAL_BASE_URL: str = "https://api.mistral.ai/v1"
     # Local models: no key, no account, no network. Lets a fresh clone run the
     # whole app without any provider at all.

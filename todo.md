@@ -3855,6 +3855,17 @@ hep SPY çıkıyor". İkisi ayrı sorunmuş.
       istatistiği "none" kovasıyla toplama eşit. Fon tasfiyesi iddiasına
       kaynak eklendi (SPK, 17 Eylül 2026; bültenler 2026/60–61). Gizlilik
       politikası tarihi güncellendi.
+- [x] **Ödeme altyapısı (2026-11-21):** web'de Lemon Squeezy (satıcı ve vergi
+      sorumlusu; Stripe TR'de bireysele hesap açmıyor), iOS'ta RevenueCat
+      (Apple uygulama içi satın alma zorunlu). `/billing/plans|me|checkout`,
+      imzalı Lemon Squeezy ve paylaşımlı sırlı RevenueCat webhook'ları;
+      bir mağazadaki iptal diğerinden alınan planı düşürmüyor; iptal edilen
+      plan dönem sonuna kadar sürüyor; App Store abonesi web'de ikinci kez
+      abone olamıyor. Planlar sayfası (profilden), "planlar yalnızca
+      danışmanı değiştirir, öneriler herkese aynı" açıklaması, iOS'ta geri
+      yükleme düğmesi ve Apple yenileme metni. "Ya şöyle olsaydı" kotası da
+      plana bağlandı. Koşullar ve gizlilik politikası güncellendi. Testli.
+      **Kurulum: `docs/billing-setup.md`.**
 - [ ] **iOS simülatöründe giriş akışını doğrula** (Clerk yönlendirmesi
       `capacitor://localhost`'a geri dönüyor mu; gerekirse @capacitor/browser
       ya da Clerk'in uygulama içi modalı).

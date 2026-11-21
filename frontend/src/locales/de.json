@@ -948,7 +948,7 @@
   },
   "legal": {
     "updated": "Zuletzt aktualisiert: {{date}}",
-    "updatedDate": "17. November 2026",
+    "updatedDate": "21. November 2026",
     "backHome": "Zurück zu Lumos",
     "contact": "Fragen zu all dem: dilaydikbiyik@gmail.com.",
     "privacy": {
@@ -965,6 +965,10 @@
         {
           "h": "Was gespeichert wird, wenn du Benachrichtigungen erlaubst",
           "p": "Wenn du Benachrichtigungen aktivierst, erzeugt dein Browser eine Abonnementadresse (einen Endpoint); wir speichern diese, die zwei gerätespezifischen Verschlüsselungsschlüssel und die von dir gewählte Sprache. Sie existieren nur, damit eine Benachrichtigung dich erreichen kann: die Adresse identifiziert einen Browser, nicht dich — sie trägt keine Identität, keinen Standort und nichts über dein Verhalten anderswo, sie ist keine Werbekennung und wird an niemanden weitergegeben. Schaltest du Benachrichtigungen ab, wird der Eintrag gelöscht, nicht markiert. Die einzige Benachrichtigung, die wir senden, ist die beruhigende Nachricht nach einer deutlichen Bewegung in deinem eigenen Portfolio; Marketing senden wir nicht."
+        },
+        {
+          "h": "Wenn du einen Plan kaufst",
+          "p": "Zahlungen wickelt vollständig der Verkäufer ab — im Web Lemon Squeezy, in der iOS-App Apple (RevenueCat erfasst das App-Store-Abo für uns). Lumos sieht nie deine Karten- oder Bankdaten. Wir erhalten und speichern nur, welchen Plan du hast, die Abo-ID des Anbieters, wann ein gekündigter Plan endet, und den Link, unter dem du ihn verwaltest — damit deinem Konto der richtige Plan zugeordnet wird."
         },
         {
           "h": "Was Lumos nie erhebt",
@@ -1030,6 +1034,10 @@
         {
           "h": "Deine Verantwortung",
           "p": "Deine Entscheidungen sind deine. Wie brauchbar die Antwort ist, hängt davon ab, wie richtig deine Eingaben sind — Einkommen, Positionen, Schulden — und Lumos hat keine Möglichkeit, davon irgendetwas zu überprüfen."
+        },
+        {
+          "h": "Bezahlte Pläne",
+          "p": "Lumos ist kostenlos nutzbar. Die optionalen bezahlten Pläne (Laterne, Morgenröte) erhöhen das tägliche Nachrichtenlimit des KI-Beraters und nutzen ein stärkeres Modell; sie ändern keine Empfehlung, Berechnung oder Zahl — diese sind für alle gleich.\n\nIm Web verkauft Lemon Squeezy die Pläne als Verkäufer und Steuerschuldner (Merchant of Record): Lemon Squeezy rechnet ab und führt Umsatzsteuer ab. In der iOS-App verkauft Apple sie per In-App-Kauf. Abos verlängern sich monatlich bis zur Kündigung. Du kannst jederzeit kündigen — im Web über den Link auf der Seite „Pläne“, unter iOS in Einstellungen → Abonnements — der Plan gilt bis zum Ende des bezahlten Zeitraums. Erstattungen richten sich nach den Regeln des Verkäufers: im Web nach denen von Lemon Squeezy, in der App nach denen von Apple."
         },
         {
           "h": "Dein Konto",
@@ -1364,5 +1372,40 @@
         "lesson": "Die App empfiehlt ihn nicht. Der stärkste Rückgang und die Volatilität zeigen, warum — und seine Historie ist zu kurz für ein Szenarioband."
       }
     }
+  },
+  "plans": {
+    "title": "Pläne",
+    "sameAdvice": "Ein bezahlter Plan ändert nur den KI-Berater: mehr Nachrichten am Tag und ein stärkeres Modell. Empfehlungen, Berechnungen und jede Zahl sind für alle gleich.",
+    "free": {
+      "label": "Glühwürmchen",
+      "pitch": "Alles, was du zum Lernen brauchst — für immer kostenlos."
+    },
+    "plus": {
+      "label": "Laterne",
+      "pitch": "Zehnmal so viele Fragen an den Berater am Tag, von einem Modell mit tieferen Antworten."
+    },
+    "pro": {
+      "label": "Morgenröte",
+      "pitch": "Das stärkste Beratermodell und das höchste Tageslimit."
+    },
+    "quota_one": "{{count}} Nachricht an den Berater pro Tag",
+    "quota_other": "{{count}} Nachrichten an den Berater pro Tag",
+    "perMonth": "{{price}} / Monat",
+    "current": "Dein aktueller Plan",
+    "endsAt": "endet am {{date}}",
+    "choose": "Diesen Plan wählen",
+    "thanks": "Danke! Deine Zahlung ist eingegangen; dein Plan wird in wenigen Sekunden aktiv.",
+    "loadError": "Die Pläne ließen sich gerade nicht laden.",
+    "storeError": "Der App Store ist gerade nicht erreichbar.",
+    "buyError": "Der Kauf ließ sich nicht abschließen.",
+    "manageWeb": "Abo verwalten",
+    "manageApple": "Verwalte dein Abo in den iPhone-Einstellungen → Abonnements.",
+    "restore": "Käufe wiederherstellen",
+    "soon": "Bezahlte Pläne kommen bald.",
+    "renewalWeb": "Das Abo verlängert sich monatlich; du kannst jederzeit kündigen, der Plan gilt bis zum Ende des bezahlten Zeitraums. Verkäufer und Steuerschuldner ist Lemon Squeezy.",
+    "renewalApple": "Die Zahlung wird über deine Apple-ID abgerechnet; das Abo verlängert sich monatlich, wenn es nicht mindestens 24 Stunden vor Ablauf gekündigt wird. Verwalten oder kündigen unter Einstellungen → Abonnements.",
+    "terms": "Nutzungsbedingungen",
+    "privacy": "Datenschutzerklärung",
+    "freePrice": "Kostenlos"
   }
 }
