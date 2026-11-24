@@ -1,5 +1,8 @@
 # ── Web Framework ─────────────────────────────────────────────────────────────
-fastapi==0.115.12
+fastapi==0.162.4
+# Pinned past the Starlette advisories of 2026 (Host/path validation, Range
+# and multipart resource exhaustion, HTTPEndpoint method lookup).
+starlette==1.10.0
 uvicorn[standard]==0.34.2
 
 # ── Data validation ───────────────────────────────────────────────────────────
@@ -7,7 +10,10 @@ pydantic==2.13.4
 pydantic-settings==2.9.1
 
 # ── Authentication (Clerk JWT) ────────────────────────────────────────────────
-python-jose[cryptography]==3.3.0
+# PyJWT, not python-jose: jose is unmaintained and one of its advisories has no
+# fixed release. Verification pins RS256, so its algorithm-confusion issue was
+# not exploitable here, but auth should not rest on an abandoned library.
+PyJWT[crypto]==2.15.1
 httpx==0.28.1
 
 # ── AI — provider-agnostic (AI_PROVIDER env var selects one) ─────────────────
@@ -46,3 +52,11 @@ pytest-asyncio==0.24.0
 
 # Web Push (VAPID) — the behavioural coach's carrier, with no store account.
 pywebpush==2.5.0
+
+# ── Security floors for transitive dependencies (pip-audit, 2026-11-25) ──────
+urllib3==2.8.0
+cryptography==50.0.2
+certifi==2026.10.18
+anyio==4.14.2
+pyasn1==0.6.4
+soupsieve==2.9.0

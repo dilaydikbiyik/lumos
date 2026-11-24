@@ -11,8 +11,11 @@ release that adds the prefix would turn that window into an outage.
 from backend.main import API_V1, app
 
 
+from backend.tests.routes import route_paths  # noqa: E402
+
+
 def _paths() -> set[str]:
-    return {route.path for route in app.routes if hasattr(route, "path")}
+    return route_paths(app)
 
 
 def test_every_endpoint_is_reachable_under_the_version_prefix():

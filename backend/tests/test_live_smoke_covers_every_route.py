@@ -22,14 +22,19 @@ SMOKE = pathlib.Path(__file__).resolve().parents[2] / "scripts" / "live_smoke.py
 
 
 def _app_routes() -> set[tuple[str, str]]:
+    from backend.tests.routes import routes
+
     out = set()
-    for r in app.routes:
-        path = getattr(r, "path", "")
+    for path, methods in routes(app):
         if not path.startswith("/api/v1"):
             continue
-        for m in getattr(r, "methods", None) or ():
+        for m in methods:
             if m not in ("HEAD", "OPTIONS"):
                 out.add((m, path[len("/api/v1"):]))
+    # A vacuous pass is the failure this guards against: the route table
+    # read empty once (FastAPI 0.162 nests included routers) and this test
+    # would have approved any smoke script.
+    assert len(out) > 50, f"only {len(out)} routes found — the route walk is broken"
     return out
 
 

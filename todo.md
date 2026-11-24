@@ -3873,3 +3873,24 @@ hep SPY çıkıyor". İkisi ayrı sorunmuş.
       ABD bonosunun EUR karşılığı istenirse USDEUR=X ile eklenebilir.
 - [ ] Keşif listesi tarihli (2026-11) bir seçki; yılda bir piyasa
       değerlerine göre gözden geçirilmeli.
+
+## Security audit — 2026-11-25
+- [x] **Dependency audit.** `npm audit --omit=dev`: 0. `pip-audit` found
+      advisories in starlette, python-jose, urllib3, cryptography, certifi,
+      anyio, pyasn1 and soupsieve — all fixed: FastAPI 0.115 → 0.162.4
+      (Starlette 1.10), python-jose (unmaintained, one advisory with no fix)
+      replaced by PyJWT 2.15, transitive floors pinned in requirements.txt.
+- [x] **Token verification rewritten** (`middleware/verify_clerk.py`):
+      RS256 only, key chosen by `kid`, `exp`/`sub` required; a failed token
+      refetches the JWKS at most once a minute (before: on every forged
+      token — an amplification against Clerk); the failure reason is logged,
+      never returned. `test_token_verification.py` forges HS256-with-public-
+      key, `none`, expired and foreign-key tokens.
+- [x] FastAPI 0.162 nests included routers (`_IncludedRouter`), so
+      `app.routes` no longer lists API paths — the smoke-coverage guard
+      would have passed vacuously. `tests/routes.py` walks them; the guard
+      now asserts it found >50 routes.
+- [ ] **Accepted, no fix exists:** diskcache pickle advisory
+      (PYSEC-2026-2447) — needs write access to the server's own cache dir.
+- [ ] Content-Security-Policy is still `Report-Only`; enforce after a
+      week of clean reports.
