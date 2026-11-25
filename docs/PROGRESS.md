@@ -44,9 +44,25 @@ Updated: 2026-11-26
 - 2026-11-26: Batch 2 audited (15 findings, 4 high): panic overlay under the nav with no way out,
   blank panic facts on a cold server, hardcoded TR/EN strings in onboarding, quiz load failure is a
   dead end. Text-opacity fixed on sight in batch 2 components.
+- 2026-11-26: Fixed batch 2 highs 2.1–2.4 (panic overlay z-index 200 + ✕/Escape/focus return,
+  loader instead of a blank facts stage, onboarding strings in i18n, quiz load error has Try again
+  + "talk instead"). New 2.16 (owner, high): risk gauge, Profile summary card and
+  AllocationRationale used three different band cut-offs; now one `utils/riskBand.js` (≤3 / ≤6,
+  mirrors the server's `_label`) + render test. Owner: high band purple, not red, but band colours
+  only as fills/dots — gauge number and card label are `--text` (card got a band dot).
+  withAlpha sweep re-checked: no concatenations left.
 ## Next step
 
-UI audit: fix batch 2 highs (2.1–2.4, all effort S), then audit batch 3 (Home). `doesBody` copy
+Owner first: ~10 min signed-in check at 375px (code-only so far: 6.1, 6.2, 6.3, 2.1, 2.2) —
+Plans buy buttons only after load + offline error/Try again; Holdings six labelled fields and
+explainer above the list; panic ✕/Escape/above nav/focus back to lifebuoy; 3.4 same band on
+gauge and card. Then batch 3 (Home), plus: **server returns the band key** with the score
+(`low/medium/growth/aggressive`); frontend maps key → colour/label only, no thresholds in
+`riskBand.js` (today it copies the server's cut-offs — the drift that caused 2.16). Colours:
+low green, medium `--firefly`, growth purple, aggressive owner's choice (suggested: deeper
+purple + lantern icon, not red). Today a 7.5 reads "Growth" on the gauge, "Aggressive" on the card.
+Separate task after batch 3, not part of the audit: animations, starting with 2.15 (every
+existing animation honours reduced motion before any new motion is added). `doesBody` copy
 waits for legal review. Separate task: rename "advisor/danışman/Berater" → assistant. Batch 6
 medium/low items 6.5, 6.6, 6.8, 6.10–6.12, 6.14–6.17 still open.
 
