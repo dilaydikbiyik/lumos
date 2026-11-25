@@ -1394,6 +1394,7 @@
     "choose": "Bu planı seç",
     "thanks": "Teşekkürler! Ödemen alındı; planın birkaç saniye içinde etkinleşir.",
     "loadError": "Planlar şu an yüklenemedi.",
+    "mineError": "Hangi planda olduğunu şu an kontrol edemedik; iki kez ücret ödememen için satın alma bekletiliyor. Birazdan tekrar dene.",
     "storeError": "App Store'a şu an ulaşılamıyor.",
     "buyError": "Satın alma tamamlanamadı.",
     "manageWeb": "Aboneliğini yönet",

@@ -1398,6 +1398,7 @@
     "choose": "Choose this plan",
     "thanks": "Thank you! Your payment went through; your plan switches on within a few seconds.",
     "loadError": "Plans couldn't be loaded right now.",
+    "mineError": "We couldn't check which plan you're on, so buying is paused — that way you can't be charged twice. Try again in a moment.",
     "storeError": "The App Store can't be reached right now.",
     "buyError": "The purchase couldn't be completed.",
     "manageWeb": "Manage your subscription",

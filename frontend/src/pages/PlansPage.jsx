@@ -27,6 +27,9 @@ export default function PlansPage() {
   const [plans, setPlans] = useState(null)
   const [webCheckout, setWebCheckout] = useState(false)
   const [mine, setMine] = useState(null)
+  // True when /billing/me failed and nothing was ever loaded: the page then
+  // cannot tell a paying reader from a free one, so it offers no purchase.
+  const [mineFailed, setMineFailed] = useState(false)
   const [packages, setPackages] = useState({})
   const [busy, setBusy] = useState(null)
   const [error, setError] = useState(null)
@@ -34,7 +37,9 @@ export default function PlansPage() {
   const justPaid = params.get('paid') === '1'
 
   const loadMine = useCallback(() =>
-    api.get('/billing/me').then(res => setMine(res.data)).catch(() => {}), [])
+    api.get('/billing/me')
+      .then(res => { setMine(res.data); setMineFailed(false) })
+      .catch(() => setMineFailed(true)), [])
 
   useEffect(() => {
     api.get('/billing/plans').then(res => {
@@ -97,7 +102,11 @@ export default function PlansPage() {
     })
   }
 
-  const current = mine?.plan || 'free'
+  // Until the reader's plan is known, no plan is "current" and nothing can be
+  // bought: assuming free would offer a paying reader a second subscription
+  // (the server refuses a second web checkout with 409, but an App Store
+  // purchase never reaches the server first).
+  const current = mine ? (mine.plan || 'free') : null
   // Already paying in a store: a second purchase would be a second
   // subscription, charged alongside the first. A web subscriber changes plan
   // in the store's portal; an App Store subscriber changes it inside the App
@@ -106,7 +115,7 @@ export default function PlansPage() {
   const payingWeb = current !== 'free' && mine?.source === 'lemonsqueezy'
   const payingApple = current !== 'free' && mine?.source === 'revenuecat'
   const blocked = payingWeb || (payingApple && !native)
-  const canBuy = (plan) => plan !== 'free' && !blocked
+  const canBuy = (plan) => mine !== null && plan !== 'free' && !blocked
     && (native ? Boolean(packages[plan]) : webCheckout)
 
   return (
@@ -121,6 +130,14 @@ export default function PlansPage() {
         {justPaid && <div className="card" role="status" style={{ fontSize: 13 }}>{t('plans.thanks')}</div>}
         {error && <p role="alert" style={{ fontSize: 13, color: 'var(--red)' }}>{error}</p>}
         {!plans && !error && <div className="spinner" style={{ margin: '24px auto' }} />}
+        {mineFailed && !mine && (
+          <div className="card" role="alert" style={{ fontSize: 13 }}>
+            <p style={{ margin: '0 0 10px' }}>{t('plans.mineError')}</p>
+            <button type="button" className="btn btn-ghost btn-full" onClick={loadMine}>
+              {t('common.tryAgain')}
+            </button>
+          </div>
+        )}
 
         {(plans || []).slice().sort((a, b) => ORDER.indexOf(a.plan) - ORDER.indexOf(b.plan)).map(p => (
           <div key={p.plan} className="card" style={{

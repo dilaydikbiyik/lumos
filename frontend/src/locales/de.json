@@ -1398,6 +1398,7 @@
     "choose": "Diesen Plan wählen",
     "thanks": "Danke! Deine Zahlung ist eingegangen; dein Plan wird in wenigen Sekunden aktiv.",
     "loadError": "Die Pläne ließen sich gerade nicht laden.",
+    "mineError": "Wir konnten gerade nicht prüfen, welchen Plan du hast, deshalb ist der Kauf pausiert — so zahlst du nicht doppelt. Versuch es gleich noch einmal.",
     "storeError": "Der App Store ist gerade nicht erreichbar.",
     "buyError": "Der Kauf ließ sich nicht abschließen.",
     "manageWeb": "Abo verwalten",
