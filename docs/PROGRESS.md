@@ -28,10 +28,17 @@ Updated: 2026-11-26
   when /billing/me fails; first-purchase explainer renders inside a collapsed section; holdings
   form has placeholder-only labels; currency card says "Consider adding foreign-currency
   assets" (copy, owner's call with 1.18). Cross-batch: text dimmed with `opacity` (6.7).
+- 2026-11-26: Fixed batch 6 items 6.1, 6.2, 6.3, 6.7, 6.9. 6.1: the server's 409 already blocked a
+  second web checkout, but an App Store purchase never reaches the server, so Plans now offers no
+  purchase until `/billing/me` loads and shows an error + Try again if it fails. Rule (owner):
+  no `opacity` on text — use `--text-muted`/`--text-dim`; later batches fix it on sight (in
+  `docs/ui-audit.md` Rules). Copy options for 1.18, 6.4, 6.18 drafted in `docs/copy-decisions.md`
+  (not applied). Signed-in screens not checked in the browser (sign-in needed); check.sh green.
 
 ## Next step
 
-UI audit: decide copy for 1.18 + 6.4 + 6.18; fix batch 6 highs (6.1–6.3); then audit batch 2.
+UI audit: owner picks options in `docs/copy-decisions.md` (1.18, 6.4, 6.18), then apply them;
+then audit batch 2. Batch 6 medium/low items 6.5, 6.6, 6.8, 6.10–6.17 still open.
 
 Owner-only steps, in order: `todo.md` → "SENİN LİSTEN — mağazaya giden yol". Apple Developer
 enrolment, Xcode, Play Console; Clerk sign-in methods decision (affects Sign in with Apple);
