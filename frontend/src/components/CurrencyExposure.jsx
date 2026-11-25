@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { withAlpha } from '../utils/palette'
 import useMarket from '../hooks/useMarket'
+import { getCurrency } from '../utils/holdingCurrency'
 
 /**
  * Home-currency vs foreign-currency exposure, with an educational message
@@ -12,23 +13,6 @@ import useMarket from '../hooks/useMarket'
  * rent is priced in. The home currency is now the market's, the totals are
  * in it, and values are the live ones the holdings list shows.
  */
-
-// Which currency an asset's VALUE follows. Physical, locally-priced things
-// track the home currency; anything listed abroad tracks its own.
-const LOCAL_TYPES = new Set(['real_estate', 'land', 'vehicle', 'cash'])
-// Listing suffix → currency. A hand-maintained ticker list went stale the
-// moment the app gained a second market; the exchange suffix does not.
-const SUFFIX_CURRENCY = { '.IS': 'TRY', '.DE': 'EUR', '.F': 'EUR', '.PA': 'EUR', '.L': 'GBP' }
-
-function getCurrency(holding, homeCurrency) {
-  const ticker = (holding.ticker || '').toUpperCase()
-  for (const [suffix, ccy] of Object.entries(SUFFIX_CURRENCY)) {
-    if (ticker.endsWith(suffix)) return ccy
-  }
-  if (LOCAL_TYPES.has(holding.asset_type)) return homeCurrency
-  if (holding.asset_type === 'gold' || holding.asset_type === 'crypto') return 'USD'
-  return ticker ? 'USD' : homeCurrency   // unsuffixed listings are US
-}
 
 export default function CurrencyExposure({ holdings }) {
   const { t } = useTranslation()
