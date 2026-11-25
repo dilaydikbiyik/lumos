@@ -246,6 +246,14 @@ h2 { font-size: clamp(1.2rem, 3.5vw, 1.45rem); font-weight: 700; }
 h3 { font-size: 1rem; font-weight: 600; }
 p  { line-height: 1.65; color: var(--text-muted); }
 
+/* Keyboard focus, app-wide: the browser default ring all but vanishes on the
+   night background. :focus-visible leaves mouse and touch taps unringed. Fields
+   keep their own glow (`.input` comes later and sets outline: none). */
+:focus-visible {
+  outline: 2px solid var(--firefly);
+  outline-offset: 2px;
+}
+
 /* Firefly gradient — orange/amber dominant */
 .gradient-text {
   background: linear-gradient(120deg, var(--firefly-bright) 0%, var(--firefly) 50%, #FF8C00 100%);
