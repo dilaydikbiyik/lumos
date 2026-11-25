@@ -54,3 +54,4 @@ htmlcov/
 # Playwright raw recording — the committed mp4/gif are generated from it
 demo/video/*.webm
 devlocal.db
+.claude/settings.local.json
