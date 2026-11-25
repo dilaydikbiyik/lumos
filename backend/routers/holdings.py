@@ -1,10 +1,12 @@
 import asyncio
 from datetime import date
+from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, Query, Request
+from fastapi import APIRouter, Depends, HTTPException, Path, Query, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.db.database import get_db
+from backend.schemas.limits import MAX_ID
 from backend.i18n import t
 from backend.middleware.language import language
 from backend.limiter import limiter
@@ -142,7 +144,7 @@ async def create_holding(
 
 @router.patch("/{holding_id}", response_model=HoldingRead)
 async def update_holding(
-    holding_id: int,
+    holding_id: Annotated[int, Path(ge=1, le=MAX_ID)],
     body: HoldingUpdate,
     user_id: str = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
@@ -158,7 +160,7 @@ async def update_holding(
 
 @router.delete("/{holding_id}", status_code=204)
 async def delete_holding(
-    holding_id: int,
+    holding_id: Annotated[int, Path(ge=1, le=MAX_ID)],
     user_id: str = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
     lang: str = Depends(language),

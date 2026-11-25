@@ -77,3 +77,47 @@ def register_error_handlers(app: FastAPI) -> None:
             500, "internal_error",
             t("error.internal", get_language(request)),
         )
+
+
+class UnhandledErrorMiddleware:
+    """
+    Turns an unhandled exception into the 500 envelope INSIDE the CORS layer.
+
+    Starlette routes `@app.exception_handler(Exception)` to its
+    ServerErrorMiddleware, which always sits outside every user middleware —
+    CORS included. So a crash produced a response with no
+    Access-Control-Allow-Origin and no X-Request-ID. The web app is
+    cross-origin (Vercel calling Render), so the browser hid that response
+    and reported "no response"; the client's retry policy then re-ran the
+    crashing GET four more times over ~37 seconds before showing a generic
+    message, and the translated one was never seen.
+
+    Registered first, so it is the innermost middleware: the request id and
+    language are already set, and CORS wraps what it returns.
+    """
+
+    def __init__(self, app):
+        self.app = app
+
+    async def __call__(self, scope, receive, send):
+        if scope["type"] != "http":
+            return await self.app(scope, receive, send)
+        started = False
+
+        async def tracking_send(message):
+            nonlocal started
+            if message["type"] == "http.response.start":
+                started = True
+            await send(message)
+
+        try:
+            await self.app(scope, receive, tracking_send)
+        except Exception:
+            if started:
+                raise  # half a response is already out; nothing clean to send
+            request = Request(scope)
+            logger.exception("[%s] Unhandled error on %s %s",
+                             request_id_var.get(), request.method, request.url.path)
+            response = _error_response(500, "internal_error",
+                                       t("error.internal", get_language(request)))
+            await response(scope, receive, send)

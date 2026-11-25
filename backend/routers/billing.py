@@ -62,6 +62,10 @@ async def checkout(request: Request, body: CheckoutRequest,
         # Already subscribed in the App Store: a second subscription on the
         # web would charge them twice for one plan.
         raise HTTPException(status_code=409, detail=t("billing.alreadyApple", lang))
+    if user.plan_source == billing.LEMONSQUEEZY and user.plan != "free":
+        # A second checkout is a second subscription, charged alongside the
+        # first. Changing plan goes through the store's customer portal.
+        raise HTTPException(status_code=409, detail=t("billing.alreadyWeb", lang))
     return_url = f"{settings.FRONTEND_URL.rstrip('/')}/plans?paid=1"
     try:
         url = await asyncio.to_thread(billing.create_checkout, user_id, user.email,

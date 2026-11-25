@@ -448,6 +448,14 @@ _C: dict[str, dict[str, str]] = {
         "tr": "Bu planı App Store üzerinden zaten alıyorsun; aboneliğini iPhone'unun Ayarlar → Abonelikler bölümünden yönetebilirsin.",
         "en": "You already have this plan through the App Store; manage it in your iPhone's Settings → Subscriptions.",
         "de": "Du hast diesen Plan bereits über den App Store; verwalte ihn in den iPhone-Einstellungen → Abonnements."},
+    "billing.alreadyWeb": {
+        "tr": "Zaten web üzerinden bir aboneliğin var; planını değiştirmek için \"Aboneliğini yönet\" bağlantısını kullan, böylece iki kez ödeme yapmazsın.",
+        "en": "You already have a subscription on the web; use \"Manage your subscription\" to change plan, so you're not charged twice.",
+        "de": "Du hast bereits ein Abo über das Web; nutze „Abo verwalten“, um den Plan zu wechseln, damit du nicht doppelt zahlst."},
+    "account.subscriptionNotCancelled": {
+        "tr": "Hesabın silinmedi: web aboneliğin şu anda iptal edilemedi ve silersek ödeme devam ederdi. Birazdan tekrar dener misin? Ya da önce Planlar sayfasındaki \"Aboneliğini yönet\" bağlantısından iptal et.",
+        "en": "Your account was not deleted: your web subscription could not be cancelled just now, and deleting would have left it charging. Could you try again shortly? Or cancel it first via \"Manage your subscription\" on the Plans page.",
+        "de": "Dein Konto wurde nicht gelöscht: Dein Web-Abo ließ sich gerade nicht kündigen, und eine Löschung hätte es weiterlaufen lassen. Versuchst du es gleich noch einmal? Oder kündige es zuerst über „Abo verwalten“ auf der Pläne-Seite."},
     "admin.userNotFound": {
         "tr": "Bu kimlikte bir kullanıcı yok.",
         "en": "There is no user with this id.",

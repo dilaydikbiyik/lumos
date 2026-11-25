@@ -2,7 +2,7 @@ import logging
 from typing import Literal, Optional
 
 from fastapi import APIRouter, Depends
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.db.database import get_db
@@ -31,7 +31,9 @@ def panic_facts(lang: str) -> list[str]:
 
 class MarketMoveRequest(BaseModel):
     direction: Literal["drop", "rise"]
-    drawdown_pct: float = 0.0
+    # A fall is between nothing and everything; a rise is not bounded by
+    # arithmetic, but a "rise" of more than 1000% is not a market move.
+    drawdown_pct: float = Field(0.0, ge=-100, le=1000)
 
 
 @router.post("/market-move")

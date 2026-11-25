@@ -97,8 +97,17 @@ export default function PlansPage() {
     })
   }
 
-  const canBuy = (plan) => plan !== 'free' && (native ? Boolean(packages[plan]) : webCheckout)
   const current = mine?.plan || 'free'
+  // Already paying in a store: a second purchase would be a second
+  // subscription, charged alongside the first. A web subscriber changes plan
+  // in the store's portal; an App Store subscriber changes it inside the App
+  // Store (Apple treats that as an upgrade, not a new subscription), so only
+  // that one may still buy here — and only in the app.
+  const payingWeb = current !== 'free' && mine?.source === 'lemonsqueezy'
+  const payingApple = current !== 'free' && mine?.source === 'revenuecat'
+  const blocked = payingWeb || (payingApple && !native)
+  const canBuy = (plan) => plan !== 'free' && !blocked
+    && (native ? Boolean(packages[plan]) : webCheckout)
 
   return (
     <div className="page">
@@ -142,6 +151,9 @@ export default function PlansPage() {
         {current !== 'free' && mine?.source === 'lemonsqueezy' && mine?.portal_url && !native && (
           <a className="btn btn-ghost" href={mine.portal_url} target="_blank" rel="noopener noreferrer"
              style={{ textAlign: 'center' }}>{t('plans.manageWeb')}</a>
+        )}
+        {payingWeb && native && (
+          <p style={{ fontSize: 12.5, color: 'var(--text-dim)' }}>{t('plans.manageWebFromApp')}</p>
         )}
         {current !== 'free' && mine?.source === 'revenuecat' && (
           <p style={{ fontSize: 12.5, color: 'var(--text-dim)' }}>{t('plans.manageApple')}</p>

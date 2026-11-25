@@ -1066,7 +1066,9 @@
     "deleteConfirm": "Delete permanently",
     "deleting": "Deleting…",
     "failed": "The account could not be deleted. Nothing was changed.",
-    "partial": "Your data was deleted, but your login could not be removed. Please contact support."
+    "partial": "Your data was deleted, but your login could not be removed. Please contact support.",
+    "deleteSubscriptions": "If you have a paid plan: a web subscription is cancelled together with your account. An App Store subscription is billed by Apple, so only you can cancel it — in your iPhone's Settings → Subscriptions.",
+    "appStoreStillActive": "Your account is deleted, but your App Store subscription is still active with Apple. Cancel it in your iPhone's Settings → Subscriptions so you aren't charged."
   },
   "glossaryPage": {
     "title": "Jargon, in plain words",
@@ -1406,6 +1408,7 @@
     "renewalApple": "Payment is charged to your Apple ID and the subscription renews monthly unless cancelled at least 24 hours before the period ends. Manage or cancel it in Settings → Subscriptions.",
     "terms": "Terms of use",
     "privacy": "Privacy policy",
-    "freePrice": "Free"
+    "freePrice": "Free",
+    "manageWebFromApp": "You bought your plan on the website; to change or cancel it, use subscription management on the web."
   }
 }

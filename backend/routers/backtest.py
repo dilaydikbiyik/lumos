@@ -2,6 +2,7 @@ from typing import Literal
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, Field
+from backend.schemas.limits import MAX_AMOUNT, Weight
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -18,8 +19,8 @@ router = APIRouter()
 
 class BacktestRequest(BaseModel):
     # ticker -> weight; must roughly sum to 1
-    weights: dict[str, float] = Field(..., min_length=1, max_length=15)
-    budget: float = Field(..., gt=0)
+    weights: dict[str, Weight] = Field(..., min_length=1, max_length=15)
+    budget: float = Field(..., gt=0, le=MAX_AMOUNT)
     period: Literal["1y", "3y", "5y"] = "5y"
 
 

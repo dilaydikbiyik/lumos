@@ -5,6 +5,7 @@ from typing import Literal
 
 from fastapi import APIRouter, Depends, Query, Request
 from pydantic import BaseModel, Field
+from backend.schemas.limits import MAX_AMOUNT
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.db.database import get_db
@@ -360,7 +361,7 @@ async def property_vs_portfolio_compare(
     region: str,
     # A negative amount was computed (a property worth -7.79); an unknown
     # period silently became five years.
-    amount: float = Query(..., gt=0),
+    amount: float = Query(..., gt=0, le=MAX_AMOUNT),
     period: Literal["1y", "3y", "5y"] = "5y",
     user_id: str = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
@@ -504,7 +505,7 @@ async def purchase_checks(
 class ListingEvalRequest(BaseModel):
     area_code: str
     size_m2: float = Field(..., gt=0, le=100_000)
-    asking_price: float = Field(..., gt=0)
+    asking_price: float = Field(..., gt=0, le=MAX_AMOUNT)
 
 
 @router.post("/listing-eval")

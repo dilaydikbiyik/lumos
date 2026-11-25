@@ -1,6 +1,7 @@
 from typing import Any, Optional
 
 from pydantic import BaseModel, Field
+from backend.schemas.limits import MAX_AMOUNT
 
 
 class AssetAllocation(BaseModel):
@@ -23,7 +24,7 @@ class AssetAllocation(BaseModel):
 
 class PortfolioRecommendRequest(BaseModel):
     risk_score: float = Field(..., ge=1, le=10)
-    budget: float = Field(..., gt=0, description="Investment budget, in the market currency")
+    budget: float = Field(..., gt=0, le=MAX_AMOUNT, description="Investment budget, in the market currency")
 
 
 class PortfolioRecommendResponse(BaseModel):

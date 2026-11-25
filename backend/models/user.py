@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 from typing import Optional
 
-from sqlalchemy import String, DateTime, Integer, Float
+from sqlalchemy import JSON, String, DateTime, Integer, Float
 from sqlalchemy.orm import Mapped, mapped_column
 
 from backend.db.database import Base
@@ -63,6 +63,10 @@ class User(Base):
     billing_portal_url: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     # When a cancelled subscription stops (the plan is kept until then).
     plan_ends_at: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    # The store timestamp (epoch ms) of the last event applied, per store:
+    # {"lemonsqueezy": ms, "revenuecat": ms}. An older event is a late
+    # retry and is dropped (services/billing.py).
+    billing_event_marks: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
 
     # Access role: user (default) / admin — admin unlocks /admin/stats
     role: Mapped[str] = mapped_column(String, default="user", nullable=False, server_default="user")

@@ -17,7 +17,19 @@ App Store, and the reverse.
 
 A cancelled subscription keeps its plan until the paid period ends; the
 store sends a separate "expired" event then, which returns the reader to
-free.
+free. If that event never comes (a refund, a lost delivery), the plan lapses
+on its own once plan_ends_at has passed — see lapse_if_ended.
+
+Stores retry failed deliveries, so events arrive late and out of order. Two
+rules keep a stale one from undoing a newer one:
+
+  * every event carries the store's own timestamp, and one older than the
+    last event applied from that store is dropped;
+  * an event that ENDS a plan (expiry, cancellation) only acts on the
+    subscription the reader is currently on — the expiry of an old
+    subscription never cancels the one that replaced it.
+
+A plan granted by an admin ("admin") is never lowered by a store event.
 """
 import hashlib
 import hmac
@@ -94,6 +106,42 @@ def create_checkout(clerk_user_id: str, email: Optional[str], plan: str,
     return res.json()["data"]["attributes"]["url"]
 
 
+def cancel_web_subscription(subscription_id: str) -> bool:
+    """Cancel a Lemon Squeezy subscription (account deletion). True when the
+    store confirmed, or the subscription no longer exists there."""
+    import httpx
+
+    if not (settings.LEMONSQUEEZY_API_KEY and subscription_id):
+        return False
+    try:
+        res = httpx.delete(f"{_LS_API}/subscriptions/{subscription_id}", timeout=20, headers={
+            "Accept": "application/vnd.api+json",
+            "Authorization": f"Bearer {settings.LEMONSQUEEZY_API_KEY}",
+        })
+    except httpx.HTTPError as exc:
+        logger.warning("subscription cancel failed (%s)", type(exc).__name__)
+        return False
+    if res.status_code == 404:
+        return True
+    if res.status_code >= 400:
+        logger.warning("subscription cancel refused (%s)", res.status_code)
+        return False
+    return True
+
+
+def _iso_ms(value) -> Optional[int]:
+    """Epoch milliseconds from an ISO-8601 string, or None."""
+    if not isinstance(value, str) or not value:
+        return None
+    try:
+        dt = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=timezone.utc)
+    return int(dt.timestamp() * 1000)
+
+
 def lemonsqueezy_signature_ok(raw_body: bytes, signature: str) -> bool:
     secret = settings.LEMONSQUEEZY_WEBHOOK_SECRET
     if not secret or not signature:
@@ -114,6 +162,8 @@ def revenuecat_auth_ok(header: str) -> bool:
 
 def lemonsqueezy_change(payload: dict) -> Optional[dict]:
     """What a Lemon Squeezy event means for the plan, or None to ignore it."""
+    if not isinstance(payload, dict):
+        return None
     meta = payload.get("meta") or {}
     data = payload.get("data") or {}
     if data.get("type") != "subscriptions":
@@ -126,7 +176,8 @@ def lemonsqueezy_change(payload: dict) -> Optional[dict]:
     change = {"user_id": user_id, "source": LEMONSQUEEZY,
               "subscription_id": str(data.get("id") or ""),
               "portal_url": (attrs.get("urls") or {}).get("customer_portal"),
-              "ends_at": attrs.get("ends_at") if status == "cancelled" else None}
+              "ends_at": attrs.get("ends_at") if status == "cancelled" else None,
+              "event_ms": _iso_ms(attrs.get("updated_at"))}
     if status in _LS_ENDED:
         return {**change, "plan": "free"}
     if status in _LS_ACTIVE:
@@ -137,6 +188,8 @@ def lemonsqueezy_change(payload: dict) -> Optional[dict]:
 
 def revenuecat_change(payload: dict) -> Optional[dict]:
     """What a RevenueCat event means for the plan, or None to ignore it."""
+    if not isinstance(payload, dict):
+        return None
     event = payload.get("event") or {}
     kind = event.get("type")
     user_id = event.get("app_user_id")
@@ -146,7 +199,9 @@ def revenuecat_change(payload: dict) -> Optional[dict]:
     plan = "pro" if "pro" in entitlements else "plus" if "plus" in entitlements else None
     change = {"user_id": user_id, "source": REVENUECAT,
               "subscription_id": event.get("original_transaction_id") or event.get("id"),
-              "portal_url": None, "ends_at": None}
+              "portal_url": None, "ends_at": None,
+              "event_ms": (event.get("event_timestamp_ms")
+                           if isinstance(event.get("event_timestamp_ms"), int) else None)}
     if kind in _RC_END:
         return {**change, "plan": "free"}
     if kind in _RC_CANCEL and plan:
@@ -160,26 +215,64 @@ def revenuecat_change(payload: dict) -> Optional[dict]:
 
 
 def apply_change(user, change: dict) -> bool:
-    """Set the plan on `user`. False when the event belongs to a plan this
-    store did not grant (a web cancellation never touches an App Store plan)."""
+    """Set the plan on `user`. False when the event is ignored: it belongs to
+    a plan this store did not grant, it is older than one already applied,
+    or it ends a subscription the reader is no longer on."""
+    source = change["source"]
+    marks = dict(user.billing_event_marks or {})
+    event_ms = change.get("event_ms")
+    if event_ms is not None and event_ms < (marks.get(source) or 0):
+        return False
+
+    ends = change["plan"] == "free" or change.get("ends_at") is not None
+    if (ends and user.plan_source == source and user.subscription_id
+            and change.get("subscription_id")
+            and change["subscription_id"] != user.subscription_id):
+        return False  # an old subscription ending; the current one is untouched
+
     if change["plan"] == "free":
-        if user.plan_source not in (None, change["source"]):
+        if user.plan_source not in (None, source):
             return False
         user.plan = "free"
         user.plan_source = None
         user.plan_ends_at = None
         user.subscription_id = None
         user.billing_portal_url = None
-        return True
-    if user.plan_source not in (None, change["source"], "admin") and user.plan != "free":
-        # Already paying in the other store: keep the better of the two.
-        order = {"free": 0, "plus": 1, "pro": 2}
-        if order.get(change["plan"], 0) <= order.get(user.plan, 0):
-            return False
-    user.plan = change["plan"]
-    user.plan_source = change["source"]
-    user.plan_ends_at = change.get("ends_at")
-    user.subscription_id = change.get("subscription_id") or user.subscription_id
-    if change.get("portal_url"):
-        user.billing_portal_url = change["portal_url"]
+    else:
+        if user.plan_source not in (None, source) and user.plan != "free":
+            # Paying in the other store, or granted by an admin: keep the
+            # better of the two.
+            order = {"free": 0, "plus": 1, "pro": 2}
+            if order.get(change["plan"], 0) <= order.get(user.plan, 0):
+                return False
+        user.plan = change["plan"]
+        user.plan_source = source
+        user.plan_ends_at = change.get("ends_at")
+        user.subscription_id = change.get("subscription_id") or user.subscription_id
+        if change.get("portal_url"):
+            user.billing_portal_url = change["portal_url"]
+
+    if event_ms is not None:
+        marks[source] = event_ms
+        user.billing_event_marks = marks  # reassigned: JSON columns track assignment
+    return True
+
+
+def lapse_if_ended(user, now: Optional[datetime] = None) -> bool:
+    """Return a store plan to free once its paid period is over.
+
+    The store's "expired" event normally does this. A refund, or a delivery
+    that never arrives, would otherwise leave the plan paid for ever. Admin
+    grants have no end date and are untouched."""
+    if user.plan == "free" or user.plan_source not in (LEMONSQUEEZY, REVENUECAT):
+        return False
+    ends_ms = _iso_ms(user.plan_ends_at)
+    now_ms = int((now or datetime.now(timezone.utc)).timestamp() * 1000)
+    if ends_ms is None or ends_ms > now_ms:
+        return False
+    user.plan = "free"
+    user.plan_source = None
+    user.plan_ends_at = None
+    user.subscription_id = None
+    user.billing_portal_url = None
     return True

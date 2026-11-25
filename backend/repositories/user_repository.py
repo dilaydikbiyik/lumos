@@ -27,6 +27,12 @@ async def get_or_create(db: AsyncSession, clerk_user_id: str) -> User:
     """
     user = await get_by_clerk_id(db, clerk_user_id)
     if user is not None:
+        from backend.services.billing import lapse_if_ended
+
+        # A paid period that is over ends here even if the store's "expired"
+        # event never arrived (a refund, a lost delivery).
+        if lapse_if_ended(user):
+            await db.flush()
         return user
 
     from sqlalchemy.exc import IntegrityError

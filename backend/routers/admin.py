@@ -3,7 +3,7 @@ from datetime import date
 import asyncio
 import logging
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Query, Request
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -89,6 +89,10 @@ async def set_user_plan(
     if user is None:
         raise HTTPException(status_code=404, detail=t("admin.userNotFound", get_language(request)))
     user.plan = body.plan
+    # Recorded so a store event cannot lower an admin grant (and so a later
+    # store "expired" cannot drop it to free) — services/billing.py.
+    user.plan_source = None if body.plan == "free" else "admin"
+    user.plan_ends_at = None
     await db.flush()
     return {"clerk_user_id": clerk_user_id, "plan": user.plan}
 
@@ -112,7 +116,7 @@ async def list_roles(
 @router.get("/users")
 async def list_users(
     q: str = "",
-    limit: int = 50,
+    limit: int = Query(50, ge=1, le=500),
     user_id: str = Depends(require_permission(perms.USERS_READ)),
     db: AsyncSession = Depends(get_db),
 ):

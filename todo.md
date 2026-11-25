@@ -3894,3 +3894,31 @@ hep SPY çıkıyor". İkisi ayrı sorunmuş.
       (PYSEC-2026-2447) — needs write access to the server's own cache dir.
 - [ ] Content-Security-Policy is still `Report-Only`; enforce after a
       week of clean reports.
+
+## Bug hunt round 11 — 2026-11-25
+- [x] **Sentry took the app down at startup** (sentry-sdk 2.19's Starlette
+      integration vs Starlette 1.x). → 2.76.0; a subprocess test imports the
+      app with a DSN set.
+- [x] **Billing — stale events:** an old subscription's expiry cancelled
+      the newer one; a late retry could undo a newer event. → ending events
+      act only on the current subscription; per-store event timestamps
+      (`billing_event_marks`, migration e7c3b9d1a4f2) drop older events.
+- [x] **Billing — double subscriptions:** a web subscriber could open a
+      second checkout (and buy in the App Store on top). → 409 on the web,
+      "Choose" hidden while paying in a store.
+- [x] **Account deletion left a web subscription charging.** → cancelled
+      at Lemon Squeezy first (nothing deleted if that fails); App Store
+      subscribers are told to cancel in Settings.
+- [x] **Admin grants were unprotected** (`plan_source="admin"` never set).
+- [x] **A paid period with no expiry event never ended** (refund, lost
+      delivery). → lapses on read once `plan_ends_at` has passed.
+- [x] **A crash (500) was unreadable cross-origin** (no CORS, no request
+      id) → the client retried for ~37 s. → `UnhandledErrorMiddleware`
+      inside CORS.
+- [x] **Infinity/NaN/1e300 accepted in every money field.** → `le=1e12`
+      bounds (`schemas/limits.py`); a guard test walks the OpenAPI document
+      and refuses any numeric request field without an upper bound.
+- [x] Webhooks 500'd on a JSON body that is not an object.
+- [ ] Plans page shows USD prices to TR/DE readers on the web; confirm in
+      Lemon Squeezy whether checkout charges local currency, and match.
+- [ ] RevenueCat TRANSFER (restore on another account) is not handled.

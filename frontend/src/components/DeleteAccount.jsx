@@ -39,6 +39,8 @@ export default function DeleteAccount({ compact = false }) {
       // The server tells us whether the login went too. If it didn't, say so
       // on the way out rather than letting them discover it at next sign-in.
       if (!data?.identity_deleted) window.alert(data?.message || t('account.partial'))
+      // Apple bills an App Store subscription; only the reader can stop it.
+      if (data?.app_store_subscription) window.alert(t('account.appStoreStillActive'))
       // Local caches are keyed per user, but a shared device should not keep
       // a departed account's numbers on screen for the next person.
       try { window.localStorage.clear() } catch { /* private mode */ }
@@ -79,6 +81,9 @@ export default function DeleteAccount({ compact = false }) {
           </h3>
           <p style={{ fontSize: 13, lineHeight: 1.65, opacity: 0.85, marginTop: 0 }}>
             {t('account.deleteBody')}
+          </p>
+          <p style={{ fontSize: 12.5, lineHeight: 1.6, opacity: 0.85 }}>
+            {t('account.deleteSubscriptions')}
           </p>
           <p style={{ fontSize: 12, opacity: 0.7 }}>
             <Link to="/privacy">{t('legal.privacy.title')}</Link>

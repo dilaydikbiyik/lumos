@@ -2,6 +2,7 @@ from typing import Literal, Optional
 
 from fastapi import APIRouter, Depends, Request
 from pydantic import BaseModel, ConfigDict, Field, model_validator
+from backend.schemas.limits import MAX_AMOUNT
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.db.database import get_db
@@ -52,12 +53,12 @@ class UserRead(BaseModel):
 # money as investable than the reader has. Rejecting it at the edge keeps
 # that impossible rather than merely unlikely.
 class MonthlyIncomeUpdate(BaseModel):
-    monthly_income: float = Field(ge=0)
+    monthly_income: float = Field(ge=0, le=MAX_AMOUNT)
 
 
 class MonthlyOutgoingsUpdate(BaseModel):
     """Rent plus essential monthly costs — not the same number as income."""
-    monthly_outgoings: float = Field(ge=0)
+    monthly_outgoings: float = Field(ge=0, le=MAX_AMOUNT)
 
 
 class InvestmentPathUpdate(BaseModel):
@@ -303,6 +304,21 @@ async def delete_me(
     if body.confirm_user_id != user_id:
         raise HTTPException(status_code=400, detail=t("account.confirmMismatch", lang))
 
+    from backend.services import billing
+
+    # A web subscription is cancelled BEFORE the rows go: afterwards nothing
+    # would remember it, and the store would keep charging a reader who has
+    # no account. If the store cannot be reached, nothing is deleted.
+    user = await user_repository.get_by_clerk_id(db, user_id)
+    app_store_subscription = bool(user and user.plan != "free"
+                                  and user.plan_source == billing.REVENUECAT)
+    if user and user.plan != "free" and user.plan_source == billing.LEMONSQUEEZY \
+            and user.subscription_id:
+        import asyncio
+
+        if not await asyncio.to_thread(billing.cancel_web_subscription, user.subscription_id):
+            raise HTTPException(status_code=502, detail=t("account.subscriptionNotCancelled", lang))
+
     await user_repository.delete_account(db, user_id)
     identity_removed = clerk_service.delete_user(user_id)
 
@@ -311,6 +327,9 @@ async def delete_me(
     return {
         "data_deleted": True,
         "identity_deleted": identity_removed,
+        # Apple bills an App Store subscription, not us: only the reader can
+        # cancel it, in their iPhone settings. The client says so.
+        "app_store_subscription": app_store_subscription,
         "message": t("account.deleted" if identity_removed
                      else "account.deletedDataOnly", lang),
     }

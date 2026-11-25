@@ -1066,7 +1066,9 @@
     "deleteConfirm": "Endgültig löschen",
     "deleting": "Wird gelöscht…",
     "failed": "Das Konto konnte nicht gelöscht werden. Es wurde nichts geändert.",
-    "partial": "Deine Daten wurden gelöscht, dein Login konnte jedoch nicht entfernt werden. Bitte wende dich an den Support."
+    "partial": "Deine Daten wurden gelöscht, dein Login konnte jedoch nicht entfernt werden. Bitte wende dich an den Support.",
+    "deleteSubscriptions": "Falls du einen bezahlten Plan hast: Ein Web-Abo wird zusammen mit deinem Konto gekündigt. Ein App-Store-Abo rechnet Apple ab, deshalb kannst nur du es kündigen — in den iPhone-Einstellungen → Abonnements.",
+    "appStoreStillActive": "Dein Konto ist gelöscht, aber dein App-Store-Abo läuft bei Apple weiter. Kündige es in den iPhone-Einstellungen → Abonnements, damit dir nichts berechnet wird."
   },
   "glossaryPage": {
     "title": "Fachbegriffe, einfach gesagt",
@@ -1406,6 +1408,7 @@
     "renewalApple": "Die Zahlung wird über deine Apple-ID abgerechnet; das Abo verlängert sich monatlich, wenn es nicht mindestens 24 Stunden vor Ablauf gekündigt wird. Verwalten oder kündigen unter Einstellungen → Abonnements.",
     "terms": "Nutzungsbedingungen",
     "privacy": "Datenschutzerklärung",
-    "freePrice": "Kostenlos"
+    "freePrice": "Kostenlos",
+    "manageWebFromApp": "Du hast deinen Plan auf der Website gekauft; um ihn zu ändern oder zu kündigen, nutze die Abo-Verwaltung im Web."
   }
 }

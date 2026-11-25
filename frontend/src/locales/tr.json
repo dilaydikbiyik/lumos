@@ -1066,7 +1066,9 @@
     "deleteConfirm": "Kalıcı olarak sil",
     "deleting": "Siliniyor…",
     "failed": "Hesap silinemedi. Hiçbir şey değişmedi.",
-    "partial": "Verilerin silindi, ancak girişin kaldırılamadı. Lütfen destekle iletişime geç."
+    "partial": "Verilerin silindi, ancak girişin kaldırılamadı. Lütfen destekle iletişime geç.",
+    "deleteSubscriptions": "Ücretli bir planın varsa: web aboneliğin hesabınla birlikte iptal edilir. App Store aboneliğini ise Apple faturalandırdığı için yalnızca sen iptal edebilirsin — iPhone'unun Ayarlar → Abonelikler bölümünden.",
+    "appStoreStillActive": "Hesabın silindi, ama App Store aboneliğin Apple'da devam ediyor. Ücretlendirilmemek için iPhone'unun Ayarlar → Abonelikler bölümünden iptal et."
   },
   "glossaryPage": {
     "title": "Sade bir dille terimler",
@@ -1406,6 +1408,7 @@
       "label": "Ateş Böceği",
       "pitch": "Öğrenmeye başlamak için ihtiyacın olan her şey — sonsuza dek ücretsiz."
     },
-    "freePrice": "Ücretsiz"
+    "freePrice": "Ücretsiz",
+    "manageWebFromApp": "Planını web sitesinden aldın; değiştirmek ya da iptal etmek için web'deki abonelik yönetimini kullan."
   }
 }

@@ -1,12 +1,13 @@
 from pydantic import BaseModel, Field
+from backend.schemas.limits import MAX_AMOUNT
 from typing import Literal, Optional
 
 
 class RiskProfileAnswers(BaseModel):
     """Structured answers collected during the risk-profiling conversation."""
-    budget: float = Field(..., gt=0, description="Available investment budget, in the reader's market currency")
+    budget: float = Field(..., gt=0, le=MAX_AMOUNT, description="Available investment budget, in the reader's market currency")
     monthly_contribution: Optional[float] = Field(
-        None, ge=0,
+        None, ge=0, le=MAX_AMOUNT,
         description="TRY the user plans to add every month (null = one-time investment)"
     )
     time_horizon: Literal["short", "medium", "long"] = Field(
@@ -30,7 +31,7 @@ class RiskProfileAnswers(BaseModel):
         description="Income stability — irregular income lowers risk capacity"
     )
     high_interest_debt: Optional[float] = Field(
-        None, ge=0,
+        None, ge=0, le=MAX_AMOUNT,
         description=(
             "Outstanding credit-card / consumer-loan debt in TRY (null = unknown, "
             "0 = none). Carrying it makes investing a losing trade, so it is "

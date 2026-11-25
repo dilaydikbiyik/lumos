@@ -2,6 +2,7 @@ from datetime import date, datetime
 from typing import Literal, Optional
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
+from backend.schemas.limits import MAX_AMOUNT
 
 AssetType = Literal[
     "stock", "fund", "etf", "real_estate", "land",
@@ -39,13 +40,13 @@ class HoldingCreate(BaseModel):
     ticker: Optional[str] = Field(None, max_length=20)
     purchase_date: Optional[date] = None
     _purchase_date_ok = field_validator("purchase_date")(_not_in_the_future)
-    purchase_amount: float = Field(..., gt=0)
+    purchase_amount: float = Field(..., gt=0, le=MAX_AMOUNT)
     # ISO 4217 of purchase_amount. Omitted = the user's market currency. It is
     # recorded rather than assumed because the app previously took every stored
     # amount for lira and compared it to dollar-quoted prices.
     currency: Optional[str] = Field(None, min_length=3, max_length=3)
-    quantity: Optional[float] = Field(None, gt=0)
-    manual_current_value: Optional[float] = Field(None, gt=0)
+    quantity: Optional[float] = Field(None, gt=0, le=MAX_AMOUNT)
+    manual_current_value: Optional[float] = Field(None, gt=0, le=MAX_AMOUNT)
     note: Optional[str] = Field(None, max_length=1000)
     emotion_tag: Optional[EmotionTag] = None
 
@@ -54,9 +55,9 @@ class HoldingUpdate(BaseModel):
     name: Optional[str] = Field(None, min_length=1, max_length=120)
     purchase_date: Optional[date] = None
     _purchase_date_ok = field_validator("purchase_date")(_not_in_the_future)
-    purchase_amount: Optional[float] = Field(None, gt=0)
-    quantity: Optional[float] = Field(None, gt=0)
-    manual_current_value: Optional[float] = Field(None, gt=0)
+    purchase_amount: Optional[float] = Field(None, gt=0, le=MAX_AMOUNT)
+    quantity: Optional[float] = Field(None, gt=0, le=MAX_AMOUNT)
+    manual_current_value: Optional[float] = Field(None, gt=0, le=MAX_AMOUNT)
     note: Optional[str] = Field(None, max_length=1000)
 
 

@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, Request
 from pydantic import BaseModel, Field
+from backend.schemas.limits import MAX_AMOUNT, Weight
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.db.database import get_db
@@ -12,9 +13,9 @@ router = APIRouter()
 
 
 class PracticeSnapshotRequest(BaseModel):
-    weights: dict[str, float] = Field(..., min_length=1, max_length=15)
+    weights: dict[str, Weight] = Field(..., min_length=1, max_length=15)
     # Omitted: the market's own practice sum (MarketPack.practice_budget).
-    virtual_budget: float | None = Field(None, gt=0)
+    virtual_budget: float | None = Field(None, gt=0, le=MAX_AMOUNT)
 
 
 @router.post("/snapshot")

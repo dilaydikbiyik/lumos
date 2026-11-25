@@ -40,7 +40,7 @@ psycopg[binary]==3.2.3   # SYNC Postgres driver for the durable cache tier.
                          # rewriting every adapter. Ships wheels, no build.
 
 # ── Observability (optional, enabled via SENTRY_DSN) ────────────────────────
-sentry-sdk[fastapi]==2.19.2
+sentry-sdk[fastapi]==2.76.0
 
 # ── Rate Limiting ─────────────────────────────────────────────────────────────
 slowapi==0.1.10

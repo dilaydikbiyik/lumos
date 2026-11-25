@@ -20,7 +20,7 @@ if settings.SENTRY_DSN:
         traces_sample_rate=0.1,
         send_default_pii=False,  # never ship user content to a third party
     )
-from backend.middleware.error_handler import register_error_handlers
+from backend.middleware.error_handler import UnhandledErrorMiddleware, register_error_handlers
 from backend.middleware.language import LanguageMiddleware
 from backend.middleware.request_id import RequestIDMiddleware
 from backend.routers import (admin, backtest, billing, chat, client_errors, coach, feedback,
@@ -214,6 +214,9 @@ async def _validation_error(request: Request, exc: RequestValidationError) -> JS
 app.add_exception_handler(RequestValidationError, _validation_error)
 
 # ── Request ID (correlation) ──────────────────────────────────────────────────
+# Innermost: a crash becomes the 500 envelope before CORS and the request id
+# are applied, so the browser can read it. See UnhandledErrorMiddleware.
+app.add_middleware(UnhandledErrorMiddleware)
 app.add_middleware(RequestIDMiddleware)
 app.add_middleware(LanguageMiddleware)
 

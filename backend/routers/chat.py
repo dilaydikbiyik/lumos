@@ -4,6 +4,7 @@ from typing import Literal
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, Field, ValidationError
+from backend.schemas.limits import MAX_AMOUNT
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.config import settings
@@ -59,7 +60,7 @@ router = APIRouter()
 class WhatIfRequest(BaseModel):
     question: str = Field(..., min_length=3, max_length=500)
     risk_score: float = Field(..., ge=1, le=10)
-    budget: float = Field(..., gt=0)
+    budget: float = Field(..., gt=0, le=MAX_AMOUNT)
 
 
 class ChatMessage(BaseModel):
