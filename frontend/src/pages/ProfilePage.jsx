@@ -15,19 +15,7 @@ import usePortfolio from '../hooks/usePortfolio'
 import useMarket from '../hooks/useMarket'
 import { readJSON, writeJSON, removeKey, userKey } from '../utils/storage'
 import { withAlpha } from '../utils/palette'
-
-// Risk score → user-friendly label and colour
-const RISK_META = {
-  low:    { color: 'var(--green)',   label: 'profile.bands.low'    },
-  medium: { color: 'var(--firefly)', label: 'profile.bands.medium' },
-  high:   { color: 'var(--accent)',  label: 'profile.bands.high'   },
-}
-
-function getRiskMeta(score) {
-  if (score <= 3) return RISK_META.low
-  if (score <= 6) return RISK_META.medium
-  return RISK_META.high
-}
+import { riskBand } from '../utils/riskBand'
 
 
 
@@ -157,16 +145,21 @@ export default function ProfilePage() {
 
             {/* Summary card */}
             <div className="card" style={{
-              borderColor: withAlpha(getRiskMeta(displayProfile.risk_score).color, 27),
+              borderColor: withAlpha(riskBand(displayProfile.risk_score).color, 27),
               background: 'var(--bg-card)',
             }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+                {/* Band colour as a dot only; the label stays --text (purple fails as text). */}
+                <span aria-hidden="true" style={{
+                  width: 8, height: 8, borderRadius: '50%', flexShrink: 0,
+                  background: riskBand(displayProfile.risk_score).color,
+                }} />
                 <span style={{
                   fontSize: 12, fontWeight: 700, letterSpacing: '0.08em',
-                  color: getRiskMeta(displayProfile.risk_score).color,
+                  color: 'var(--text)',
                   textTransform: 'uppercase',
                 }}>
-                  {t(getRiskMeta(displayProfile.risk_score).label)} {t('profile.profileWord')}
+                  {t(riskBand(displayProfile.risk_score).label)} {t('profile.profileWord')}
                 </span>
                 <span className="badge badge-amber">{displayProfile.risk_score}/10</span>
               </div>

@@ -4,6 +4,7 @@ import api from '../utils/api'
 import RoleAlternatives from './RoleAlternatives'
 import { Trans, useTranslation } from 'react-i18next'
 import { percentFromWeight } from '../utils/format'
+import { riskBand } from '../utils/riskBand'
 
 /**
  * "Why this allocation?" — the engine's deterministic rationale.
@@ -66,11 +67,7 @@ export default function AllocationRationale({ portfolio }) {
             <div>
               <Trans i18nKey="rationale.step2" values={{ pct: logic.growth_target_pct }}
                      components={[<strong key="a" />, <br key="b" />]} />{' '}
-              {portfolio.risk_score <= 3.5
-                ? t('rationale.lowBand')
-                : portfolio.risk_score >= 7
-                  ? t('rationale.highBand')
-                  : t('rationale.midBand')}
+              {t({ low: 'rationale.lowBand', medium: 'rationale.midBand', high: 'rationale.highBand' }[riskBand(portfolio.risk_score).key])}
             </div>
           </div>
 

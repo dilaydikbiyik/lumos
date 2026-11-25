@@ -1,8 +1,10 @@
 import { useTranslation } from 'react-i18next'
+import { riskBand } from '../utils/riskBand'
 
 /* SVG arc gauge showing risk score 1-10, in the reader's number format (6,6 / 6.6). */
-export default function RiskGauge({ score = 5, label = 'Dengeli' }) {
-  const { i18n } = useTranslation()
+export default function RiskGauge({ score = 5, label }) {
+  const { t, i18n } = useTranslation()
+  const band = riskBand(score)
   const pct = (score - 1) / 9          // 0–1
   const angle = pct * 180              // 0–180 degrees arc
   const r = 70, cx = 100, cy = 90
@@ -16,12 +18,7 @@ export default function RiskGauge({ score = 5, label = 'Dengeli' }) {
   const x2 = cx + r * Math.cos(endAngle)
   const y2 = cy + r * Math.sin(endAngle)
 
-  const colorMap = [
-    '#3DD68C', '#3DD68C', '#3DD68C',   // 1-3 green
-    '#F5A524', '#F5A524', '#F5A524',   // 4-6 amber
-    '#F5515F', '#F5515F', '#F5515F', '#F5515F' // 7-10 red
-  ]
-  const color = colorMap[Math.round(score) - 1] || '#7C6FF7'
+  const color = band.color
 
   return (
     <div className="card" style={{ textAlign: 'center' }}>
@@ -35,11 +32,11 @@ export default function RiskGauge({ score = 5, label = 'Dengeli' }) {
         {angle > 0 && (
           <path
             d={`M ${x1} ${y1} A ${r} ${r} 0 0 1 ${x2} ${y2}`}
-            fill="none" stroke={color} strokeWidth={12} strokeLinecap="round"
+            fill="none" style={{ stroke: color }} strokeWidth={12} strokeLinecap="round"
           />
         )}
         {/* Score text */}
-        <text x={cx} y={cy - 4} textAnchor="middle" fontSize={28} fontWeight={700} fill={color}>
+        <text x={cx} y={cy - 4} textAnchor="middle" fontSize={28} fontWeight={700} style={{ fill: 'var(--text)' }}>
           {new Intl.NumberFormat(i18n.language, { minimumFractionDigits: 1, maximumFractionDigits: 1 }).format(score)}
         </text>
         <text x={cx} y={cy + 18} textAnchor="middle" fontSize={12} fill="#8B8CA8">
@@ -47,8 +44,8 @@ export default function RiskGauge({ score = 5, label = 'Dengeli' }) {
         </text>
       </svg>
 
-      <h3 style={{ marginTop: -4 }}>{label}</h3>
-      <p style={{ fontSize: 12, marginTop: 4 }}>Risk skorun</p>
+      <h3 style={{ marginTop: -4 }}>{label || t(band.label)}</h3>
+      <p style={{ fontSize: 12, marginTop: 4 }}>{t('profile.riskScoreCaption')}</p>
     </div>
   )
 }
