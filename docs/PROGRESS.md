@@ -35,10 +35,20 @@ Updated: 2026-11-26
   `docs/ui-audit.md` Rules). Copy options for 1.18, 6.4, 6.18 drafted in `docs/copy-decisions.md`
   (not applied). Signed-in screens not checked in the browser (sign-in needed); check.sh green.
 
+- 2026-11-26: Colour+hex-alpha concatenation (`${c}55`, `c + '44'`) replaced app-wide (8 sites)
+  by `withAlpha()` in `utils/palette.js` (color-mix); rule added to `docs/ui-audit.md`. 6.13 fixed.
+  Live check (test account, local) found dollar cash counted as lira on the currency card — fixed
+  (`utils/holdingCurrency.js` + test); the suspected purchase-amount mixing was not a bug (server
+  converts). Vercel and Render both auto-deploy on push to `main`. Local backend DB moved to
+  `./e2e.db` (launch.json; old path was a cleared scratch folder).
+- 2026-11-26: Batch 2 audited (15 findings, 4 high): panic overlay under the nav with no way out,
+  blank panic facts on a cold server, hardcoded TR/EN strings in onboarding, quiz load failure is a
+  dead end. Text-opacity fixed on sight in batch 2 components.
 ## Next step
 
-UI audit: picked copy in `docs/copy-decisions.md` applied 2026-11-26 except `doesBody`, which
-waits for legal review (brief question 11). Next: audit batch 2. Separate task: rename "advisor/danışman/Berater" → assistant. Batch 6 medium/low items 6.5, 6.6, 6.8, 6.10–6.17 still open.
+UI audit: fix batch 2 highs (2.1–2.4, all effort S), then audit batch 3 (Home). `doesBody` copy
+waits for legal review. Separate task: rename "advisor/danışman/Berater" → assistant. Batch 6
+medium/low items 6.5, 6.6, 6.8, 6.10–6.12, 6.14–6.17 still open.
 
 Owner-only steps, in order: `todo.md` → "SENİN LİSTEN — mağazaya giden yol". Apple Developer
 enrolment, Xcode, Play Console; Clerk sign-in methods decision (affects Sign in with Apple);

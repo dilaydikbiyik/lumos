@@ -12,7 +12,11 @@ never recommend · reduced motion.
 Outfit). No new style, palette or font. **Text is never faded with `opacity`** (owner, 2026-11-26,
 from 6.7): use `--text-muted` or `--text-dim`, and `--t-micro` for the smallest text. In each later
 batch, fix this on sight in that batch's components and do not report it as a finding. (Opacity on
-graphics, e.g. chart bars, and on disabled controls is fine.) Each finding is **verified** (code read or measured) or
+graphics, e.g. chart bars, and on disabled controls is fine.) **No alpha appended to a colour
+variable** (`` `${color}55` ``, `color + '44'`; owner, 2026-11-26, from 6.13): colours arrive as hex,
+`hsl()` or `var(--token)`, so this is invalid CSS for most of them and the tint silently vanishes. Use
+`withAlpha(color, percent)` from `utils/palette.js` (a `color-mix`). Fix on sight, do not report
+it. Each finding is **verified** (code read or measured) or
 **suspected**. AssetCard is out of scope (audited and fixed 2026-11-26; its open #5 and #8 stay
 in `docs/PROGRESS.md`).
 
@@ -27,7 +31,7 @@ Size = lines of JSX in the batch (a rough effort proxy).
 | # | Batch | Screens / flows | Components in scope | ~Lines | Status |
 |---|---|---|---|---|---|
 | 1 | First contact (signed out) + install | `/` landing, disclaimer modal, sign-in (web redirect + in-app Clerk `SignIn`), `AuthPending` loading, crash screen, unknown URL → `/`, `/privacy`, `/terms`, PWA install + offline | OnboardingPage, DisclaimerModal, LanguageSwitcher, LumosLogo, FireflyMark, LegalPage, InstallHint, utils/errorBoundary, `public/manifest.webmanifest`, `public/sw.js` | 950 | done 2026-11-26 |
-| 2 | Getting to know you + the app shell | `/path` (step 1), `/fear-check-in` (step 2), `/profile` risk quiz (step 3, chat + structured); shell first seen here: header, bottom nav / sidebar, market + language switchers, panic button, advisor chat, feedback | PathSelectionPage, FearCheckInPage, ProfilePage, ChatWindow, MessageBubble, StructuredQuiz, RiskGauge, DebtFirstCard · AppHeader, AppNav, MarketSwitcher, HeaderSelect, PanicButton, AdvisorChat, FeedbackButton, Section, Disclaimer | 1,890 | todo |
+| 2 | Getting to know you + the app shell | `/path` (step 1), `/fear-check-in` (step 2), `/profile` risk quiz (step 3, chat + structured); shell first seen here: header, bottom nav / sidebar, market + language switchers, panic button, advisor chat, feedback | PathSelectionPage, FearCheckInPage, ProfilePage, ChatWindow, MessageBubble, StructuredQuiz, RiskGauge, DebtFirstCard · AppHeader, AppNav, MarketSwitcher, HeaderSelect, PanicButton, AdvisorChat, FeedbackButton, Section, Disclaimer | 1,890 | done 2026-11-26 |
 | 3 | Home | `/dashboard` (first tab, where a finished profile lands) | DashboardPage, ReadinessScore, PathSuggestion, PathInvitation, DailyTip, HeadlineEducation, NewsDigest, BudgetSplit, GoalPlanner, BehaviorMirror, PortfolioChart (minus AssetCard), PortfolioComparison, StocksLink | 1,730 | todo |
 | 4 | Your portfolio plan | `/recommend` (allocation, why, what-if, practice), `/stocks` (asset classes) | RecommendPage, AllocationRationale, RoleAlternatives, AssetExplainer, ReitCard, ReferenceFacts, TimeMachine, AssetCharacter, IsikTut, FutureScenarios, WhatIfAssistant, PracticeMode, BoughtItBridge, BeginnerGuide, Glossary, RealEstatePathNotice · StocksPage, AssetClasses | 2,140 | todo |
 | 5 | Real estate | `/explore` (property vs portfolio, purchase checks, listing evaluation, population trend, ways into a home) | ExplorePage, PropertyVsPortfolio, PurchaseChecks, ListingEval, PopulationTrend, HomeRoutes | 1,390 | todo |
@@ -103,6 +107,47 @@ marker, `other` in AdminPage. Suggested look: dashboard, disclaimer modal, a cha
   visible" (which formula?). The landing page has no Işık Tut, so the fix there is a plain
   half-line, not a tooltip.
 
+### Batch 2 — getting to know you + the app shell (audited 2026-11-26)
+
+Read from code; the panic overlay, floating buttons, header and nav were also checked live on the
+local build with a test account, at 375/390px (mobile, bottom bar) and 1280px (web, sidebar).
+Contrast is computed from the tokens.
+
+| # | Issue | Why it matters for a beginner | Fix | Effort | Sev | Evidence |
+|---|---|---|---|---|---|---|
+| 2.1 | **Panic overlay can't be left and sits under the nav.** Its `z-index: 50` is below the bottom nav (100) and the header, so both show and stay tappable on top of a "stop and breathe" screen. There is no close button and no Escape in the pause and facts stages: the only way out is to pick an answer. Focus stays on `<body>`. | Someone who taps the lifebuoy by accident, or out of fear, is held in a full-screen dialog that only lets them out by answering. | `z-index` above the nav (as `.advisor-overlay`, 200); a labelled close button and Escape in every stage; focus into the dialog and back to the button on close. | S | high | verified live, 375px |
+| 2.2 | **Panic facts stage can be blank.** "Show now", or the end of the 10s count, switches to `coach` before `/coach/panic` has answered; `stage === 'coach' && coach` then renders nothing. On a cold server (30–60s) that is an empty dark screen with no buttons (and, with 2.1, no exit). | The moment of panic is the worst time for a blank screen. | While `coach` is null, show the loader and one line ("getting your numbers…"); keep the close button. | S | high | verified (code) |
+| 2.3 | **Hardcoded Turkish/English in onboarding.** Fear check-in continue button `"Harika, devam edelim →"`; RiskGauge `"Risk skorun"` and default label `'Dengeli'`; quiz chat send button `aria-label="Send"`. | EN and DE readers meet Turkish on step 2 and on their result. | i18n keys in tr/en/de. | S | high | verified (code) |
+| 2.4 | **Quiz questions fail to load → dead end.** If `/profile/questions` fails, StructuredQuiz shows only the red error: no Try again, and the "I'd rather talk" link (the other way in) is not rendered. | Step 3 of 3 of onboarding, on the cold start a new user is most likely to meet. | Try again button + keep the "talk instead" link in the error state. | S | high | verified (code) |
+| 2.5 | Quiz number input (age, budget, income…) has no `className="input"`: browser-default light field on the dark card, under 16px, so iOS Safari zooms on focus (as 6.10). | The first thing a new user types into. | `className="input"`. | S | medium | verified (code) |
+| 2.6 | Quiz "Back" and "I'd rather talk" are 12px text buttons with `padding: 0` (~16px tall). | Back is the only way to fix a wrong answer; too small to hit. | `min-height: var(--touch-target)`, `--t-small`. | S | medium | verified (code) |
+| 2.7 | **Gauge and summary disagree on the band.** RiskGauge bands by `Math.round` and paints 7–10 **red**; the summary card bands by `≤3 / ≤6` and paints "high" purple (`--accent`). Score 3.4: green gauge, amber "medium" label; 6.6: red gauge, purple "high". The SVG has no `role="img"`/label and uses hex, not tokens. | Red tells a reader their answer is wrong or dangerous; a risk tolerance is neither. Two colours for one score reads as two verdicts. | One band function in both; no red (use the summary's colours); `role="img"` + `aria-label`; tokens. | S | medium | verified (code) |
+| 2.8 | "Redo" has no way back: the result hides until the quiz is finished again (only a reload restores it), and the saved draft is deleted first. | A curious tap costs the reader their result screen. | A "Back to my result" link while `retaking` and a result exists. | S | medium | verified (code) |
+| 2.9 | Chat (quiz chat and advisor): message list has no `aria-live`, so replies are not announced; both inputs are placeholder-only (no label); advisor × has no size (~30px); advisor Escape works only once focus is inside the panel, and opening does not move focus there. | Screen-reader users get no answer read out; the close is hard to hit. | `aria-live="polite"` on the list; `aria-label` on inputs; 48px close; focus the input on open. | S | medium | verified (code) |
+| 2.10 | **Dawn background lowers contrast** (cross-batch). At illumination stage 3 (`--bg-dawn` + the amber `body::after` glow) near the bottom of the screen: `--text-dim` ≈ **3.8:1**, `--text-muted` ≈ **4.3:1**, `--accent` ≈ **3.5:1**. Cards are opaque, so only page-level text there is hit: the "Say something about this" feedback link (`--text-dim`, 11px), page subtitles and footers. Night, dusk and pre-dawn stay ≥ 4.6:1. | The reward for learning makes the smallest text harder to read. | Cap the glow (e.g. 0.12 at stage 3) or give bottom-of-page text `--text-muted` on a surface. | S | medium | computed; glow strength at viewport bottom estimated (~13%) |
+| 2.11 | Path and fear choices save in the background (5 tries, then `.catch(() => {})`); PathSelectionPage's `error` state is never set. If every try fails, the next app open asks again with no word why. | Silent loss of what the reader just told us. | After the last failed try, a small non-blocking note on the next screen. | S | low | suspected (needs a 15s outage to see) |
+| 2.12 | Panic and advisor buttons show on `/path` and `/fear-check-in` (only `/profile` hides them): a lifebuoy "panic" button before the reader owns anything. FABs are 46px (< 48). | Two unexplained floating buttons on the first screens after sign-in. | Hide on the intro routes too; 48px. | S | low | verified live |
+| 2.13 | Feedback sheet: no `role="dialog"`, no Escape; category chips have no `aria-pressed`; textarea is placeholder-only. | Screen readers don't know a sheet opened or which category is chosen. | Add them. | S | low | verified (code) |
+| 2.14 | Small text and targets: `common.eduFooter` at 10px in both chats (below `--t-micro`); Plans button on Profile `min-height: 44`. | Legal line too small to read. | `--t-micro`; 48px. | S | low | verified (code) |
+| 2.15 | Motion outside `prefers-reduced-motion`: path/fear cards slide/scale on hover, FABs slide on scroll, reassurance ring `light-pulse` loops, chats scroll smoothly. | Motion-sensitive readers get it anyway. | Wrap in the existing reduced-motion block. | S | low | verified (code) |
+
+**Fixed on sight in this batch** (Rules): text faded with `opacity` → `--text-muted`/`--text-dim` in
+ProfilePage (score breakdown), StructuredQuiz (help lines, Skip), DebtFirstCard (captions),
+PanicButton (pause body, facts), FeedbackButton (subtitle), AdvisorChat (typing bubble), Section
+(count, subtitle). ProfilePage summary border `color + '44'` → `withAlpha`.
+
+**Checked and fine:** header pickers fit at 375px with no sideways scroll; bottom bar (mobile) and
+sidebar (web) switch at 768px and never show together; nav buttons have `aria-label`s; the advisor
+panel sits above the nav (z 200) and is full-screen on phones; the quiz counts "3 of 9" instead of a
+bar, checks each answer's range on that question, allows skipping optional ones and has `role="alert"`
+errors; RiskGauge prints the score in the reader's number format; `Section` uses `aria-expanded`;
+`--text-dim`/`--text-muted` ≥ 4.6:1 on night, dusk and pre-dawn; the debt card shows its arithmetic
+and its assumption.
+
+**Deferred AssetCard patterns in batch 2:** #5 focus / live region: quiz step change (new question not
+announced), fear choice → reassurance swap, panic stages, "Redo". #8 jargon: "risk score", the
+factor "+2 / −1" contributions, "profile", the panic "10" with no word on what the count is.
+
 ### Batch 6 — what you own, account and plans (audited 2026-11-26, `/admin` skipped)
 
 Read from code; these screens need a signed-in account, so nothing here was measured in the
@@ -122,7 +167,7 @@ browser. Contrast is computed from the tokens (with the new `--text-dim`, so it 
 | 6.10 | Delete-account confirm input has no `className="input"` (and no global `input` rule), so it renders as the browser's default light ~13px field on the dark card; iOS Safari zooms when a field under 16px gets focus. | The last screen before an irreversible step looks broken and jumps. | `className="input"`. | S | med | verified (code); iOS zoom suspected |
 | 6.11 | Account deletion reports a partial delete and a still-active App Store subscription with two consecutive `window.alert`s: browser chrome ("… says"), untranslated OK, the second easy to dismiss unread. | The subscription warning is the one that costs money if missed. | One in-app message listing both, shown before `signOut`, with one "OK, sign me out". | S | med | verified (code) |
 | 6.12 | After web checkout (`?paid=1`) the plan is re-read 6× over 18s, then polling stops silently; a slower webhook leaves "Thanks, switches on within a few seconds" above "Free — current". | Paid, and the screen says free. | After the last try, a "still confirming — refresh in a minute" line and a Refresh button. | S | low | verified (code) |
-| 6.13 | Currency badge background is `` `${riskColor}18` `` with `var(--red)` → `var(--red)18`, invalid CSS, no tint (AssetCard #1 bug class). A holding without `current_value` falls back to `purchase_amount`, which may be in `h.currency`, and is summed as home currency. | The percentages are the card's whole point. | `color-mix(in srgb, … 10%, transparent)`; convert or skip the fallback. | S | low | badge verified; mixing suspected |
+| 6.13 | Currency badge background is `` `${riskColor}18` `` with `var(--red)` → `var(--red)18`, invalid CSS, no tint (AssetCard #1 bug class). A holding without `current_value` falls back to `purchase_amount`, which may be in `h.currency`, and is summed as home currency. | The percentages are the card's whole point. | `color-mix(in srgb, … 10%, transparent)`; convert or skip the fallback. | S | low | **fixed 2026-11-26** — badge uses `withAlpha` (all 8 colour+hex-alpha sites app-wide replaced). Mixing: **not a bug** — `holdings_valuation.py` converts every foreign holding, fallback included, to the reader's currency (0 if the rate is unknown); checked live with USD cash. That live check found a real one, fixed: `getCurrency` counted cash/property/vehicles as home currency whatever `h.currency` said, so dollar cash read as lira (test in `utils/holdingCurrency.test.js`) |
 | 6.14 | PortfolioValueChart: first load without cache shows only the title and range buttons (no spinner/text); error line has no retry; range buttons lack `aria-pressed`; hex colours instead of `--green`/`--red`. | A card with buttons and nothing else looks broken. | `role="status"` loading line, Retry, `aria-pressed`, tokens. | S | low | verified (code) |
 | 6.15 | FirstPurchaseEducation ✕ is ~26px and its title starts with 🎉; PathSwitcher uses emoji (🏦 🏘️ ⚖️ 🤷) instead of the `Icon` set and shows nothing as current, with no message, if `getMe` fails; CurrencyExposure title uses 💱. | 🤷 beside "undecided" reads as flippant to someone anxious about the choice; small target. | 48px hit area; `Icon` glyphs; one-line load error. | S | low | verified (code) |
 | 6.16 | Compact "Delete account" link (onboarding variant) is 12px with `padding:0` (~16px tall). | Hard to hit; reachability is a store requirement. | `padding: 14px 12px; min-height: 44px`, as the landing legal links. | S | low | verified (code) |
