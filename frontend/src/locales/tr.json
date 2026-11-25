@@ -61,7 +61,7 @@
     "doesBody": "risk profilini çıkarır, sana uygun bir portföy dağılımı hesaplar, her rakamı canlı piyasa ve resmî enflasyon verisiyle arındırıp gösterir, kararlarının arkasındaki formülü açıklar.",
     "doesnt": "Yapmaz:",
     "doesntBody": "senin adına alım satım yapmaz, paranı tutmaz. Yatırım tavsiyesi, finansal planlama veya düzenlemeye tabi bir finansal hizmet vermez.",
-    "detail": "Bu uygulamanın ürettiği portföy önerileri, halka açık piyasa verilerine ve yapay zeka analizine dayanır. Hiçbir yatırım kararının tek dayanağı olmamalıdır. Yatırım yapmadan önce mutlaka lisanslı bir finansal danışmana başvurun.",
+    "detail": "Bu uygulamanın gösterdiği her şey — örnek dağılımlar, senaryolar, rakamlar — halka açık piyasa verisi ve yapay zekâ analiziyle hazırlanmış genel bir eğitimdir. Senin durumunun tamamını bilmez, bu yüzden kişisel tavsiye değildir. Yatırım yapmadan önce lisanslı bir finansal danışmana başvur.",
     "checkbox": "Bu uygulamanın yalnızca eğitim amaçlı olduğunu ve yatırım tavsiyesi niteliği taşımadığını anlıyorum.",
     "accept": "Anladım, devam et"
   },
@@ -528,7 +528,7 @@
     "erosionFormula": "Toplam × aylık ortalama enflasyon ({{pct}}) = {{amount}}",
     "healthTitle": "Varlık dağılımın",
     "healthBody": "İki soru: tek bir şeye mi yığılmış, ve gerektiğinde ne kadarını hızla nakde çevirebilirsin?",
-    "rebuildCta": "↻ Kalan {{amount}} ile portföyümü güncelle",
+    "rebuildCta": "↻ Kalan {{amount}} için örnek bir dağılım gör",
     "purchase": "Alış",
     "current": "Güncel",
     "live": "● canlı",
@@ -566,9 +566,10 @@
     "subtitle": "Yerel para ile döviz bazlı varlıkların",
     "riskLabel": "Kur riski",
     "high": "Yüksek",
+    "mostlyHome": "Ağırlıklı yerel para",
     "mid": "Orta",
-    "highMsg": "Portföyünün çoğu yerel parada ({{currency}}). {{currency}} değer kaybederse bütün portföy bunu hisseder. Döviz bazlı varlık eklemeyi düşünebilirsin.",
-    "midMsg": "Yerel para ({{currency}}) ile döviz arasında makul bir denge var. Bu dağılım kur dalgalanmalarına karşı kısmi koruma sağlar.",
+    "highMsg": "Portföyünün çoğu {{currency}} cinsinden. Kiran ve mutfak masrafların da {{currency}} ile fiyatlandığı için bu, harcamalarınla örtüşür; öbür yüzü, {{currency}} diğer paralar karşısında değer kaybederse portföyde bunu dengeleyen bir şey olmamasıdır. İki dağılımın da doğrusu ya da yanlışı yok; hangisine sahip olduğunu bilmek işe yarar.",
+    "midMsg": "Portföyün {{currency}} ile diğer para birimleri arasında bölünmüş. {{currency}} değer kaybettiğinde döviz kısmı bunun bir kısmını dengeler; değer kazandığında o kısım {{currency}} karşılığında biraz azalır.",
     "fxLegend": "🌍 Döviz — %{{pct}}",
     "fxHeavyMsg": "Portföyün neredeyse tamamen döviz bazlı. {{currency}} değer kaybederken bu seni korur — ama kiran, mutfağın ve alacağın ev {{currency}} ile fiyatlanıyor ve ters yöndeki bir hareketi dengeleyen hiçbir şey yok. Makul bir tercih olabilir; yeter ki bilinçli ve bunun bir yoğunlaşma olduğunu bilerek yapılsın.",
     "homeLegend": "🏠 {{currency}} — %{{pct}}"
@@ -1377,7 +1378,7 @@
   },
   "plans": {
     "title": "Planlar",
-    "sameAdvice": "Ücretli plan yalnızca yapay zekâ danışmanını değiştirir: günlük mesaj hakkı ve daha güçlü bir model. Öneriler, hesaplar ve her rakam herkes için aynıdır.",
+    "sameAdvice": "Ücretli plan yalnızca yapay zekâ danışmanını değiştirir: günlük mesaj hakkı ve daha güçlü bir model. Geri kalan her şey — örnek portföyler, hesaplar, her rakam ve açıklama — ücretsiz dahil her planda aynıdır.",
     "plus": {
       "label": "Fener",
       "pitch": "Danışmana günde on kat daha fazla soru, daha derin cevaplar veren bir model."

@@ -61,7 +61,7 @@
     "doesBody": "builds your risk profile, computes a portfolio allocation that fits it, deflates every number with live market and official inflation data, and explains the formula behind each decision.",
     "doesnt": "Doesn't:",
     "doesntBody": "trade on your behalf or hold your money. It provides no investment advice, financial planning, or any regulated financial service.",
-    "detail": "The portfolio suggestions this app produces are based on public market data and AI analysis. They should never be the sole basis of any investment decision. Always consult a licensed financial advisor before investing.",
+    "detail": "Everything this app shows — example allocations, scenarios, figures — is general education built from public market data and AI analysis. It does not know your whole situation, so it is not personal advice. Before investing, talk to a licensed financial advisor.",
     "checkbox": "I understand this app is educational only and does not constitute investment advice.",
     "accept": "Got it, continue"
   },
@@ -528,7 +528,7 @@
     "erosionFormula": "Total × average monthly inflation ({{pct}}) = {{amount}}",
     "healthTitle": "How your wealth is spread",
     "healthBody": "Two questions: is it piled into one thing, and how much of it could become cash quickly if you needed it to?",
-    "rebuildCta": "↻ Update my portfolio with the remaining {{amount}}",
+    "rebuildCta": "↻ See an example split for the remaining {{amount}}",
     "purchase": "Bought",
     "current": "Now",
     "live": "● live",
@@ -566,9 +566,10 @@
     "subtitle": "Your home-currency vs foreign-currency assets",
     "riskLabel": "Currency risk",
     "high": "High",
+    "mostlyHome": "Mostly home currency",
     "mid": "Medium",
-    "highMsg": "Most of your portfolio is in your home currency ({{currency}}). When it weakens, your whole portfolio feels it. Consider adding foreign-currency assets.",
-    "midMsg": "There's a reasonable balance between your home currency ({{currency}}) and foreign currencies. This split gives partial protection against currency swings.",
+    "highMsg": "Most of your portfolio is in {{currency}}. That matches your rent and shopping, which are priced in it too; the flip side is that if {{currency}} loses value against other currencies, nothing in the portfolio offsets it. Neither split is right or wrong — it helps to know which one you have.",
+    "midMsg": "Your portfolio is split between {{currency}} and other currencies. When {{currency}} weakens, the foreign part cushions some of it; when it strengthens, that part is worth a little less in {{currency}}.",
     "fxLegend": "🌍 FX — {{pct}}%",
     "fxHeavyMsg": "Your portfolio is almost entirely in foreign currencies. That protects you when {{currency}} weakens — but your rent, food and future home are priced in it, and nothing offsets a move the other way. It can be a reasonable stance; just make it a deliberate one, knowing it is a concentration.",
     "homeLegend": "🏠 {{currency}} — {{pct}}%"
@@ -1377,7 +1378,7 @@
   },
   "plans": {
     "title": "Plans",
-    "sameAdvice": "A paid plan changes the AI advisor only: more daily messages and a stronger model. Recommendations, calculations and every figure are the same for everyone.",
+    "sameAdvice": "A paid plan changes the AI advisor only: more daily messages and a stronger model. Everything else — the example portfolios, the calculations, every figure and explanation — is the same on every plan, free included.",
     "free": {
       "label": "Firefly",
       "pitch": "Everything you need to start learning — free forever."

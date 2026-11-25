@@ -59,9 +59,11 @@ export default function CurrencyExposure({ holdings }) {
   // an all-FX portfolio "low risk" and described it purely as protection —
   // true while the lira falls, and silent about the fact that the user's rent,
   // food and future home are all priced in the currency they hold none of.
-  let riskLevel, riskMessage, riskColor
+  // Mostly home currency is an ordinary position, not a danger: the badge
+  // names the split in the same neutral colour as the opposite extreme.
+  let riskLevel, riskMessage, riskColor, badge
   if (tryPct >= 80) {
-    riskLevel = t('fx.high'); riskMessage = t('fx.highMsg', { currency: homeCurrency }); riskColor = 'var(--red)'
+    badge = t('fx.mostlyHome'); riskMessage = t('fx.highMsg', { currency: homeCurrency }); riskColor = 'var(--firefly)'
   } else if (tryPct <= 20) {
     riskLevel = t('fx.high'); riskMessage = t('fx.fxHeavyMsg', { currency: homeCurrency }); riskColor = 'var(--firefly)'
   } else {
@@ -81,7 +83,7 @@ export default function CurrencyExposure({ holdings }) {
           borderRadius: 20, color: riskColor,
           background: `${riskColor}18`,
         }}>
-          {t('fx.riskLabel')}: {riskLevel}
+          {badge || `${t('fx.riskLabel')}: ${riskLevel}`}
         </span>
       </div>
 

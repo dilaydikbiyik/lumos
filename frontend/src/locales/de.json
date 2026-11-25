@@ -70,7 +70,7 @@
     "doesBody": "erstellt dein Risikoprofil, berechnet eine dazu passende Portfolioaufteilung, bereinigt jede Zahl mit Live-Markt- und offiziellen Inflationsdaten und erklärt die Formel hinter jeder Entscheidung.",
     "doesnt": "Tut nicht:",
     "doesntBody": "in deinem Namen handeln oder dein Geld verwahren. Lumos bietet keine Anlageberatung, keine Finanzplanung und keine regulierte Finanzdienstleistung.",
-    "detail": "Die Portfoliovorschläge dieser App beruhen auf öffentlichen Marktdaten und KI-Analyse. Sie dürfen nie die alleinige Grundlage einer Anlageentscheidung sein. Sprich vor dem Investieren mit einer lizenzierten Fachperson.",
+    "detail": "Alles, was diese App zeigt — Beispielaufteilungen, Szenarien, Zahlen — ist allgemeine Bildung aus öffentlichen Marktdaten und KI-Analyse. Sie kennt deine Gesamtsituation nicht und ist daher keine persönliche Beratung. Sprich vor dem Investieren mit einer lizenzierten Fachperson.",
     "checkbox": "Ich verstehe, dass diese App nur der Bildung dient und keine Anlageberatung darstellt.",
     "accept": "Verstanden, weiter"
   },
@@ -218,7 +218,7 @@
     "erosionFormula": "Summe × durchschnittliche Monatsinflation ({{pct}}) = {{amount}}",
     "healthTitle": "Wie dein Vermögen verteilt ist",
     "healthBody": "Zwei Fragen: steckt alles in einer Sache, und wie viel davon wäre im Bedarfsfall schnell Bargeld?",
-    "rebuildCta": "↻ Portfolio mit den verbleibenden {{amount}} aktualisieren",
+    "rebuildCta": "↻ Beispielaufteilung für die verbleibenden {{amount}} ansehen",
     "purchase": "Gekauft",
     "current": "Aktuell",
     "live": "● live",
@@ -378,9 +378,10 @@
     "subtitle": "Heimatwährung vs. Fremdwährung in deinem Vermögen",
     "riskLabel": "Währungsrisiko",
     "high": "Hoch",
+    "mostlyHome": "Überwiegend Heimatwährung",
     "mid": "Mittel",
-    "highMsg": "Der Großteil deines Portfolios liegt in deiner Heimatwährung ({{currency}}). Wenn sie schwächer wird, spürt es das ganze Portfolio. Erwäge Anlagen in Fremdwährung.",
-    "midMsg": "Zwischen Heimatwährung ({{currency}}) und Fremdwährungen besteht ein vernünftiges Gleichgewicht. Diese Aufteilung schützt teilweise vor Wechselkursschwankungen.",
+    "highMsg": "Der Großteil deines Portfolios liegt in {{currency}}. Das passt zu Miete und Einkäufen, die ebenfalls darin bezahlt werden; die Kehrseite: Verliert {{currency}} gegenüber anderen Währungen an Wert, gleicht im Portfolio nichts das aus. Keine Aufteilung ist richtig oder falsch — gut zu wissen, welche du hast.",
+    "midMsg": "Dein Portfolio verteilt sich auf {{currency}} und andere Währungen. Wird {{currency}} schwächer, federt der Fremdwährungsteil einen Teil davon ab; wird sie stärker, ist dieser Teil in {{currency}} etwas weniger wert.",
     "fxLegend": "🌍 Fremdwährung — {{pct}} %",
     "homeLegend": "🏠 {{currency}} — {{pct}} %"
   },
@@ -1377,7 +1378,7 @@
   },
   "plans": {
     "title": "Pläne",
-    "sameAdvice": "Ein bezahlter Plan ändert nur den KI-Berater: mehr Nachrichten am Tag und ein stärkeres Modell. Empfehlungen, Berechnungen und jede Zahl sind für alle gleich.",
+    "sameAdvice": "Ein bezahlter Plan ändert nur den KI-Berater: mehr Nachrichten am Tag und ein stärkeres Modell. Alles andere — Beispielportfolios, Berechnungen, jede Zahl und Erklärung — ist in jedem Plan gleich, auch im kostenlosen.",
     "free": {
       "label": "Glühwürmchen",
       "pitch": "Alles, was du zum Lernen brauchst — für immer kostenlos."
