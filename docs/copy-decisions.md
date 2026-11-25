@@ -158,16 +158,21 @@ next with real money they still hold.
 
 ---
 
-## Your choices
+## Choices (proposed by Claude 2026-11-26 at the owner's request; owner reviewed, two changed)
 
-| Item | String | Choice (A / B / edit) |
-|---|---|---|
-| 1.18 | `disclaimerModal.doesBody` | |
-| 1.18 | `disclaimerModal.detail` | |
-| 1.18 | `index.html` meta description (+ one language for title/meta) | |
-| 6.4 | `fx.highMsg` | |
-| 6.4 | badge colour + text | |
-| 6.4 | `fx.midMsg` (related) | |
-| 6.18 | `plans.sameAdvice` | |
-| 6.18 | `holdings.rebuildCta` | |
-| 6.18 | "advisor / danışman / Berater" name (related) | |
+| Item | String | Choice | Why |
+|---|---|---|---|
+| 1.18 | `disclaimerModal.doesBody` | **Open — unchanged** | Owner: the problem is what the product does, not the wording. A split computed from the reader's answers may be a personal recommendation under MiFID II whatever it is called; A says so, B hides it. Sent to `docs/legal-review-brief.md` (question 11). |
+| 1.18 | `disclaimerModal.detail` | **B** | It gives the reason it is not advice ("it does not know your whole situation") instead of only asserting it — explain before showing. Fixes the formal *başvurun* too. |
+| 1.18 | `index.html` meta description | **A** (tr); `<title>` = **"Lumos"** | Owner: one `index.html` serves tr/en/de readers, so a Turkish title would be wrong for two of three; brand name only until there are per-language pages. The description and `og:` tags are still Turkish — same problem, left for that later change. |
+| 6.4 | `fx.highMsg` | **B** | Two-sided, like the card's own `fxHeavyMsg`, so both extremes are treated alike. A's last line ("assets in other currencies are what would change this") still points at an action. |
+| 6.4 | badge colour + text | **`--firefly`**, "Ağırlıklı yerel para / Mostly home currency / Überwiegend Heimatwährung" | Red signals danger for an ordinary position; the badge should name the split, not grade it. |
+| 6.4 | `fx.midMsg` (related) | **Rewrite** (below) | "Reasonable balance" is a grade; describe what the split does instead. |
+| 6.18 | `plans.sameAdvice` | **B** | Says outright that free gets everything else — the reassurance a timid reader needs on a paywall page. |
+| 6.18 | `holdings.rebuildCta` | **A** | Button labels should say what happens on tap; a question on a button reads as unclear. |
+| 6.18 | "advisor / danışman / Berater" name | **Rename to assistant** (asistan / Assistent) — separate change | *Berater* next to *Anlageberatung* is the larger regulatory risk, but it touches many keys and the plan names; do it as its own task. |
+
+`fx.midMsg` rewrite:
+- en: Your portfolio is split between {{currency}} and other currencies. When {{currency}} weakens, the foreign part cushions some of it; when it strengthens, that part is worth a little less in {{currency}}.
+- tr: Portföyün {{currency}} ile diğer para birimleri arasında bölünmüş. {{currency}} değer kaybettiğinde döviz kısmı bunun bir kısmını dengeler; değer kazandığında o kısım {{currency}} karşılığında biraz azalır.
+- de: Dein Portfolio verteilt sich auf {{currency}} und andere Währungen. Wird {{currency}} schwächer, federt der Fremdwährungsteil einen Teil davon ab; wird sie stärker, ist dieser Teil in {{currency}} etwas weniger wert.

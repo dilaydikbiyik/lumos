@@ -37,8 +37,8 @@ Updated: 2026-11-26
 
 ## Next step
 
-UI audit: owner picks options in `docs/copy-decisions.md` (1.18, 6.4, 6.18), then apply them;
-then audit batch 2. Batch 6 medium/low items 6.5, 6.6, 6.8, 6.10–6.17 still open.
+UI audit: picked copy in `docs/copy-decisions.md` applied 2026-11-26 except `doesBody`, which
+waits for legal review (brief question 11). Next: audit batch 2. Separate task: rename "advisor/danışman/Berater" → assistant. Batch 6 medium/low items 6.5, 6.6, 6.8, 6.10–6.17 still open.
 
 Owner-only steps, in order: `todo.md` → "SENİN LİSTEN — mağazaya giden yol". Apple Developer
 enrolment, Xcode, Play Console; Clerk sign-in methods decision (affects Sign in with Apple);

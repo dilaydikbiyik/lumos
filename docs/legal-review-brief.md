@@ -87,6 +87,16 @@ will ask for each one.
    personal financial data. What does it oblige beyond the privacy policy
    already published — a data controller registration (VERBİS), a DPIA, a
    retention schedule?
+11. **How the app may describe its own allocation (open, from UI audit 1.18).**
+   The split is computed from the reader's own quiz answers. Is that a
+   personal recommendation in Türkiye and Germany (MiFID II treats advice as
+   a recommendation presented as suitable for the person, or based on their
+   circumstances)? The disclaimer modal currently says the app "computes a
+   portfolio allocation that fits [your profile]". No rewording fixes this if
+   the product itself is personal: "an example for a profile like yours" is
+   accurate but personal; "how portfolios are usually split" hides the
+   personalisation. The wording waits for this answer
+   (`docs/copy-decisions.md`, `disclaimerModal.doesBody`).
 
 ### Ask about structure last, not first
 
