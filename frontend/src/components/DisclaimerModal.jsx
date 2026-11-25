@@ -1,5 +1,7 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import LanguageSwitcher from './LanguageSwitcher'
 
 export default function DisclaimerModal({ onAccept }) {
   const { t } = useTranslation()
@@ -10,11 +12,21 @@ export default function DisclaimerModal({ onAccept }) {
       position: 'fixed', inset: 0,
       background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(6px)',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
-      zIndex: 1000, padding: 16,
+      zIndex: 1000, padding: 16, overflowY: 'auto',
     }}>
-      <div className="card" style={{ maxWidth: 480, width: '100%' }}
+      {/* The card scrolls inside the viewport: on a small phone, or any
+          phone held sideways, it was taller than the screen and the
+          "Got it" button could not be reached, so the app could not be
+          entered at all. */}
+      <div className="card"
+           style={{ maxWidth: 480, width: '100%', maxHeight: 'calc(100dvh - 32px)', overflowY: 'auto' }}
            role="dialog" aria-modal="true" aria-labelledby="disclaimer-title">
-        <div style={{ fontSize: 36, marginBottom: 16, textAlign: 'center' }}></div>
+        {/* The modal covers the landing header, so the language picker
+            lives here too: nobody should have to agree to a text they
+            cannot switch into their own language. */}
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 8 }}>
+          <LanguageSwitcher compact />
+        </div>
         <h2 id="disclaimer-title" style={{ marginBottom: 12, textAlign: 'center' }}>{t('disclaimerModal.title')}</h2>
 
         {/* Same legal boundary as before, stated in the other order: what the
@@ -40,6 +52,21 @@ export default function DisclaimerModal({ onAccept }) {
           />
           {t('disclaimerModal.checkbox')}
         </label>
+
+        {/* The terms this text refers to must be readable before agreeing. */}
+        <nav style={{
+          display: 'flex', justifyContent: 'center', gap: '0.5rem',
+          marginTop: -12, marginBottom: 8, fontSize: 12, flexWrap: 'wrap',
+        }}>
+          <Link to="/privacy" style={{
+            color: 'var(--text-dim)', padding: '14px 12px',
+            display: 'inline-flex', alignItems: 'center', minHeight: 44,
+          }}>{t('legal.privacy.title')}</Link>
+          <Link to="/terms" style={{
+            color: 'var(--text-dim)', padding: '14px 12px',
+            display: 'inline-flex', alignItems: 'center', minHeight: 44,
+          }}>{t('legal.terms.title')}</Link>
+        </nav>
 
         <button
           className="btn btn-primary"

@@ -14,7 +14,7 @@
   --border-light: #2E3048;
   --text:         #F2F2FF;
   --text-muted:   #8E90AC;
-  --text-dim:     #4E5070;
+  --text-dim:     #8385A9;  /* 5.5:1 on --bg, 4.6:1 on --bg-input (AA text) */
 
   /* ── Firefly: primary theme colour (orange/amber — firefly) ── */
   --firefly:        #F5A524;
