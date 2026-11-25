@@ -15,6 +15,8 @@ Explain before showing, no jargon by default, describe instruments but never rec
   you need, then read that range.
 - When the user wraps up, rewrite `docs/PROGRESS.md` (state, next step, decisions and why,
   open items). Keep it under ~60 lines; detail goes to `todo.md` and git, not there.
+  Overwrite it from scratch every time — never append. Finished items and history move to a
+  dated "Session log" section at the end of `todo.md`.
 
 ## Session habits (do these without being asked)
 

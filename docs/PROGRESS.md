@@ -1,82 +1,55 @@
 # Lumos — progress (handoff)
 
-Updated: 2026-11-26
+Updated: 2026-11-26. Overwritten each session; history is in `todo.md` → "Session log".
 
-## Where it stands
+## Current state
 
 - Phases 1–4 complete; 5–9 partly done (`todo.md` → "📊 Progress Summary").
-- Code is store-ready. Paid plans built: Lemon Squeezy on the web, RevenueCat in the App Store.
-- Last work (2026-11-25): security audit and bug-hunt round 11 — billing stale and double
-  events, Sentry startup crash, bounded money fields, readable 500s across origins.
-- 2026-11-26: AssetCard UI/UX audit (11 findings). Fixed #1–4, 6, 7, 9, 10: hsl-safe border
-  (color-mix), slice colour on border/dot only (text in tokens for contrast), 48px close
-  button, i18n close label, global firefly `:focus-visible` ring, typography tokens, "—"
-  fallbacks. Still open: #5 (focus return + live region), #8 (Işık Tut on category, plain
-  "what is this" line). Same issues elsewhere: hardcoded "Kapat" in HeadlineEducation.jsx;
-  PortfolioChart legend % in slice colour (low contrast for REIT/cash).
-- 2026-11-26: App-wide UI/UX audit started (audit only, no code changes). Inventory and 6
-  batches are in `docs/ui-audit.md`. Batch 1 (first contact, signed out) done: 20 findings,
-  4 high — disclaimer modal can't scroll on small/landscape phones, Privacy/Terms links 2.5:1
-  contrast, modal hides language picker + legal links, `--text-dim` fails AA as text app-wide.
-  Order for the rest: 6 (skip /admin) → 2 → 3 → 4 → 5, one per session.
-- 2026-11-26: Fixed batch 1 items 1.1–1.4. Disclaimer modal scrolls (fits 375×560 and landscape)
-  and carries the language picker + Privacy/Terms links. Owner decision on 1.4: raise the
-  `--text-dim` token (#4E5070 → #8385A9; 5.5:1 on --bg, 4.6:1 on --bg-input) instead of
-  editing call sites, so 1.2 is fixed by it too; if a screen looks flat, use size/weight.
-  1.18 (recommending copy) left for the owner.
-- 2026-11-26: Batch 6 audited (18 findings, 4 high): Plans can offer a second subscription
-  when /billing/me fails; first-purchase explainer renders inside a collapsed section; holdings
-  form has placeholder-only labels; currency card says "Consider adding foreign-currency
-  assets" (copy, owner's call with 1.18). Cross-batch: text dimmed with `opacity` (6.7).
-- 2026-11-26: Fixed batch 6 items 6.1, 6.2, 6.3, 6.7, 6.9. 6.1: the server's 409 already blocked a
-  second web checkout, but an App Store purchase never reaches the server, so Plans now offers no
-  purchase until `/billing/me` loads and shows an error + Try again if it fails. Rule (owner):
-  no `opacity` on text — use `--text-muted`/`--text-dim`; later batches fix it on sight (in
-  `docs/ui-audit.md` Rules). Copy options for 1.18, 6.4, 6.18 drafted in `docs/copy-decisions.md`
-  (not applied). Signed-in screens not checked in the browser (sign-in needed); check.sh green.
+- Code is store-ready. Paid plans: Lemon Squeezy (web), RevenueCat (App Store).
+- Vercel and Render auto-deploy on push to `main`.
+- App-wide UI/UX audit in progress (`docs/ui-audit.md`). Done: batch 1, 6, 2 audited; all
+  their highs fixed. Remaining batches: 3 (Home) → 4 → 5, one per session. Skip /admin.
+- Audit rules (`docs/ui-audit.md` Rules): no `opacity` on text; colour+alpha only via
+  `withAlpha()`; band colours as fills/dots only, text in `--text`.
+- Signed-in fixes are verified by code and tests only, not yet in the browser.
 
-- 2026-11-26: Colour+hex-alpha concatenation (`${c}55`, `c + '44'`) replaced app-wide (8 sites)
-  by `withAlpha()` in `utils/palette.js` (color-mix); rule added to `docs/ui-audit.md`. 6.13 fixed.
-  Live check (test account, local) found dollar cash counted as lira on the currency card — fixed
-  (`utils/holdingCurrency.js` + test); the suspected purchase-amount mixing was not a bug (server
-  converts). Vercel and Render both auto-deploy on push to `main`. Local backend DB moved to
-  `./e2e.db` (launch.json; old path was a cleared scratch folder).
-- 2026-11-26: Batch 2 audited (15 findings, 4 high): panic overlay under the nav with no way out,
-  blank panic facts on a cold server, hardcoded TR/EN strings in onboarding, quiz load failure is a
-  dead end. Text-opacity fixed on sight in batch 2 components.
-- 2026-11-26: Fixed batch 2 highs 2.1–2.4 (panic overlay z-index 200 + ✕/Escape/focus return,
-  loader instead of a blank facts stage, onboarding strings in i18n, quiz load error has Try again
-  + "talk instead"). New 2.16 (owner, high): risk gauge, Profile summary card and
-  AllocationRationale used three different band cut-offs; now one `utils/riskBand.js` (≤3 / ≤6,
-  mirrors the server's `_label`) + render test. Owner: high band purple, not red, but band colours
-  only as fills/dots — gauge number and card label are `--text` (card got a band dot).
-  withAlpha sweep re-checked: no concatenations left.
 ## Next step
 
-Owner first: ~10 min signed-in check at 375px (code-only so far: 6.1, 6.2, 6.3, 2.1, 2.2) —
-Plans buy buttons only after load + offline error/Try again; Holdings six labelled fields and
-explainer above the list; panic ✕/Escape/above nav/focus back to lifebuoy; 3.4 same band on
-gauge and card. Then batch 3 (Home), plus: **server returns the band key** with the score
-(`low/medium/growth/aggressive`); frontend maps key → colour/label only, no thresholds in
-`riskBand.js` (today it copies the server's cut-offs — the drift that caused 2.16). Colours:
-low green, medium `--firefly`, growth purple, aggressive owner's choice (suggested: deeper
-purple + lantern icon, not red). Today a 7.5 reads "Growth" on the gauge, "Aggressive" on the card.
-Separate task after batch 3, not part of the audit: animations, starting with 2.15 (every
-existing animation honours reduced motion before any new motion is added). `doesBody` copy
-waits for legal review. Separate task: rename "advisor/danışman/Berater" → assistant. Batch 6
-medium/low items 6.5, 6.6, 6.8, 6.10–6.12, 6.14–6.17 still open.
-
-Owner-only steps, in order: `todo.md` → "SENİN LİSTEN — mağazaya giden yol". Apple Developer
-enrolment, Xcode, Play Console; Clerk sign-in methods decision (affects Sign in with Apple);
-Render env (VAPID keys, `CRON_SECRET`); cron-job.org market sweep; `SENTRY_DSN`; enforce CSP.
+1. **Owner: ~10 min signed-in check at 375px** — Plans buy buttons only after load, offline
+   error + Try again (6.1); Holdings six labelled fields, explainer above the list (6.2, 6.3);
+   panic ✕/Escape/above nav/focus back to lifebuoy (2.1); facts loader (2.2); same band on
+   gauge and card (2.16).
+2. **Batch 3 (Home) audit**, plus: server returns the risk **band key** with the score
+   (`low/medium/growth/aggressive`); frontend maps key → colour/label only, no thresholds in
+   `utils/riskBand.js` (today it copies the server's cut-offs — the drift behind 2.16).
+   Colours: low green, medium `--firefly`, growth purple, aggressive = owner's choice.
 
 ## Open in code
 
-- Web plans page shows USD to TR/DE readers — confirm whether Lemon Squeezy charges local currency.
+- AssetCard #5 (focus return + live region), #8 (Işık Tut on category, plain "what is this").
+- Hardcoded "Kapat" in `HeadlineEducation.jsx`; PortfolioChart legend % in slice colour
+  (low contrast for REIT/cash).
+- Batch 6 medium/low: 6.5, 6.6, 6.8, 6.10–6.12, 6.14–6.17. Batch 1/2 medium/low per `ui-audit.md`.
+- Web Plans page shows USD to TR/DE readers — confirm whether Lemon Squeezy charges local currency.
 - RevenueCat `TRANSFER` (restore on another account) not handled.
 - CSP still `Report-Only`.
 - Accepted, no fix exists: diskcache advisory PYSEC-2026-2447.
 
-## Undecided
+## Later (separate tasks, not the audit)
 
-- Whether the first store release is free (proposed in `todo.md`, not decided).
+- Animations, starting with 2.15: every existing animation honours reduced motion first.
+- Rename "advisor/danışman/Berater" → assistant.
+
+## Open decisions (owner)
+
+- Risk band colour for "aggressive" (suggested: deeper purple + lantern icon, not red).
+- Copy: 1.18 (recommending copy), 6.4 (currency card "consider adding…"), 6.18 — options
+  drafted in `docs/copy-decisions.md`, not applied. `doesBody` copy waits for legal review.
+- Clerk sign-in methods (affects Sign in with Apple).
+- Whether the first store release is free (proposed in `todo.md`).
+
+## Owner-only steps
+
+In order, from `todo.md` → "SENİN LİSTEN — mağazaya giden yol": Apple Developer enrolment,
+Xcode, Play Console; Render env (VAPID keys, `CRON_SECRET`); cron-job.org market sweep;
+`SENTRY_DSN`; enforce CSP.

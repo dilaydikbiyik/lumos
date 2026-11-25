@@ -3922,3 +3922,29 @@ hep SPY çıkıyor". İkisi ayrı sorunmuş.
 - [ ] Plans page shows USD prices to TR/DE readers on the web; confirm in
       Lemon Squeezy whether checkout charges local currency, and match.
 - [ ] RevenueCat TRANSFER (restore on another account) is not handled.
+
+## Session log — 2026-11-26 (AssetCard + app-wide UI/UX audit)
+Full findings: `docs/ui-audit.md` (inventory, 6 batches, Rules). Copy drafts: `docs/copy-decisions.md`.
+- [x] **AssetCard audit** (11 findings). Fixed #1–4, 6, 7, 9, 10: hsl-safe border (color-mix),
+      slice colour on border/dot only (text in tokens for contrast), 48px close button, i18n
+      close label, global firefly `:focus-visible` ring, typography tokens, "—" fallbacks.
+- [x] **Batch 1 (first contact, signed out)** audited: 20 findings, 4 high. Fixed 1.1–1.4:
+      disclaimer modal scrolls (375×560 and landscape) and carries the language picker +
+      Privacy/Terms links. Owner decision on 1.4: raise `--text-dim` (#4E5070 → #8385A9;
+      5.5:1 on --bg, 4.6:1 on --bg-input) instead of editing call sites — fixes 1.2 too.
+- [x] **Batch 6** audited: 18 findings, 4 high. Fixed 6.1, 6.2, 6.3, 6.7, 6.9, 6.13. 6.1: the
+      server's 409 blocked a second web checkout, but an App Store purchase never reaches the
+      server, so Plans offers no purchase until `/billing/me` loads (error + Try again on fail).
+- [x] Rule (owner): no `opacity` on text — use `--text-muted`/`--text-dim`; fix on sight.
+- [x] Colour+hex-alpha concatenation (`${c}55`) replaced app-wide (8 sites) by `withAlpha()`
+      in `utils/palette.js` (color-mix); re-checked, none left.
+- [x] Live check (test account, local): dollar cash counted as lira on the currency card —
+      fixed (`utils/holdingCurrency.js` + test). Purchase-amount mixing was not a bug (server
+      converts). Local backend DB moved to `./e2e.db` (launch.json).
+- [x] **Batch 2** audited: 15 findings, 4 high. Fixed 2.1–2.4: panic overlay z-index 200 +
+      ✕/Escape/focus return; loader instead of blank facts on a cold server; onboarding
+      strings in i18n; quiz load error has Try again + "talk instead".
+- [x] **2.16** (owner, high): gauge, Profile card and AllocationRationale used three band
+      cut-offs → one `utils/riskBand.js` (≤3 / ≤6, mirrors server `_label`) + render test.
+      High band purple, not red; band colours only as fills/dots, numbers/labels in `--text`.
+- Fact: Vercel and Render both auto-deploy on push to `main`.
