@@ -34,6 +34,12 @@ const EMPTY_FORM = {
 // '' maps to the prompt label; the rest carry their own locale keys.
 const EMOTION_VALUES = ['', 'plan', 'fomo', 'tuyo', 'panik']
 
+// A visible label above every field. Placeholders alone vanished once a field
+// was filled, so "what I paid" and "what it is worth" — two number fields one
+// under the other — could not be told apart, and a listing hand-off opened
+// the form already full of unlabelled numbers.
+const FIELD = { display: 'flex', flexDirection: 'column', gap: 4, fontSize: 12.5, color: 'var(--text-muted)' }
+
 export default function HoldingsPage() {
   const { t } = useTranslation()
   const navigate = useNavigate()
@@ -207,6 +213,23 @@ export default function HoldingsPage() {
   const valueRequired = tickerOptional && !form.ticker.trim()
   const isVehicle = form.asset_type === 'vehicle'
 
+  // money() rounds to whole units, right for totals and wrong for a unit
+  // price ($12.34 is not $12). Same conventions otherwise: market locale, and
+  // "TL" after the number for lira. A code Intl does not know falls back to
+  // the bare number and the code rather than breaking the form.
+  const exact = (n, currency = pack.currency) => {
+    const num = new Intl.NumberFormat(pack.locale, { maximumFractionDigits: 2 })
+    if (!currency) return num.format(n)
+    if (currency === 'TRY') return `${num.format(n)} TL`
+    try {
+      return new Intl.NumberFormat(pack.locale, {
+        style: 'currency', currency, maximumFractionDigits: 2,
+      }).format(n)
+    } catch {
+      return `${num.format(n)} ${currency}`
+    }
+  }
+
   return (
     <div className="page">
       <AppHeader />
@@ -293,6 +316,14 @@ export default function HoldingsPage() {
             now; the analysis is what you scroll to, not what you scroll
             past. */}
         <Section title={t('section.yourAssets')} count={holdings.length || undefined}>
+        {/* Right after the add, above the list — where the reader's eyes
+            already are, and dismissible because they may already know. It
+            used to sit in the collapsed "how it is doing" section, so it
+            mounted out of sight and the moment passed with nothing shown. */}
+        <FirstPurchaseEducation
+          assetType={firstOfType}
+          onClose={() => setFirstOfType(null)}
+        />
         {/* Holdings list */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {holdings.map(h => (
@@ -300,7 +331,7 @@ export default function HoldingsPage() {
               <span style={{ fontSize: 14 }}>{t('holdings.types.' + h.asset_type, { defaultValue: h.asset_type })}</span>
               <div style={{ flex: 1 }}>
                 <div style={{ fontWeight: 600, fontSize: 14 }}>{h.name}</div>
-                <div style={{ fontSize: 12, opacity: 0.7 }}>
+                <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>
                   {t('holdings.purchase')}: {money(h.purchase_amount, h.currency || undefined)}
                   {h.current_value != null && h.value_source !== 'purchase' && (
                     <> · {t('holdings.current')}: <strong style={{ color: 'var(--text)' }}>{money(h.current_value)}</strong>
@@ -312,7 +343,7 @@ export default function HoldingsPage() {
                           {h.value_change_pct >= 0 ? '▲' : '▼'} {percent(Math.abs(h.value_change_pct), { decimals: 1 })}
                         </span>
                       )}
-                      <span style={{ marginLeft: 6, fontSize: 10, opacity: 0.6 }}>
+                      <span style={{ marginLeft: 6, fontSize: 'var(--t-micro)', color: 'var(--text-dim)' }}>
                         {h.value_source === 'live'
                           ? (h.purchase_date === localToday()
                               // A 0% move on the day of purchase is correct, not a
@@ -324,7 +355,7 @@ export default function HoldingsPage() {
                     </>
                   )}
                   {(h.current_value == null || h.value_source === 'purchase') && h.ticker && (
-                    <span style={{ marginLeft: 6, fontSize: 10, opacity: 0.55 }}>
+                    <span style={{ marginLeft: 6, fontSize: 'var(--t-micro)', color: 'var(--text-dim)' }}>
                       {t('holdings.liveHint')}
                     </span>
                   )}
@@ -386,11 +417,13 @@ export default function HoldingsPage() {
         {/* Add form */}
         {showForm ? (
           <form className="card" onSubmit={addHolding} style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            <select className="input" value={form.asset_type}
-                    aria-label={t('holdings.selectType')}
-                    onChange={e => setForm({ ...form, asset_type: e.target.value })}>
-              {TYPE_KEYS.map(v => <option key={v} value={v}>{t('holdings.types.' + v)}</option>)}
-            </select>
+            <label style={FIELD}>
+              {t('holdings.selectType')}
+              <select className="input" value={form.asset_type}
+                      onChange={e => setForm({ ...form, asset_type: e.target.value })}>
+                {TYPE_KEYS.map(v => <option key={v} value={v}>{t('holdings.types.' + v)}</option>)}
+              </select>
+            </label>
             {/* 🚗 Vehicle warning — "is your car wealth or an expense?" */}
             {isVehicle && (
               <div style={{
@@ -412,13 +445,15 @@ export default function HoldingsPage() {
             )}
             {needsTicker && (
               <>
-                <div style={{ display: 'flex', gap: 8 }}>
-                  <input className="input" style={{ flex: 1 }} required={!tickerOptional}
-                         placeholder={t('holdings.tickerPlaceholder', { example: pack.example_ticker })}
-                         value={form.ticker}
-                         onChange={e => { setForm({ ...form, ticker: e.target.value }); setLookup({ state: 'idle', data: null }) }}
-                         onBlur={lookupTicker}
-                         onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); lookupTicker() } }} />
+                <div style={{ display: 'flex', gap: 8, alignItems: 'flex-end' }}>
+                  <label style={{ ...FIELD, flex: 1 }}>
+                    {t('holdings.tickerPlaceholder', { example: pack.example_ticker })}
+                    <input className="input" required={!tickerOptional}
+                           value={form.ticker}
+                           onChange={e => { setForm({ ...form, ticker: e.target.value }); setLookup({ state: 'idle', data: null }) }}
+                           onBlur={lookupTicker}
+                           onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); lookupTicker() } }} />
+                  </label>
                   <button type="button" className="btn btn-ghost" onClick={lookupTicker}
                           disabled={!form.ticker.trim() || lookup.state === 'loading'}
                           style={{ flexShrink: 0 }}>
@@ -438,16 +473,14 @@ export default function HoldingsPage() {
                     <strong>{lookup.data.name || lookup.data.ticker}</strong>
                     <div style={{ color: 'var(--text-muted)', marginTop: 2 }}>
                       {t('holdings.lookupPrice', {
-                        price: lookup.data.price,
-                        currency: lookup.data.currency || '',
+                        price: exact(lookup.data.price, lookup.data.currency),
                       })}
                       {/* Foreign listing: show the converted price too, so the
                           amount the form fills in is never a surprise. */}
                       {lookup.data.price_in_user_currency != null
                         && lookup.data.currency !== lookup.data.user_currency && (
                         <> · {t('holdings.lookupConverted', {
-                          price: Math.round(lookup.data.price_in_user_currency * 100) / 100,
-                          currency: lookup.data.user_currency,
+                          price: exact(lookup.data.price_in_user_currency, lookup.data.user_currency),
                         })}</>
                       )}
                     </div>
@@ -459,8 +492,9 @@ export default function HoldingsPage() {
                   </p>
                 )}
 
-                <input className="input" type="number" step="any" min="0"
-                       placeholder={t('holdings.quantityPlaceholder')}
+                <label style={FIELD}>
+                {t('holdings.quantityPlaceholder')}
+                <input className="input" type="number" step="any" min="0" inputMode="decimal"
                        value={form.quantity}
                        onChange={e => {
                          const quantity = e.target.value
@@ -471,6 +505,7 @@ export default function HoldingsPage() {
                            : form.purchase_amount
                          setForm({ ...form, quantity, purchase_amount: auto })
                        }} />
+                </label>
               </>
             )}
             {/* The name comes AFTER the symbol on purpose. It used to come
@@ -478,17 +513,22 @@ export default function HoldingsPage() {
                 already filled and the code correctly refused to overwrite
                 it — which meant every stock was typed out by hand even
                 though the app could have filled it. */}
-            <input className="input" required maxLength={120}
-                   placeholder={t('holdings.namePlaceholder', { example: pack.example_asset_name })}
-                   value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
-            <input className="input" type="number" placeholder={t('holdings.amountPlaceholder', { unit })} required min="1"
-                   value={form.purchase_amount} onChange={e => setForm({ ...form, purchase_amount: e.target.value })} />
+            <label style={FIELD}>
+              {t('holdings.namePlaceholder', { example: pack.example_asset_name })}
+              <input className="input" required maxLength={120}
+                     value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
+            </label>
+            <label style={FIELD}>
+              {t('holdings.amountPlaceholder', { unit })}
+              <input className="input" type="number" required min="1" step="any" inputMode="decimal"
+                     value={form.purchase_amount} onChange={e => setForm({ ...form, purchase_amount: e.target.value })} />
+            </label>
             {computedAmount != null && (
               <p style={{ fontSize: 'var(--t-micro)', color: 'var(--text-dim)', marginTop: -4, lineHeight: 1.5 }}>
                 {t('holdings.computedNote', {
-                  quantity: form.quantity,
-                  price: lookedUpPrice,
-                  total: Math.round(computedAmount * 100) / 100,
+                  quantity: new Intl.NumberFormat(pack.locale, { maximumFractionDigits: 6 }).format(Number(form.quantity)),
+                  price: exact(lookedUpPrice, lookup.data.user_currency || undefined),
+                  total: exact(computedAmount, lookup.data.user_currency || undefined),
                 })}
               </p>
             )}
@@ -497,9 +537,12 @@ export default function HoldingsPage() {
                 {t('holdings.offExchangeHint')}
               </p>
             )}
-            <input className="input" type="number" placeholder={t('holdings.currentPlaceholder')} min="1"
-                   required={valueRequired}
-                   value={form.manual_current_value} onChange={e => setForm({ ...form, manual_current_value: e.target.value })} />
+            <label style={FIELD}>
+              {t('holdings.currentPlaceholder')}
+              <input className="input" type="number" min="1" step="any" inputMode="decimal"
+                     required={valueRequired}
+                     value={form.manual_current_value} onChange={e => setForm({ ...form, manual_current_value: e.target.value })} />
+            </label>
             <select className="input" value={form.emotion_tag}
                     aria-label={t('holdings.emotions.prompt')}
                     onChange={e => setForm({ ...form, emotion_tag: e.target.value })}>
@@ -543,7 +586,7 @@ export default function HoldingsPage() {
               {t('holdings.healthBody')}
             </p>
             {health.notes.map((n, i) => (
-              <p key={i} style={{ fontSize: 13, lineHeight: 1.6, opacity: 0.85 }}>{n}</p>
+              <p key={i} style={{ fontSize: 13, lineHeight: 1.6 }}>{n}</p>
             ))}
           </div>
         )}
@@ -554,12 +597,6 @@ export default function HoldingsPage() {
         {/* Post-purchase advice: has the mix drifted from the target? */}
 
         {/* Currency exposure — TL vs FX */}
-        {/* Right after the add, above the list — where the reader's eyes
-            already are, and dismissible because they may already know. */}
-        <FirstPurchaseEducation
-          assetType={firstOfType}
-          onClose={() => setFirstOfType(null)}
-        />
           <PortfolioValueChart holdingsCount={holdings.length} />
           <DriftCard holdingsCount={holdings.length} />
           <CurrencyExposure holdings={holdings} />

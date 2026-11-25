@@ -57,7 +57,7 @@ export default function PathSwitcher({ onChanged }) {
   return (
     <div className="card" style={{ marginTop: '1rem' }}>
       <h3 style={{ margin: '0 0 4px', fontSize: '1rem' }}>{t('pathSwitch.title')}</h3>
-      <p style={{ fontSize: 13, opacity: 0.8, marginTop: 0 }}>{t('pathSwitch.subtitle')}</p>
+      <p style={{ fontSize: 13, marginTop: 0 }}>{t('pathSwitch.subtitle')}</p>
 
       <div style={{ display: 'grid', gap: 8 }}>
         {PATHS.map(id => {
@@ -81,7 +81,7 @@ export default function PathSwitcher({ onChanged }) {
               <span style={{ fontSize: 20 }} aria-hidden="true">{PATH_ICON[id]}</span>
               <span style={{ flex: 1 }}>
                 <strong style={{ fontSize: 14 }}>{t(`path.options.${id}.title`)}</strong>
-                <span style={{ display: 'block', fontSize: 12, opacity: 0.75, marginTop: 2 }}>
+                <span style={{ display: 'block', fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>
                   {t(`path.options.${id}.desc`)}
                 </span>
               </span>
@@ -94,7 +94,7 @@ export default function PathSwitcher({ onChanged }) {
       {error && (
         <p role="alert" style={{ color: 'var(--red, #f87171)', fontSize: 13 }}>{error}</p>
       )}
-      <p style={{ fontSize: 12, opacity: 0.65, marginBottom: 0 }}>
+      <p style={{ fontSize: 12, color: 'var(--text-dim)', marginBottom: 0 }}>
         {t('pathSwitch.note')}
       </p>
     </div>

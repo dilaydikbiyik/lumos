@@ -79,13 +79,13 @@ export default function DeleteAccount({ compact = false }) {
           <h3 style={{ margin: '0 0 0.5rem', fontSize: '1rem', color: 'var(--red, #f87171)' }}>
             {t('account.deleteTitle')}
           </h3>
-          <p style={{ fontSize: 13, lineHeight: 1.65, opacity: 0.85, marginTop: 0 }}>
+          <p style={{ fontSize: 13, lineHeight: 1.65, marginTop: 0 }}>
             {t('account.deleteBody')}
           </p>
-          <p style={{ fontSize: 12.5, lineHeight: 1.6, opacity: 0.85 }}>
+          <p style={{ fontSize: 12.5, lineHeight: 1.6 }}>
             {t('account.deleteSubscriptions')}
           </p>
-          <p style={{ fontSize: 12, opacity: 0.7 }}>
+          <p style={{ fontSize: 12 }}>
             <Link to="/privacy">{t('legal.privacy.title')}</Link>
           </p>
 

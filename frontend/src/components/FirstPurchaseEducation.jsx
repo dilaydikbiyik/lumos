@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 
 /**
@@ -14,6 +15,10 @@ import { useTranslation } from 'react-i18next'
  */
 export default function FirstPurchaseEducation({ assetType, onClose }) {
   const { t, i18n } = useTranslation()
+  const titleRef = useRef(null)
+  // The card appears after the add form closes; moving focus to its title
+  // tells a screen-reader user something new is here, and where.
+  useEffect(() => { if (assetType) titleRef.current?.focus() }, [assetType])
   if (!assetType) return null
 
   // The category explainers already exist for every type the app can hold,
@@ -24,7 +29,7 @@ export default function FirstPurchaseEducation({ assetType, onClose }) {
   return (
     <div className="card" style={{ border: '1px solid var(--firefly)' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8 }}>
-        <strong style={{ fontSize: '1rem' }}>
+        <strong ref={titleRef} tabIndex={-1} style={{ fontSize: '1rem' }}>
           🎉 {t('firstPurchase.title', {
             type: t(`holdings.types.${assetType}`, { defaultValue: assetType }),
           })}
@@ -42,7 +47,7 @@ export default function FirstPurchaseEducation({ assetType, onClose }) {
         </button>
       </div>
 
-      <p style={{ fontSize: 13, opacity: 0.8, margin: '4px 0 10px' }}>
+      <p style={{ fontSize: 13, margin: '4px 0 10px' }}>
         {t('firstPurchase.subtitle')}
       </p>
 
@@ -52,7 +57,7 @@ export default function FirstPurchaseEducation({ assetType, onClose }) {
             <dt style={{ fontWeight: 600, fontSize: 12.5, color: 'var(--firefly)' }}>
               {t(`explainer.tabs.${tab}`, { defaultValue: tab })}
             </dt>
-            <dd style={{ margin: '2px 0 0', fontSize: 12.5, lineHeight: 1.65, opacity: 0.9 }}>
+            <dd style={{ margin: '2px 0 0', fontSize: 12.5, lineHeight: 1.65, color: 'var(--text-muted)' }}>
               {t(`${base}.${tab}`)}
             </dd>
           </div>
