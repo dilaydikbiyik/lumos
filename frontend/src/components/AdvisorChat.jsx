@@ -78,7 +78,7 @@ function AdvisorPanel({ onClose }) {
         <div style={{ flex: 1, overflowY: 'auto', padding: 14, display: 'flex', flexDirection: 'column', gap: 10 }}>
           {messages.map((m, i) => <MessageBubble key={i} role={m.role} content={m.greeting ? t('advisor.greeting') : m.content} />)}
           {loading && (
-            <div className="bubble-assistant" style={{ opacity: 0.7 }}>
+            <div className="bubble-assistant" style={{ color: 'var(--text-muted)' }}>
               <span className="light-loader" style={{ width: 14, height: 14, display: 'inline-block' }} /> {t('advisor.typing')}
             </div>
           )}

@@ -101,7 +101,7 @@ export default function PanicButton() {
               <p style={{ fontSize: 17, fontWeight: 600, marginTop: 18 }}>
                 {t('panic.pauseTitle')}
               </p>
-              <p style={{ fontSize: 14, opacity: 0.75, marginTop: 8, maxWidth: 360, lineHeight: 1.6 }}>
+              <p style={{ fontSize: 14, color: 'var(--text-muted)', marginTop: 8, maxWidth: 360, lineHeight: 1.6 }}>
                 {t('panic.pauseBody')}
               </p>
               <button className="btn btn-ghost" style={{ marginTop: 24, fontSize: 13 }}
@@ -122,7 +122,7 @@ export default function PanicButton() {
               <p style={{ fontSize: 15, lineHeight: 1.7, marginBottom: 18 }}>{coach.message}</p>
               <div style={{ textAlign: 'left', display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 22 }}>
                 {coach.facts?.map((f, i) => (
-                  <div key={i} style={{ display: 'flex', gap: 8, fontSize: 13, opacity: 0.85 }}>
+                  <div key={i} style={{ display: 'flex', gap: 8, fontSize: 13, color: 'var(--text-muted)' }}>
                     <span style={{ color: 'var(--firefly)' }}>•</span>
                     <span>{f}</span>
                   </div>

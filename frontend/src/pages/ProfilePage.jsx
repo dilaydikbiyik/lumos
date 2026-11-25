@@ -117,7 +117,7 @@ export default function ProfilePage() {
                 <button
                   type="button"
                   className="btn btn-ghost btn-full"
-                  style={{ marginTop: 10, opacity: 0.8 }}
+                  style={{ marginTop: 10 }}
                   onClick={() => setChatMode(false)}
                 >
                   {t('quiz.backToQuiz')}
@@ -197,7 +197,7 @@ export default function ProfilePage() {
             {displayProfile.factors?.length > 0 && (
               <div className="card">
                 <h3 style={{ marginBottom: 4, fontSize: 15 }}>{t('profile.whyTitle')}</h3>
-                <p style={{ fontSize: 12, opacity: 0.7, marginBottom: 12 }}>
+                <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 12 }}>
                   {t('profile.whySubtitle')}
                 </p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -213,12 +213,12 @@ export default function ProfilePage() {
                       </span>
                       <div style={{ fontSize: 13, lineHeight: 1.5 }}>
                         <strong>{f.factor}:</strong> {f.answer}
-                        <div style={{ fontSize: 12, opacity: 0.65 }}>{f.explanation}</div>
+                        <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{f.explanation}</div>
                       </div>
                     </div>
                   ))}
                 </div>
-                <p style={{ fontSize: 12, opacity: 0.6, marginTop: 12, borderTop: '1px solid var(--border)', paddingTop: 8 }}>
+                <p style={{ fontSize: 12, color: 'var(--text-dim)', marginTop: 12, borderTop: '1px solid var(--border)', paddingTop: 8 }}>
                   <Trans
                     i18nKey="profile.total"
                     values={{ score: displayProfile.risk_score }}

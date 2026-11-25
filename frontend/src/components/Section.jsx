@@ -58,10 +58,10 @@ function Heading({ title, subtitle, count }) {
         margin: 0, fontSize: 12, fontWeight: 700, letterSpacing: '0.09em',
         textTransform: 'uppercase', color: 'var(--firefly)',
       }}>
-        {title}{count != null && <span style={{ opacity: 0.6 }}> · {count}</span>}
+        {title}{count != null && <span style={{ color: 'var(--text-muted)' }}> · {count}</span>}
       </h3>
       {subtitle && (
-        <p style={{ fontSize: 12.5, opacity: 0.7, margin: '3px 0 0', lineHeight: 1.5 }}>
+        <p style={{ fontSize: 12.5, color: 'var(--text-muted)', margin: '3px 0 0', lineHeight: 1.5 }}>
           {subtitle}
         </p>
       )}

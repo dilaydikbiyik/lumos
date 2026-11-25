@@ -123,7 +123,7 @@ export default function StructuredQuiz({ onComplete, onPreferChat }) {
       <h3 style={{ margin: '8px 0 6px', fontSize: '1.05rem', lineHeight: 1.4 }}>
         {question.title}
       </h3>
-      <p style={{ fontSize: 13, lineHeight: 1.65, opacity: 0.82, marginTop: 0 }}>
+      <p style={{ fontSize: 13, lineHeight: 1.65, color: 'var(--text-muted)', marginTop: 0 }}>
         {question.help}
       </p>
 
@@ -142,7 +142,7 @@ export default function StructuredQuiz({ onComplete, onPreferChat }) {
               }}
             >
               <strong style={{ fontSize: 13.5 }}>{option.label}</strong>
-              <span style={{ display: 'block', fontSize: 12, opacity: 0.75, marginTop: 2 }}>
+              <span style={{ display: 'block', fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>
                 {option.help}
               </span>
             </button>
@@ -174,7 +174,7 @@ export default function StructuredQuiz({ onComplete, onPreferChat }) {
         <button
           type="button"
           className="btn btn-ghost btn-full"
-          style={{ marginTop: 8, opacity: 0.75 }}
+          style={{ marginTop: 8 }}
           onClick={() => advance(undefined)}
           disabled={saving}
         >

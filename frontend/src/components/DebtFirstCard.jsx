@@ -32,13 +32,13 @@ export default function DebtFirstCard({ check }) {
           padding: 12, borderRadius: 10,
           border: '1px solid var(--border)', background: 'var(--bg-input)',
         }}>
-          <div style={{ fontSize: 12, opacity: 0.75, marginBottom: 4 }}>
+          <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 4 }}>
             {t('debt.ifRepay', { amount: money(check.applied) })}
           </div>
           <div className="num-lead" style={{ color: 'var(--green, #3DD68C)' }}>
             +{money(check.interest_avoided)}
           </div>
-          <div style={{ fontSize: 11, opacity: 0.65, marginTop: 2 }}>
+          <div style={{ fontSize: 'var(--t-micro)', color: 'var(--text-dim)', marginTop: 2 }}>
             {t('debt.repayCaption')}
           </div>
         </div>
@@ -46,11 +46,11 @@ export default function DebtFirstCard({ check }) {
           padding: 12, borderRadius: 10,
           border: '1px solid var(--border)', background: 'var(--bg-input)',
         }}>
-          <div style={{ fontSize: 12, opacity: 0.75, marginBottom: 4 }}>
+          <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 4 }}>
             {t('debt.ifInvest')}
           </div>
           <div className="num-lead">+{money(check.investment_gain)}</div>
-          <div style={{ fontSize: 11, opacity: 0.65, marginTop: 2 }}>
+          <div style={{ fontSize: 'var(--t-micro)', color: 'var(--text-dim)', marginTop: 2 }}>
             {t('debt.investCaption')}
           </div>
         </div>

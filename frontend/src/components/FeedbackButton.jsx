@@ -71,7 +71,7 @@ export default function FeedbackButton() {
         ) : (
           <>
             <h3 style={{ marginBottom: 4 }}>{t('feedback.title')}</h3>
-            <p style={{ fontSize: 'var(--t-small)', opacity: 0.8, marginBottom: 12, lineHeight: 1.6 }}>
+            <p style={{ fontSize: 'var(--t-small)', color: 'var(--text-muted)', marginBottom: 12, lineHeight: 1.6 }}>
               {t('feedback.subtitle')}
             </p>
 
