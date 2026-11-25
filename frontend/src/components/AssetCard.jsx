@@ -1,4 +1,4 @@
-import { sliceColor } from '../utils/palette'
+import { sliceColor, withAlpha } from '../utils/palette'
 import { useTranslation } from 'react-i18next'
 import { percentFromWeight } from '../utils/format'
 
@@ -11,8 +11,7 @@ export default function AssetCard({ allocation, index = 0, color = null, onClose
   if (!allocation) return null
   // The caller knows the sibling shading; fall back only when it doesn't.
   const accent = color || sliceColor(allocation, index)
-  // Sibling shades arrive as hsl(), so alpha can't be appended as hex digits.
-  const border = `color-mix(in srgb, ${accent} 33%, transparent)`
+  const border = withAlpha(accent, 33)
   // Several category colours (REIT purple, cash brown) fall under 4.5:1 on this
   // background, so the slice colour marks the card (border, dot) but text stays
   // in readable tokens.

@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+import { withAlpha } from '../utils/palette'
 import useMarket from '../hooks/useMarket'
 
 /**
@@ -81,7 +82,7 @@ export default function CurrencyExposure({ holdings }) {
         <span style={{
           fontSize: 11, fontWeight: 600, padding: '3px 10px',
           borderRadius: 20, color: riskColor,
-          background: `${riskColor}18`,
+          background: withAlpha(riskColor, 9),
         }}>
           {badge || `${t('fx.riskLabel')}: ${riskLevel}`}
         </span>

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import useMarket from '../hooks/useMarket'
 import { percentFromWeight } from '../utils/format'
+import { withAlpha } from '../utils/palette'
 
 /**
  * "What is it / why is it in your portfolio / what's the risk" card for
@@ -87,8 +88,8 @@ export default function AssetExplainer({ allocation, onClose, color }) {
 
   return (
     <div className="card" style={{
-      border: `1px solid ${accent}22`,
-      background: `linear-gradient(135deg, var(--bg-card) 0%, ${accent}08 100%)`,
+      border: `1px solid ${withAlpha(accent, 13)}`,
+      background: `linear-gradient(135deg, var(--bg-card) 0%, ${withAlpha(accent, 3)} 100%)`,
       animation: 'fade-in 0.3s ease',
       position: 'relative',
     }}>
@@ -108,7 +109,7 @@ export default function AssetExplainer({ allocation, onClose, color }) {
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
         <span style={{
           fontSize: 28,
-          filter: `drop-shadow(0 0 8px ${accent}40)`,
+          filter: `drop-shadow(0 0 8px ${withAlpha(accent, 25)})`,
         }}>{meta.icon}</span>
         <div>
           <h3 style={{ fontSize: 15, fontWeight: 700 }}>
@@ -139,7 +140,7 @@ export default function AssetExplainer({ allocation, onClose, color }) {
             style={{
               flex: 1, padding: '8px 4px',
               background: activeTab === tab.key ? 'var(--bg-card-2)' : 'transparent',
-              border: activeTab === tab.key ? `1px solid ${accent}33` : '1px solid transparent',
+              border: activeTab === tab.key ? `1px solid ${withAlpha(accent, 20)}` : '1px solid transparent',
               borderRadius: 'var(--radius-xs)',
               color: activeTab === tab.key ? 'var(--text)' : 'var(--text-dim)',
               fontSize: 12, fontWeight: activeTab === tab.key ? 600 : 400,

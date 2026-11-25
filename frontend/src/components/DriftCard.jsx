@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import api from '../utils/api'
-import { CATEGORY_COLORS, COLORS } from '../utils/palette'
+import { CATEGORY_COLORS, COLORS, withAlpha } from '../utils/palette'
 import Icon from './Icon'
 import { useTranslation } from 'react-i18next'
 
@@ -38,7 +38,7 @@ export default function DriftCard({ holdingsCount }) {
         <strong style={{ fontSize: 'var(--t-lead)' }}>{t('drift.title')}</strong>
         <span className="badge" style={{
           marginLeft: 'auto', background: 'transparent',
-          border: `1px solid ${v.color}55`, color: v.color, fontSize: 'var(--t-micro)',
+          border: `1px solid ${withAlpha(v.color, 33)}`, color: v.color, fontSize: 'var(--t-micro)',
         }}>
           {t(v.label)}
         </span>

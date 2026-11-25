@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '@clerk/clerk-react'
 import api, { setAuthToken } from '../utils/api'
 import { percent, signedPercent } from '../utils/format'
+import { withAlpha } from '../utils/palette'
 
 /**
  * Actual vs recommended portfolio comparison.
@@ -136,7 +137,7 @@ export default function PortfolioComparison() {
                 <div style={{
                   width: `${Math.min(item.target, 100)}%`,
                   height: '100%', borderRadius: 2,
-                  background: `${item.color}55`,
+                  background: withAlpha(item.color, 33),
                   transition: 'width 0.6s ease',
                   borderTop: '1px dashed var(--border)',
                 }} />

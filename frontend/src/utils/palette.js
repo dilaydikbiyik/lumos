@@ -63,3 +63,10 @@ export function sliceColor(allocation, index = 0, allocations = null) {
   if (allocations) return allocationColors(allocations)[index] ?? COLORS[index % COLORS.length]
   return CATEGORY_COLORS[allocation.category] || COLORS[index % COLORS.length]
 }
+
+// A colour at a given strength. Colours arrive as hex, hsl() (sibling shades) or
+// var(--token), so alpha can never be appended as hex digits (`${c}55`): that
+// silently yields invalid CSS for anything but #rrggbb. color-mix works for all.
+export function withAlpha(color, percent) {
+  return `color-mix(in srgb, ${color} ${percent}%, transparent)`
+}

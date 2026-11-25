@@ -14,6 +14,7 @@ import PathSwitcher from '../components/PathSwitcher'
 import usePortfolio from '../hooks/usePortfolio'
 import useMarket from '../hooks/useMarket'
 import { readJSON, writeJSON, removeKey, userKey } from '../utils/storage'
+import { withAlpha } from '../utils/palette'
 
 // Risk score → user-friendly label and colour
 const RISK_META = {
@@ -156,7 +157,7 @@ export default function ProfilePage() {
 
             {/* Summary card */}
             <div className="card" style={{
-              borderColor: getRiskMeta(displayProfile.risk_score).color + '44',
+              borderColor: withAlpha(getRiskMeta(displayProfile.risk_score).color, 27),
               background: 'var(--bg-card)',
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
