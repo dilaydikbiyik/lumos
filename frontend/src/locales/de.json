@@ -75,6 +75,7 @@
     "accept": "Verstanden, weiter"
   },
   "quiz": {
+    "loadError": "Die Fragen konnten nicht geladen werden — der Server wacht vielleicht gerade auf.",
     "intro": "Hallo! Ich bin Lumos.\n\nIch stelle dir 9 kurze Fragen und erstelle daraus dein persönliches Risikoprofil. Bereit?\n\n**Frage 1 — Wie viel kannst du zum Investieren beiseitelegen?** (z. B. 50.000 {{unit}})",
     "reveal": "Gelesen — zeig mir mein Risikoprofil →",
     "noRush": "Keine Eile — lies oben so lange du möchtest.",
@@ -103,6 +104,7 @@
     "readyTitle": "Dein Risikoprofil ist fertig",
     "readySubtitle": "Deine Antworten sind ausgewertet — dein persönliches Portfolio wird berechnet.",
     "profileWord": "Profil",
+    "riskScoreCaption": "Dein Risikowert",
     "budgetNote": "Dein Budget beträgt <0>{{budget}}</0>. Bei diesem Risikoniveau könnte ein starker Einbruch dein Portfolio vorübergehend um rund <1>{{pct}} %</1> auf <2>{{worst}}</2> drücken. Das ist für dieses Profil eine normale Schwankung — ein Verlust wird erst real, wenn du verkaufst.",
     "whyTitle": "Woher kommt dieser Wert?",
     "whySubtitle": "Keine Blackbox — Quelle und Begründung für jeden Punkt:",
@@ -288,6 +290,7 @@
     "privacy": "Der Bildschirm, auf dem du bist, wird automatisch angehängt. Sonst wird nichts erfasst."
   },
   "panic": {
+    "loading": "Deine Zahlen werden geladen…",
     "openLabel": "Hilfe bei Panik",
     "fallbackMessage": "Du musst nichts überstürzt entscheiden. Ein Kursrückgang wird erst zum Verlust, wenn du verkaufst.",
     "fallbackFact": "Diesen Bildschirm zu schließen und nichts zu tun ist ebenfalls eine gültige Entscheidung.",
@@ -422,6 +425,7 @@
     "nextUp": "Als Nächstes:"
   },
   "fear": {
+    "continue": "Super, weiter geht’s →",
     "step": "Schritt 2 / 3",
     "title": "Was macht dir am Investieren am meisten Angst?",
     "subtitle": "Diese Angst muss nicht weg — sie ist ein Hinweis, der uns hilft, dich zu verstehen. Wir richten unser Vorgehen nach deiner Wahl aus.",

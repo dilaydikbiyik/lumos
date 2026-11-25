@@ -69,6 +69,7 @@
     "label": "Language"
   },
   "quiz": {
+    "loadError": "The questions couldn't load — the server may still be waking up.",
     "intro": "Hi! I'm Lumos.\n\nI'll ask you 9 short questions and build your personal risk profile. Ready?\n\n**Question 1 — How much can you set aside for investing?** (e.g. 50,000 {{unit}})",
     "reveal": "I've read it — show my risk profile →",
     "noRush": "No rush — read the above for as long as you like.",
@@ -97,6 +98,7 @@
     "readyTitle": "Your Risk Profile Is Ready",
     "readySubtitle": "Your answers are analysed — your personal portfolio is being computed.",
     "profileWord": "Profile",
+    "riskScoreCaption": "Your risk score",
     "budgetNote": "Your budget is <0>{{budget}}</0>. At this risk level, a sharp downturn could temporarily take your portfolio down about <1>{{pct}}%</1> to <2>{{worst}}</2>. That's a normal range for this profile — no loss is locked in unless you sell.",
     "whyTitle": "Where did this score come from?",
     "whySubtitle": "No black box — the source and reasoning behind every point:",
@@ -414,6 +416,7 @@
     "sug6": "Should I hold dollars or gold?"
   },
   "panic": {
+    "loading": "Getting your numbers…",
     "openLabel": "Panic support",
     "fallbackMessage": "You don't have to decide anything in a hurry. A drop only becomes a loss when you sell.",
     "fallbackFact": "Closing this screen and doing nothing is also a valid decision.",
@@ -734,6 +737,7 @@
     "nextUp": "Next:"
   },
   "fear": {
+    "continue": "Great, let's keep going →",
     "step": "Step 2 / 3",
     "title": "What scares you most about investing?",
     "subtitle": "This fear isn't something to suppress — it's a clue that helps us understand you. We'll shape our approach around the one you pick.",

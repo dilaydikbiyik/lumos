@@ -69,7 +69,7 @@ export default function FearCheckInPage() {
             style={{ maxWidth: 340 }}
             onClick={() => navigate('/profile')}
           >
-            Harika, devam edelim →
+            {t('fear.continue')}
           </button>
         </div>
       </div>

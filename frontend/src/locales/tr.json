@@ -69,6 +69,7 @@
     "label": "Dil"
   },
   "quiz": {
+    "loadError": "Sorular yüklenemedi — sunucu uyanıyor olabilir.",
     "intro": "Merhaba! Ben Lumos.\n\nSana 9 kısa soru soracağım ve kişisel risk profilini oluşturacağım. Hazır mısın?\n\n**1. soru — Yatırıma ayırabileceğin bütçen nedir?** (Örn: 50.000 {{unit}})",
     "reveal": "Okudum, risk profilimi göster →",
     "noRush": "Acelen yok — yukarıyı istediğin kadar okuyabilirsin.",
@@ -97,6 +98,7 @@
     "readyTitle": "Risk Profilin Hazır",
     "readySubtitle": "Cevapların analiz edildi — sana özel portföy hesaplanıyor.",
     "profileWord": "Profil",
+    "riskScoreCaption": "Risk skorun",
     "budgetNote": "Senin bütçen <0>{{budget}}</0>. Bu risk seviyesinde, sert bir düşüşte portföyün geçici olarak yaklaşık <1>%{{pct}}</1> gerileyip <2>{{worst}}</2>'ye inebilir. Bu, bu profil için normal bir dalgalanma aralığı — satmadığın sürece zarar kesinleşmez.",
     "whyTitle": "Bu skor nereden geldi?",
     "whySubtitle": "Kara kutu yok — her puanın kaynağı ve gerekçesi:",
@@ -414,6 +416,7 @@
     "sug6": "Dolar mı altın mı tutmalıyım?"
   },
   "panic": {
+    "loading": "Rakamların getiriliyor…",
     "openLabel": "Panik anı desteği",
     "fallbackMessage": "Acele bir karar vermek zorunda değilsin. Bir düşüş, ancak sattığında kesinleşir.",
     "fallbackFact": "Bu ekranı kapatıp hiçbir şey yapmamak da geçerli bir karardır.",
@@ -734,6 +737,7 @@
     "nextUp": "Sıradaki:"
   },
   "fear": {
+    "continue": "Harika, devam edelim →",
     "step": "Adım 2 / 3",
     "title": "Yatırımda seni en çok ne korkutuyor?",
     "subtitle": "Bu korku bastırılacak bir şey değil — seni daha iyi anlamamız için bir ipucu. Seçtiğin korkuya özel bir yaklaşım geliştiririz.",

@@ -111,7 +111,7 @@ export default function ChatWindow({ onProfileComplete, onFirstMessage }) {
           type="submit"
           disabled={isLoading || !input.trim()}
           style={{ padding: '0 18px', flexShrink: 0 }}
-          aria-label="Send"
+          aria-label={t('common.send')}
         >
           {isLoading ? <span className="spinner" style={{ width: 18, height: 18 }} /> : '→'}
         </button>

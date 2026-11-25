@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import useScrollDirection from '../hooks/useScrollDirection'
 import Icon from './Icon'
 import { useAuth } from '@clerk/clerk-react'
@@ -23,6 +23,27 @@ export default function PanicButton() {
   const [coach, setCoach] = useState(null)
   const [closing, setClosing] = useState(null)
   const [secondsLeft, setSecondsLeft] = useState(10)
+  const fabRef = useRef(null)
+  const closeRef = useRef(null)
+
+  // Never a trap: Escape closes in every stage, focus moves into the dialog on
+  // open and back to the lifebuoy on close.
+  function close() {
+    setOpen(false)
+    fabRef.current?.focus()
+  }
+
+  useEffect(() => {
+    if (!open) return
+    closeRef.current?.focus()
+    const onKey = e => {
+      if (e.key !== 'Escape') return
+      setOpen(false)
+      fabRef.current?.focus()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [open])
 
   // Pause stage: a 10-second countdown before the facts appear. The wait is
   // the point — it breaks the reflex to act instantly. Skippable.
@@ -68,6 +89,7 @@ export default function PanicButton() {
     <>
       {/* Floating panic button — left side, above the bottom nav */}
       <button
+        ref={fabRef}
         onClick={press}
         aria-label={t('panic.openLabel')}
         className={`fab fab-panic ${tucked ? "fab-tucked" : ""}`}
@@ -83,13 +105,28 @@ export default function PanicButton() {
         <div
           role="dialog"
           aria-modal="true"
+          aria-label={t('panic.openLabel')}
           style={{
-            position: 'fixed', inset: 0, zIndex: 50,
+            position: 'fixed', inset: 0, zIndex: 200,   /* above the bottom nav (100), as .advisor-overlay */
             background: 'rgba(6,7,12,0.94)', backdropFilter: 'blur(6px)',
             display: 'flex', flexDirection: 'column', alignItems: 'center',
             justifyContent: 'center', padding: 24, textAlign: 'center',
           }}
         >
+          <button
+            ref={closeRef}
+            type="button"
+            onClick={close}
+            aria-label={t('common.close')}
+            style={{
+              position: 'absolute', top: 'max(12px, env(safe-area-inset-top))', right: 12,
+              width: 'var(--touch-target)', height: 'var(--touch-target)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              background: 'none', border: 'none', borderRadius: 10,
+              color: 'var(--text-muted)', cursor: 'pointer', fontSize: 18,
+            }}
+          >✕</button>
+
           {stage === 'pause' && (
             <>
               <div style={{
@@ -109,6 +146,16 @@ export default function PanicButton() {
                 {t('panic.showNow')}
               </button>
             </>
+          )}
+
+          {/* Cold server: the facts may still be on their way. Never a blank screen. */}
+          {stage === 'coach' && !coach && (
+            <div role="status">
+              <div className="light-loader" style={{ width: 28, height: 28, margin: '0 auto' }} />
+              <p style={{ fontSize: 14, color: 'var(--text-muted)', marginTop: 14 }}>
+                {t('panic.loading')}
+              </p>
+            </div>
           )}
 
           {stage === 'coach' && coach && (
@@ -142,7 +189,7 @@ export default function PanicButton() {
           {stage === 'done' && (
             <div style={{ maxWidth: 420 }}>
               <p style={{ fontSize: 15, lineHeight: 1.7, marginBottom: 22 }}>{closing}</p>
-              <button className="btn btn-primary" onClick={() => setOpen(false)}>
+              <button className="btn btn-primary" onClick={close}>
                 {t('common.close')}
               </button>
             </div>

@@ -32,16 +32,38 @@ export default function StructuredQuiz({ onComplete, onPreferChat }) {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState(null)
 
+  const [loadAttempt, setLoadAttempt] = useState(0)
+
   useEffect(() => {
     let cancelled = false
     api.get('/profile/questions')
       .then(res => { if (!cancelled) setQuestions(res.data.questions) })
-      .catch(err => { if (!cancelled) setError(extractErrorMessage(err)) })
+      .catch(() => { if (!cancelled) setError(t('quiz.loadError')) })
     return () => { cancelled = true }
-  }, [])
+  }, [loadAttempt, t])
 
+  // A failed load must not be a dead end: offer a retry and keep the other way in.
   if (error && !questions) {
-    return <p role="alert" style={{ fontSize: 13, color: 'var(--red, #f87171)' }}>{error}</p>
+    return (
+      <div style={{ textAlign: 'center', margin: '24px 0' }}>
+        <p role="alert" style={{ fontSize: 13, color: 'var(--red, #f87171)', marginBottom: 12 }}>{error}</p>
+        <button type="button" className="btn btn-primary" onClick={() => { setError(null); setLoadAttempt(n => n + 1) }}>
+          {t('common.tryAgain')}
+        </button>
+        <div style={{ marginTop: 14 }}>
+          <button
+            type="button"
+            onClick={onPreferChat}
+            style={{
+              background: 'none', border: 'none', color: 'var(--text-muted)',
+              cursor: 'pointer', font: 'inherit', fontSize: 13, padding: '12px 8px',
+            }}
+          >
+            {t('quiz.preferChat')}
+          </button>
+        </div>
+      </div>
+    )
   }
   if (!questions) {
     return <div className="light-loader" style={{ width: 24, height: 24, margin: '40px auto' }} />
