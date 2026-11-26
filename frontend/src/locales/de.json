@@ -469,7 +469,9 @@
     "buildPortfolio": "Mein Portfolio erstellen"
   },
   "news": {
-    "title": "Was ist heute passiert?"
+    "title": "Was ist heute passiert?",
+    "count_one": "{{count}} Meldung",
+    "count_other": "{{count}} Meldungen"
   },
   "headlines": {
     "title": "Schlagzeile lesen, ohne Panik verstehen",
@@ -833,13 +835,6 @@
     "flatNote": "{{count}} Anlagen (Bargeld/manuell) werden zum zuletzt bekannten Wert konstant gehalten",
     "dipNote": "Verlusttage sind normal — es geht darum, an ihnen nicht zu verkaufen.",
     "pending": "Sobald deine Anlagen einige Tage an Daten gesammelt haben, erscheint hier der Chart."
-  },
-  "comparison": {
-    "balanced": "Dein Portfolio ist ausgewogen",
-    "deviations": "Abweichungen vom Ziel",
-    "subtitle": "Empfohlene und tatsächliche Aufteilung für dein Risikoprofil {{score}}/10",
-    "actualLegend": "■ Tatsächliche Aufteilung",
-    "targetLegend": "■ Zielaufteilung"
   },
   "dailyTip": {
     "label": "Heute gelernt",

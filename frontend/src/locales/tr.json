@@ -599,13 +599,6 @@
     "dipNote": "Düşüş günleri normaldir — mesele o günlerde satmamak.",
     "pending": "Grafik, varlıkların birkaç gün veri biriktirince burada belirecek."
   },
-  "comparison": {
-    "balanced": "Portföyün Dengede",
-    "deviations": "Hedef Dağılımdan Sapmalar",
-    "subtitle": "Risk {{score}}/10 profiline göre önerilen vs gerçek dağılım",
-    "actualLegend": "■ Gerçek dağılım",
-    "targetLegend": "■ Hedef dağılım"
-  },
   "dailyTip": {
     "label": "Bugün Öğrendin",
     "next": "Karta dokun → sıradaki kavram",
@@ -781,7 +774,9 @@
     "buildPortfolio": "Portföyümü Oluştur"
   },
   "news": {
-    "title": "Bugün Ne Oldu?"
+    "title": "Bugün Ne Oldu?",
+    "count_one": "{{count}} haber",
+    "count_other": "{{count}} haber"
   },
   "headlines": {
     "title": "Manşet Oku, Paniklemeden Anla",

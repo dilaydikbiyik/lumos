@@ -92,14 +92,15 @@ export default function PortfolioChart({ allocations = [], onSliceClick }) {
             onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleClick(d) } }}
             style={{
               display: 'flex', alignItems: 'center', gap: 10,
-              cursor: 'pointer', opacity: active && active !== d.ticker ? 0.5 : 1,
+              cursor: 'pointer',
               padding: '4px 8px', borderRadius: 6,
               background: active === d.ticker ? 'var(--bg-input)' : 'transparent',
             }}
             onClick={() => handleClick(d)}
           >
-            <span style={{ width: 10, height: 10, borderRadius: '50%', background: colors[i], flexShrink: 0 }} />
-            <span style={{ fontSize: 13, flex: 1 }}>{d.name}</span>
+            {/* Another row selected: fade the dot (a graphic), mute the text (ui-audit rule: no opacity on text). */}
+            <span style={{ width: 10, height: 10, borderRadius: '50%', background: colors[i], flexShrink: 0, opacity: active && active !== d.ticker ? 0.4 : 1 }} />
+            <span style={{ fontSize: 13, flex: 1, color: active && active !== d.ticker ? 'var(--text-muted)' : 'var(--text)' }}>{d.name}</span>
             {/* Percentage in the exact slice colour — the legend and pie read as one */}
             <span style={{ fontSize: 13, fontWeight: 700, color: colors[i] }}>{percent(d.value, { decimals: 1 })}</span>
           </div>

@@ -63,7 +63,7 @@ export default function PathInvitation() {
         <span style={{ fontSize: 20 }} aria-hidden="true">💡</span>
         <div style={{ flex: 1 }}>
           <strong style={{ fontSize: 14 }}>{t(`pathInvite.${invite.copy}.title`)}</strong>
-          <p style={{ fontSize: 13, opacity: 0.85, margin: '4px 0 10px', lineHeight: 1.6 }}>
+          <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: '4px 0 10px', lineHeight: 1.6 }}>
             {t(`pathInvite.${invite.copy}.body`)}
           </p>
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
@@ -72,7 +72,7 @@ export default function PathInvitation() {
             </button>
             <button
               className="btn btn-ghost"
-              style={{ opacity: 0.7 }}
+              style={{ color: 'var(--text-muted)' }}
               onClick={dismiss}
             >
               {t('pathInvite.notNow')}

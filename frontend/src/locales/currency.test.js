@@ -153,7 +153,11 @@ describe('copy catalogue', () => {
 
     const dead = flatten(tr)
       .map(([key]) => key)
-      .filter(key => !blob.includes(key) && !stems.some(s => key.startsWith(s)))
+      // i18next plurals: `t('news.count', { count })` reaches news.count_one/_other.
+      .map(key => [key, key.replace(/_(zero|one|two|few|many|other)$/, '')])
+      .filter(([key, base]) => !blob.includes(key) && !blob.includes(base)
+        && !stems.some(s => key.startsWith(s)))
+      .map(([key]) => key)
 
     expect(dead, `copy with no code behind it:\n${dead.join('\n')}`).toEqual([])
   })

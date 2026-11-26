@@ -77,7 +77,7 @@ export default function HeadlineEducation() {
           background: 'none', border: 'none', color: 'var(--text-dim)',
           cursor: 'pointer', fontSize: 16, padding: '2px 6px',
         }}
-        aria-label="Kapat"
+        aria-label={t('common.close')}
       >✕</button>
 
       <span style={{

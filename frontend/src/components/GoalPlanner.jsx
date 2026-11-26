@@ -54,7 +54,7 @@ export default function GoalPlanner() {
   return (
     <div className="card">
       <h3 style={{ marginBottom: 4 }}>{t('goal.title')}</h3>
-      <p style={{ fontSize: 13, opacity: 0.8, marginBottom: 12 }}>
+      <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 12 }}>
         {t('goal.subtitle')}
       </p>
       <form onSubmit={run} style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -89,7 +89,7 @@ export default function GoalPlanner() {
           )}
 
           {plan.target_real_value != null && (
-            <p style={{ fontSize: 12, opacity: 0.7, marginTop: 8, lineHeight: 1.5 }}>
+            <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 8, lineHeight: 1.5 }}>
               ℹ️ <Trans i18nKey="goal.realValueNote"
                         values={{
                           inflation: plan.annual_inflation_pct,
@@ -142,7 +142,7 @@ export default function GoalPlanner() {
                   background: 'linear-gradient(90deg, #8b8bf5, #4ade80)',
                 }} />
               </div>
-              <div style={{ fontSize: 12, opacity: 0.7, marginTop: 4 }}>{t('goal.progress', { pct: progress.progress_pct })}</div>
+              <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 4 }}>{t('goal.progress', { pct: progress.progress_pct })}</div>
             </div>
           )}
         </div>

@@ -12,6 +12,7 @@ export default function ReadinessScore() {
   const { t } = useTranslation()
   const { getToken, isSignedIn } = useAuth()
   const [data, setData] = useState(null)
+  const [failed, setFailed] = useState(false)
 
   useEffect(() => {
     if (!isSignedIn) return
@@ -22,7 +23,8 @@ export default function ReadinessScore() {
         const res = await api.get('/users/me/readiness')
         if (!cancelled) setData(res.data)
       } catch {
-        // kozmetik — sessizce atla
+        // A failed load used to leave the skeleton up forever (ui-audit 3.5).
+        if (!cancelled) setFailed(true)
       }
     }
     load()
@@ -33,6 +35,7 @@ export default function ReadinessScore() {
   // slot and then jump back down when the data landed — the dashboard looked
   // broken for its first two seconds. A placeholder of the right height keeps
   // the layout still.
+  if (failed) return null
   if (!data) {
     return (
       <div className="card" aria-hidden="true" style={{ opacity: 0.35, minHeight: 96 }}>
@@ -69,7 +72,7 @@ export default function ReadinessScore() {
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10 }}>
         <div>
           <strong style={{ fontSize: 14 }}>{t('readiness.title')}</strong>
-          <p style={{ fontSize: 12, opacity: 0.7, margin: '2px 0 0' }}>
+          <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: '2px 0 0' }}>
             {t('readiness.stepsDone', { done, total: entries.length })}
             {/* When the groundwork is done, say so. When it is not, name the
                 ONE thing to do next rather than a vague "progressing" —
@@ -93,7 +96,7 @@ export default function ReadinessScore() {
             }}>
               {done ? '✓' : ''}
             </span>
-            <span style={{ opacity: done ? 1 : 0.55 }}>{t(`readiness.milestones.${key}`)}</span>
+            <span style={{ color: done ? 'var(--text)' : 'var(--text-dim)' }}>{t(`readiness.milestones.${key}`)}</span>
           </div>
         ))}
       </div>

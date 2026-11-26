@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@clerk/clerk-react'
 import AppHeader from '../components/AppHeader'
 import PortfolioChart from '../components/PortfolioChart'
-import PortfolioComparison from '../components/PortfolioComparison'
+import DriftCard from '../components/DriftCard'
 import NewsDigest from '../components/NewsDigest'
 import GoalPlanner from '../components/GoalPlanner'
 import PathInvitation from '../components/PathInvitation'
@@ -45,7 +45,10 @@ function ProgressiveDetails({ holdingsSummary, portfolio }) {
         </button>
       ) : (
         <>
-          <PortfolioComparison />
+          {/* The server's drift against the reader's real plan — the same card
+              as on Holdings. A client-side target table used to stand here and
+              disagreed with both the plan and that card (ui-audit 3.1). */}
+          <DriftCard holdingsCount={Object.keys(holdingsSummary?.by_type || {}).length} />
           <GoalPlanner />
           <button
             onClick={() => setExpanded(false)}
@@ -66,7 +69,7 @@ export default function DashboardPage() {
   const navigate = useNavigate()
   const { getToken } = useAuth()
   const { fmt, money, unit } = useMarket()
-  const { portfolio, profile, isLoading, loadProfile, recommend } = usePortfolio()
+  const { portfolio, profile, isLoading, error, loadProfile, recommend } = usePortfolio()
 
   // Holdings summary — for the dashboard card
   const [holdingsSummary, setHoldingsSummary] = useState(null)
@@ -139,6 +142,11 @@ export default function DashboardPage() {
             <FireflyMark size={40} style={{ display: 'block', margin: '0 auto 10px', filter: 'drop-shadow(0 0 8px rgba(245,165,36,0.3))' }} />
             <p style={{ fontSize: 14, marginBottom: 6 }}>{t('dashboard.profileReadyTitle')}</p>
             <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 18 }}>{t('dashboard.profileReadyBody')}</p>
+            {/* A failed build used to drop the reader back on this card with
+                no word (ui-audit 3.2); the button below is the retry. */}
+            {error && (
+              <p role="alert" style={{ fontSize: 13, color: 'var(--red)', marginBottom: 14 }}>{error}</p>
+            )}
             <button className="btn btn-primary" onClick={handleRerun}>
               {t('dashboard.buildPortfolio')}
             </button>

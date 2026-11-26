@@ -54,7 +54,7 @@ export default function NewsDigest() {
           padding: '2px 8px', borderRadius: 20, fontWeight: 600,
           marginLeft: 'auto',
         }}>
-          {items.length} haber
+          {t('news.count', { count: items.length })}
         </span>
       </div>
 

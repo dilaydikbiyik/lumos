@@ -57,7 +57,7 @@ export default function PathSuggestion({ onApplied }) {
       <h3 style={{ margin: '0 0 4px', fontSize: '1rem' }}>
         🧭 {t('pathSuggestion.title')}
       </h3>
-      <p style={{ fontSize: 13, opacity: 0.8, marginTop: 0 }}>
+      <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 0 }}>
         {data.confident
           ? t('pathSuggestion.confident', { path: t(`path.options.${data.path}.title`) })
           : t('pathSuggestion.tentative', { path: t(`path.options.${data.path}.title`) })}
@@ -68,7 +68,7 @@ export default function PathSuggestion({ onApplied }) {
       </ul>
 
       {data.entry_threshold ? (
-        <p style={{ fontSize: 12, opacity: 0.65 }}>
+        <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>
           {t('pathSuggestion.threshold', { amount: money(data.entry_threshold) })}
         </p>
       ) : null}
@@ -82,7 +82,7 @@ export default function PathSuggestion({ onApplied }) {
           ? t('pathSuggestion.applying')
           : t('pathSuggestion.apply', { path: t(`path.options.${data.path}.title`) })}
       </button>
-      <p style={{ fontSize: 12, opacity: 0.6, margin: '8px 0 0', textAlign: 'center' }}>
+      <p style={{ fontSize: 12, color: 'var(--text-dim)', margin: '8px 0 0', textAlign: 'center' }}>
         {t('pathSuggestion.note')}
       </p>
     </div>

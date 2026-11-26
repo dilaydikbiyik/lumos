@@ -50,7 +50,7 @@ export default function BehaviorMirror() {
       <h3 style={{ margin: '0 0 6px', fontSize: '1rem' }}>
         🪞 {t('mirror.title')}
       </h3>
-      <p style={{ fontSize: 13, lineHeight: 1.7, margin: 0, opacity: 0.9 }}>
+      <p style={{ fontSize: 13, lineHeight: 1.7, margin: 0 }}>
         {data.note}
       </p>
 
@@ -58,7 +58,7 @@ export default function BehaviorMirror() {
           visually quieter, so the sentence is what gets read. */}
       <div style={{
         display: 'flex', gap: 12, marginTop: 10, paddingTop: 10,
-        borderTop: '1px solid var(--border)', fontSize: 11.5, opacity: 0.7,
+        borderTop: '1px solid var(--border)', fontSize: 11.5, color: 'var(--text-muted)',
       }}>
         <span>{t('mirror.plan', { count: plan })}</span>
         <span>{t('mirror.fomo', { count: fomo })}</span>

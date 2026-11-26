@@ -61,7 +61,7 @@ export default function BudgetSplit() {
   return (
     <div className="card">
       <h3 style={{ margin: '0 0 4px', fontSize: '1rem' }}>🧮 {t('budgetSplit.title')}</h3>
-      <p style={{ fontSize: 13, opacity: 0.8, marginTop: 0 }}>
+      <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 0 }}>
         {t('budgetSplit.subtitle', { total: money(total) })}
       </p>
 
@@ -85,7 +85,7 @@ export default function BudgetSplit() {
             }} />
             <dt style={{ fontWeight: 600, fontSize: 13, flex: 1 }}>
               {t(`budgetSplit.parts.${seg.key}.label`)}
-              <span style={{ display: 'block', fontWeight: 400, opacity: 0.7, fontSize: 12 }}>
+              <span style={{ display: 'block', fontWeight: 400, color: 'var(--text-muted)', fontSize: 12 }}>
                 {/* The property row explains its VEHICLE; the others carry a
                     fixed hint. `defaultValue` keeps a missing one blank rather
                     than printing the key at the reader. */}
@@ -96,7 +96,7 @@ export default function BudgetSplit() {
             </dt>
             <dd style={{ margin: 0, fontWeight: 600, fontSize: 13, whiteSpace: 'nowrap' }}>
               {money(plan[seg.amount])}
-              <span style={{ opacity: 0.6, fontWeight: 400 }}> · {percent(plan[seg.pct])}</span>
+              <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}> · {percent(plan[seg.pct])}</span>
             </dd>
           </div>
         ))}
@@ -104,7 +104,7 @@ export default function BudgetSplit() {
 
       <ul style={{
         margin: '10px 0 0', paddingLeft: 18, fontSize: 12.5,
-        lineHeight: 1.65, opacity: 0.85,
+        lineHeight: 1.65, color: 'var(--text-muted)',
       }}>
         {plan.reasons.map((reason, i) => <li key={i} style={{ marginBottom: 6 }}>{reason}</li>)}
       </ul>
@@ -113,7 +113,6 @@ export default function BudgetSplit() {
         <form onSubmit={saveOutgoings} style={{ display: 'flex', gap: 8, marginTop: 10 }}>
           <input
             className="input"
-        className="input"
             value={outgoings}
             onChange={e => setOutgoings(e.target.value)}
             inputMode="numeric"
@@ -127,7 +126,7 @@ export default function BudgetSplit() {
         </form>
       )}
 
-      <p style={{ fontSize: 11.5, opacity: 0.6, margin: '10px 0 0' }}>
+      <p style={{ fontSize: 11.5, color: 'var(--text-dim)', margin: '10px 0 0' }}>
         {t('budgetSplit.disclaimer')}
       </p>
     </div>

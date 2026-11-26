@@ -599,13 +599,6 @@
     "dipNote": "Down days are normal — the point is not selling on them.",
     "pending": "The chart will appear here once your assets accumulate a few days of data."
   },
-  "comparison": {
-    "balanced": "Your Portfolio Is Balanced",
-    "deviations": "Deviations From Target",
-    "subtitle": "Recommended vs actual split for your risk {{score}}/10 profile",
-    "actualLegend": "■ Actual split",
-    "targetLegend": "■ Target split"
-  },
   "dailyTip": {
     "label": "Learned Today",
     "next": "Tap the card → next concept",
@@ -781,7 +774,9 @@
     "buildPortfolio": "Build My Portfolio"
   },
   "news": {
-    "title": "What Happened Today?"
+    "title": "What Happened Today?",
+    "count_one": "{{count}} story",
+    "count_other": "{{count}} stories"
   },
   "headlines": {
     "title": "Read the Headline, Understand It Without Panic",

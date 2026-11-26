@@ -3948,3 +3948,10 @@ Full findings: `docs/ui-audit.md` (inventory, 6 batches, Rules). Copy drafts: `d
       cut-offs → one `utils/riskBand.js` (≤3 / ≤6, mirrors server `_label`) + render test.
       High band purple, not red; band colours only as fills/dots, numbers/labels in `--text`.
 - Fact: Vercel and Render both auto-deploy on push to `main`.
+- [x] **Batch 3 (Home) audited** (`docs/ui-audit.md` 3.1–3.15). Highs fixed: 3.1 dashboard
+      PortfolioComparison (client-made target table) → DriftCard, component deleted; 3.2 build
+      failure shows `role="alert"` error; 3.3 server `risk_band()` sends `band` (profile) and
+      `allocation_logic.risk_band` (portfolio), `utils/riskBand.js` = key → colour only, gauge and
+      card show the server label (a 7 had read "Growth-Focused" and "Aggressive" on one screen);
+      3.4 `news.count`, `common.close`. Also 3.5 (readiness skeleton forever) and text-opacity on sight.
+      Unused `profile.bands`, `profile.profileWord`, `comparison.*` keys removed.
