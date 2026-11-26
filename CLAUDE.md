@@ -17,6 +17,8 @@ Explain before showing, no jargon by default, describe instruments but never rec
   open items). Keep it under ~60 lines; detail goes to `todo.md` and git, not there.
   Overwrite it from scratch every time — never append. Finished items and history move to a
   dated "Session log" section at the end of `todo.md`.
+- When writing PROGRESS.md, get the push state from `git status -sb` (ahead/behind origin),
+  never from memory.
 
 ## Session habits (do these without being asked)
 

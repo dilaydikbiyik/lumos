@@ -33,7 +33,7 @@ Size = lines of JSX in the batch (a rough effort proxy).
 | 1 | First contact (signed out) + install | `/` landing, disclaimer modal, sign-in (web redirect + in-app Clerk `SignIn`), `AuthPending` loading, crash screen, unknown URL → `/`, `/privacy`, `/terms`, PWA install + offline | OnboardingPage, DisclaimerModal, LanguageSwitcher, LumosLogo, FireflyMark, LegalPage, InstallHint, utils/errorBoundary, `public/manifest.webmanifest`, `public/sw.js` | 950 | done 2026-11-26 |
 | 2 | Getting to know you + the app shell | `/path` (step 1), `/fear-check-in` (step 2), `/profile` risk quiz (step 3, chat + structured); shell first seen here: header, bottom nav / sidebar, market + language switchers, panic button, advisor chat, feedback | PathSelectionPage, FearCheckInPage, ProfilePage, ChatWindow, MessageBubble, StructuredQuiz, RiskGauge, DebtFirstCard · AppHeader, AppNav, MarketSwitcher, HeaderSelect, PanicButton, AdvisorChat, FeedbackButton, Section, Disclaimer | 1,890 | done 2026-11-26 |
 | 3 | Home | `/dashboard` (first tab, where a finished profile lands) | DashboardPage, ReadinessScore, PathSuggestion, PathInvitation, DailyTip, HeadlineEducation, NewsDigest, BudgetSplit, GoalPlanner, BehaviorMirror, PortfolioChart (minus AssetCard), PortfolioComparison, StocksLink | 1,730 | done 2026-11-26 |
-| 4 | Your portfolio plan | `/recommend` (allocation, why, what-if, practice), `/stocks` (asset classes) | RecommendPage, AllocationRationale, RoleAlternatives, AssetExplainer, ReitCard, ReferenceFacts, TimeMachine, AssetCharacter, IsikTut, FutureScenarios, WhatIfAssistant, PracticeMode, BoughtItBridge, BeginnerGuide, Glossary, RealEstatePathNotice · StocksPage, AssetClasses | 2,140 | todo |
+| 4 | Your portfolio plan | `/recommend` (allocation, why, what-if, practice), `/stocks` (asset classes) | RecommendPage, AllocationRationale, RoleAlternatives, AssetExplainer, ReitCard, ReferenceFacts, TimeMachine, AssetCharacter, IsikTut, FutureScenarios, WhatIfAssistant, PracticeMode, BoughtItBridge, BeginnerGuide, Glossary, RealEstatePathNotice · StocksPage, AssetClasses | 2,140 | audited 2026-11-26 (no fixes yet) |
 | 5 | Real estate | `/explore` (property vs portfolio, purchase checks, listing evaluation, population trend, ways into a home) | ExplorePage, PropertyVsPortfolio, PurchaseChecks, ListingEval, PopulationTrend, HomeRoutes | 1,390 | todo |
 | 6 | What you own, account and plans | `/holdings` (record purchases, value, drift, currency); path switch + delete account (on `/profile`); `/plans` billing (Lemon Squeezy web / RevenueCat app); `/admin` (admin only, low priority) | HoldingsPage, FirstPurchaseEducation, PortfolioValueChart, DriftCard, CurrencyExposure · PathSwitcher, DeleteAccount, PlansPage · AdminPage, UserAccessPanel | 1,820 | done 2026-11-26 (`/admin` skipped) |
 
@@ -186,6 +186,59 @@ shows its formula; NewsDigest hides itself on failure; StocksLink is a real butt
 **Deferred AssetCard patterns in batch 3:** #5 focus / live region — tip and headline swaps, news item
 expand, goal result appearing. #8 jargon — "risk score", "remaining budget", "eroding", "deviation",
 "Courage Score"; none has Işık Tut.
+
+### Batch 4 — your portfolio plan (audited 2026-11-26)
+
+Read from code; `/recommend` and `/stocks` need a signed-in account, so nothing here was measured in
+the browser. 4.1 was checked by rendering the glossary with i18next. **No fixes in this batch yet**
+(owner, 2026-11-26): none until the signed-in check of the earlier fixes is reported.
+
+| # | Issue | Why it matters for a beginner | Fix | Effort | Sev | Evidence |
+|---|---|---|---|---|---|---|
+| 4.1 | **Glossary shows raw placeholders** for "inflation" and "real return": `Glossary.jsx` reads the entries with `returnObjects` and no values, so the text reads "At {{rate}}% inflation, 100 {{unit}} under the mattress…" and "You made {{nominal}}% but inflation was {{inflation}}%" (tr/en/de). `IsikTut` passes the values, the glossary list does not. | The two words the app most wants a beginner to understand show up broken, in the place they go to look words up. | Render each entry with `t('glossary.<id>.text', { unit, ...inflationExample(pack), ...realReturnExample(pack) })`, as `IsikTut` does. Test: no `{{` in the rendered list. | S | high | verified (rendered with i18next) |
+| 4.2 | **ReitCard leaks the US market and Turkish.** It always names "VNQ (Vanguard REIT) · SCHH (Schwab US REIT)", but a German portfolio's REIT is `IQQP.DE` and `markets/de.py` says EU retail investors cannot buy VNQ. Its badge is hardcoded Turkish "Dahil". | A German reader is pointed at funds they cannot legally buy; EN/DE readers see Turkish. | Name the REITs from `portfolio.allocations` (category `reit`); badge → `t('reit.included')`. | S | high | verified (code) |
+| 4.3 | **`/recommend` can be blank or a dead end.** `if (!portfolio) return null`: when the saved profile fails to load (cold start, offline) and nothing is cached, the page is empty with no header. The error state has no header, shows the raw error, and its button reads "Back Try again" (two strings glued together) and goes to the `/profile` quiz instead of retrying. | The Portfolio tab, on the server state a new user meets most, is an empty screen or sends them back to the quiz. | Header plus one error card; "Try again" re-runs the load; a blank state only while loading. | S | high | verified (code) |
+| 4.4 | REIT in two colours on one screen: purple pie slice (`#7A4A93`), blue `ReitCard` (`rgba(91,142,240,…)`). `AssetExplainer`'s own `CATEGORY_META` / `ASSET_META` colours (REIT green, QQQ `#9B59B6`) are dead today because the page always passes the slice colour. | Breaks "one asset, one colour". | `ReitCard` uses `CATEGORY_COLORS.reit` via `withAlpha`; drop the unused colour fields. | S | medium | verified (code) |
+| 4.5 | Işık Tut bubble is 260px, centred on the term with `position: absolute`. At 375px a term near either edge pushes it off-screen. No Escape or outside tap to close; `role="tooltip"` with no `aria-describedby`. Shared: also used in batches 2, 3 and 5. | The app's main "explain this word" tool can open half off-screen and stays open. | Clamp to the viewport (or open as an inline block under the line); Escape and outside tap close; `aria-describedby`. | M | medium | suspected (layout) / verified (keys) |
+| 4.6 | The risk badge is always amber, "Risk 6.6/10", with no band name or plain line, though the server sends `allocation_logic.risk_band`. | The score that shaped the whole plan is unexplained, and its colour disagrees with `/profile`. | Show the server band label; colour from `bandColor()`; one plain line. | S | medium | verified (code) |
+| 4.7 | Tickers alone where a beginner needs names: AssetCharacter rows ("XEON.DE"), what-if allocation changes, Practice's "biggest mover". Practice's mover % is the raw number (no `percent()`, so no locale decimal or rounding). | "IUSA.DE moved +1.2345" means nothing to a beginner, and the DE decimal mark is wrong. | Name (ticker) from the allocation; `signedPercent()`. | S | medium | verified (code) |
+| 4.8 | WhatIfAssistant: the question box has only a placeholder (no label); "Risk" is hardcoded English. Errors in TimeMachine, FutureScenarios, WhatIf, Practice and BoughtItBridge have no `role="alert"`; results appear with no live region. | Screen-reader users don't hear failures or answers; DE shows English. | Label, `t()`, `role="alert"`, `aria-live` on the result. | S | medium | verified (code) |
+| 4.9 | "I bought it" records the whole recommended amount, at today's date, in one tap, with no step for what was actually bought. | A reader who bought less, or yesterday, gets wrong holdings and wrong drift, then has to fix them on another screen. | Confirm step with the amount and date shown, or let the reader change them (the server already de-duplicates). | M | medium | verified (code) |
+| 4.10 | "What you hold" section header says "· 3", but each `ReferenceFacts` card hides itself on failure, so the count can be wrong and the section can open empty. | An empty drawer after a tap reads as broken. | Count what loaded, or hide the section when none loaded. | S | medium | verified (code) |
+| 4.11 | `/stocks` and asset-class load errors show text only, no "Try again". | Every error state needs a way forward (project rule). | Retry button that re-fetches. | S | medium | verified (code) |
+| 4.12 | `/stocks` column labels "real", "worst drop", "volatility" and the "swing vs index" line have no Işık Tut or plain line (the glossary has these terms). | The page's whole lesson depends on words it doesn't explain. | Işık Tut on each label, once per page. | S | medium | verified (code) |
+| 4.13 | FutureScenarios puts two selects and a button in one row; at 375px that is about 311px, and the asset names are long ("Vanguard Real Estate ETF (VNQ)"). | The asset picker is clipped on a phone. | Wrap the row: the select on its own line. | S | medium | suspected (layout) |
+| 4.14 | Small targets: AssetExplainer ✕ (~34px) and tabs (12px text, ~33px); BeginnerGuide step chips (~28px, 11px text, active chip `#000`) and header button without `aria-expanded`; RoleAlternatives summary `minHeight: 24`; Glossary ✕; `/stocks` tabs and rows `minHeight: 44`. | Hard to hit on a phone. | `--touch-target`, `--t-micro` minimum, tokens, `aria-expanded`. | S | low | verified (code) |
+| 4.15 | A real-estate-only reader: `getMe()` and `recommend()` start together, so a stock portfolio is built (server work) and can flash before the notice. | Briefly shows the thing the path choice said not to. | Wait for `getMe()` before building. | S | low | suspected (race) |
+| 4.16 | AssetExplainer tabs and `/stocks` tabs: no full tab semantics (no `tablist`/`aria-selected` in the explainer; no `tabpanel` or arrow keys on `/stocks`). | Screen readers hear plain buttons. | ARIA tabs pattern. | S | low | verified (code) |
+| 4.17 | Hex outside tokens: TimeMachine line `#8b8bf5` and tooltip label `#333`; PracticeMode border fallback; `rgba(...)` in ReitCard and IsikTut. | Drifts from the palette. | Tokens / `withAlpha`. | S | low | verified (code) |
+| 4.18 | `stocks.asOf` gets the date as the server sends it, not formatted for the reader's locale. | "2026-11-20" in a German sentence. | Format with the market's date format. | S | low | suspected |
+| 4.19 | AssetClasses: `available` with an empty `classes` list throws on `sharpest.key` (crash screen). | Edge case, but a crash on a teaching page. | Guard the empty list. | S | low | suspected (edge) |
+| 4.20 | Motion outside reduced motion: AssetExplainer fade-in, Işık Tut pulse, chevron and chip transitions. | As 2.15. | Do with the animations task. | S | low | verified (code) |
+
+**REIT purple vs `--violet` (asked in PROGRESS.md):** they never share a screen. `--violet` is used only by
+`RiskGauge` and `ProfilePage` (`/profile`). `/recommend` gets REIT purple through `CATEGORY_COLORS`, and
+every category the server sends (`stocks`, `bond`, `cash`, `gold`, `reit`) has a colour there, so the
+position-based fallback list (which holds a light violet, `#A78BFA`) is never reached on this page. If
+4.6 colours the risk badge with `bandColor()`, an aggressive reader *will* see violet next to the REIT
+slice: give the badge a dot, not a fill, or recheck the pair then.
+
+**Fix on sight, not done this time** (Rules; held because no code changes until the check): text faded
+with `opacity` in AllocationRationale, RoleAlternatives, ReferenceFacts, TimeMachine, AssetCharacter,
+FutureScenarios, WhatIfAssistant, PracticeMode, BoughtItBridge ("checking" card), RealEstatePathNotice
+and Glossary. No colour-plus-alpha strings (`${color}55`) found in this batch.
+
+**Checked and fine:** the page opens on the chart, with the reasoning and tools folded away; the rationale
+lists every dropped asset with its reason; the currency-risk note sits on the Risk tab only; RoleAlternatives
+ranks nothing; FutureScenarios measures past windows, gives no forecast and shows its honesty note; TimeMachine
+shows the worst moment next to the result; BeginnerGuide gets regulator facts from the market pack; the
+stock list is sorted by name in the reader's alphabet and is the same for every reader; AssetClasses keeps
+the server's calm-to-volatile order; the glossary search has a label; "I bought it" never shows the button
+while it doesn't know, and a retry skips what was already saved.
+
+**Deferred AssetCard patterns in batch 4:** #5 focus / live region — tapping a slice opens AssetExplainer
+below without moving focus; tool results (time machine, scenarios, practice, what-if) appear silently.
+#8 jargon — "Risk 6.6/10", "defensive / growth target", "position cap", "stagnation".
 
 ### Batch 6 — what you own, account and plans (audited 2026-11-26, `/admin` skipped)
 

@@ -3360,7 +3360,9 @@ maddeler günler süren onaylar başlatıyor, o yüzden bugün yapılmalı.
       kullanıcı listesinde arkadaşlarının hesapları var.
 - [ ] **14. Hukuki inceleme** — `docs/legal-review-brief.md` hazır.
 - [ ] **15. Clerk production instance + domain** — dev instance mağaza
-      sürümü için uygun değil.
+      sürümü için uygun değil. Canlı uygulama ve arkadaşlarının gerçek hesapları
+      hâlâ dev instance'ta (2026-11-26): mevcut kullanıcıları taşıma planı da
+      gerekir. Dev instance sınırlarını Clerk belgelerinden kontrol et.
 
 ### Bu turda kodda yapılanlar (2026-11-05)
 
@@ -3955,3 +3957,9 @@ Full findings: `docs/ui-audit.md` (inventory, 6 batches, Rules). Copy drafts: `d
       card show the server label (a 7 had read "Growth-Focused" and "Aggressive" on one screen);
       3.4 `news.count`, `common.close`. Also 3.5 (readiness skeleton forever) and text-opacity on sight.
       Unused `profile.bands`, `profile.profileWord`, `comparison.*` keys removed.
+- [x] **Batch 4 (Portfolio plan) audited** (`docs/ui-audit.md` 4.1–4.20), no code changes: owner
+      rule, no fixes in any batch until the signed-in check is reported. Highs: 4.1 Glossary renders
+      raw `{{rate}}`/`{{unit}}` for inflation and real return; 4.2 ReitCard names VNQ/SCHH to every
+      market (DE cannot buy them) and has a Turkish "Dahil" badge; 4.3 `/recommend` blank when the
+      profile load fails uncached, and its error button reads "Back Try again" and goes to the quiz.
+      REIT purple and `--violet` never share a screen (violet only on `/profile`).
