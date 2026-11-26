@@ -7,8 +7,9 @@ Updated: 2026-11-26. Overwritten each session; history is in `todo.md` → "Sess
 - Phases 1–4 complete; 5–9 partly done (`todo.md` → "📊 Progress Summary").
 - Code is store-ready. Paid plans: Lemon Squeezy (web), RevenueCat (App Store).
 - Vercel and Render auto-deploy on push to `main`. The batch 1/6/2/3 fixes are pushed (live since
-  2026-11-26 11:18) but not yet checked signed in. Per `git status -sb` at commit time: `main` is
-  1 ahead of `origin/main` (the batch 4 audit docs commit, unpushed; docs only).
+  2026-11-26 11:18) but not yet checked signed in. Batch 4 audit docs pushed. Per `git status -sb`
+  at commit time: `main` is 1 ahead of `origin/main` (CLAUDE.md security-notes rule +
+  `docs/private/` in `.gitignore`; to go out with the next fix).
 - App-wide UI/UX audit (`docs/ui-audit.md`). Batches 1, 6, 2, 3 audited, all their highs fixed.
   **Batch 4 (Portfolio plan) audited 2026-11-26, nothing fixed**: 3 high (4.1 glossary shows raw
   `{{placeholders}}`; 4.2 ReitCard names US funds to DE readers + Turkish "Dahil"; 4.3 `/recommend`

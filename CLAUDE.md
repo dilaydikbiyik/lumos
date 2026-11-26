@@ -51,6 +51,9 @@ Use `scripts/check.sh`.
 - Never commit `.env`. Every external API call goes behind the daily cache. Clerk JWTs are
   verified on the backend. Every error state has fallback UI. Money fields are bounded
   (`backend/schemas/limits.py`). Every system prompt carries the legal disclaimer.
+- Unfixed, exploitable security details (how to trigger a vuln, bypasses, secrets handling gaps)
+  go in git-ignored `docs/private/` until fixed; move them to the public log once fixed.
+  Planning notes, UI findings and legal questions stay public.
 
 ## Docs
 

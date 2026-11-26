@@ -21,6 +21,8 @@ env/
 .env
 *.key
 *.pem
+# Unfixed security details (CLAUDE.md → Rules); public once fixed
+docs/private/
 
 # Node / Frontend
 node_modules/
