@@ -186,3 +186,28 @@ def test_summary_mentions_age_when_provided():
 def test_summary_mentions_income_when_irregular():
     r = compute_risk_score(_answers(income_stability="irregular"))
     assert "gelir" in r.summary.lower() or "düzensiz" in r.summary.lower()
+
+
+# ── Band key ───────────────────────────────────────────────────────────────────
+# The client colours the score by this key and holds no cut-offs of its own;
+# a second copy of the thresholds is how the gauge and the card once disagreed.
+
+def test_band_key_matches_the_label_cut_offs():
+    from backend.services.risk_engine import risk_band
+    assert [risk_band(s) for s in (1, 3, 3.1, 6, 6.1, 8, 8.1, 10)] == [
+        "conservative", "conservative", "balanced", "balanced",
+        "growth", "growth", "aggressive", "aggressive",
+    ]
+
+
+def test_profile_response_carries_band_with_its_label():
+    from backend.i18n import t
+    result = compute_risk_score(_answers(), "en")
+    assert result.label == t(f"risk.label.{result.band}", "en")
+
+
+def test_portfolio_carries_the_same_band():
+    from backend.services.portfolio_engine import build_portfolio
+    from backend.services.risk_engine import risk_band
+    portfolio = build_portfolio(7, 100_000)
+    assert portfolio.metadata["allocation_logic"]["risk_band"] == risk_band(7) == "growth"

@@ -93,17 +93,11 @@
     "notANumber": "Bitte gib nur eine Zahl ein (z. B. 250.000)."
   },
   "profile": {
-    "bands": {
-      "low": "Konservativ",
-      "medium": "Ausgewogen",
-      "high": "Offensiv"
-    },
     "step": "Schritt 3 / 3",
     "title": "Lernen wir dich kennen",
     "subtitle": "9 kurze Fragen. Deine Antworten fließen direkt in den Wert ein — hier wird nichts geraten, und jeder Punkt wird dir danach gezeigt.",
     "readyTitle": "Dein Risikoprofil ist fertig",
     "readySubtitle": "Deine Antworten sind ausgewertet — dein persönliches Portfolio wird berechnet.",
-    "profileWord": "Profil",
     "riskScoreCaption": "Dein Risikowert",
     "budgetNote": "Dein Budget beträgt <0>{{budget}}</0>. Bei diesem Risikoniveau könnte ein starker Einbruch dein Portfolio vorübergehend um rund <1>{{pct}} %</1> auf <2>{{worst}}</2> drücken. Das ist für dieses Profil eine normale Schwankung — ein Verlust wird erst real, wenn du verkaufst.",
     "whyTitle": "Woher kommt dieser Wert?",

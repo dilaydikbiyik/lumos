@@ -64,16 +64,20 @@ def _round_half_up(value: float, places: int = 1) -> float:
     return float(Decimal(str(value)).quantize(quantum, rounding=ROUND_HALF_UP))
 
 
-def _label(score: float, lang: str) -> str:
+def risk_band(score: float) -> str:
+    """The band key for a 1–10 score. The only copy of these cut-offs: the
+    client receives the key and maps it to a colour, never a threshold."""
     if score <= 3:
-        key = "conservative"
-    elif score <= 6:
-        key = "balanced"
-    elif score <= 8:
-        key = "growth"
-    else:
-        key = "aggressive"
-    return t(f"risk.label.{key}", lang)
+        return "conservative"
+    if score <= 6:
+        return "balanced"
+    if score <= 8:
+        return "growth"
+    return "aggressive"
+
+
+def _label(score: float, lang: str) -> str:
+    return t(f"risk.label.{risk_band(score)}", lang)
 
 
 def _age_modifier(age: int | None) -> float:
@@ -197,6 +201,7 @@ def compute_risk_score(answers: RiskProfileAnswers, lang: str = "tr",
 
     return RiskProfileResponse(
         risk_score=score,
+        band=risk_band(score),
         label=label,
         summary=summary,
         factors=factors,

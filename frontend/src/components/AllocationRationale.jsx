@@ -4,7 +4,13 @@ import api from '../utils/api'
 import RoleAlternatives from './RoleAlternatives'
 import { Trans, useTranslation } from 'react-i18next'
 import { percentFromWeight } from '../utils/format'
-import { riskBand } from '../utils/riskBand'
+
+const BAND_SENTENCE = {
+  conservative: 'rationale.lowBand',
+  balanced: 'rationale.midBand',
+  growth: 'rationale.highBand',
+  aggressive: 'rationale.highBand',
+}
 
 /**
  * "Why this allocation?" — the engine's deterministic rationale.
@@ -67,7 +73,8 @@ export default function AllocationRationale({ portfolio }) {
             <div>
               <Trans i18nKey="rationale.step2" values={{ pct: logic.growth_target_pct }}
                      components={[<strong key="a" />, <br key="b" />]} />{' '}
-              {t({ low: 'rationale.lowBand', medium: 'rationale.midBand', high: 'rationale.highBand' }[riskBand(portfolio.risk_score).key])}
+              {/* The server's band key; a portfolio cached before it was sent has none. */}
+              {BAND_SENTENCE[logic.risk_band] && t(BAND_SENTENCE[logic.risk_band])}
             </div>
           </div>
 

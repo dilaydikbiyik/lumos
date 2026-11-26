@@ -1,15 +1,19 @@
-// Single source of truth for risk-score bands (1–10) and their colours.
-// The cut-offs mirror the server's label (`_label` in backend/services/risk_engine.py:
-// ≤3 conservative, ≤6 balanced), so the gauge, the summary card and the allocation
-// rationale can never put the same score in different bands.
-export const RISK_BANDS = {
-  low:    { key: 'low',    max: 3,        color: 'var(--green)',   label: 'profile.bands.low' },
-  medium: { key: 'medium', max: 6,        color: 'var(--firefly)', label: 'profile.bands.medium' },
-  high:   { key: 'high',   max: Infinity, color: 'var(--accent)',  label: 'profile.bands.high' },
+// Colours for the risk band keys the server sends with every score
+// (`risk_band` in backend/services/risk_engine.py: conservative ≤3,
+// balanced ≤6, growth ≤8, aggressive). There are no cut-offs here on purpose:
+// a second copy of the thresholds is how the gauge once said "Growth-Focused"
+// while the card under it said "Aggressive". The name shown is the server's
+// `label`; this file only picks the colour for a fill or a dot (never text).
+export const RISK_BAND_COLORS = {
+  conservative: 'var(--green)',
+  balanced:     'var(--firefly)',
+  growth:       'var(--accent)',
+  // Deeper than growth's --accent, not red: a high tolerance is not a wrong answer.
+  aggressive:   'var(--violet)',
 }
 
-export function riskBand(score) {
-  if (score <= RISK_BANDS.low.max) return RISK_BANDS.low
-  if (score <= RISK_BANDS.medium.max) return RISK_BANDS.medium
-  return RISK_BANDS.high
+// A profile cached before the server sent `band` has no key: neutral colour
+// until the next fetch replaces it.
+export function bandColor(key) {
+  return RISK_BAND_COLORS[key] ?? 'var(--text-dim)'
 }

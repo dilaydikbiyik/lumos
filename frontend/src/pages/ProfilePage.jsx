@@ -15,7 +15,7 @@ import usePortfolio from '../hooks/usePortfolio'
 import useMarket from '../hooks/useMarket'
 import { readJSON, writeJSON, removeKey, userKey } from '../utils/storage'
 import { withAlpha } from '../utils/palette'
-import { riskBand } from '../utils/riskBand'
+import { bandColor } from '../utils/riskBand'
 
 
 
@@ -137,7 +137,7 @@ export default function ProfilePage() {
               </p>
             </div>
 
-            <RiskGauge score={displayProfile.risk_score} label={displayProfile.label} />
+            <RiskGauge score={displayProfile.risk_score} band={displayProfile.band} label={displayProfile.label} />
 
             {/* Before the portfolio, not after it: if repayment beats investing,
                 the user should read that first, not as a footnote. */}
@@ -145,21 +145,21 @@ export default function ProfilePage() {
 
             {/* Summary card */}
             <div className="card" style={{
-              borderColor: withAlpha(riskBand(displayProfile.risk_score).color, 27),
+              borderColor: withAlpha(bandColor(displayProfile.band), 27),
               background: 'var(--bg-card)',
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
                 {/* Band colour as a dot only; the label stays --text (purple fails as text). */}
                 <span aria-hidden="true" style={{
                   width: 8, height: 8, borderRadius: '50%', flexShrink: 0,
-                  background: riskBand(displayProfile.risk_score).color,
+                  background: bandColor(displayProfile.band),
                 }} />
                 <span style={{
                   fontSize: 12, fontWeight: 700, letterSpacing: '0.08em',
                   color: 'var(--text)',
                   textTransform: 'uppercase',
                 }}>
-                  {t(riskBand(displayProfile.risk_score).label)} {t('profile.profileWord')}
+                  {displayProfile.label}
                 </span>
                 <span className="badge badge-amber">{displayProfile.risk_score}/10</span>
               </div>

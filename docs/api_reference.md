@@ -59,6 +59,7 @@ All endpoints except `/health` require Clerk JWT Bearer token in `Authorization`
 ```json
 {
   "risk_score": 5,
+  "band": "balanced",
   "label": "Dengeli",
   "summary": "Orta riskli, dengeli bir profil...",
   "answers": { "budget": 100000, "time_horizon": "medium", ... }

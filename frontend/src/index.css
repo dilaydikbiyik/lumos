@@ -28,6 +28,7 @@
   --accent:       #7C6FF7;
   --accent-2:     #5B8EF0;
   --accent-glow:  rgba(124,111,247,0.18);
+  --violet:       #9D4EDD;  /* aggressive risk band: fills/dots only, 4:1 on --bg-card */
 
   /* ── Semantic ── */
   --green:        #3DD68C;

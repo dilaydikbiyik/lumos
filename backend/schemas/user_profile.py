@@ -51,7 +51,8 @@ class RiskFactor(BaseModel):
 class RiskProfileResponse(BaseModel):
     """Computed risk profile returned to the client."""
     risk_score: float = Field(..., ge=1, le=10, description="Risk score from 1 (safe) to 10 (aggressive)")
-    label: str = Field(..., description="Human-readable label: Conservative / Moderate / Aggressive")
+    band: str = Field(..., description="Band key: conservative / balanced / growth / aggressive")
+    label: str = Field(..., description="Human-readable label for the band, in the reader's language")
     summary: str = Field(..., description="Brief explanation of the score")
     factors: list[RiskFactor] = Field(default_factory=list, description="Skorun şeffaf dökümü")
     answers: RiskProfileAnswers

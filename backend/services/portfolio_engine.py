@@ -56,6 +56,7 @@ from backend.i18n import t as _t
 from backend.schemas.portfolio import AssetAllocation, PortfolioRecommendResponse
 from backend.services.hybrid_basket import get_reit_assets, should_include_reits
 from backend.services.holdings_valuation import ticker_currency
+from backend.services.risk_engine import risk_band
 from backend.services.volatility import compute_volatility
 
 _ASSET_UNIVERSE_PATH = Path(__file__).parent.parent / "data" / "asset_universe.json"
@@ -546,6 +547,7 @@ def build_portfolio(risk_score: float, budget: float, market: str = "TR",
                 "alpha": round(alpha, 2),
                 "defensive_target_pct": round(defensive_target * 100, 1),
                 "growth_target_pct": round(growth_target * 100, 1),
+                "risk_band": risk_band(risk_score),
                 "formula": _t("formula.allocation", lang),
                 "position_cap": slot_cap,
                 "max_position_pct": round(weight_cap * 100, 1),

@@ -87,17 +87,11 @@
     "notANumber": "Please enter a number only (e.g. 250,000)."
   },
   "profile": {
-    "bands": {
-      "low": "Conservative",
-      "medium": "Balanced",
-      "high": "Aggressive"
-    },
     "step": "Step 3 / 3",
     "title": "Let's Get to Know You",
     "subtitle": "9 short questions. Your answers go straight into the score — nothing here is guessed, and every point is shown to you afterwards.",
     "readyTitle": "Your Risk Profile Is Ready",
     "readySubtitle": "Your answers are analysed — your personal portfolio is being computed.",
-    "profileWord": "Profile",
     "riskScoreCaption": "Your risk score",
     "budgetNote": "Your budget is <0>{{budget}}</0>. At this risk level, a sharp downturn could temporarily take your portfolio down about <1>{{pct}}%</1> to <2>{{worst}}</2>. That's a normal range for this profile — no loss is locked in unless you sell.",
     "whyTitle": "Where did this score come from?",

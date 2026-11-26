@@ -1,10 +1,9 @@
 import { useTranslation } from 'react-i18next'
-import { riskBand } from '../utils/riskBand'
+import { bandColor } from '../utils/riskBand'
 
 /* SVG arc gauge showing risk score 1-10, in the reader's number format (6,6 / 6.6). */
-export default function RiskGauge({ score = 5, label }) {
+export default function RiskGauge({ score = 5, band, label }) {
   const { t, i18n } = useTranslation()
-  const band = riskBand(score)
   const pct = (score - 1) / 9          // 0–1
   const angle = pct * 180              // 0–180 degrees arc
   const r = 70, cx = 100, cy = 90
@@ -18,7 +17,7 @@ export default function RiskGauge({ score = 5, label }) {
   const x2 = cx + r * Math.cos(endAngle)
   const y2 = cy + r * Math.sin(endAngle)
 
-  const color = band.color
+  const color = bandColor(band)
 
   return (
     <div className="card" style={{ textAlign: 'center' }}>
@@ -44,7 +43,7 @@ export default function RiskGauge({ score = 5, label }) {
         </text>
       </svg>
 
-      <h3 style={{ marginTop: -4 }}>{label || t(band.label)}</h3>
+      <h3 style={{ marginTop: -4 }}>{label}</h3>
       <p style={{ fontSize: 12, marginTop: 4 }}>{t('profile.riskScoreCaption')}</p>
     </div>
   )

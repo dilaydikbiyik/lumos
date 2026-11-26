@@ -87,17 +87,11 @@
     "notANumber": "Lütfen yalnızca bir sayı gir (ör. 250.000)."
   },
   "profile": {
-    "bands": {
-      "low": "Muhafazakâr",
-      "medium": "Dengeli",
-      "high": "Atılgan"
-    },
     "step": "Adım 3 / 3",
     "title": "Seni Tanıyalım",
     "subtitle": "9 kısa soru. Cevapların doğrudan skora giriyor — burada tahmin edilen hiçbir şey yok ve her puanı sonrasında sana gösteriyoruz.",
     "readyTitle": "Risk Profilin Hazır",
     "readySubtitle": "Cevapların analiz edildi — sana özel portföy hesaplanıyor.",
-    "profileWord": "Profil",
     "riskScoreCaption": "Risk skorun",
     "budgetNote": "Senin bütçen <0>{{budget}}</0>. Bu risk seviyesinde, sert bir düşüşte portföyün geçici olarak yaklaşık <1>%{{pct}}</1> gerileyip <2>{{worst}}</2>'ye inebilir. Bu, bu profil için normal bir dalgalanma aralığı — satmadığın sürece zarar kesinleşmez.",
     "whyTitle": "Bu skor nereden geldi?",

@@ -4,44 +4,43 @@ import i18n from 'i18next'
 import { initReactI18next } from 'react-i18next'
 import en from '../locales/en.json'
 import RiskGauge from '../components/RiskGauge'
-import { riskBand, RISK_BANDS } from './riskBand'
+import { bandColor, RISK_BAND_COLORS } from './riskBand'
 
-describe('riskBand', () => {
-  it('puts each score in the band the server label uses', () => {
-    expect(riskBand(1).key).toBe('low')
-    expect(riskBand(3).key).toBe('low')
-    expect(riskBand(3.4).key).toBe('medium')
-    expect(riskBand(6).key).toBe('medium')
-    expect(riskBand(6.1).key).toBe('high')
-    expect(riskBand(10).key).toBe('high')
+describe('bandColor', () => {
+  it('has a colour token for each of the server\'s four band keys', () => {
+    expect(Object.keys(RISK_BAND_COLORS).sort())
+      .toEqual(['aggressive', 'balanced', 'conservative', 'growth'])
+    for (const c of Object.values(RISK_BAND_COLORS)) expect(c).toMatch(/^var\(--/)
   })
 
-  it('gives every band a colour and a label key', () => {
-    for (const b of Object.values(RISK_BANDS)) {
-      expect(b.color).toMatch(/^var\(--/)
-      expect(b.label).toMatch(/^profile\.bands\./)
-    }
+  it('gives each band its own colour, none of them red', () => {
+    const colors = Object.values(RISK_BAND_COLORS)
+    expect(new Set(colors).size).toBe(colors.length)
+    expect(colors).not.toContain('var(--red)')
+  })
+
+  it('falls back to a neutral colour for a profile cached without a band', () => {
+    expect(bandColor(undefined)).toBe('var(--text-dim)')
   })
 })
 
-// The gauge and the Profile summary card once disagreed: the gauge rounded 3.4
-// to 3 (green, "low") while the card said "Balanced". The card reads riskBand()
-// directly; this checks the rendered gauge lands in the same band.
-describe('RiskGauge agrees with the summary card', () => {
+// The gauge once said "Growth-Focused" (server label) while the card under it
+// said "Aggressive" (a client copy of the cut-offs). Both now take the server's
+// band key and label; the gauge holds no threshold of its own.
+describe('RiskGauge follows the server band', () => {
   beforeAll(async () => {
     await i18n.use(initReactI18next).init({
       lng: 'en', resources: { en: { translation: en } }, interpolation: { escapeValue: false },
     })
   })
 
-  it.each([3.4, 3, 6, 6.6])('score %s', score => {
-    const band = riskBand(score)
-    const html = renderToStaticMarkup(<RiskGauge score={score} />)
-    expect(html).toContain(`stroke:${band.color}`)
+  it.each([
+    [3.4, 'balanced', 'Balanced'],
+    [7, 'growth', 'Growth-Focused'],
+  ])('score %s', (score, band, label) => {
+    const html = renderToStaticMarkup(<RiskGauge score={score} band={band} label={label} />)
+    expect(html).toContain(`stroke:${RISK_BAND_COLORS[band]}`)
     expect(html).toContain('fill:var(--text)')   // band colour is the arc only, never text
-    expect(html).toContain(`<h3 style="margin-top:-4px">${en.profile.bands[band.key]}</h3>`)
-    for (const other of Object.values(RISK_BANDS).filter(b => b !== band)) {
-      expect(html).not.toContain(other.color)
-    }
+    expect(html).toContain(`<h3 style="margin-top:-4px">${label}</h3>`)
   })
 })
