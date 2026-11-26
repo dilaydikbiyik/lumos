@@ -171,6 +171,7 @@ Contrast is computed from the tokens.
 | 3.13 | NewsDigest items: no `aria-expanded`; button contains `<p>`/`<div>`; chevron unlabeled. | Screen readers don't hear that an item opened. | `aria-expanded`, spans. | S | low | verified (code) |
 | 3.14 | Small text and targets: tip/headline counters at 10px (below `--t-micro`) plus a progress bar (the app's own rule is "a count, not a bar"); StocksLink `minHeight: 44`; details toggle 12–13px; BudgetSplit input has `className` twice. | Hard to read and hit. | `--t-micro`, 48px, drop the bars. | S | low | verified (code) |
 | 3.15 | Motion outside reduced motion: journey-card glow `pulse` loops, bar width transitions, news fade-in. | As 2.15. | Do with the animations task. | S | low | verified (code) |
+| 3.16 | Dashboard holdings mini-bar coloured by position (`colors[i]`): the second type was always REIT purple, so gold or a fund could read as "REIT", and a type's colour changed with the rest of the holdings. | Breaks the `palette.js` rule that one asset has one colour everywhere. | `holdingTypeColors()` in `palette.js`: holding type → allocation category colour, fixed colours for crypto/vehicle/other, ranked in a fixed order. Test: same type, same colour, any order. | S | medium | **fixed 2026-11-26** |
 
 **Fixed on sight in this batch** (Rules): text faded with `opacity` → `--text-muted`/`--text-dim` in
 ReadinessScore, PathSuggestion, PathInvitation, StocksLink, BudgetSplit, GoalPlanner, BehaviorMirror,

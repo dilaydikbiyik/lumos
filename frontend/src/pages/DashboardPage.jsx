@@ -25,6 +25,7 @@ import api, { setAuthToken } from '../utils/api'
 import { useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { percent } from '../utils/format'
+import { holdingTypeColors } from '../utils/palette'
 
 /** Progressive UI: minimal view for new users, deepens via "Show More" */
 function ProgressiveDetails({ holdingsSummary, portfolio }) {
@@ -233,17 +234,18 @@ export default function DashboardPage() {
             )}
 
             {/* Per-type allocation mini bar */}
-            {holdingsSummary.by_type && Object.keys(holdingsSummary.by_type).length > 0 && (
+            {holdingsSummary.by_type && Object.keys(holdingsSummary.by_type).length > 0 && (() => {
+              const typeColors = holdingTypeColors(Object.keys(holdingsSummary.by_type))
+              return (
               <div style={{ marginTop: 16 }}>
                 <div style={{ display: 'flex', gap: 4, height: 6, borderRadius: 6, overflow: 'hidden', marginBottom: 8 }}>
-                  {Object.entries(holdingsSummary.by_type).map(([type, val], i) => {
-                    const colors = ['#F5A524', '#7A4A93', '#1FB2A6', '#E8663F', '#9C5A34']
+                  {Object.entries(holdingsSummary.by_type).map(([type, val]) => {
                     const pct = holdingsSummary.total_current_value > 0
                       ? (Number(val) / holdingsSummary.total_current_value) * 100
                       : 0
                     return (
                       <div key={type} style={{
-                        width: `${pct}%`, background: colors[i % colors.length],
+                        width: `${pct}%`, background: typeColors[type],
                         borderRadius: 3, minWidth: pct > 0 ? 4 : 0,
                         transition: 'width 0.6s ease',
                       }} title={`${type}: ${percent(pct)}`} />
@@ -251,21 +253,21 @@ export default function DashboardPage() {
                   })}
                 </div>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px 12px' }}>
-                  {Object.entries(holdingsSummary.by_type).map(([type, val], i) => {
-                    const colors = ['#F5A524', '#7A4A93', '#1FB2A6', '#E8663F', '#9C5A34']
+                  {Object.entries(holdingsSummary.by_type).map(([type, val]) => {
                     const pct = holdingsSummary.total_current_value > 0
                       ? Math.round((Number(val) / holdingsSummary.total_current_value) * 100)
                       : 0
                     return (
                       <span key={type} style={{ fontSize: 11, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 4 }}>
-                        <span style={{ width: 7, height: 7, borderRadius: '50%', background: colors[i % colors.length], display: 'inline-block' }} />
+                        <span style={{ width: 7, height: 7, borderRadius: '50%', background: typeColors[type], display: 'inline-block' }} />
                         {t('holdings.types.' + type, { defaultValue: type })} {percent(pct)}
                       </span>
                     )
                   })}
                 </div>
               </div>
-            )}
+              )
+            })()}
 
             <button
               className="btn btn-ghost"

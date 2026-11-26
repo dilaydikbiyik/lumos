@@ -64,6 +64,38 @@ export function sliceColor(allocation, index = 0, allocations = null) {
   return CATEGORY_COLORS[allocation.category] || COLORS[index % COLORS.length]
 }
 
+// Holdings use their own type keys (backend/schemas/holding.py AssetType), not
+// allocation categories. Each type borrows the category it belongs to, so a
+// stock holding is the same ember as a stock slice. Types with no allocation
+// category get a fixed colour of their own: never a position-based one, or the
+// same type would change colour with whatever else the reader holds.
+const HOLDING_TYPE_CATEGORY = {
+  stock: 'stocks', fund: 'fund', etf: 'fund', gold: 'gold', cash: 'cash',
+  real_estate: 'reit', land: 'reit',
+}
+const HOLDING_ONLY_COLORS = {
+  crypto:  '#5B8EF0',  // accent blue
+  vehicle: '#C9A27E',  // sand
+  other:   '#8E90AC',  // muted
+}
+const HOLDING_TYPE_ORDER = ['stock', 'fund', 'etf', 'real_estate', 'land', 'vehicle', 'gold', 'crypto', 'cash', 'other']
+
+/**
+ * { asset_type: colour } for a holdings breakdown. Types are ranked in a fixed
+ * order before sibling shading, so the colours never depend on the order the
+ * server happened to return them in.
+ */
+export function holdingTypeColors(types = []) {
+  const rank = (t) => { const i = HOLDING_TYPE_ORDER.indexOf(t); return i < 0 ? Infinity : i }
+  const sorted = [...types].sort((a, b) => rank(a) - rank(b) || a.localeCompare(b))
+  const withCategory = sorted.filter((t) => HOLDING_TYPE_CATEGORY[t])
+  const shades = allocationColors(withCategory.map((t) => ({ category: HOLDING_TYPE_CATEGORY[t] })))
+  const out = {}
+  withCategory.forEach((t, i) => { out[t] = shades[i] })
+  for (const t of sorted) if (!out[t]) out[t] = HOLDING_ONLY_COLORS[t] ?? HOLDING_ONLY_COLORS.other
+  return out
+}
+
 // A colour at a given strength. Colours arrive as hex, hsl() (sibling shades) or
 // var(--token), so alpha can never be appended as hex digits (`${c}55`): that
 // silently yields invalid CSS for anything but #rrggbb. color-mix works for all.
