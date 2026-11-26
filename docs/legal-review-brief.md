@@ -97,6 +97,23 @@ will ask for each one.
    accurate but personal; "how portfolios are usually split" hides the
    personalisation. The wording waits for this answer
    (`docs/copy-decisions.md`, `disclaimerModal.doesBody`).
+   *Related — behavioural nudge (UI audit 3.12):* the dashboard's headline card
+   shows, after a "THE MARKET CRASHED" headline: "A drop stays a change in price
+   until you sell; selling is what makes it a fixed loss." It is worded as a fact,
+   not an instruction, but its effect is to discourage selling during a fall. Is
+   a general, non-personalised line like this acceptable, or does placing it
+   next to the reader's own portfolio make it a nudge that counts as advice
+   ("hold")? Same question for the panic overlay, which carries the same idea.
+   *Related — the "reality" lines above those cards (copy, decide later):*
+   - `headlines.headline-dolar.reality` ends "If your portfolio holds some, this
+     headline may be protecting you": one-sided again, directly above the
+     two-sided action line.
+   - Past-performance claims with no source: "historically … recovered"
+     (`headlines.headline-crash.reality`, `headline-crash-global.reality`,
+     `explainer.byCategory.stocks.risk`) and "the Turkish market has
+     historically beaten inflation" (`explainer.byTicker.XU100_IS.risk`).
+     Must such lines cite a source and period, carry a "past performance is
+     no guarantee" note, or be dropped?
 
 ### Ask about structure last, not first
 

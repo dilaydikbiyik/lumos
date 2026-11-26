@@ -478,22 +478,22 @@
     "headline-crash": {
       "headline": "📰 \"DER MARKT IST ABGESTÜRZT\"",
       "reality": "Der Index ist höchstwahrscheinlich 2–4 % gefallen. Historisch wurden solche Rückgänge meist innerhalb von Monaten aufgeholt. \"Absturz\" klingt gut in einer Schlagzeile und ist für Anleger normal.",
-      "action": "Bleib ruhig. Heute zu verkaufen macht aus dem Rückgang einen echten Verlust."
+      "action": "Ein Rückgang bleibt bis zum Verkauf eine Preisänderung; erst der Verkauf macht daraus einen festen Verlust."
     },
     "headline-crash-global": {
       "headline": "📰 \"EINE KRISE KOMMT\"",
       "reality": "Krisenprognosen gibt es in den Medien ständig — die meisten treten nie ein. Nach denen, die eintraten, haben sich die Märkte historisch erholt, was aber Jahre dauern kann.",
-      "action": "Bereite dich mit Streuung vor, nicht mit Panik."
+      "action": "Ein Schock, der eine Anlage hart trifft, trifft ein über mehrere Anlagen gestreutes Portfolio weniger."
     },
     "headline-gold": {
       "headline": "📰 \"GOLD AUF REKORDHOCH\"",
       "reality": "Steigendes Gold bedeutet meist, dass Unsicherheit im Spiel ist. Es heißt nicht, dass deine anderen Anlagen wertlos geworden sind — jede Anlage glänzt unter anderen Bedingungen.",
-      "action": "Sich auf eine einzige Anlage zu verlassen ist riskant. Balance zählt."
+      "action": "Ein Portfolio, das an einer Anlage hängt, steigt und fällt nur mit ihr; eine Mischung verteilt die Schwankungen."
     },
     "headline-dolar": {
       "headline": "📰 \"DER DOLLAR EXPLODIERT\"",
       "reality": "Wenn die Heimatwährung schwächer wird, steigt der lokale Wert von Fremdwährungsanlagen. Hält dein Portfolio welche, schützt dich diese Schlagzeile womöglich.",
-      "action": "Halte einige Fremdwährungsanlagen, um das Währungsrisiko auszugleichen."
+      "action": "Fremdwährungsanlagen federn eine schwächere Heimatwährung ab; wird sie stärker, sind sie in Heimatwährung weniger wert. Keine Aufteilung ist richtig oder falsch — gut zu wissen, welche du hast."
     }
   },
   "explore": {

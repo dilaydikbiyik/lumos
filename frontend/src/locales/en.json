@@ -790,22 +790,22 @@
     "headline-crash": {
       "headline": "📰 \"THE MARKET CRASHED\"",
       "reality": "The index most likely fell 2–4%. Historically such drops have usually been recovered within months. \"Crash\" is attractive for a headline and ordinary for an investor.",
-      "action": "Stay calm. Selling today turns the drop into a real loss."
+      "action": "A drop stays a change in price until you sell; selling is what makes it a fixed loss."
     },
     "headline-crash-global": {
       "headline": "📰 \"A CRISIS IS COMING\"",
       "reality": "Crisis predictions are constant in the media — most never arrive. After the ones that did, markets have historically recovered, though it can take years.",
-      "action": "Prepare with diversification, not with panic."
+      "action": "A shock that hits one asset hard hits a portfolio spread across several assets less."
     },
     "headline-gold": {
       "headline": "📰 \"GOLD HITS A RECORD\"",
       "reality": "Gold rising usually means uncertainty is around. It does not mean your other assets became worthless — different assets shine in different conditions.",
-      "action": "Depending on one asset is risky. Balance matters."
+      "action": "A portfolio tied to one asset rises and falls with that asset alone; a mix spreads the swings out."
     },
     "headline-dolar": {
       "headline": "📰 \"THE DOLLAR IS SURGING\"",
       "reality": "When the local currency weakens, the local value of FX-based assets rises. If your portfolio holds some, this headline may be protecting you.",
-      "action": "Hold some FX-based assets to balance currency risk."
+      "action": "FX-based assets soften the blow when the local currency weakens; when it strengthens, they are worth less in local terms. Neither split is right or wrong — it helps to know which one you have."
     }
   },
   "explore": {

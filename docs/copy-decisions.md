@@ -176,3 +176,15 @@ next with real money they still hold.
 - en: Your portfolio is split between {{currency}} and other currencies. When {{currency}} weakens, the foreign part cushions some of it; when it strengthens, that part is worth a little less in {{currency}}.
 - tr: Portföyün {{currency}} ile diğer para birimleri arasında bölünmüş. {{currency}} değer kaybettiğinde döviz kısmı bunun bir kısmını dengeler; değer kazandığında o kısım {{currency}} karşılığında biraz azalır.
 - de: Dein Portfolio verteilt sich auf {{currency}} und andere Währungen. Wird {{currency}} schwächer, federt der Fremdwährungsteil einen Teil davon ab; wird sie stärker, ist dieser Teil in {{currency}} etwas weniger wert.
+
+## 3.12 — Headline card `action` lines (applied 2026-11-26, owner approved)
+
+All four were imperatives ("Stay calm. Selling today…", "Prepare with diversification…",
+"Balance matters", "Hold some FX-based assets…"). Each is now a description of what happens,
+same idea, no instruction. en:
+- crash: A drop stays a change in price until you sell; selling is what makes it a fixed loss.
+- crash-global: A shock that hits one asset hard hits a portfolio spread across several assets less. ("Historically" dropped: no sourced claim.)
+- gold: A portfolio tied to one asset rises and falls with that asset alone; a mix spreads the swings out.
+- dolar: FX-based assets soften the blow when the local currency weakens; when it strengthens, they are worth less in local terms. Neither split is right or wrong — it helps to know which one you have. (Two-sided, like 6.4.)
+
+The crash line is also a behavioural nudge (it discourages selling); sent to legal review next to question 11.

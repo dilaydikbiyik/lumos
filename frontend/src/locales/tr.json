@@ -790,22 +790,22 @@
     "headline-crash": {
       "headline": "📰 \"BORSA ÇAKILDI\"",
       "reality": "Endeks büyük ihtimalle %2–4 düştü. Tarihsel olarak bu düşüşler çoğu zaman aylar içinde telafi edilir. \"Çakılmak\" manşet için cazip, yatırımcı için norm.",
-      "action": "Sakin kal. Bugün satmak, kaybı gerçeğe dönüştürür."
+      "action": "Düşüş, satana kadar bir fiyat değişimidir; kaybı kesinleştiren satıştır."
     },
     "headline-crash-global": {
       "headline": "📰 \"KRİZ GELİYOR\"",
       "reality": "Kriz öngörüleri medyada sürekli var — çoğu gerçekleşmez. Gerçekleşenlerin ardından piyasalar tarihsel olarak toparlanmıştır, ama bu birkaç yıl sürebilir.",
-      "action": "Panikle değil, çeşitlendirmeyle hazırlan."
+      "action": "Bir varlığı sert vuran bir sarsıntı, birkaç varlığa yayılmış bir portföyü daha az vurur."
     },
     "headline-gold": {
       "headline": "📰 \"ALTIN REKORA KOŞTU\"",
       "reality": "Altın yükselince genellikle belirsizlik var demektir. Bu, diğer varlıklarının değersizleştiği anlamına gelmez — her varlık farklı koşulda parlar.",
-      "action": "Tek varlığa bağlı kalmak risklidir. Denge önemli."
+      "action": "Tek varlığa bağlı bir portföy yalnızca onunla iner çıkar; karışık bir portföyde dalgalanmalar yayılır."
     },
     "headline-dolar": {
       "headline": "📰 \"DOLAR PATLIYOR\"",
       "reality": "Yerel para değer kaybedince döviz bazlı varlıkların yerel karşılığı yükselir. Portföyünde döviz bazlı varlık varsa bu manşet seni koruyabilir.",
-      "action": "Kur riski için portföyde döviz bazlı varlık tut."
+      "action": "Döviz bazlı varlıklar yerel para değer kaybettiğinde darbeyi yumuşatır; yerel para değer kazandığında ise yerel karşılıkları azalır. İki dağılımın da doğrusu ya da yanlışı yok; hangisine sahip olduğunu bilmek işe yarar."
     }
   },
   "explore": {
