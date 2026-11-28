@@ -34,7 +34,7 @@ Size = lines of JSX in the batch (a rough effort proxy).
 | 2 | Getting to know you + the app shell | `/path` (step 1), `/fear-check-in` (step 2), `/profile` risk quiz (step 3, chat + structured); shell first seen here: header, bottom nav / sidebar, market + language switchers, panic button, advisor chat, feedback | PathSelectionPage, FearCheckInPage, ProfilePage, ChatWindow, MessageBubble, StructuredQuiz, RiskGauge, DebtFirstCard · AppHeader, AppNav, MarketSwitcher, HeaderSelect, PanicButton, AdvisorChat, FeedbackButton, Section, Disclaimer | 1,890 | done 2026-11-26 |
 | 3 | Home | `/dashboard` (first tab, where a finished profile lands) | DashboardPage, ReadinessScore, PathSuggestion, PathInvitation, DailyTip, HeadlineEducation, NewsDigest, BudgetSplit, GoalPlanner, BehaviorMirror, PortfolioChart (minus AssetCard), PortfolioComparison, StocksLink | 1,730 | done 2026-11-26 |
 | 4 | Your portfolio plan | `/recommend` (allocation, why, what-if, practice), `/stocks` (asset classes) | RecommendPage, AllocationRationale, RoleAlternatives, AssetExplainer, ReitCard, ReferenceFacts, TimeMachine, AssetCharacter, IsikTut, FutureScenarios, WhatIfAssistant, PracticeMode, BoughtItBridge, BeginnerGuide, Glossary, RealEstatePathNotice · StocksPage, AssetClasses | 2,140 | audited 2026-11-26 (no fixes yet) |
-| 5 | Real estate | `/explore` (property vs portfolio, purchase checks, listing evaluation, population trend, ways into a home) | ExplorePage, PropertyVsPortfolio, PurchaseChecks, ListingEval, PopulationTrend, HomeRoutes | 1,390 | todo |
+| 5 | Real estate | `/explore` (property vs portfolio, purchase checks, listing evaluation, population trend, ways into a home) | ExplorePage, PropertyVsPortfolio, PurchaseChecks, ListingEval, PopulationTrend, HomeRoutes | 1,390 | audited 2026-11-28 (no fixes yet) |
 | 6 | What you own, account and plans | `/holdings` (record purchases, value, drift, currency); path switch + delete account (on `/profile`); `/plans` billing (Lemon Squeezy web / RevenueCat app); `/admin` (admin only, low priority) | HoldingsPage, FirstPurchaseEducation, PortfolioValueChart, DriftCard, CurrencyExposure · PathSwitcher, DeleteAccount, PlansPage · AdminPage, UserAccessPanel | 1,820 | done 2026-11-26 (`/admin` skipped) |
 
 Why this order: `homeRoute.js` sends a new reader `/` → `/path` → `/fear-check-in` → `/profile`
@@ -239,6 +239,46 @@ while it doesn't know, and a retry skips what was already saved.
 **Deferred AssetCard patterns in batch 4:** #5 focus / live region — tapping a slice opens AssetExplainer
 below without moving focus; tool results (time machine, scenarios, practice, what-if) appear silently.
 #8 jargon — "Risk 6.6/10", "defensive / growth target", "position cap", "stagnation".
+
+### Batch 5 — real estate (audited 2026-11-28)
+
+Read from code; `/explore` needs a signed-in account, so nothing was measured in the browser. Locale
+strings and backend rounding were read to confirm the number and wording findings. **No fixes yet**
+(same hold as batch 4).
+
+| # | Issue | Why it matters for a beginner | Fix | Effort | Sev | Evidence |
+|---|---|---|---|---|---|---|
+| 5.1 | **Area pickers only offer the table's visible rows.** `ListingEval` and `PropertyVsPortfolio` get `visible`: by default the top 5 areas ranked by real change, or whatever the search box matches. A reader whose city is not in the top 5 cannot evaluate their listing or compare their area unless they find "Show all". A search with no hits hides both cards entirely. | The listing check is the tool a reader uses with a real flat in hand, and it hides their city. The list it does show is a leaderboard, which nudges toward "the winners". | Pass every area (`all`), sorted by name in the reader's locale, not `visible`. | S | high | verified (code) |
+| 5.2 | **Rent-or-buy fields have no labels.** Down payment, rent, home price, income, loan rate and term are placeholder-only (no `<label>`, no `aria-label`). The placeholder disappears as soon as the reader types. | Six money fields that look the same once filled: a beginner can't tell rent from home price on a second look, and a screen reader announces "edit text". | Visible label above each field (keep the placeholder as an example). | S | high | verified (code) |
+| 5.3 | **Province scenario goes stale and fails together.** After the first result the "What if I had bought…" button is gone, so changing the amount at the top leaves the old band on screen with no way to recompute. The band and the listing links load in one `Promise.all`, so if only the links fail, the whole scenario shows "couldn't be calculated". | The reader sees money values for an amount that is no longer on screen, and an unrelated failure hides the answer. | Recompute when the amount changes (or keep a "Recalculate" button); load the links separately and let them fail quietly. | S | high | verified (code) |
+| 5.4 | The area table's error is text only ("try again shortly"), with no button. The EN text says "Province data" to US readers (their areas are states); `areaWord` variants exist for other strings but not this one. | A dead end on the page's first block, and a Turkish concept shown to US readers. | "Try again" that re-runs `load`; `explore.dataError_${areaWord}`. | S | medium | verified (code + strings) |
+| 5.5 | Typing income in rent-or-buy silently saves it to the profile (`PATCH /users/me/income`). The placeholder says only "optional — checks affordability". | Saving a money figure the reader did not knowingly hand over breaks trust, and the field never shows again afterwards. | Say so in the label ("we'll remember this for next time"), or ask before saving. | S | medium | verified (code + strings) |
+| 5.6 | Raw numbers: `vsCompare.realReturn` prints the server's 2-decimal value with a dot and no sign ("12.34% after inflation" in TR/DE); `population.workingAge` and the rent-or-buy assumptions/loan rate are raw too. | Wrong decimal mark in TR/DE, false precision, and a loss doesn't read as a loss. | `signedPercent()` / `percent()` with one decimal. | S | medium | verified (code + backend rounding) |
+| 5.7 | Unexplained terms: "10th percentile" in the worst-band label, "gross / net rental yield", "dividend yield", "nominal". The yield strip shows before the reader does anything. | The card meant to stop "rent is free money" uses the words a beginner doesn't know. | Işık Tut on each (once per page); "one of the worst windows" alone is enough without the percentile. | S | medium | verified (strings) |
+| 5.8 | The rent-or-buy assumptions are one ~110-word paragraph at 12px faded text, and it holds the numbers the verdict depends on (growth rates, fees, upkeep). | The verdict is read, the reasons behind it are not. | Short list under a "What we assumed" fold; the inflation/stale note stays visible. | S | medium | verified (code + strings) |
+| 5.9 | "Background" section is always rendered, but `PopulationTrend` returns nothing for the US (`population_source="none"`), so US readers open an empty section. | An empty drawer reads as broken (as 4.10). | Hide the section when the market has no population source. | S | medium | verified (code) |
+| 5.10 | No `role="alert"` on the scenario, rent-or-buy and listing-links errors (ListingEval and PropertyVsPortfolio have it); results appear with no live region. | Screen-reader users don't hear failures or answers. | `role="alert"`; `aria-live` on result blocks. | S | medium | verified (code) |
+| 5.11 | Listing links: the standalone form defaults to "land" (`arsa`) while the scenario defaults to "flat"; no loading state, button not disabled while fetching; the link buttons sit in one row without wrap, and German labels ("Inserate auf ImmobilienScout24 →") are long. | A home-seeker gets land-plot links by default; at 375px the buttons can clip. | Default to flat; disable while loading; `flexWrap: 'wrap'`. | S | medium | verified (defaults) / suspected (layout) |
+| 5.12 | Horizon buttons (1/3/5 years) have no `aria-pressed` (PropertyVsPortfolio's period buttons do); an opened ProvinceCard keeps `aria-expanded` with no role. | Screen readers can't tell which window is selected. | `aria-pressed`; drop `aria-expanded` once open, or move it to a real button. | S | low | verified (code) |
+| 5.13 | Dates shown as the server sends them: `typical.as_of`, `data_through`, `inflation_as_of` (also in the stale-inflation warning). | As 4.18. | Market date format. | S | low | suspected |
+| 5.14 | Rent-or-buy result is two columns at every width: at 375px each is ~135px with 17px bold totals. | Large lira totals may wrap mid-number. | One column below ~400px. | S | low | suspected (layout) |
+| 5.15 | Colours outside tokens: rank badge `rgba(74,222,128,…)` / `rgba(248,113,113,…)`; green fallbacks disagree (`#4ade80` vs `#3DD68C`). | Drifts from the palette. | `withAlpha(var(--green|--red))`; drop fallbacks. | S | low | verified (code) |
+
+**Fix on sight, not done this time** (held): text faded with `opacity` in all six components (ExplorePage
+most of all, also PropertyVsPortfolio, PurchaseChecks, ListingEval, PopulationTrend, HomeRoutes). No
+colour-plus-alpha strings found.
+
+**Checked and fine:** amounts use the market's formatter (no TL for Texas); area search folds case in the
+market's locale; ranks are only shown where areas are real alternatives (not Germany); the example amount
+starts at a typical home for the market; purchase checks, home routes and population data are fetched per
+market and hidden when absent; the scenario band is past windows with its honesty note; property vs
+portfolio is backward-looking and itemises the costs only property pays, with net (not gross) rent; the
+listing check refuses on index-only markets and keeps the caveat beside the verdict; rent-or-buy verdicts
+are worded "on these assumptions … looks about X better" and keep the emotional card; "I bought this" only
+prefills Holdings, it saves nothing.
+
+**Deferred AssetCard patterns in batch 5:** #5 — results (scenario band, rent-or-buy, comparison,
+listing check) appear below the form without moving focus. #8 — "real", "10th percentile", "yield".
 
 ### Batch 6 — what you own, account and plans (audited 2026-11-26, `/admin` skipped)
 
